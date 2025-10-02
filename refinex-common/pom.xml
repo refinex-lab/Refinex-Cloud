@@ -12,6 +12,7 @@
 
     <name>refinex-common</name>
     <description>Refinex Cloud Common</description>
+
     <modules>
         <module>refinex-common-core</module>
     </modules>

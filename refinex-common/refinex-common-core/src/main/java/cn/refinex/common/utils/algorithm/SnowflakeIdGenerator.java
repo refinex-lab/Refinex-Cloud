@@ -15,7 +15,7 @@ package cn.refinex.common.utils.algorithm;
  * - 支持时钟回拨容错策略（可配置）
  * - 更优雅的单例与线程安全处理
  *
- * @author JCodeNest
+ * @author Refinex
  * @since 1.0.0
  */
 public class SnowflakeIdGenerator {
