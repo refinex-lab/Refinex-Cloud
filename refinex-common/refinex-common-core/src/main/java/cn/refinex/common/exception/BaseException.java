@@ -1,7 +1,5 @@
 package cn.refinex.common.exception;
 
-import java.io.Serializable;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -9,8 +7,7 @@ import lombok.ToString;
 /**
  * 基础异常类
  * <p>
- * 统一定义微服务异常的基础结构与行为，作为所有自定义异常的父类。
- * 包含所属模块、错误码、错误信息与时间戳等核心属性，便于日志、监控与排障。
+ * 统一定义微服务异常的基础结构与行为，作为所有自定义异常的父类。 包含所属模块、错误码、错误信息与时间戳等核心属性，便于日志、监控与排障。
  * <p>
  * 错误码规范：
  * <ul>
@@ -27,7 +24,7 @@ import lombok.ToString;
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class BaseException extends RuntimeException implements Serializable {
+public class BaseException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
@@ -58,8 +55,8 @@ public class BaseException extends RuntimeException implements Serializable {
     /**
      * 构造方法
      *
-     * @param module       异常来源模块
-     * @param errorCode    标准化错误码
+     * @param module 异常来源模块
+     * @param errorCode 标准化错误码
      * @param errorMessage 错误信息
      */
     protected BaseException(String module, String errorCode, String errorMessage) {
@@ -73,10 +70,10 @@ public class BaseException extends RuntimeException implements Serializable {
     /**
      * 构造方法（带原始异常）
      *
-     * @param module       异常来源模块
-     * @param errorCode    标准化错误码
+     * @param module 异常来源模块
+     * @param errorCode 标准化错误码
      * @param errorMessage 错误信息
-     * @param cause        原始异常（可为 null）
+     * @param cause 原始异常（可为 null）
      */
     protected BaseException(String module, String errorCode, String errorMessage, Throwable cause) {
         super(errorMessage, cause);
@@ -89,10 +86,10 @@ public class BaseException extends RuntimeException implements Serializable {
     /**
      * 构造方法（自定义时间戳）
      *
-     * @param module       异常来源模块
-     * @param errorCode    标准化错误码
+     * @param module 异常来源模块
+     * @param errorCode 标准化错误码
      * @param errorMessage 错误信息
-     * @param timestamp    异常发生时间（epoch 毫秒）
+     * @param timestamp 异常发生时间（epoch 毫秒）
      */
     protected BaseException(String module, String errorCode, String errorMessage, long timestamp) {
         super(errorMessage);
@@ -105,13 +102,14 @@ public class BaseException extends RuntimeException implements Serializable {
     /**
      * 构造方法（自定义时间戳 + 原始异常）
      *
-     * @param module       异常来源模块
-     * @param errorCode    标准化错误码
+     * @param module 异常来源模块
+     * @param errorCode 标准化错误码
      * @param errorMessage 错误信息
-     * @param timestamp    异常发生时间（epoch 毫秒）
-     * @param cause        原始异常（可为 null）
+     * @param timestamp 异常发生时间（epoch 毫秒）
+     * @param cause 原始异常（可为 null）
      */
-    protected BaseException(String module, String errorCode, String errorMessage, long timestamp, Throwable cause) {
+    protected BaseException(String module, String errorCode, String errorMessage, long timestamp,
+            Throwable cause) {
         super(errorMessage, cause);
         this.module = module;
         this.errorCode = errorCode;

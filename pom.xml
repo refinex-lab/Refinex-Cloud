@@ -10,6 +10,7 @@
 
     <name>Refinex-Cloud</name>
     <url>https://github.com/refinex/Refinex-Cloud</url>
+
     <modules>
         <module>refinex-common</module>
     </modules>
@@ -25,6 +26,7 @@
         <spring-cloud-alibaba.version>2023.0.3.3</spring-cloud-alibaba.version>
         <spring-boot-admin.version>3.5.3</spring-boot-admin.version>
 
+        <satoken.version>1.44.0</satoken.version>
         <hutool.version>5.8.38</hutool.version>
         <lombok.version>1.18.40</lombok.version>
         <mapstruct-plus.version>1.5.0</mapstruct-plus.version>
@@ -59,6 +61,22 @@
                 <version>${spring-cloud-alibaba.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-jwt</artifactId>
+                <version>${satoken.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-core</artifactId>
+                <version>${satoken.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-spring-boot3-starter</artifactId>
+                <version>${satoken.version}</version>
             </dependency>
 
             <!-- hutool -->
