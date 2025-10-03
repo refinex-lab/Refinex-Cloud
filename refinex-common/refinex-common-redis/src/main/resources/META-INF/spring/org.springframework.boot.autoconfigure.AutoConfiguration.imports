@@ -1,0 +1,2 @@
+cn.refinex.common.redis.config.RefinexCacheAutoConfiguration
+cn.refinex.common.redis.config.RefinexRedisAutoConfiguration

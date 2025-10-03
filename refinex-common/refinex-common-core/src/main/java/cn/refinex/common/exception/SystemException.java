@@ -1,5 +1,6 @@
 package cn.refinex.common.exception;
 
+import cn.refinex.common.exception.code.ResultCode;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
@@ -63,5 +64,15 @@ public class SystemException extends BaseException {
      */
     public SystemException(String module, String errorCode, String errorMessage, long timestamp, Throwable cause) {
         super(module, errorCode, errorMessage, timestamp, cause);
+    }
+
+    /**
+     * 构造方法（使用 ResultCode 枚举）
+     *
+     * @param module     异常来源模块
+     * @param resultCode 枚举类型的错误码（包含错误码和错误信息）
+     */
+    public SystemException(String module, ResultCode resultCode) {
+        super(module, resultCode.getCode(), resultCode.getMessage());
     }
 }
