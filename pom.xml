@@ -20,7 +20,7 @@
     </modules>
 
     <properties>
-        <reversion>1.0.0</reversion>
+        <revision>1.0.0</revision>
 
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -37,6 +37,10 @@
         <mapstruct-plus.version>1.5.0</mapstruct-plus.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
         <commons-collections4.version>4.4</commons-collections4.version>
+        <commons-io.version>2.20.0</commons-io.version>
+        <tika-core.version>3.2.3</tika-core.version>
+        <springdoc.version>2.2.0</springdoc.version>
+        <easy-captcha.version>1.6.2</easy-captcha.version>
 
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
@@ -99,7 +103,17 @@
             </dependency>
             <dependency>
                 <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-redis-template</artifactId>
+                <version>${satoken.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-spring-boot3-starter</artifactId>
+                <version>${satoken.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-reactor-spring-boot3-starter</artifactId>
                 <version>${satoken.version}</version>
             </dependency>
 
@@ -124,6 +138,34 @@
                 <version>${commons-collections4.version}</version>
             </dependency>
 
+            <!-- Apache Commons IO -->
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+
+            <!-- Apache Tika核心库 -->
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-core</artifactId>
+                <version>${tika-core.version}</version>
+            </dependency>
+
+            <!-- 验证码生成库 https://github.com/ele-admin/EasyCaptcha -->
+            <dependency>
+                <groupId>com.github.whvcse</groupId>
+                <artifactId>easy-captcha</artifactId>
+                <version>${easy-captcha.version}</version>
+            </dependency>
+
+            <!-- SpringDoc OpenAPI -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+
             <!-- =================== 内部模块 =================== -->
             <dependency>
                 <groupId>cn.refinex</groupId>
@@ -134,6 +176,30 @@
             <dependency>
                 <groupId>cn.refinex</groupId>
                 <artifactId>refinex-common-redis</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.refinex</groupId>
+                <artifactId>refinex-common-jdbc</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.refinex</groupId>
+                <artifactId>refinex-common-security</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.refinex</groupId>
+                <artifactId>refinex-api-auth</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.refinex</groupId>
+                <artifactId>refinex-api-platform</artifactId>
                 <version>${revision}</version>
             </dependency>
         </dependencies>

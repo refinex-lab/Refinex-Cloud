@@ -1,0 +1,2 @@
+cn.refinex.common.security.config.SaTokenAutoConfiguration
+cn.refinex.common.security.config.FeignSecurityAutoConfiguration

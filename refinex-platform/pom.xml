@@ -43,6 +43,34 @@
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-core</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-security</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-jdbc</artifactId>
+        </dependency>
+
+        <!-- SpringDoc OpenAPI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
+
+        <!-- Feign Client -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
+        <!-- API Auth -->
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-api-auth</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

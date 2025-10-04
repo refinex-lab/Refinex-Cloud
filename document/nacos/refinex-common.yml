@@ -80,17 +80,48 @@ spring:
         validation-timeout: 5000
 
 # Sa-Token 相关配置
-satoken:
+sa-token:
   # token 名称 (同时也是 cookie 名称)
   token-name: Authorization
-  # 开启内网服务调用鉴权(不允许越过 Gateway 访问内网服务 保障服务安全)
-  check-same-token: true
-  # 是否允许同一账号并发登录(为 true 时允许一起登录, 为 false 时新登录挤掉旧登录)
+  # token 有效期（单位：秒）默认 30 天，-1 代表永久有效
+  timeout: 7200
+  # token 最低活跃频率（单位：秒），如果 token 超过此时间没有访问系统就会被冻结，默认 -1 代表不限制，永不冻结
+  active-timeout: 1800
+  # 是否允许同一账号并发登录（为 true 时允许一起登录，为 false 时新登录挤掉旧登录）
   is-concurrent: true
-  # 在多人登录同一账号时是否共用一个 token (为 true 时所有登录共用一个 token, 为 false 时每次登录新建一个 token)
+  # 在多人登录同一账号时是否共用一个 token（为 true 时所有登录共用一个 token，为 false 时每次登录新建一个 token）
   is-share: false
-  # jwt 秘钥
-  jwt-secret-key: abcdefghijklmnopqrstuvwxyz
+  # token 风格（可选值：uuid、simple-uuid、random-32、random-64、random-128、tik、jwt-simple）
+  token-style: jwt-simple
+  # 是否输出操作日志
+  is-log: false
+  # 开启内网服务调用鉴权（不允许越过 Gateway 访问内网服务，保障服务安全）
+  check-same-token: true
+  # jwt 秘钥（生产环境必须修改为强密钥，建议使用环境变量注入）
+  jwt-secret-key: ${JWT_SECRET_KEY:abcdefghijklmnopqrstuvwxyz1234567890}
+
+# Feign 配置
+feign:
+  client:
+    config:
+      default:
+        # 连接超时时间（毫秒）
+        connect-timeout: 5000
+        # 读取超时时间（毫秒）
+        read-timeout: 10000
+        # 日志级别
+        logger-level: basic
+  # 启用 Sentinel 熔断降级
+  sentinel:
+    enabled: false
+  # 启用压缩
+  compression:
+    request:
+      enabled: true
+      mime-types: text/xml,application/xml,application/json
+      min-request-size: 2048
+    response:
+      enabled: true
 
 # Logback 配置
 logging:

@@ -4,6 +4,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.Serial;
+
 /**
  * 基础异常类
  * <p>
@@ -26,6 +28,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class BaseException extends RuntimeException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // ============================== 属性定义 ===================================

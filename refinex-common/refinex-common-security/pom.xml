@@ -26,6 +26,11 @@
 
         <dependency>
             <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-redis-template</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.dev33</groupId>
             <artifactId>sa-token-spring-boot3-starter</artifactId>
         </dependency>
 
@@ -42,6 +47,18 @@
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-jdbc</artifactId>
+        </dependency>
+
+        <!-- OpenFeign (optional) -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>

@@ -15,5 +15,6 @@
 
     <modules>
         <module>refinex-api-platform</module>
+        <module>refinex-api-auth</module>
     </modules>
 </project>

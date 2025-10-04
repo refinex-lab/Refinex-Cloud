@@ -15,15 +15,20 @@ public final class ModuleConstants {
     /**
      * 公共模块
      */
-    public static final String MODULE_COMMON = "common";
+    public static final String MODULE_COMMON = "COMMON";
 
     /**
      * 知识库模块
      */
-    public static final String MODULE_KB = "kb";
+    public static final String MODULE_KB = "KB";
 
     /**
      * AI模块
      */
-    public static final String MODULE_AI = "ai";
+    public static final String MODULE_AI = "AI";
+
+    /**
+     * 安全模块
+     */
+    public static final String MODULE_SECURITY = "SECURITY";
 }

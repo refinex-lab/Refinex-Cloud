@@ -1,0 +1,38 @@
+# Refinex Gateway 服务配置
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        # 认证服务路由
+        - id: refinex-auth
+          uri: lb://refinex-auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=0
+
+        # 平台服务路由
+        - id: refinex-platform
+          uri: lb://refinex-platform
+          predicates:
+            - Path=/platform/**
+          filters:
+            - StripPrefix=0
+
+# 网关安全配置
+gateway:
+  security:
+    # 启用鉴权
+    enabled: true
+    # 启用日志
+    log-enabled: true
+    # 白名单路径（不需要认证）
+    whitelist-paths:
+      - /auth/login
+      - /auth/register
+      - /favicon.ico
+      - /actuator/**
+      - /doc.html
+      - /swagger-ui/**
+      - /v3/api-docs/**
