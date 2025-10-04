@@ -9,6 +9,7 @@ import cn.refinex.common.jdbc.callback.InputStreamCallback;
 import cn.refinex.common.jdbc.callback.TransactionCallback;
 import cn.refinex.common.jdbc.dialect.DatabaseDialect;
 import cn.refinex.common.jdbc.dialect.MySQLDialect;
+import cn.refinex.common.jdbc.enums.LogFormatType;
 import cn.refinex.common.jdbc.masker.SensitiveDataMasker;
 import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
@@ -97,7 +98,7 @@ public class JdbcTemplateManager {
      * 日志格式（text 或 json）
      */
     @Setter
-    private String logFormat = "text";
+    private String logFormat = LogFormatType.TEXT.getValue();
 
     /**
      * JSON 对象映射器
@@ -1535,9 +1536,9 @@ public class JdbcTemplateManager {
             log.warn("检测到慢查询: operation={}, sql={}, elapsedMs={}ms", operation, sql, elapsedMs);
         }
 
-        if ("json".equalsIgnoreCase(logFormat)) {
+        if (LogFormatType.JSON.getValue().equalsIgnoreCase(logFormat)) {
             logSqlAsJson(operation, sql, params, elapsedMs, rowsAffected, resultSize, exception);
-        } else {
+        } else if (LogFormatType.TEXT.getValue().equalsIgnoreCase(logFormat)) {
             logSqlAsText(operation, sql, params, elapsedMs, rowsAffected, resultSize, exception);
         }
     }
