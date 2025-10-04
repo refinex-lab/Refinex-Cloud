@@ -17,6 +17,7 @@
         <module>refinex-common-core</module>
         <module>refinex-common-security</module>
         <module>refinex-common-redis</module>
+        <module>refinex-common-jdbc</module>
     </modules>
 
 </project>
