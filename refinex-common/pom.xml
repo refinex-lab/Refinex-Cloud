@@ -18,6 +18,7 @@
         <module>refinex-common-security</module>
         <module>refinex-common-redis</module>
         <module>refinex-common-jdbc</module>
+        <module>refinex-common-json</module>
     </modules>
 
 </project>
