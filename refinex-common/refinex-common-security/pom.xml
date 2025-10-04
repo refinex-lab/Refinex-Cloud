@@ -38,5 +38,10 @@
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-redis</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-core</artifactId>
+        </dependency>
     </dependencies>
 </project>
