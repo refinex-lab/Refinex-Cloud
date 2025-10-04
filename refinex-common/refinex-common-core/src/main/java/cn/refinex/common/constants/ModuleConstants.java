@@ -16,4 +16,14 @@ public final class ModuleConstants {
      * 公共模块
      */
     public static final String MODULE_COMMON = "common";
+
+    /**
+     * 知识库模块
+     */
+    public static final String MODULE_KB = "kb";
+
+    /**
+     * AI模块
+     */
+    public static final String MODULE_AI = "ai";
 }
