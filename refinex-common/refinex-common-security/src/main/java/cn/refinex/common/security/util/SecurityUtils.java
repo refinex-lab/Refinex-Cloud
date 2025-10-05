@@ -4,6 +4,8 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.refinex.common.security.service.WhitelistService;
+import cn.refinex.common.utils.spring.SpringContextHolder;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -208,6 +210,209 @@ public final class SecurityUtils {
      */
     public static void renewTimeout() {
         StpUtil.renewTimeout(StpUtil.getTokenTimeout());
+    }
+
+    // ==================== 踢人下线相关方法 ====================
+
+    /**
+     * 踢人下线（根据用户 ID）
+     * <p>
+     * 说明：
+     * 1. 将指定用户的所有设备踢下线
+     * 2. 不会清除 Token 信息，而是标记为 "已被踢下线"
+     * 3. 后续访问会提示 "Token已被踢下线"
+     * 4. 白名单用户（管理员）不受影响
+     * </p>
+     *
+     * @param userId 用户 ID
+     * @throws cn.refinex.common.security.exception.WhitelistException 用户在白名单中时抛出
+     */
+    public static void kickout(Long userId) {
+        // 白名单检查
+        checkNotWhitelist(userId);
+        StpUtil.kickout(userId);
+    }
+
+    /**
+     * 踢人下线（根据用户 ID 和设备类型）
+     * <p>
+     * 说明：
+     * 1. 将指定用户的指定设备类型踢下线
+     * 2. 其他设备类型不受影响
+     * 3. 白名单用户（管理员）不受影响
+     * </p>
+     *
+     * @param userId     用户 ID
+     * @param deviceType 设备类型（如 "PC"、"APP"、"H5"）
+     * @throws cn.refinex.common.security.exception.WhitelistException 用户在白名单中时抛出
+     */
+    public static void kickout(Long userId, String deviceType) {
+        // 白名单检查
+        checkNotWhitelist(userId);
+        StpUtil.kickout(userId, deviceType);
+    }
+
+    /**
+     * 踢人下线（根据 Token 值）
+     * <p>
+     * 说明：
+     * 1. 将指定 Token 踢下线
+     * 2. 适用于精确控制某个会话
+     * </p>
+     *
+     * @param tokenValue Token 值
+     */
+    public static void kickoutByTokenValue(String tokenValue) {
+        StpUtil.kickoutByTokenValue(tokenValue);
+    }
+
+    // ==================== 账号封禁相关方法 ====================
+
+    /**
+     * 封禁账号
+     * <p>
+     * 说明：
+     * 1. 封禁指定账号，禁止其登录
+     * 2. 封禁期间，该账号无法通过任何方式登录
+     * 3. 封禁时间到期后自动解封
+     * 4. 白名单用户（管理员）不受影响
+     * </p>
+     *
+     * @param userId  用户 ID
+     * @param seconds 封禁时长（秒），-1 表示永久封禁
+     * @throws cn.refinex.common.security.exception.WhitelistException 用户在白名单中时抛出
+     */
+    public static void disable(Long userId, long seconds) {
+        // 白名单检查
+        checkNotWhitelist(userId);
+        StpUtil.disable(userId, seconds);
+    }
+
+    /**
+     * 分类封禁（封禁指定服务）
+     * <p>
+     * 说明：
+     * 1. 封禁指定账号的指定服务
+     * 2. 例如：封禁评论功能、封禁发帖功能
+     * 3. 其他服务不受影响
+     * 4. 白名单用户（管理员）不受影响
+     * </p>
+     *
+     * @param userId  用户 ID
+     * @param service 服务标识（如 "comment"、"post"）
+     * @param seconds 封禁时长（秒），-1 表示永久封禁
+     * @throws cn.refinex.common.security.exception.WhitelistException 用户在白名单中时抛出
+     */
+    public static void disable(Long userId, String service, long seconds) {
+        // 白名单检查
+        checkNotWhitelist(userId);
+        StpUtil.disable(userId, service, seconds);
+    }
+
+    /**
+     * 判断账号是否被封禁
+     *
+     * @param userId 用户 ID
+     * @return true=已被封禁，false=未被封禁
+     */
+    public static boolean isDisable(Long userId) {
+        return StpUtil.isDisable(userId);
+    }
+
+    /**
+     * 判断账号的指定服务是否被封禁
+     *
+     * @param userId  用户 ID
+     * @param service 服务标识
+     * @return true=已被封禁，false=未被封禁
+     */
+    public static boolean isDisable(Long userId, String service) {
+        return StpUtil.isDisable(userId, service);
+    }
+
+    /**
+     * 校验账号是否被封禁（如果被封禁则抛出异常）
+     *
+     * @param userId 用户 ID
+     * @throws cn.dev33.satoken.exception.DisableServiceException 账号被封禁时抛出
+     */
+    public static void checkDisable(Long userId) {
+        StpUtil.checkDisable(userId);
+    }
+
+    /**
+     * 校验账号的指定服务是否被封禁（如果被封禁则抛出异常）
+     *
+     * @param userId  用户 ID
+     * @param service 服务标识
+     * @throws cn.dev33.satoken.exception.DisableServiceException 服务被封禁时抛出
+     */
+    public static void checkDisable(Long userId, String service) {
+        StpUtil.checkDisable(userId, service);
+    }
+
+    /**
+     * 获取账号剩余封禁时间
+     *
+     * @param userId 用户 ID
+     * @return 剩余封禁时间（秒），-1=永久封禁，-2=未被封禁
+     */
+    public static long getDisableTime(Long userId) {
+        return StpUtil.getDisableTime(userId);
+    }
+
+    /**
+     * 获取账号指定服务的剩余封禁时间
+     *
+     * @param userId  用户 ID
+     * @param service 服务标识
+     * @return 剩余封禁时间（秒），-1=永久封禁，-2=未被封禁
+     */
+    public static long getDisableTime(Long userId, String service) {
+        return StpUtil.getDisableTime(userId, service);
+    }
+
+    /**
+     * 解封账号
+     *
+     * @param userId 用户 ID
+     */
+    public static void untieDisable(Long userId) {
+        StpUtil.untieDisable(userId);
+    }
+
+    /**
+     * 解封账号的指定服务
+     *
+     * @param userId  用户 ID
+     * @param service 服务标识
+     */
+    public static void untieDisable(Long userId, String service) {
+        StpUtil.untieDisable(userId, service);
+    }
+
+    // ==================== 白名单相关方法 ====================
+
+    /**
+     * 检查用户是否不在白名单中
+     * <p>
+     * 如果用户在白名单中（管理员），则抛出异常
+     * </p>
+     *
+     * @param userId 用户 ID
+     * @throws cn.refinex.common.security.exception.WhitelistException 用户在白名单中时抛出
+     */
+    private static void checkNotWhitelist(Long userId) {
+        try {
+            WhitelistService whitelistService = SpringContextHolder.getBean(WhitelistService.class);
+            whitelistService.checkNotWhitelist(userId);
+        } catch (Exception e) {
+            // 如果获取 WhitelistService 失败，记录日志但不阻止操作
+            // 这样可以避免在某些特殊场景下（如测试环境）因为 Bean 未初始化而导致功能不可用
+            if (e instanceof cn.refinex.common.security.exception.WhitelistException) {
+                throw e;
+            }
+        }
     }
 }
 

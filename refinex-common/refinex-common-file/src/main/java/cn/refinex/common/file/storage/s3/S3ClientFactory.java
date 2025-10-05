@@ -58,8 +58,8 @@ public class S3ClientFactory {
     private S3Client createClient(FileStorageConfig config) {
         try {
             // 1. 解密 access_key 和 secret_key
-            String accessKey = sensitiveDataService.queryAndDecrypt(config.getAccessKey());
-            String secretKey = sensitiveDataService.queryAndDecrypt(config.getSecretKey());
+            String accessKey = sensitiveDataService.queryAndDecrypt("sys_file_storage_config", config.getAccessKey(), "access_key");
+            String secretKey = sensitiveDataService.queryAndDecrypt("sys_file_storage_config", config.getSecretKey(), "secret_key");
 
             if (accessKey == null || secretKey == null) {
                 throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND, "存储配置密钥不存在，configId=" + config.getId());

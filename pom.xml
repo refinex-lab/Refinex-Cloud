@@ -46,6 +46,7 @@
         <jasypt.version>1.9.3</jasypt.version>
         <aws-sdk.version>2.28.22</aws-sdk.version>
         <thumbnailator.version>0.4.20</thumbnailator.version>
+        <yauaa.version>7.28.1</yauaa.version>
 
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
@@ -216,6 +217,13 @@
                 <version>${thumbnailator.version}</version>
             </dependency>
 
+            <!-- Yauaa（User-Agent 解析） -->
+            <dependency>
+                <groupId>nl.basjes.parse.useragent</groupId>
+                <artifactId>yauaa</artifactId>
+                <version>${yauaa.version}</version>
+            </dependency>
+
             <!-- =================== 内部模块 =================== -->
             <dependency>
                 <groupId>cn.refinex</groupId>
@@ -256,6 +264,12 @@
             <dependency>
                 <groupId>cn.refinex</groupId>
                 <artifactId>refinex-common-mail</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.refinex</groupId>
+                <artifactId>refinex-common-log</artifactId>
                 <version>${revision}</version>
             </dependency>
 

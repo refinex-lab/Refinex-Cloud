@@ -1,8 +1,8 @@
 package cn.refinex.common.security.core;
 
 import cn.dev33.satoken.stp.StpInterface;
-import cn.refinex.common.security.dao.PermissionDao;
-import cn.refinex.common.security.dao.RoleDao;
+import cn.refinex.common.security.repository.PermissionRepository;
+import cn.refinex.common.security.repository.RoleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,13 +24,13 @@ import java.util.List;
 @Component
 public class StpInterfaceImpl implements StpInterface {
 
-    private final PermissionDao permissionDao;
-    private final RoleDao roleDao;
+    private final PermissionRepository permissionRepository;
+    private final RoleRepository roleRepository;
 
     @Autowired
-    public StpInterfaceImpl(PermissionDao permissionDao, RoleDao roleDao) {
-        this.permissionDao = permissionDao;
-        this.roleDao = roleDao;
+    public StpInterfaceImpl(PermissionRepository permissionRepository, RoleRepository roleRepository) {
+        this.permissionRepository = permissionRepository;
+        this.roleRepository = roleRepository;
         log.info("初始化 Sa-Token 权限接口实现");
     }
 
@@ -57,7 +57,7 @@ public class StpInterfaceImpl implements StpInterface {
 
         try {
             Long userId = Long.valueOf(loginId.toString());
-            List<String> permissions = permissionDao.selectPermissionCodesByUserId(userId);
+            List<String> permissions = permissionRepository.selectPermissionCodesByUserId(userId);
             log.debug("查询用户权限成功，userId: {}, loginType: {}, permissions: {}", userId, loginType, permissions);
             return permissions;
         } catch (Exception e) {
@@ -90,7 +90,7 @@ public class StpInterfaceImpl implements StpInterface {
 
         try {
             Long userId = Long.valueOf(loginId.toString());
-            List<String> roles = roleDao.selectValidRoleCodesByUserId(userId);
+            List<String> roles = roleRepository.selectValidRoleCodesByUserId(userId);
             log.debug("查询用户角色成功，userId: {}, loginType: {}, roles: {}", userId, loginType, roles);
             return roles;
         } catch (Exception e) {

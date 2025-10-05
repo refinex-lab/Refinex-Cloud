@@ -105,20 +105,25 @@ public class SensitiveDataService {
      * @param rowGuid sys_sensitive 表的 row_guid
      * @return 明文值（如果不存在返回 null）
      */
-    public String queryAndDecrypt(String rowGuid) {
-        if (!StringUtils.hasText(rowGuid)) {
-            log.warn("rowGuid 为空，无法查询敏感数据");
-            return null;
-        }
+    public String queryAndDecrypt(String tableName, String rowGuid, String fieldCode) {
+        Assert.hasText(tableName, "tableName 不能为空");
+        Assert.hasText(rowGuid, "rowGuid 不能为空");
+        Assert.hasText(fieldCode, "fieldCode 不能为空");
 
         try {
             // 1. 从 sys_sensitive 表查询加密值
             String sql = """
                     SELECT encrypted_value FROM sys_sensitive
-                    WHERE row_guid = :rowGuid
+                    WHERE table_name = :tableName
+                      AND row_guid = :rowGuid
+                      AND field_code = :fieldCode
                     """;
 
-            Map<String, Object> params = Map.of("rowGuid", rowGuid);
+            Map<String, Object> params = Map.of(
+                    "tableName", tableName,
+                    "rowGuid", rowGuid,
+                    "fieldCode", fieldCode
+            );
             String encryptedValue = jdbcManager.queryString(sql, params, false);
 
             if (!StringUtils.hasText(encryptedValue)) {

@@ -61,7 +61,7 @@ CREATE TABLE `sys_sensitive`
 CREATE TABLE `sys_role`
 (
     `id`          BIGINT      NOT NULL COMMENT '主键ID',
-    `role_code`   VARCHAR(50) NOT NULL COMMENT '角色编码,如ROLE_USER,ROLE_VIP_MONTHLY',
+    `role_code`   VARCHAR(50) NOT NULL COMMENT '角色编码,如ROLE_ADMIN,ROLE_USER,ROLE_VIP_MONTHLY',
     `role_name`   VARCHAR(50) NOT NULL COMMENT '角色名称,如普通用户,月度会员',
     `role_type`   TINYINT     NOT NULL DEFAULT 0 COMMENT '角色类型:0前台角色,1后台角色',
     `role_scope`  VARCHAR(100)         DEFAULT NULL COMMENT '角色权限范围',
@@ -1282,27 +1282,6 @@ CREATE TABLE `sys_dict_data`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci COMMENT ='字典数据表-字典的具体数据项';
 
-CREATE TABLE `sys_encrypt_config`
-(
-    `id`                BIGINT      NOT NULL COMMENT '主键ID',
-    `table_name`        VARCHAR(64) NOT NULL COMMENT '表名',
-    `field_name`        VARCHAR(64) NOT NULL COMMENT '字段名',
-    `encrypt_algorithm` VARCHAR(20) NOT NULL DEFAULT 'AES256' COMMENT '加密算法',
-    `key_version`       INT         NOT NULL DEFAULT 1 COMMENT '密钥版本号',
-    `is_enabled`        TINYINT     NOT NULL DEFAULT 1 COMMENT '是否启用:0否,1是',
-    `create_by`         BIGINT               DEFAULT NULL COMMENT '创建人ID',
-    `create_time`       DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_by`         BIGINT               DEFAULT NULL COMMENT '更新人ID',
-    `update_time`       DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `deleted`           TINYINT     NOT NULL DEFAULT 0 COMMENT '逻辑删除标记:0未删除,1已删除',
-    `version`           INT         NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
-    `remark`            VARCHAR(500)         DEFAULT NULL COMMENT '备注说明',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uni_table_field` (`table_name`, `field_name`) COMMENT '表字段唯一索引'
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='字段加密配置表-配置需要加密的字段';
-
 CREATE TABLE `email_template`
 (
     `id`                BIGINT       NOT NULL COMMENT '主键ID',
@@ -1471,47 +1450,3 @@ CREATE TABLE `log_api`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci COMMENT ='API调用日志表-记录API调用情况';
-
-CREATE TABLE `sys_user_token`
-(
-    `id`               BIGINT       NOT NULL COMMENT '主键ID',
-    `user_id`          BIGINT       NOT NULL COMMENT '用户ID',
-    `token_value`      VARCHAR(500) NOT NULL COMMENT 'Token值',
-    `token_type`       VARCHAR(20)  NOT NULL COMMENT 'Token类型:ACCESS,REFRESH',
-    `device_type`      VARCHAR(20)  NOT NULL COMMENT '终端类型:WEB,IOS,ANDROID,H5',
-    `device_id`        VARCHAR(100)          DEFAULT NULL COMMENT '设备唯一标识',
-    `device_name`      VARCHAR(100)          DEFAULT NULL COMMENT '设备名称',
-    `login_ip`         VARCHAR(50)           DEFAULT NULL COMMENT '登录IP',
-    `login_location`   VARCHAR(100)          DEFAULT NULL COMMENT '登录地点',
-    `expire_time`      DATETIME     NOT NULL COMMENT '过期时间',
-    `last_access_time` DATETIME              DEFAULT NULL COMMENT '最后访问时间',
-    `access_count`     INT          NOT NULL DEFAULT 0 COMMENT '访问次数',
-    `create_time`      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uni_token` (`token_value`(255)) COMMENT 'Token唯一索引',
-    KEY `idx_user_device_type` (`user_id`, `device_type`, `token_type`) COMMENT '用户设备类型联合索引',
-    KEY `idx_expire` (`expire_time`) COMMENT '过期时间索引',
-    KEY `idx_last_access` (`last_access_time`) COMMENT '最后访问时间索引'
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='用户Token表-管理用户登录Token';
-
-CREATE TABLE `sys_refresh_token`
-(
-    `id`              BIGINT       NOT NULL COMMENT '主键ID',
-    `user_id`         BIGINT       NOT NULL COMMENT '用户ID',
-    `refresh_token`   VARCHAR(500) NOT NULL COMMENT '刷新令牌值',
-    `access_token_id` BIGINT       NOT NULL COMMENT '关联的访问令牌ID',
-    `device_type`     VARCHAR(20)  NOT NULL COMMENT '终端类型',
-    `device_id`       VARCHAR(100)          DEFAULT NULL COMMENT '设备唯一标识',
-    `expire_time`     DATETIME     NOT NULL COMMENT '过期时间',
-    `used_count`      INT          NOT NULL DEFAULT 0 COMMENT '使用次数',
-    `last_used_time`  DATETIME              DEFAULT NULL COMMENT '最后使用时间',
-    `create_time`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uni_refresh_token` (`refresh_token`(255)) COMMENT '刷新令牌唯一索引',
-    KEY `idx_user_device` (`user_id`, `device_type`) COMMENT '用户设备联合索引',
-    KEY `idx_expire` (`expire_time`) COMMENT '过期时间索引'
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='刷新令牌表-存储长期有效的刷新令牌';

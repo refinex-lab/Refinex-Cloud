@@ -39,5 +39,24 @@ public class LoginRequest {
      */
     @Schema(description = "验证码文本", example = "8u6h")
     private String captchaCode;
+
+    /**
+     * 设备类型（可选，前端传递）
+     * <p>
+     * 可选值：PC、APP、H5
+     * 如果不传，则通过 User-Agent 自动识别
+     * </p>
+     */
+    @Schema(description = "设备类型", example = "PC", allowableValues = {"PC", "APP", "H5"})
+    private String deviceType;
+
+    /**
+     * 是否记住我（默认 false）
+     * <p>
+     * true=长期有效（7天），false=短期有效（2小时）
+     * </p>
+     */
+    @Schema(description = "是否记住我", example = "false")
+    private Boolean rememberMe = false;
 }
 

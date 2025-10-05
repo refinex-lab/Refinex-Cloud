@@ -46,7 +46,7 @@ public class AuthController {
             HttpServletRequest httpRequest
     ) {
         String clientIp = ServletUtils.getClientIp(httpRequest);
-        LoginResponse response = authService.login(request, clientIp);
+        LoginResponse response = authService.login(request, clientIp, httpRequest);
         return ApiResult.success(response);
     }
 

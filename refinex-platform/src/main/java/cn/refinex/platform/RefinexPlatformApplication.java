@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
  */
 @EnableAsync
 @EnableDiscoveryClient
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "cn.refinex")
 @EnableFeignClients(basePackages = "cn.refinex")
 public class RefinexPlatformApplication {
 

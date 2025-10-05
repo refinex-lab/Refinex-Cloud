@@ -29,8 +29,10 @@ gateway:
     log-enabled: true
     # 白名单路径（不需要认证）
     whitelist-paths:
+      - /feign-api/**
       - /auth/login
       - /auth/register
+      - /captcha/generate
       - /favicon.ico
       - /actuator/**
       - /doc.html

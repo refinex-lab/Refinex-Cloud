@@ -1,4 +1,4 @@
-package cn.refinex.common.security.dao;
+package cn.refinex.common.security.repository;
 
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
 import cn.refinex.common.redis.RedisService;
@@ -22,7 +22,7 @@ import java.util.Map;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RoleDao {
+public class RoleRepository {
 
     private final JdbcTemplateManager jdbcManager;
     private final RedisService redisService;
