@@ -1,7 +1,6 @@
 package cn.refinex.auth.service;
 
 import cn.dev33.satoken.stp.StpUtil;
-import cn.refinex.api.auth.domain.dto.UserInfoDTO;
 import cn.refinex.auth.repository.SysUserRepository;
 import cn.refinex.auth.domain.dto.request.LoginRequest;
 import cn.refinex.auth.domain.dto.response.LoginResponse;
@@ -15,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * 认证服务
@@ -134,34 +132,6 @@ public class AuthService {
         log.info("Token 刷新成功，userId: {}", userId);
 
         return newToken;
-    }
-
-    /**
-     * 获取当前用户信息
-     *
-     * @return 用户信息
-     */
-    public UserInfoDTO getCurrentUserInfo() {
-        Long userId = SecurityUtils.getRequiredUserId();
-        log.debug("获取用户信息，userId: {}", userId);
-
-        // 从 Session 中获取用户基本信息
-        String username = SecurityUtils.getSessionValue("username");
-        String nickname = SecurityUtils.getSessionValue("nickname");
-        String avatar = SecurityUtils.getSessionValue("avatar");
-
-        // 从 Sa-Token 中获取用户权限和角色
-        List<String> permissions = StpUtil.getPermissionList();
-        List<String> roles = StpUtil.getRoleList();
-
-        return UserInfoDTO.builder()
-                .userId(userId)
-                .username(username)
-                .nickname(nickname)
-                .avatar(avatar)
-                .permissions(permissions)
-                .roles(roles)
-                .build();
     }
 
     /**

@@ -1,6 +1,6 @@
 package cn.refinex.auth.controller;
 
-import cn.refinex.api.auth.domain.dto.CaptchaGenerateResponse;
+import cn.refinex.auth.domain.dto.response.CaptchaGenerateResponse;
 import cn.refinex.auth.service.CaptchaService;
 import cn.refinex.common.domain.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;

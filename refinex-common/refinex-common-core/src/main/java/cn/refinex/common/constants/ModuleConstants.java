@@ -36,4 +36,9 @@ public final class ModuleConstants {
      * 安全模块
      */
     public static final String MODULE_SECURITY = "SECURITY";
+
+    /**
+     * 邮件模块
+     */
+    public static final String MODULE_MAIL = "MAIL";
 }

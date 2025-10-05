@@ -1,6 +1,6 @@
 package cn.refinex.auth.service;
 
-import cn.refinex.api.auth.domain.dto.CaptchaGenerateResponse;
+import cn.refinex.auth.domain.dto.response.CaptchaGenerateResponse;
 import cn.refinex.auth.enums.CaptchaTypeEnum;
 import cn.refinex.auth.properties.CaptchaProperties;
 import cn.refinex.common.constants.ModuleConstants;
