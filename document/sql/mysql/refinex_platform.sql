@@ -48,8 +48,7 @@ CREATE TABLE `sys_sensitive`
     `table_name`             VARCHAR(64) NOT NULL COMMENT '来源表名,如sys_user',
     `field_code`             VARCHAR(64) NOT NULL COMMENT '字段代码,如mobile或email',
     `encrypted_value`        TEXT        NOT NULL COMMENT '加密后的值,AES-256加密',
-    `encryption_algorithm`   VARCHAR(20) NOT NULL DEFAULT 'AES256' COMMENT '加密算法标识',
-    `encryption_key_version` INT         NOT NULL DEFAULT 1 COMMENT '密钥版本号,支持密钥轮换',
+    `encryption_algorithm`   VARCHAR(20) NOT NULL DEFAULT 'AES256-GCM' COMMENT '加密算法标识,默认AES256-GCM(带认证)',
     `create_time`            DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`            DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
@@ -1091,6 +1090,7 @@ CREATE TABLE `file_info`
     `bucket_name`       VARCHAR(100)          DEFAULT NULL COMMENT '存储桶名称',
     `access_url`        VARCHAR(1000)         DEFAULT NULL COMMENT '访问URL',
     `file_md5`          VARCHAR(64)           DEFAULT NULL COMMENT '文件MD5哈希值',
+    `thumbnail_file_id` BIGINT                DEFAULT NULL COMMENT '缩略图文件ID',
     `uploader_id`       BIGINT                DEFAULT NULL COMMENT '上传者ID',
     `biz_type`          VARCHAR(50)           DEFAULT NULL COMMENT '业务类型:AVATAR,COVER,DOCUMENT,BLOG_IMAGE,VIDEO',
     `biz_id`            BIGINT                DEFAULT NULL COMMENT '业务关联ID',
@@ -1108,7 +1108,12 @@ CREATE TABLE `file_info`
     UNIQUE KEY `uni_guid` (`file_guid`) COMMENT '文件唯一标识索引',
     KEY `idx_md5` (`file_md5`) COMMENT 'MD5索引',
     KEY `idx_uploader` (`uploader_id`) COMMENT '上传者索引',
-    KEY `idx_biz` (`biz_type`, `biz_id`) COMMENT '业务类型ID联合索引'
+    KEY `idx_biz` (`biz_type`, `biz_id`) COMMENT '业务类型ID联合索引',
+    KEY `idx_thumbnail` (`thumbnail_file_id`) COMMENT '缩略图索引',
+    KEY `idx_storage_strategy` (`storage_strategy`) COMMENT '存储策略索引',
+    KEY `idx_create_time` (`create_time`) COMMENT '创建时间索引',
+    KEY `idx_uploader_time` (`uploader_id`, `create_time`) COMMENT '上传者时间联合索引',
+    KEY `idx_biz_deleted` (`biz_type`, `biz_id`, `deleted`) COMMENT '业务关联删除状态联合索引'
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci COMMENT ='文件元数据表-统一的文件管理';
@@ -1177,7 +1182,7 @@ CREATE TABLE `file_storage_config`
     `remark`        VARCHAR(500)          DEFAULT NULL COMMENT '备注说明',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uni_code` (`config_code`) COMMENT '配置编码唯一索引',
-    KEY `idx_type_enabled` (`storage_type`, `is_enabled`) COMMENT '类型启用联合索引',
+    KEY `idx_type_enabled_priority` (`storage_type`, `is_enabled`, `priority`) COMMENT '类型启用优先级联合索引',
     KEY `idx_default` (`is_default`) COMMENT '默认配置索引'
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4

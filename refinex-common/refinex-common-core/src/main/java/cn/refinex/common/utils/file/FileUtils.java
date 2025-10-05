@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.tika.Tika;
+import org.springframework.util.Assert;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -623,6 +624,21 @@ public final class FileUtils {
             log.error("检测MIME类型失败: {}", filePath, e);
             return null;
         }
+    }
+
+    /**
+     * 根据文件名检测 MIME 类型
+     * <p>
+     * 使用 Apache Tika 进行检测，比基于扩展名的判断更准确。
+     * </p>
+     *
+     * @param fileName 文件名
+     * @return MIME类型，检测失败返回null
+     * @throws IllegalArgumentException 如果文件名为空
+     */
+    public static String getMimeTypeByFileName(String fileName) {
+        Assert.notNull(fileName, "文件名不能为null");
+        return TIKA.detect(fileName);
     }
 
     /**

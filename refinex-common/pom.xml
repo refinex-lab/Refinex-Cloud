@@ -19,6 +19,8 @@
         <module>refinex-common-redis</module>
         <module>refinex-common-jdbc</module>
         <module>refinex-common-json</module>
+        <module>refinex-common-mail</module>
+        <module>refinex-common-file</module>
     </modules>
 
 </project>

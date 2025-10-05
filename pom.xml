@@ -41,6 +41,11 @@
         <tika-core.version>3.2.3</tika-core.version>
         <springdoc.version>2.2.0</springdoc.version>
         <easy-captcha.version>1.6.2</easy-captcha.version>
+        <bcprov-jdk15to18.version>1.82</bcprov-jdk15to18.version>
+        <jasypt-spring-boot-starter.version>3.0.5</jasypt-spring-boot-starter.version>
+        <jasypt.version>1.9.3</jasypt.version>
+        <aws-sdk.version>2.28.22</aws-sdk.version>
+        <thumbnailator.version>0.4.20</thumbnailator.version>
 
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
@@ -159,11 +164,56 @@
                 <version>${easy-captcha.version}</version>
             </dependency>
 
+            <!-- Bouncy Castle: provider + PKIX (SM2/SM3/SM4 等) -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15to18</artifactId>
+                <version>${bcprov-jdk15to18.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk15to18</artifactId>
+                <version>${bcprov-jdk15to18.version}</version>
+            </dependency>
+
+            <!-- Jasypt Spring Boot starter -->
+            <dependency>
+                <groupId>com.github.ulisesbocchio</groupId>
+                <artifactId>jasypt-spring-boot-starter</artifactId>
+                <version>${jasypt-spring-boot-starter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jasypt</groupId>
+                <artifactId>jasypt</artifactId>
+                <version>${jasypt.version}</version>
+            </dependency>
+
             <!-- SpringDoc OpenAPI -->
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc.version}</version>
+            </dependency>
+
+            <!-- AWS SDK for Java 2.x - S3 -->
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>s3</artifactId>
+                <version>${aws-sdk.version}</version>
+            </dependency>
+
+            <!-- AWS SDK URL Connection Client -->
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>url-connection-client</artifactId>
+                <version>${aws-sdk.version}</version>
+            </dependency>
+
+            <!-- Thumbnailator（图片压缩） -->
+            <dependency>
+                <groupId>net.coobird</groupId>
+                <artifactId>thumbnailator</artifactId>
+                <version>${thumbnailator.version}</version>
             </dependency>
 
             <!-- =================== 内部模块 =================== -->
@@ -188,6 +238,24 @@
             <dependency>
                 <groupId>cn.refinex</groupId>
                 <artifactId>refinex-common-security</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.refinex</groupId>
+                <artifactId>refinex-common-json</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.refinex</groupId>
+                <artifactId>refinex-common-file</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.refinex</groupId>
+                <artifactId>refinex-common-mail</artifactId>
                 <version>${revision}</version>
             </dependency>
 

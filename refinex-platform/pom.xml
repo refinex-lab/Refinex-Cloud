@@ -66,10 +66,40 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
+        <!-- Common File -->
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-file</artifactId>
+        </dependency>
+
+        <!-- Common Mail -->
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-mail</artifactId>
+        </dependency>
+
+        <!-- Common Redis -->
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-redis</artifactId>
+        </dependency>
+
+        <!-- Common JSON -->
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-json</artifactId>
+        </dependency>
+
         <!-- API Auth -->
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-api-auth</artifactId>
+        </dependency>
+
+        <!-- API Platform -->
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-api-platform</artifactId>
         </dependency>
     </dependencies>
 
