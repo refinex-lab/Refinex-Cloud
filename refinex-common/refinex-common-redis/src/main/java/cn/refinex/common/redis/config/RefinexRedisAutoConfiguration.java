@@ -19,7 +19,7 @@ import java.util.Objects;
  * 基于 Redis 的自动配置类，优先于 {@link RedissonAutoConfigurationV2} 执行
  * copy from <a href="https://github.com/YunaiV/yudao-cloud/blob/master/yudao-framework/yudao-spring-boot-starter-redis/src/main/java/cn/iocoder/yudao/framework/redis/config/YudaoRedisAutoConfiguration.java">...</a>
  *
- * @author 艿芋
+ * @author 芋道源码
  * @since 1.0.0
  */
 @AutoConfiguration(before = RedissonAutoConfigurationV2.class)

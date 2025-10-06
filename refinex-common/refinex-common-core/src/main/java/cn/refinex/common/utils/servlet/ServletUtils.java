@@ -11,6 +11,9 @@ import jakarta.servlet.http.HttpSession;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -80,6 +83,21 @@ public final class ServletUtils {
      * 代理IP分隔符
      */
     private static final String IP_SEPARATOR = ",";
+
+    // ==================== 请求对象获取 ====================
+
+    /**
+     * 获取当前请求的 HttpServletRequest 对象
+     *
+     * @return 当前请求的 HttpServletRequest 对象
+     */
+    public static HttpServletRequest getRequest() {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (!(requestAttributes instanceof ServletRequestAttributes)) {
+            return null;
+        }
+        return ((ServletRequestAttributes) requestAttributes).getRequest();
+    }
 
     // ==================== 请求参数获取 ====================
 

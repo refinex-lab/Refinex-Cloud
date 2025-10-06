@@ -1,0 +1,2 @@
+cn.refinex.common.web.config.WebAutoConfiguration
+cn.refinex.common.xss.config.XssAutoConfiguration

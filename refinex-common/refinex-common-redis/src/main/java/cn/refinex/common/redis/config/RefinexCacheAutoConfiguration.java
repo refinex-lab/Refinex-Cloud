@@ -28,7 +28,7 @@ import java.util.Objects;
  * 配置 Redis 缓存，包括自定义过期时间的 RedisCacheManager 和 RedisCacheConfiguration。
  * </p>
  *
- * @author 艿芋
+ * @author 芋道源码
  * @author Refinex
  * @since 1.0.0
  */
