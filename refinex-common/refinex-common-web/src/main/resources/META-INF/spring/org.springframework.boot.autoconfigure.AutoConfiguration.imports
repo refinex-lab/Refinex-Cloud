@@ -1,2 +1,3 @@
 cn.refinex.common.web.config.WebAutoConfiguration
 cn.refinex.common.xss.config.XssAutoConfiguration
+cn.refinex.common.swagger.config.SwaggerAutoConfiguration

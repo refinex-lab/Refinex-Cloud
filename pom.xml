@@ -48,6 +48,7 @@
         <thumbnailator.version>0.4.20</thumbnailator.version>
         <yauaa.version>7.28.1</yauaa.version>
         <jsoup.version>1.21.2</jsoup.version>
+        <knife4j.version>4.4.0</knife4j.version>
 
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
@@ -195,6 +196,17 @@
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
                 <version>${springdoc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+                <version>${knife4j.version}</version>
+            </dependency>
+            <!-- https://doc.xiaominfo.com/docs/changelog/x/4.1#spring-cloud-gateway%E7%BD%91%E5%85%B3%E8%81%9A%E5%90%88%E7%BB%84%E4%BB%B6%E5%8D%87%E7%BA%A7 -->
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-gateway-spring-boot-starter</artifactId>
+                <version>${knife4j.version}</version>
             </dependency>
 
             <!-- AWS SDK for Java 2.x - S3 -->

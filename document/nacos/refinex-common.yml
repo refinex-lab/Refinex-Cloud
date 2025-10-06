@@ -211,6 +211,28 @@ refinex:
     exclude-paths:
       # 不处理 Actuator 的请求
       - ${management.endpoints.web.base-path}/**
+
+  # Swagger 配置
+  swagger:
+    # 是否开启 Swagger
+    enabled: true
+    # 标题
+    title: Refinex API Doc
+    # 描述
+    description: Refinex API Doc
+    # 版本
+    version: 1.0.0
+    # 联系人名称
+    contact-name: Refinex
+    # 联系人邮箱
+    contact-email: refinex@gmail.com
+    # 联系人 URL
+    contact-url: https://refinex.cn
+    # 许可证
+    license: Apache 2.0
+    # 许可证 URL
+    license-url: https://www.apache.org/licenses/LICENSE-2.0.html
+
   # 文件存储配置
   file:
     # 是否启用文件存储模块

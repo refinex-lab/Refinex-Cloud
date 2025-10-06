@@ -38,3 +38,14 @@ gateway:
       - /doc.html
       - /swagger-ui/**
       - /v3/api-docs/**
+
+# # Gateway 聚合 Swagger 文档
+knife4j:
+  gateway:
+    enable: true
+    # 指定服务发现的模式聚合微服务文档，并且是默认`default`分组
+    strategy: discover
+    discover:
+      enable: true
+      # 指定版本号(Swagger2|OpenAPI3)
+      version : openapi3
