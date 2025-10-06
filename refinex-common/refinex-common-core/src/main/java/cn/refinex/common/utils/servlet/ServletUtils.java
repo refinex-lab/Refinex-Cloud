@@ -572,6 +572,19 @@ public final class ServletUtils {
     // ==================== 客户端IP获取 ====================
 
     /**
+     * 获取当前请求的客户端IP地址
+     * <p>
+     * 调用{@link #getClientIp(HttpServletRequest)}方法，传入当前请求对象。
+     * </p>
+     *
+     * @return 客户端IP地址
+     * @throws IllegalArgumentException 如果当前请求对象为null
+     */
+    public static String getClientIp() {
+        return getClientIp(getRequest());
+    }
+
+    /**
      * 获取客户端真实IP地址
      * <p>
      * 支持通过代理服务器和负载均衡器获取真实IP。

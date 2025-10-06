@@ -22,6 +22,7 @@
         <module>refinex-common-mail</module>
         <module>refinex-common-file</module>
         <module>refinex-common-web</module>
+        <module>refinex-common-protection</module>
     </modules>
 
 </project>

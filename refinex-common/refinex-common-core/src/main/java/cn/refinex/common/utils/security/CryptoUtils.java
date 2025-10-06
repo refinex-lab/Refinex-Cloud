@@ -269,12 +269,15 @@ public final class CryptoUtils {
      *
      * @param input 待计算数据
      * @return MD5 Hex 表示（小写）
-     * @throws NoSuchAlgorithmException 若不支持 MD5 算法
      */
-    public static String md5Hex(final String input) throws NoSuchAlgorithmException {
-        final MessageDigest md = MessageDigest.getInstance("MD5");
-        final byte[] digest = md.digest(input.getBytes(StandardCharsets.UTF_8));
-        return Hex.toHexString(digest);
+    public static String md5Hex(final String input) {
+        try {
+            final MessageDigest md = MessageDigest.getInstance("MD5");
+            final byte[] digest = md.digest(input.getBytes(StandardCharsets.UTF_8));
+            return Hex.toHexString(digest);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException("不支持 MD5 算法", e);
+        }
     }
 
     /**
