@@ -19,6 +19,7 @@ public enum ResultCode implements ErrorCode {
     UNAUTHORIZED("401", "未认证或已过期"),
     FORBIDDEN("403", "没有相关权限"),
     NOT_FOUND("404", "资源不存在"),
+    METHOD_NOT_ALLOWED("405", "请求方法错误"),
     INTERNAL_ERROR("500", "系统内部异常");
 
     private final String code;
