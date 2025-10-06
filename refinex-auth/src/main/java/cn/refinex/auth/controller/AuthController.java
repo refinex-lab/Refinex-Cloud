@@ -6,7 +6,10 @@ import cn.refinex.auth.domain.dto.response.LoginResponse;
 import cn.refinex.auth.service.AuthService;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.utils.servlet.ServletUtils;
+import cn.refinex.platform.client.user.UserClient;
+import cn.refinex.platform.client.user.dto.request.CreateUserRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -31,6 +34,14 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserClient userClient;
+
+    @PostMapping("/register")
+    @Operation(summary = "注册用户", description = "根据创建用户请求参数注册用户")
+    @Parameter(name = "request", description = "创建用户请求参数", required = true)
+    ApiResult<Boolean> registerUser(CreateUserRequest request) {
+        return userClient.registerUser(request);
+    }
 
     /**
      * 用户登录

@@ -18,6 +18,11 @@ public final class ModuleConstants {
     public static final String MODULE_COMMON = "COMMON";
 
     /**
+     * 平台模块
+     */
+    public static final String PLATFORM = "PLATFORM";
+
+    /**
      * 文件模块
      */
     public static final String MODULE_FILE = "FILE";

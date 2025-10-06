@@ -285,7 +285,7 @@ public class SensitiveDataService {
      * @param plainValue 明文
      * @return Base64 编码的密文（包含 IV）
      */
-    private String encryptValue(String plainValue) throws GeneralSecurityException {
+    public String encryptValue(String plainValue) throws GeneralSecurityException {
         byte[] keyBytes = getAesKeyBytes();
         byte[] plainBytes = plainValue.getBytes(StandardCharsets.UTF_8);
 
@@ -299,7 +299,7 @@ public class SensitiveDataService {
      * @param encryptedValue Base64 编码的密文（包含 IV）
      * @return 明文
      */
-    private String decryptValue(String encryptedValue) throws GeneralSecurityException {
+    public String decryptValue(String encryptedValue) throws GeneralSecurityException {
         byte[] keyBytes = getAesKeyBytes();
 
         // 使用 CryptoUtils 的 AES-GCM 解密（无 AAD）
