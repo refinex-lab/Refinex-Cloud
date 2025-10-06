@@ -5,8 +5,8 @@ import cn.refinex.common.jdbc.service.SensitiveDataService;
 import cn.refinex.common.mail.service.EmailSendService;
 import cn.refinex.common.utils.Fn;
 import cn.refinex.common.utils.regex.RegexUtils;
-import cn.refinex.platform.domain.entity.SysUser;
-import cn.refinex.platform.repository.UserRepository;
+import cn.refinex.platform.domain.entity.sys.SysUser;
+import cn.refinex.platform.repository.sys.SysUserRepository;
 import cn.refinex.platform.util.UserContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserNotificationService {
 
-    private final UserRepository userRepository;
+    private final SysUserRepository sysUserRepository;
     private final SensitiveDataService sensitiveDataService;
     private final EmailSendService emailSendService;
 
@@ -56,7 +56,7 @@ public class UserNotificationService {
             }
 
             // 2. 获取用户信息
-            SysUser user = userRepository.selectById(userId);
+            SysUser user = sysUserRepository.selectById(userId);
             if (user == null) {
                 log.warn("用户不存在，跳过发送通知，userId: {}", userId);
                 return;
@@ -103,7 +103,7 @@ public class UserNotificationService {
             }
 
             // 2. 获取用户信息
-            SysUser user = userRepository.selectById(userId);
+            SysUser user = sysUserRepository.selectById(userId);
             if (user == null) {
                 log.warn("用户不存在，跳过发送通知，userId: {}", userId);
                 return;
@@ -161,7 +161,7 @@ public class UserNotificationService {
             }
 
             // 2. 获取用户信息
-            SysUser user = userRepository.selectById(userId);
+            SysUser user = sysUserRepository.selectById(userId);
             if (user == null) {
                 log.warn("用户不存在，跳过发送通知，userId: {}", userId);
                 return;

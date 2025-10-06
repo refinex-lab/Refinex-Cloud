@@ -1,7 +1,7 @@
-package cn.refinex.platform.repository;
+package cn.refinex.platform.repository.sys;
 
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
-import cn.refinex.platform.domain.entity.SysUser;
+import cn.refinex.platform.domain.entity.sys.SysUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -17,7 +17,7 @@ import java.util.Map;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class UserRepository {
+public class SysUserRepository {
 
     private final JdbcTemplateManager jdbcManager;
 
