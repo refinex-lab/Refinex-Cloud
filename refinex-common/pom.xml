@@ -21,7 +21,6 @@
         <module>refinex-common-json</module>
         <module>refinex-common-mail</module>
         <module>refinex-common-file</module>
-        <module>refinex-common-log</module>
         <module>refinex-common-web</module>
     </modules>
 

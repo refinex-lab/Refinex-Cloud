@@ -1,3 +1,5 @@
 cn.refinex.common.web.config.WebAutoConfiguration
 cn.refinex.common.xss.config.XssAutoConfiguration
 cn.refinex.common.swagger.config.SwaggerAutoConfiguration
+cn.refinex.common.apilog.config.LogOperationAutoConfiguration
+cn.refinex.common.apilog.config.LogOperationClientAutoConfiguration

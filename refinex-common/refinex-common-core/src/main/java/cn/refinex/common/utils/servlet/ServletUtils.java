@@ -1,6 +1,7 @@
 package cn.refinex.common.utils.servlet;
 
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.hutool.json.JSONUtil;
@@ -253,9 +254,6 @@ public final class ServletUtils {
 
     /**
      * 获取所有请求参数（扁平化）
-     * <p>
-     * 如果参数有多个值，只取第一个值。
-     * </p>
      *
      * @param request HttpServletRequest对象
      * @return 参数Map，键为参数名，值为参数值
@@ -268,7 +266,7 @@ public final class ServletUtils {
 
         paramMap.forEach((key, values) -> {
             if (values != null && values.length > 0 && StrUtil.isNotBlank(values[0])) {
-                result.put(key, values[0].trim());
+                result.put(key, ArrayUtil.join(values, StrUtil.COMMA));
             }
         });
 

@@ -25,6 +25,9 @@ import java.time.LocalDateTime;
 @Schema(description = "操作日志实体")
 public class LogOperation {
 
+    public static final Integer REQUEST_PARAM_MAX_LENGTH = 8000;
+    public static final Integer RESPONSE_RESULT_MAX_LENGTH = 8000;
+
     @Schema(description = "主键ID", example = "1")
     private Long id;
 
@@ -33,6 +36,9 @@ public class LogOperation {
 
     @Schema(description = "操作人用户名", example = "admin")
     private String username;
+
+    @Schema(description = "应用名称", example = "refinex-platform")
+    private String applicationName;
 
     @Schema(description = "操作模块", example = "用户管理")
     private String operationModule;
@@ -51,6 +57,9 @@ public class LogOperation {
 
     @Schema(description = "请求参数（JSON格式）")
     private String requestParams;
+
+    @Schema(description = "请求体（JSON格式）")
+    private String requestBody;
 
     @Schema(description = "响应结果（JSON格式）")
     private String responseResult;

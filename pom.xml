@@ -289,7 +289,7 @@
 
             <dependency>
                 <groupId>cn.refinex</groupId>
-                <artifactId>refinex-common-log</artifactId>
+                <artifactId>refinex-common-web</artifactId>
                 <version>${revision}</version>
             </dependency>
 
