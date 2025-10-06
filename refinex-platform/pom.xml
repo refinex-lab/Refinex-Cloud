@@ -54,6 +54,11 @@
             <artifactId>refinex-common-jdbc</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-web</artifactId>
+        </dependency>
+
         <!-- SpringDoc OpenAPI -->
         <dependency>
             <groupId>org.springdoc</groupId>
