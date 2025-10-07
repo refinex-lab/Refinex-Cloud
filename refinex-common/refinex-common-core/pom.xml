@@ -103,5 +103,10 @@
             <artifactId>yauaa</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-protection</artifactId>
+        </dependency>
+
     </dependencies>
 </project>

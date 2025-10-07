@@ -349,6 +349,12 @@
 
             <dependency>
                 <groupId>cn.refinex</groupId>
+                <artifactId>refinex-common-protection</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.refinex</groupId>
                 <artifactId>refinex-common-test</artifactId>
                 <version>${revision}</version>
             </dependency>

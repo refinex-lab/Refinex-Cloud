@@ -5,6 +5,8 @@ import cn.refinex.auth.domain.dto.request.LoginRequest;
 import cn.refinex.auth.domain.dto.response.LoginResponse;
 import cn.refinex.auth.service.AuthService;
 import cn.refinex.common.domain.ApiResult;
+import cn.refinex.common.protection.ratelimiter.core.annotation.RateLimiter;
+import cn.refinex.common.protection.ratelimiter.core.keyresolver.impl.ClientIpRateLimiterKeyResolver;
 import cn.refinex.common.utils.servlet.ServletUtils;
 import cn.refinex.platform.client.user.UserClient;
 import cn.refinex.platform.client.user.dto.request.CreateUserRequest;
@@ -16,6 +18,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 认证控制器
@@ -39,6 +43,7 @@ public class AuthController {
     @PostMapping("/register")
     @Operation(summary = "注册用户", description = "根据创建用户请求参数注册用户")
     @Parameter(name = "request", description = "创建用户请求参数", required = true)
+    @RateLimiter(time = 10, timeUnit = TimeUnit.MINUTES, count = 5, keyResolver = ClientIpRateLimiterKeyResolver.class)
     ApiResult<Boolean> registerUser(CreateUserRequest request) {
         return userClient.registerUser(request);
     }
