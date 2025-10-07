@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cn.refinex</groupId>
+    <artifactId>refinex-common</artifactId>
+    <version>1.0.0</version>
+  </parent>
+  <groupId>cn.refinex</groupId>
+  <artifactId>refinex-common-mail</artifactId>
+  <version>1.0.0</version>
+  <name>refinex-common-mail</name>
+  <description>Refinex Cloud Common Mail</description>
+  <dependencies>
+    <dependency>
+      <groupId>cn.refinex</groupId>
+      <artifactId>refinex-common-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cn.refinex</groupId>
+      <artifactId>refinex-common-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cn.refinex</groupId>
+      <artifactId>refinex-common-redis</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cn.refinex</groupId>
+      <artifactId>refinex-common-json</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-mail</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-autoconfigure</artifactId>
+    </dependency>
+  </dependencies>
+</project>
