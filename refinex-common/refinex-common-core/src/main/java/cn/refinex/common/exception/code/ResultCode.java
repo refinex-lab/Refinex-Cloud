@@ -21,6 +21,7 @@ public enum ResultCode implements ErrorCode {
     NOT_FOUND("404", "资源不存在"),
     METHOD_NOT_ALLOWED("405", "请求方法错误"),
     TOO_MANY_REQUESTS("429", "请求过于频繁，请稍后重试"),
+    REPEATED_REQUESTS("409", "存在重复请求"),
     INTERNAL_ERROR("500", "系统内部异常");
 
     private final String code;

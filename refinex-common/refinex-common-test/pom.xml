@@ -7,11 +7,11 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>refinex-common-protection</artifactId>
+    <artifactId>refinex-common-test</artifactId>
     <packaging>jar</packaging>
 
-    <name>refinex-common-protection</name>
-    <description>Refinex Common Protection</description>
+    <name>refinex-common-test</name>
+    <description>Refinex Common Test</description>
 
     <dependencies>
         <dependency>
@@ -26,18 +26,32 @@
 
         <dependency>
             <groupId>cn.refinex</groupId>
-            <artifactId>refinex-common-web</artifactId>
+            <artifactId>refinex-common-jdbc</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
-            <optional>true</optional>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>cn.refinex</groupId>
-            <artifactId>refinex-common-test</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.fppt</groupId>
+            <artifactId>jedis-mock</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.co.jemos.podam</groupId>
+            <artifactId>podam</artifactId>
         </dependency>
     </dependencies>
 </project>

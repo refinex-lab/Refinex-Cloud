@@ -50,6 +50,9 @@
         <yauaa.version>7.28.1</yauaa.version>
         <jsoup.version>1.21.2</jsoup.version>
         <knife4j.version>4.4.0</knife4j.version>
+        <podam.version>8.0.2.RELEASE</podam.version>
+        <jedis-mock.version>1.1.4</jedis-mock.version>
+        <mockito-inline.version>5.2.0</mockito-inline.version>
 
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
@@ -257,6 +260,44 @@
                 <version>${jsoup.version}</version>
             </dependency>
 
+            <!-- 单元测试 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <version>${spring-boot.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>asm</artifactId>
+                        <groupId>org.ow2.asm</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.mockito</groupId>
+                        <artifactId>mockito-core</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- 支持 Mockito 的 final 类与 static 方法的 mock -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-inline</artifactId>
+                <version>${mockito-inline.version}</version>
+            </dependency>
+
+            <!-- 单元测试，采用内嵌的 Redis 数据库 -->
+            <dependency>
+                <groupId>com.github.fppt</groupId>
+                <artifactId>jedis-mock</artifactId>
+                <version>${jedis-mock.version}</version>
+            </dependency>
+
+            <!-- 单元测试，随机生成 POJO 类 -->
+            <dependency>
+                <groupId>uk.co.jemos.podam</groupId>
+                <artifactId>podam</artifactId>
+                <version>${podam.version}</version>
+            </dependency>
+
             <!-- =================== 内部模块 =================== -->
             <dependency>
                 <groupId>cn.refinex</groupId>
@@ -303,6 +344,12 @@
             <dependency>
                 <groupId>cn.refinex</groupId>
                 <artifactId>refinex-common-web</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.refinex</groupId>
+                <artifactId>refinex-common-test</artifactId>
                 <version>${revision}</version>
             </dependency>
 

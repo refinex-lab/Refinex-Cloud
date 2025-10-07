@@ -1,1 +1,2 @@
 cn.refinex.common.protection.ratelimiter.config.RateLimiterConfiguration
+cn.refinex.common.protection.signature.config.ApiSignatureAutoConfiguration
