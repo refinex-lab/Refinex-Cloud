@@ -42,11 +42,19 @@ async function handleSubmit() {
 <template>
   <NForm ref="formRef" :model="model" :rules="rules" size="large" :show-label="false" @keyup.enter="handleSubmit">
     <NFormItem path="phone">
-      <NInput v-model:value="model.phone" :placeholder="$t('page.login.common.phonePlaceholder')" />
+      <NInput v-model:value="model.phone" :placeholder="$t('page.login.common.phonePlaceholder')">
+        <template #prefix>
+          <SvgIcon icon="ph:phone" class="text-16px text-#999 dark:text-#bbb" />
+        </template>
+      </NInput>
     </NFormItem>
     <NFormItem path="code">
       <div class="w-full flex-y-center gap-16px">
-        <NInput v-model:value="model.code" :placeholder="$t('page.login.common.codePlaceholder')" />
+        <NInput v-model:value="model.code" :placeholder="$t('page.login.common.codePlaceholder')">
+          <template #prefix>
+            <SvgIcon icon="ph:key" class="text-16px text-#999 dark:text-#bbb" />
+          </template>
+        </NInput>
         <NButton size="large" :disabled="isCounting" :loading="loading" @click="getCaptcha(model.phone)">
           {{ label }}
         </NButton>

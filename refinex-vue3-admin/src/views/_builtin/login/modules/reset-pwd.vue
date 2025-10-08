@@ -47,10 +47,18 @@ async function handleSubmit() {
 <template>
   <NForm ref="formRef" :model="model" :rules="rules" size="large" :show-label="false" @keyup.enter="handleSubmit">
     <NFormItem path="phone">
-      <NInput v-model:value="model.phone" :placeholder="$t('page.login.common.phonePlaceholder')" />
+      <NInput v-model:value="model.phone" :placeholder="$t('page.login.common.phonePlaceholder')">
+        <template #prefix>
+          <SvgIcon icon="ph:phone" class="text-16px text-#999 dark:text-#bbb" />
+        </template>
+      </NInput>
     </NFormItem>
     <NFormItem path="code">
-      <NInput v-model:value="model.code" :placeholder="$t('page.login.common.codePlaceholder')" />
+      <NInput v-model:value="model.code" :placeholder="$t('page.login.common.codePlaceholder')">
+        <template #prefix>
+          <SvgIcon icon="ph:key" class="text-16px text-#999 dark:text-#bbb" />
+        </template>
+      </NInput>
     </NFormItem>
     <NFormItem path="password">
       <NInput
@@ -58,7 +66,11 @@ async function handleSubmit() {
         type="password"
         show-password-on="click"
         :placeholder="$t('page.login.common.passwordPlaceholder')"
-      />
+      >
+        <template #prefix>
+          <SvgIcon icon="ph:lock" class="text-16px text-#999 dark:text-#bbb" />
+        </template>
+      </NInput>
     </NFormItem>
     <NFormItem path="confirmPassword">
       <NInput
@@ -66,7 +78,11 @@ async function handleSubmit() {
         type="password"
         show-password-on="click"
         :placeholder="$t('page.login.common.confirmPasswordPlaceholder')"
-      />
+      >
+        <template #prefix>
+          <SvgIcon icon="ph:lock" class="text-16px text-#999 dark:text-#bbb" />
+        </template>
+      </NInput>
     </NFormItem>
     <NSpace vertical :size="18" class="w-full">
       <NButton type="primary" size="large" round block @click="handleSubmit">
