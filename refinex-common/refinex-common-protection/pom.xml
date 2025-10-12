@@ -10,7 +10,7 @@
     <artifactId>refinex-common-protection</artifactId>
     <packaging>jar</packaging>
 
-    <name>refinex-common-protection</name>
+    <name>${project.artifactId}</name>
     <description>Refinex Common Protection</description>
 
     <dependencies>

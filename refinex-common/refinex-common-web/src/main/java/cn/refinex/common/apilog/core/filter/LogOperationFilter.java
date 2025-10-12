@@ -16,8 +16,8 @@ import cn.refinex.common.utils.device.DeviceUtils;
 import cn.refinex.common.utils.servlet.ServletUtils;
 import cn.refinex.common.web.config.properties.WebProperties;
 import cn.refinex.common.web.core.filter.ApiRequestFilter;
-import cn.refinex.platform.client.logger.LogOperationClient;
-import cn.refinex.platform.client.logger.dto.request.LogOperationCreateRequest;
+import cn.refinex.platform.api.LogOperationFeignClient;
+import cn.refinex.platform.domain.dto.request.LogOperationCreateRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -58,7 +58,7 @@ public class LogOperationFilter extends ApiRequestFilter {
     private static final String[] SANITIZE_KEYS = new String[]{"password", "token", "accessToken", "refreshToken"};
 
     private final String applicationName;
-    private final LogOperationClient logOperationClient;
+    private final LogOperationFeignClient logOperationClient;
 
     /**
      * 构造函数
@@ -67,7 +67,7 @@ public class LogOperationFilter extends ApiRequestFilter {
      * @param applicationName    应用名称
      * @param logOperationClient 操作日志客户端
      */
-    public LogOperationFilter(WebProperties webProperties, String applicationName, LogOperationClient logOperationClient) {
+    public LogOperationFilter(WebProperties webProperties, String applicationName, LogOperationFeignClient logOperationClient) {
         super(webProperties);
         this.applicationName = applicationName;
         this.logOperationClient = logOperationClient;

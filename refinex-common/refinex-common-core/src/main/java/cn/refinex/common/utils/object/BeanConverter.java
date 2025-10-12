@@ -3,6 +3,7 @@ package cn.refinex.common.utils.object;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.BeanCopier;
 import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.json.JSONException;
@@ -45,6 +46,25 @@ public final class BeanConverter {
             return null;
         }
         return BeanUtil.toBean(source, clazz);
+    }
+
+    /**
+     * 将 sourceList 转换为目标对象列表，支持空列表返回空列表。
+     *
+     * @param sourceList 源对象列表
+     * @param clazz      目标类型
+     * @param <T1>       源泛型
+     * @param <T2>       目标泛型
+     * @return 目标对象列表
+     */
+    public static <T1, T2> List<T2> copyToList(final List<T1> sourceList, final Class<T2> clazz) {
+        if (CollectionUtil.isEmpty(sourceList)) {
+            return Collections.emptyList();
+        }
+
+        return sourceList.stream()
+                .map(item -> BeanUtil.toBean(item, clazz))
+                .toList();
     }
 
     /**

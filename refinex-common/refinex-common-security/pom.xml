@@ -10,70 +10,23 @@
     <artifactId>refinex-common-security</artifactId>
     <packaging>jar</packaging>
 
-    <name>refinex-common-security</name>
-    <description>Refinex Cloud Common Security</description>
+    <name>${project.artifactId}</name>
+    <description>
+        Refinex Cloud Common Security：
+        基于 Sa-Token 封装的认证鉴权模块，其他模块需要引入获得使用 Sa-Token 相关功能的能力。
+    </description>
 
     <dependencies>
+        <!-- Sa-Token 集成 -->
         <dependency>
-            <groupId>cn.dev33</groupId>
-            <artifactId>sa-token-jwt</artifactId>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-satoken</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>cn.dev33</groupId>
-            <artifactId>sa-token-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.dev33</groupId>
-            <artifactId>sa-token-redis-template</artifactId>
-        </dependency>
-
+        <!-- Sa-Token 权限认证 (Spring Boot 3 集成) -->
         <dependency>
             <groupId>cn.dev33</groupId>
             <artifactId>sa-token-spring-boot3-starter</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.refinex</groupId>
-            <artifactId>refinex-common-redis</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.refinex</groupId>
-            <artifactId>refinex-common-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.refinex</groupId>
-            <artifactId>refinex-common-jdbc</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
     </dependencies>
 </project>

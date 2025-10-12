@@ -1,13 +1,11 @@
 package cn.refinex.common.exception;
 
+import cn.refinex.common.exception.code.ResultCode;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
  * 业务异常类
- * <p>
- * 用于表示业务逻辑层的错误，例如参数校验失败、状态不合法、资源不可用等。
- * 该异常在高频场景下默认关闭堆栈填充，以优化性能（可通过覆盖策略调整）。
  *
  * @author Refinex
  * @since 1.0.0
@@ -17,52 +15,68 @@ import lombok.ToString;
 public class BusinessException extends BaseException {
 
     // ============================== 构造方法 ===================================
+
     /**
-     * 构造方法
+     * 构造方法（仅错误信息）
      *
-     * @param module       异常来源模块
-     * @param errorCode    标准化错误码（建议区间：1000-1999）
      * @param errorMessage 错误信息
      */
-    public BusinessException(String module, String errorCode, String errorMessage) {
-        super(module, errorCode, errorMessage);
+    public BusinessException(String errorMessage) {
+        super(errorMessage);
     }
 
     /**
      * 构造方法（带原始异常）
      *
-     * @param module       异常来源模块
-     * @param errorCode    标准化错误码（建议区间：1000-1999）
      * @param errorMessage 错误信息
      * @param cause        原始异常（可为 null）
      */
-    public BusinessException(String module, String errorCode, String errorMessage, Throwable cause) {
-        super(module, errorCode, errorMessage, cause);
+    public BusinessException(String errorMessage, Throwable cause) {
+        super(ResultCode.INTERNAL_ERROR.getCode(), errorMessage, cause);
+    }
+
+    /**
+     * 构造方法
+     *
+     * @param errorCode    标准化错误码
+     * @param errorMessage 错误信息
+     */
+    public BusinessException(int errorCode, String errorMessage) {
+        super(errorCode, errorMessage);
+    }
+
+    /**
+     * 构造方法（带原始异常）
+     *
+     * @param errorCode    标准化错误码
+     * @param errorMessage 错误信息
+     * @param cause        原始异常（可为 null）
+     */
+    public BusinessException(int errorCode, String errorMessage, Throwable cause) {
+        super(errorCode, errorMessage, cause);
     }
 
     /**
      * 构造方法（自定义时间戳）
      *
-     * @param module       异常来源模块
-     * @param errorCode    标准化错误码（建议区间：1000-1999）
+     * @param errorCode    标准化错误码
      * @param errorMessage 错误信息
      * @param timestamp    异常发生时间（epoch 毫秒）
      */
-    public BusinessException(String module, String errorCode, String errorMessage, long timestamp) {
-        super(module, errorCode, errorMessage, timestamp);
+    public BusinessException(int errorCode, String errorMessage, long timestamp) {
+        super(errorCode, errorMessage, timestamp);
     }
 
     /**
      * 构造方法（自定义时间戳 + 原始异常）
      *
-     * @param module       异常来源模块
-     * @param errorCode    标准化错误码（建议区间：1000-1999）
+     * @param errorCode    标准化错误码
      * @param errorMessage 错误信息
      * @param timestamp    异常发生时间（epoch 毫秒）
      * @param cause        原始异常（可为 null）
      */
-    public BusinessException(String module, String errorCode, String errorMessage, long timestamp, Throwable cause) {
-        super(module, errorCode, errorMessage, timestamp, cause);
+    public BusinessException(int errorCode, String errorMessage, long timestamp, Throwable cause) {
+        super(errorCode, errorMessage, timestamp, cause);
     }
 
     // ============================== 性能优化 ===================================

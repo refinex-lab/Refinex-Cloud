@@ -10,7 +10,7 @@
     <artifactId>refinex-common-test</artifactId>
     <packaging>jar</packaging>
 
-    <name>refinex-common-test</name>
+    <name>${project.artifactId}</name>
     <description>Refinex Common Test</description>
 
     <dependencies>

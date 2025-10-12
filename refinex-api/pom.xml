@@ -10,11 +10,10 @@
     <artifactId>refinex-api</artifactId>
     <packaging>pom</packaging>
 
-    <name>refinex-api</name>
+    <name>${project.artifactId}</name>
     <description>Refinex Cloud API</description>
 
     <modules>
         <module>refinex-api-platform</module>
-        <module>refinex-api-auth</module>
     </modules>
 </project>

@@ -10,7 +10,7 @@
     <artifactId>refinex-api-platform</artifactId>
     <packaging>jar</packaging>
 
-    <name>refinex-api-platform</name>
+    <name>${project.artifactId}</name>
     <description>Refinex Cloud API Platform</description>
 
     <dependencies>

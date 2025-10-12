@@ -1,10 +1,7 @@
 package cn.refinex.common.jdbc.core;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Blob;
-import java.util.*;
-
+import cn.refinex.common.exception.SystemException;
+import cn.refinex.common.exception.code.ResultCode;
 import cn.refinex.common.jdbc.callback.InputStreamCallback;
 import cn.refinex.common.jdbc.callback.TransactionCallback;
 import cn.refinex.common.jdbc.dialect.DatabaseDialect;
@@ -17,6 +14,7 @@ import cn.refinex.common.jdbc.sql.NamedSqlManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.CallableStatementCallback;
@@ -28,10 +26,10 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 
-import cn.refinex.common.constants.ModuleConstants;
-import cn.refinex.common.exception.SystemException;
-import cn.refinex.common.exception.code.ResultCode;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Blob;
+import java.util.*;
 
 /**
  * JDBC 模板管理器
@@ -369,7 +367,7 @@ public class JdbcTemplateManager {
             if (logSql) {
                 this.logSqlStructured("queryInputStream", sql, params, elapsedMs, null, 0, exception);
             }
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR.getCode(), "查询输入流失败");
+            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "查询输入流失败");
         }
     }
 
@@ -420,10 +418,10 @@ public class JdbcTemplateManager {
                         try {
                             return callback.process(inputStream);
                         } catch (Exception ex) {
-                            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR.getCode(), "回调处理输入流失败", ex);
+                            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "回调处理输入流失败", ex);
                         }
                     } catch (IOException ioEx) {
-                        throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR.getCode(), "关闭输入流失败", ioEx);
+                        throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "关闭输入流失败", ioEx);
                     }
                 }
                 return null;
@@ -442,7 +440,7 @@ public class JdbcTemplateManager {
             if (logSql) {
                 this.logSqlStructured("queryInputStreamWithCallback", sql, params, elapsedMs, null, 0, exception);
             }
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR.getCode(), "查询并处理输入流失败");
+            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "查询并处理输入流失败");
         }
     }
 
@@ -954,10 +952,10 @@ public class JdbcTemplateManager {
             if (keyHolder.getKey() == null) {
                 if (logSql) {
                     long elapsedMs = (System.nanoTime() - start) / 1_000_000;
-                    this.logSqlStructured("updateAndGetKey", sql, params, elapsedMs, rows, null, new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR.getCode(), "获取主键失败"));
+                    this.logSqlStructured("updateAndGetKey", sql, params, elapsedMs, rows, null, new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "获取主键失败"));
                 }
                 log.error("获取主键失败，sql: {}, params: {}", sql, params);
-                throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR.getCode(), "获取主键失败");
+                throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "获取主键失败");
             }
 
             long resultKey = keyHolder.getKey().longValue();
@@ -1208,7 +1206,7 @@ public class JdbcTemplateManager {
                 this.logSqlStructured("callProcedure", procedureName, params, elapsedMs, null, 0, exception);
             }
             log.error("调用存储过程失败: {}, params: {}", procedureName, params, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR.getCode(), "调用存储过程失败");
+            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "调用存储过程失败");
         }
     }
 
@@ -1223,7 +1221,7 @@ public class JdbcTemplateManager {
      */
     public List<Map<String, Object>> queryListByName(String sqlName, Map<String, Object> params) {
         if (namedSqlManager == null) {
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR.getCode(), "命名 SQL 管理器未初始化");
+            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "命名 SQL 管理器未初始化");
         }
         String sql = namedSqlManager.getSql(sqlName);
         return this.queryList(sql, params, true);
@@ -1239,7 +1237,7 @@ public class JdbcTemplateManager {
      */
     public <T> T queryObjectByName(String sqlName, Map<String, Object> params, Class<T> rowMapperClass) {
         if (namedSqlManager == null) {
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR.getCode(), "命名 SQL 管理器未初始化");
+            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "命名 SQL 管理器未初始化");
         }
         String sql = namedSqlManager.getSql(sqlName);
         return this.queryObject(sql, params, true, rowMapperClass);
@@ -1254,7 +1252,7 @@ public class JdbcTemplateManager {
      */
     public int updateByName(String sqlName, Map<String, Object> params) {
         if (namedSqlManager == null) {
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR.getCode(), "命名 SQL 管理器未初始化");
+            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "命名 SQL 管理器未初始化");
         }
         String sql = namedSqlManager.getSql(sqlName);
         return this.update(sql, params, true);
@@ -1323,7 +1321,7 @@ public class JdbcTemplateManager {
             if (e instanceof SystemException systemException) {
                 throw systemException;
             }
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR.getCode(), "事务执行失败: " + e.getMessage());
+            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "事务执行失败: " + e.getMessage());
         }
     }
 
@@ -1355,7 +1353,7 @@ public class JdbcTemplateManager {
      */
     private void ensureTransactionManagerInitialized() {
         if (this.dataSourceTransactionManager == null || this.transactionDefinition == null) {
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR.getCode(), "事务管理器未初始化，请使用事务构造函数创建实例");
+            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "事务管理器未初始化，请使用事务构造函数创建实例");
         }
     }
 
@@ -1416,7 +1414,7 @@ public class JdbcTemplateManager {
             if (enableColumnConflictCheck) {
                 if (lowerKeys.contains(lowerKey) && !lowerKey.equals(originalKey)) {
                     log.error("列名大小写冲突，可能导致数据丢失: 原始键 {} 与 转小写键 {} 发生覆盖", originalKey, lowerKey);
-                    throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR.getCode(), "列名大小写冲突: " + originalKey + " -> " + lowerKey);
+                    throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "列名大小写冲突: " + originalKey + " -> " + lowerKey);
                 }
                 lowerKeys.add(lowerKey);
             }
@@ -1479,7 +1477,7 @@ public class JdbcTemplateManager {
      */
     private String buildPageSql(String sql, PageRequest pageRequest) {
         if (databaseDialect == null) {
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR.getCode(), "数据库方言未初始化");
+            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "数据库方言未初始化");
         }
 
         StringBuilder sb = new StringBuilder(sql);
@@ -1556,8 +1554,7 @@ public class JdbcTemplateManager {
      */
     private void logSqlAsText(String operation, String sql, Object params, long elapsedMs, Integer rowsAffected, Integer resultSize, Exception exception) {
         String logMessage = String.format(
-                "module=%s, op=%s, sql=%s, params=%s, elapsedMs=%dms, rowsAffected=%s, resultSize=%s, error=%s",
-                ModuleConstants.MODULE_COMMON,
+                "op=%s, sql=%s, params=%s, elapsedMs=%dms, rowsAffected=%s, resultSize=%s, error=%s",
                 operation,
                 sql,
                 sanitizeParams(params),
@@ -1589,7 +1586,6 @@ public class JdbcTemplateManager {
      */
     private void logSqlAsJson(String operation, String sql, Object params, long elapsedMs, Integer rowsAffected, Integer resultSize, Exception exception) {
         Map<String, Object> logData = new LinkedHashMap<>();
-        logData.put("module", ModuleConstants.MODULE_COMMON);
         logData.put("operation", operation);
         logData.put("sql", sql);
         logData.put("params", sanitizeParams(params));

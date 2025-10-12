@@ -43,4 +43,9 @@ public final class WebFilterOrderConstants {
      * Flowable 过滤器顺序, 需要保证在 Spring Security 过滤后面
      */
     public static final int FLOWABLE_FILTER = -98;
+
+    /**
+     * 用户上下文拦截器顺序, 在所有业务拦截器之前，确保正确设置用户上下文
+     */
+    public static final int USER_CONTEXT_FILTER = -90;
 }

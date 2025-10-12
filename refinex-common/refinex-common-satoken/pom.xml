@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cn.refinex</groupId>
+        <artifactId>refinex-common</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>refinex-common-satoken</artifactId>
+    <packaging>jar</packaging>
+
+    <name>${project.artifactId}</name>
+    <description>Sa-Token 权限认证</description>
+
+    <dependencies>
+        <!-- Sa-Token 权限认证 (核心模块) -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-core</artifactId>
+        </dependency>
+
+        <!-- Sa-Token 集成 JWT 认证 -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-jwt</artifactId>
+        </dependency>
+
+        <!-- Caffeine 缓存, 用于优化 SaTokenDao 在走 Redis 前先取本地缓存提高并发查询效率 -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
+        <!-- Refinex 公共 Redis 模块 -->
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-redis</artifactId>
+        </dependency>
+
+        <!-- Refinex 公共 Core 模块 -->
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-core</artifactId>
+        </dependency>
+
+        <!-- Refinex 公共 API 平台模块 -->
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-api-platform</artifactId>
+        </dependency>
+    </dependencies>
+</project>

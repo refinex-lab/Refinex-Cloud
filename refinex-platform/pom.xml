@@ -10,23 +10,19 @@
     <artifactId>refinex-platform</artifactId>
     <packaging>jar</packaging>
 
-    <name>refinex-platform</name>
+    <name>${project.artifactId}</name>
     <description>Refinex Cloud Platform</description>
 
     <dependencies>
+        <!-- Nacos -->
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-nacos</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
 
         <dependency>
@@ -93,12 +89,6 @@
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-json</artifactId>
-        </dependency>
-
-        <!-- API Auth -->
-        <dependency>
-            <groupId>cn.refinex</groupId>
-            <artifactId>refinex-api-auth</artifactId>
         </dependency>
 
         <!-- API Platform -->

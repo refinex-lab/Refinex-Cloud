@@ -30,7 +30,7 @@ public class SysUserRepository {
      */
     public SysUser selectById(Long userId) {
         String sql = """
-                SELECT id, username, email, nickname
+                SELECT *
                 FROM sys_user
                 WHERE id = :userId AND deleted = 0
                 """;
@@ -53,7 +53,7 @@ public class SysUserRepository {
      */
     public SysUser selectByUserName(String username) {
         String sql = """
-                SELECT id, username, password, email, nickname
+                SELECT *
                 FROM sys_user
                 WHERE username = :username AND deleted = 0
                 """;
@@ -76,7 +76,7 @@ public class SysUserRepository {
      */
     public SysUser selectByMobile(String phoneEncrypted) {
         String sql = """
-                SELECT id, username, password, email, nickname
+                SELECT *
                 FROM sys_user AS u
                 INNER JOIN sys_sensitive AS s ON u.user_id = s.row_guid AND s.table_name = 'sys_user' AND s.field_code = 'mobile'
                 WHERE s.encrypted_value = :phoneEncrypted
@@ -100,7 +100,7 @@ public class SysUserRepository {
      */
     public SysUser selectByEmail(String emailEncrypted) {
         String sql = """
-                SELECT id, username, password, email, nickname
+                SELECT *
                 FROM sys_user AS u
                 INNER JOIN sys_sensitive AS s ON u.user_id = s.row_guid AND s.table_name = 'sys_user' AND s.field_code = 'email'
                 WHERE s.encrypted_value = :emailEncrypted

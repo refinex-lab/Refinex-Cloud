@@ -1,6 +1,5 @@
 package cn.refinex.common.redis.basic;
 
-import cn.refinex.common.constants.ModuleConstants;
 import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.exception.code.ResultCode;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +41,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().add(key, values);
         } catch (Exception e) {
             log.error("添加元素到集合失败，key: {}, values: {}", key, values, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -58,7 +57,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().remove(key, values);
         } catch (Exception e) {
             log.error("从集合中移除元素失败，key: {}, values: {}", key, values, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -74,7 +73,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().isMember(key, value);
         } catch (Exception e) {
             log.error("判断元素是否在集合中失败，key: {}, value: {}", key, value, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -90,7 +89,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().isMember(key, values);
         } catch (Exception e) {
             log.error("批量判断元素是否在集合中失败，key: {}, values: {}", key, values, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -105,7 +104,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().members(key);
         } catch (Exception e) {
             log.error("获取集合所有元素失败，key: {}", key, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -120,7 +119,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().size(key);
         } catch (Exception e) {
             log.error("获取集合大小失败，key: {}", key, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -137,7 +136,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().randomMember(key);
         } catch (Exception e) {
             log.error("随机获取集合中的一个元素失败，key: {}", key, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -153,7 +152,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().randomMembers(key, count);
         } catch (Exception e) {
             log.error("随机获取集合中的多个元素失败，key: {}, count: {}", key, count, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -169,7 +168,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().distinctRandomMembers(key, count);
         } catch (Exception e) {
             log.error("随机获取集合中的多个不重复元素失败，key: {}, count: {}", key, count, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -184,7 +183,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().pop(key);
         } catch (Exception e) {
             log.error("随机弹出集合中的一个元素失败，key: {}", key, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -200,7 +199,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().pop(key, count);
         } catch (Exception e) {
             log.error("随机弹出集合中的多个元素失败，key: {}, count: {}", key, count, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -219,7 +218,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().move(sourceKey, value, destinationKey);
         } catch (Exception e) {
             log.error("将元素从源集合移动到目标集合失败，sourceKey: {}, value: {}, destinationKey: {}", sourceKey, value, destinationKey, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -237,7 +236,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().intersect(key, List.of(keys));
         } catch (Exception e) {
             log.error("计算多个集合的交集失败，key: {}, keys: {}", key, keys, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -252,7 +251,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().intersect(keys);
         } catch (Exception e) {
             log.error("计算多个集合的交集失败，keys: {}", keys, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -269,7 +268,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().intersectAndStore(key, otherKeys, destKey);
         } catch (Exception e) {
             log.error("计算多个集合的交集并存储到目标集合失败，key: {}, otherKeys: {}, destKey: {}", key, otherKeys, destKey, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -285,7 +284,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().union(key, List.of(keys));
         } catch (Exception e) {
             log.error("计算多个集合的并集失败，key: {}, keys: {}", key, keys, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -300,7 +299,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().union(keys);
         } catch (Exception e) {
             log.error("计算多个集合的并集失败，keys: {}", keys, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -317,7 +316,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().unionAndStore(key, otherKeys, destKey);
         } catch (Exception e) {
             log.error("计算多个集合的并集并存储到目标集合失败，key: {}, otherKeys: {}, destKey: {}", key, otherKeys, destKey, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -333,7 +332,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().difference(key, List.of(keys));
         } catch (Exception e) {
             log.error("计算多个集合的差集失败，key: {}, keys: {}", key, keys, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -348,7 +347,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().difference(keys);
         } catch (Exception e) {
             log.error("计算多个集合的差集失败，keys: {}", keys, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -365,7 +364,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().differenceAndStore(key, otherKeys, destKey);
         } catch (Exception e) {
             log.error("计算多个集合的差集并存储到目标集合失败，key: {}, otherKeys: {}, destKey: {}", key, otherKeys, destKey, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -383,7 +382,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().scan(key, options);
         } catch (Exception e) {
             log.error("扫描集合元素失败，key: {}, options: {}", key, options, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -400,7 +399,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().scan(key, options);
         } catch (Exception e) {
             log.error("扫描匹配模式的集合元素失败，key: {}, pattern: {}", key, pattern, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -418,7 +417,7 @@ public class RedisSetService {
             return redisTemplate.opsForSet().scan(key, options);
         } catch (Exception e) {
             log.error("扫描匹配模式的集合元素（限制数量）失败，key: {}, pattern: {}, count: {}", key, pattern, count, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 }

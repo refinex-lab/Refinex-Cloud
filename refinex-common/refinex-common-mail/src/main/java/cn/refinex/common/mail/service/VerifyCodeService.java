@@ -1,6 +1,7 @@
 package cn.refinex.common.mail.service;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.mail.config.properties.MailProperties;
 import cn.refinex.common.mail.domain.dto.EmailSendRequest;
 import cn.refinex.common.mail.domain.dto.EmailSendResult;
@@ -9,8 +10,7 @@ import cn.refinex.common.mail.domain.dto.VerifyCodeResult;
 import cn.refinex.common.mail.domain.dto.VerifyCodeValidateRequest;
 import cn.refinex.common.mail.domain.entity.EmailVerifyCode;
 import cn.refinex.common.mail.enums.VerifyCodeStatus;
-import cn.refinex.common.mail.exception.EmailErrorCode;
-import cn.refinex.common.mail.exception.EmailException;
+import cn.refinex.common.mail.constants.EmailErrorMessageConstants;
 import cn.refinex.common.mail.repository.EmailVerifyCodeRepository;
 import cn.refinex.common.redis.RedisService;
 import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
@@ -141,19 +141,19 @@ public class VerifyCodeService {
 
         if (Objects.isNull(codeEntity)) {
             log.error("验证码不存在: email={}, code={}", request.getEmail(), request.getVerifyCode());
-            throw new EmailException(EmailErrorCode.VERIFY_CODE_INVALID);
+            throw new SystemException(EmailErrorMessageConstants.VERIFY_CODE_INVALID);
         }
 
         // 2. 检查验证码状态
         if (!VerifyCodeStatus.UNUSED.getCode().equals(codeEntity.getStatus())) {
             log.error("验证码状态异常: email={}, status={}", request.getEmail(), codeEntity.getStatus());
-            throw new EmailException(EmailErrorCode.VERIFY_CODE_INVALID);
+            throw new SystemException(EmailErrorMessageConstants.VERIFY_CODE_INVALID);
         }
 
         // 3. 检查是否已使用
         if (Objects.nonNull(codeEntity.getIsUsed()) && codeEntity.getIsUsed() == 1) {
             log.error("验证码已使用: email={}", request.getEmail());
-            throw new EmailException(EmailErrorCode.VERIFY_CODE_USED);
+            throw new SystemException(EmailErrorMessageConstants.VERIFY_CODE_USED);
         }
 
         // 4. 检查是否过期
@@ -161,7 +161,7 @@ public class VerifyCodeService {
             log.error("验证码已过期: email={}, expireTime={}", request.getEmail(), codeEntity.getExpireTime());
             // 更新状态为已过期
             verifyCodeRepository.markAsInvalid(codeEntity.getId());
-            throw new EmailException(EmailErrorCode.VERIFY_CODE_EXPIRED);
+            throw new SystemException(EmailErrorMessageConstants.VERIFY_CODE_EXPIRED);
         }
 
         // 5. 标记为已使用
@@ -230,7 +230,7 @@ public class VerifyCodeService {
         Integer emailCount = redisService.getStringService().get(emailKey, Integer.class);
         if (Objects.nonNull(emailCount) && emailCount >= mailProperties.getVerifyCode().getRateLimit().getEmailPerMinute()) {
             log.error("邮箱发送频率超限: email={}, count={}", email, emailCount);
-            throw new EmailException(EmailErrorCode.VERIFY_CODE_SEND_TOO_FREQUENT);
+            throw new SystemException(EmailErrorMessageConstants.VERIFY_CODE_SEND_TOO_FREQUENT);
         }
 
         // 2. 检查 IP 频率限制
@@ -239,7 +239,7 @@ public class VerifyCodeService {
             Integer ipCount = redisService.getStringService().get(ipKey, Integer.class);
             if (ipCount != null && ipCount >= mailProperties.getVerifyCode().getRateLimit().getIpPerMinute()) {
                 log.error("IP 发送频率超限: ip={}, count={}", clientIp, ipCount);
-                throw new EmailException(EmailErrorCode.VERIFY_CODE_SEND_TOO_FREQUENT);
+                throw new SystemException(EmailErrorMessageConstants.VERIFY_CODE_SEND_TOO_FREQUENT);
             }
         }
     }

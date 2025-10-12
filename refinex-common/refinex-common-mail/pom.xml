@@ -10,7 +10,7 @@
     <artifactId>refinex-common-mail</artifactId>
     <packaging>jar</packaging>
 
-    <name>refinex-common-mail</name>
+    <name>${project.artifactId}</name>
     <description>Refinex Cloud Common Mail</description>
 
     <dependencies>

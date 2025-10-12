@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * JSON 工具类 - 基于 Jackson（ObjectMapper）
@@ -175,6 +176,27 @@ public class JsonUtils implements ApplicationContextAware {
         } catch (IOException e) {
             log.warn("[Refinex-JSON] 转换为 List 失败: {}", e.getMessage());
             return Collections.emptyList();
+        }
+    }
+
+    /**
+     * 解析为 Set 对象。
+     *
+     * @param json  JSON 字符串
+     * @param clazz 元素类型
+     * @param <T>   泛型
+     * @return Set；失败返回空 Set
+     */
+    public static <T> Set<T> toSet(@Nullable String json, Class<T> clazz) {
+        if (json == null || json.isBlank()) {
+            return Collections.emptySet();
+        }
+        try {
+            ObjectMapper objectMapper = ObjectMapperHolder.get();
+            return objectMapper.readValue(json, objectMapper.getTypeFactory().constructCollectionType(Set.class, clazz));
+        } catch (IOException e) {
+            log.warn("[Refinex-JSON] 转换为 Set 失败: {}", e.getMessage());
+            return Collections.emptySet();
         }
     }
 

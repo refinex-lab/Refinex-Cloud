@@ -1,7 +1,6 @@
 package cn.refinex.common.redis.basic;
 
 import cn.hutool.json.JSONUtil;
-import cn.refinex.common.constants.ModuleConstants;
 import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.exception.code.ResultCode;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +42,7 @@ public class RedisHashService {
             redisTemplate.opsForHash().put(key, field, value);
         } catch (Exception e) {
             log.error("设置 Hash 字段值失败，key: {}, field: {}, value: {}", key, field, value, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -60,7 +59,7 @@ public class RedisHashService {
             return redisTemplate.opsForHash().putIfAbsent(key, field, value);
         } catch (Exception e) {
             log.error("仅当字段不存在时设置值失败，key: {}, field: {}, value: {}", key, field, value, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -76,7 +75,7 @@ public class RedisHashService {
             return redisTemplate.opsForHash().get(key, field);
         } catch (Exception e) {
             log.error("获取 Hash 字段值失败，key: {}, field: {}", key, field, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -102,7 +101,7 @@ public class RedisHashService {
             throw new ClassCastException("无法将值转换为指定类型: " + clazz.getName());
         } catch (Exception e) {
             log.error("获取 Hash 字段值并转换类型失败，key: {}, field: {}, clazz: {}", key, field, clazz, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -118,7 +117,7 @@ public class RedisHashService {
             return redisTemplate.opsForHash().delete(key, fields);
         } catch (Exception e) {
             log.error("删除 Hash 字段失败，key: {}, fields: {}", key, fields, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -134,7 +133,7 @@ public class RedisHashService {
             return redisTemplate.opsForHash().hasKey(key, field);
         } catch (Exception e) {
             log.error("判断 Hash 字段是否存在失败，key: {}, field: {}", key, field, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -151,7 +150,7 @@ public class RedisHashService {
             redisTemplate.opsForHash().putAll(key, map);
         } catch (Exception e) {
             log.error("批量设置 Hash 字段值失败，key: {}, map: {}", key, map, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -167,7 +166,7 @@ public class RedisHashService {
             return redisTemplate.opsForHash().multiGet(key, fields);
         } catch (Exception e) {
             log.error("批量获取 Hash 字段值失败，key: {}, fields: {}", key, fields, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -182,7 +181,7 @@ public class RedisHashService {
             return redisTemplate.opsForHash().entries(key);
         } catch (Exception e) {
             log.error("获取所有字段和值失败，key: {}", key, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -197,7 +196,7 @@ public class RedisHashService {
             return redisTemplate.opsForHash().keys(key);
         } catch (Exception e) {
             log.error("获取所有字段失败，key: {}", key, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -212,7 +211,7 @@ public class RedisHashService {
             return redisTemplate.opsForHash().values(key);
         } catch (Exception e) {
             log.error("获取所有值失败，key: {}", key, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -231,7 +230,7 @@ public class RedisHashService {
             return redisTemplate.opsForHash().increment(key, field, delta);
         } catch (Exception e) {
             log.error("递增 Hash 字段值失败，key: {}, field: {}, delta: {}", key, field, delta, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -248,7 +247,7 @@ public class RedisHashService {
             return redisTemplate.opsForHash().increment(key, field, delta);
         } catch (Exception e) {
             log.error("递增 Hash 字段浮点值失败，key: {}, field: {}, delta: {}", key, field, delta, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -265,7 +264,7 @@ public class RedisHashService {
             return redisTemplate.opsForHash().size(key);
         } catch (Exception e) {
             log.error("获取 Hash 字段数量失败，key: {}", key, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -281,7 +280,7 @@ public class RedisHashService {
             return redisTemplate.opsForHash().lengthOfValue(key, field);
         } catch (Exception e) {
             log.error("获取 Hash 字段长度失败，key: {}, field: {}", key, field, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -299,7 +298,7 @@ public class RedisHashService {
             return redisTemplate.opsForHash().scan(key, options);
         } catch (Exception e) {
             log.error("扫描 Hash 字段失败，key: {}, options: {}", key, options, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -316,7 +315,7 @@ public class RedisHashService {
             return redisTemplate.opsForHash().scan(key, options);
         } catch (Exception e) {
             log.error("扫描匹配模式的 Hash 字段失败，key: {}, pattern: {}", key, pattern, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 
@@ -334,7 +333,7 @@ public class RedisHashService {
             return redisTemplate.opsForHash().scan(key, options);
         } catch (Exception e) {
             log.error("扫描匹配模式的 Hash 字段（限制数量）失败，key: {}, pattern: {}, count: {}", key, pattern, count, e);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 }

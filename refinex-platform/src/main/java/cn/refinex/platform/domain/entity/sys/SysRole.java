@@ -37,7 +37,7 @@ public class SysRole {
     @Schema(description = "角色类型：0前台角色,1后台角色", example = "1")
     private Integer roleType;
 
-    @Schema(description = "数据权限范围：0全部,1本部门,2本部门及下级,3仅本人", example = "0")
+    @Schema(description = "角色权限范围(1:所有数据权限 2:自定义数据权限 3:仅本人数据权限)", example = "1")
     private Integer dataScope;
 
     @Schema(description = "是否系统内置角色：0否,1是", example = "1")

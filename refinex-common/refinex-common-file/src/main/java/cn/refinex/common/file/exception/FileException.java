@@ -1,6 +1,5 @@
 package cn.refinex.common.file.exception;
 
-import cn.refinex.common.constants.ModuleConstants;
 import cn.refinex.common.exception.BusinessException;
 
 import java.io.Serial;
@@ -19,7 +18,7 @@ public class FileException extends BusinessException {
     /**
      * 模块标识
      */
-    private static final String MODULE = ModuleConstants.MODULE_FILE;
+    private static final String MODULE = SystemModuleConstants.MODULE_FILE;
 
     /**
      * 构造方法

@@ -37,23 +37,32 @@ spring:
       thread-name-prefix: task-
       # 由 Spring 管理任务执行线程池, SpringBoot 3.5+ SpringBoot 会自动配置线程池
       mode: force
+
   data:
     # 定义 Redis 相关配置
     redis:
       # 定义 Redis 主机地址
-      host: localhost
+      host: 127.0.0.1
       # 定义 Redis 端口号
       port: 6379
-      # 定义 Redis 密码
-      password: 123456
-      # 定义 Redis 数据库索引
+      # 定义 Redis 密码, 默认空字符串
+      # password:
+      # 定义 Redis 数据库索引, 默认 0
       database: 0
       # 定义 Redis 连接超时时间, 单位毫秒
-      timeout: 10000
-      # 定义 Redis SSL 配置
-      ssl:
-        # 定义是否启用 Redis SSL
-        enabled: false
+      timeout: 10s
+      # 定义 Lettuce 连接池配置
+      lettuce:
+        pool:
+          # 连接池最大连接数
+          max-active: 200
+          # 连接池最大阻塞等待时间 (使用负值表示没有限制)
+          max-wait: -1ms
+          # 连接池中的最大空闲连接
+          max-idle: 10
+          # 连接池中的最小空闲连接
+          min-idle: 0
+
   # 定义数据源相关配置
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
@@ -81,24 +90,24 @@ spring:
 
 # Sa-Token 相关配置
 sa-token:
-  # token 名称 (同时也是 cookie 名称)
+  # Token 名称, 同时也是 Cookie 名称
   token-name: Authorization
-  # token 有效期（单位：秒）默认 30 天，-1 代表永久有效
-  timeout: 7200
-  # token 最低活跃频率（单位：秒），如果 token 超过此时间没有访问系统就会被冻结，默认 -1 代表不限制，永不冻结
+  # Token 有效期, 单位：秒, 默认 30 天, -1 代表永久有效
+  # 本系统设置为 30 分钟, 通过 Token 续期进行扩展
+  timeout: 1800
+  # Token 最低活跃频率, 单位：秒, 如果 Token 超过此时间没有访问系统就会被冻结, 默认 -1 代表不限制永不冻结
+  # 本系统设置为 30 分钟, 超过 30 分钟未访问系统就会被冻结
   active-timeout: 1800
-  # 是否允许同一账号并发登录（为 true 时允许一起登录，为 false 时新登录挤掉旧登录）
+  # 是否允许同一账号并发登录, true：允许一起登录, false：新登录挤掉旧登录
   is-concurrent: true
-  # 在多人登录同一账号时是否共用一个 token（为 true 时所有登录共用一个 token，为 false 时每次登录新建一个 token）
+  # 在多人登录同一账号时是否共用一个 Token, true：所有登录共用一个 Token, false：每次登录新建一个 Token
   is-share: false
-  # token 风格（可选值：uuid、simple-uuid、random-32、random-64、random-128、tik、jwt-simple）
-  token-style: jwt-simple
+  # Token 风格 (可选值：uuid、simple-uuid、random-32、random-64、random-128、tik、jwt-simple)
+  token-style: uuid
   # 是否输出操作日志
   is-log: false
-  # 开启内网服务调用鉴权（不允许越过 Gateway 访问内网服务，保障服务安全）
+  # 开启内网服务调用鉴权, 不允许越过 Gateway 访问内网服务, 保障服务安全
   check-same-token: true
-  # jwt 秘钥（生产环境必须修改为强密钥，建议使用环境变量注入）
-  jwt-secret-key: ${JWT_SECRET_KEY:abcdefghijklmnopqrstuvwxyz1234567890}
 
 # Feign 配置
 feign:

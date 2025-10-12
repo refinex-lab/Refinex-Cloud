@@ -10,7 +10,7 @@
     <artifactId>refinex-common-file</artifactId>
     <packaging>jar</packaging>
 
-    <name>refinex-common-file</name>
+    <name>${project.artifactId}</name>
     <description>Refinex Cloud Common File Storage</description>
 
     <dependencies>

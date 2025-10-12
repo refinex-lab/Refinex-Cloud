@@ -38,7 +38,21 @@ public final class Fn {
     }
 
     /**
+     * 安全转换为 Integer, 转换失败时返回默认值 null
+     *
+     * @param obj 源对象
+     * @return Integer 值
+     */
+    public static Integer getInt(final Object obj) {
+        return getInt(obj, null);
+    }
+
+    /**
      * 安全转换为 Long
+     *
+     * @param obj          源对象
+     * @param defaultValue 转换失败时的默认值
+     * @return Long 值
      */
     public static Long getLong(final Object obj, final Long defaultValue) {
         if (obj == null) {
@@ -49,7 +63,21 @@ public final class Fn {
     }
 
     /**
+     * 安全转换为 Long, 转换失败时返回默认值 null
+     *
+     * @param obj 源对象
+     * @return Long 值
+     */
+    public static Long getLong(final Object obj) {
+        return getLong(obj, null);
+    }
+
+    /**
      * 安全转换为 Double
+     *
+     * @param obj          源对象
+     * @param defaultValue 转换失败时的默认值
+     * @return Double 值
      */
     public static Double getDouble(final Object obj, final Double defaultValue) {
         if (obj == null) {
@@ -59,8 +87,22 @@ public final class Fn {
         return NumberUtils.isCreatable(str) ? NumberUtils.toDouble(str, defaultValue) : defaultValue;
     }
 
+     /**
+     * 安全转换为 Double, 转换失败时返回默认值 null
+     *
+     * @param obj 源对象
+     * @return Double 值
+     */
+    public static Double getDouble(final Object obj) {
+        return getDouble(obj, null);
+    }
+
     /**
      * 安全转换为 BigDecimal
+     *
+     * @param obj          源对象
+     * @param defaultValue 转换失败时的默认值
+     * @return BigDecimal 值
      */
     public static BigDecimal getDecimal(final Object obj, final BigDecimal defaultValue) {
         if (obj == null) {
@@ -71,6 +113,16 @@ public final class Fn {
         } catch (NumberFormatException e) {
             return defaultValue;
         }
+    }
+
+     /**
+     * 安全转换为 BigDecimal, 转换失败时返回默认值 null
+     *
+     * @param obj 源对象
+     * @return BigDecimal 值
+     */
+    public static BigDecimal getDecimal(final Object obj) {
+        return getDecimal(obj, null);
     }
 
     /**
@@ -85,6 +137,16 @@ public final class Fn {
                 .map(String::trim)
                 .filter(StrUtil::isNotEmpty)
                 .orElse(defaultValue);
+    }
+
+    /**
+     * 获取安全字符串, 转换失败时返回默认值 null
+     *
+     * @param obj 源对象
+     * @return 字符串值
+     */
+    public static String getString(final Object obj) {
+        return getString(obj, null);
     }
 
     // ======================== UUID / 唯一标识生成 ======================== //

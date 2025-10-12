@@ -1,7 +1,6 @@
 package cn.refinex.common.protection.ratelimiter.core.aop;
 
 import cn.hutool.core.util.StrUtil;
-import cn.refinex.common.constants.ModuleConstants;
 import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.exception.code.ResultCode;
 import cn.refinex.common.protection.ratelimiter.core.annotation.RateLimiter;
@@ -64,7 +63,7 @@ public class RateLimiterAspect {
         if (!success) {
             log.info("[beforePointCut][方法({}) 参数({}) 请求过于频繁]", joinPoint.getSignature().toString(), joinPoint.getArgs());
             String message = StrUtil.blankToDefault(rateLimiter.message(), ResultCode.TOO_MANY_REQUESTS.getMessage());
-            throw new BusinessException(ModuleConstants.MODULE_COMMON, ResultCode.TOO_MANY_REQUESTS.getCode(), message);
+            throw new BusinessException(ResultCode.TOO_MANY_REQUESTS.getCode(), message);
         }
     }
 }

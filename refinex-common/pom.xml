@@ -10,7 +10,7 @@
     <artifactId>refinex-common</artifactId>
     <packaging>pom</packaging>
 
-    <name>refinex-common</name>
+    <name>${project.artifactId}</name>
     <description>Refinex Cloud Common</description>
 
     <modules>
@@ -24,6 +24,8 @@
         <module>refinex-common-web</module>
         <module>refinex-common-protection</module>
         <module>refinex-common-test</module>
+        <module>refinex-common-nacos</module>
+        <module>refinex-common-satoken</module>
     </modules>
 
 </project>

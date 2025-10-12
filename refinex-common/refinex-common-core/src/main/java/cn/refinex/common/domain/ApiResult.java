@@ -27,9 +27,9 @@ public final class ApiResult<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 状态码：可为通用码（200/400/401/403/404/500）或业务模块码（MODULE-NNNN）
+     * 状态码
      */
-    private final String code;
+    private final int code;
 
     /**
      * 用户友好的错误信息（中文）
@@ -79,7 +79,7 @@ public final class ApiResult<T> implements Serializable {
      * @param <T>     载荷数据类型
      * @return 失败返回对象
      */
-    public static <T> ApiResult<T> failure(String code, String message) {
+    public static <T> ApiResult<T> failure(int code, String message) {
         return new ApiResult<>(code, message, null, System.currentTimeMillis());
     }
 
@@ -91,7 +91,7 @@ public final class ApiResult<T> implements Serializable {
      * @return 失败返回对象
      */
     public static <T> ApiResult<T> failure(ErrorCode errorCode) {
-        String c = (errorCode != null) ? errorCode.getCode() : ResultCode.INTERNAL_ERROR.getCode();
+        int c = (errorCode != null) ? errorCode.getCode() : ResultCode.INTERNAL_ERROR.getCode();
         String m = (errorCode != null) ? errorCode.getMessage() : ResultCode.INTERNAL_ERROR.getMessage();
         return new ApiResult<>(c, m, null, System.currentTimeMillis());
     }
@@ -118,7 +118,7 @@ public final class ApiResult<T> implements Serializable {
      * @param code 新状态码
      * @return 新的 ApiResult 对象
      */
-    public ApiResult<T> withCode(String code) {
+    public ApiResult<T> withCode(int code) {
         return new ApiResult<>(code, this.message, this.data, this.timestamp);
     }
 
@@ -150,5 +150,16 @@ public final class ApiResult<T> implements Serializable {
      */
     public ApiResult<T> withTimestamp(long timestamp) {
         return new ApiResult<>(this.code, this.message, this.data, timestamp);
+    }
+
+    // ============================== 判断方法 ======================================
+
+    /**
+     * 是否成功（状态码为 200）
+     *
+     * @return true 如果状态码为 200，否则 false
+     */
+    public boolean isSuccess() {
+        return ResultCode.SUCCESS.getCode() == this.code;
     }
 }

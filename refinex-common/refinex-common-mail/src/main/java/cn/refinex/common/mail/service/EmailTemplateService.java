@@ -1,10 +1,10 @@
 package cn.refinex.common.mail.service;
 
+import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.json.utils.JsonUtils;
 import cn.refinex.common.mail.domain.dto.EmailTemplateDTO;
 import cn.refinex.common.mail.domain.entity.EmailTemplate;
-import cn.refinex.common.mail.exception.EmailErrorCode;
-import cn.refinex.common.mail.exception.EmailException;
+import cn.refinex.common.mail.constants.EmailErrorMessageConstants;
 import cn.refinex.common.mail.repository.EmailTemplateRepository;
 import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
 import cn.refinex.common.utils.object.BeanConverter;
@@ -49,7 +49,7 @@ public class EmailTemplateService {
         // 1. 检查模板编码是否已存在
         if (templateRepository.existsByTemplateCode(templateDTO.getTemplateCode())) {
             log.error("模板编码已存在: {}", templateDTO.getTemplateCode());
-            throw new EmailException(EmailErrorCode.TEMPLATE_CODE_DUPLICATE);
+            throw new SystemException(EmailErrorMessageConstants.TEMPLATE_CODE_DUPLICATE);
         }
 
         // 2. 转换为实体
@@ -69,7 +69,7 @@ public class EmailTemplateService {
         int rows = templateRepository.insert(template);
         if (rows <= 0) {
             log.error("创建模板失败: {}", templateDTO.getTemplateCode());
-            throw new EmailException(EmailErrorCode.TEMPLATE_CREATE_FAILED);
+            throw new SystemException(EmailErrorMessageConstants.TEMPLATE_CREATE_FAILED);
         }
 
         log.info("创建模板成功: code={}, id={}", template.getTemplateCode(), template.getId());
@@ -87,7 +87,7 @@ public class EmailTemplateService {
         EmailTemplate existingTemplate = templateRepository.findById(templateDTO.getId());
         if (existingTemplate == null) {
             log.error("模板不存在: id={}", templateDTO.getId());
-            throw new EmailException(EmailErrorCode.TEMPLATE_NOT_FOUND);
+            throw new SystemException(EmailErrorMessageConstants.TEMPLATE_NOT_FOUND);
         }
 
         // 2. 转换为实体
@@ -121,13 +121,13 @@ public class EmailTemplateService {
         EmailTemplate template = templateRepository.findById(id);
         if (Objects.isNull(template)) {
             log.error("模板不存在: id={}", id);
-            throw new EmailException(EmailErrorCode.TEMPLATE_NOT_FOUND);
+            throw new SystemException(EmailErrorMessageConstants.TEMPLATE_NOT_FOUND);
         }
 
         // 2. 系统模板不允许删除
         if (Objects.nonNull(template.getIsSystem()) && template.getIsSystem() == 1) {
             log.error("系统模板不允许删除: id={}", id);
-            throw new EmailException(EmailErrorCode.TEMPLATE_SYSTEM_NOT_DELETABLE);
+            throw new SystemException(EmailErrorMessageConstants.TEMPLATE_SYSTEM_NOT_DELETABLE);
         }
 
         // 3. 逻辑删除
@@ -151,7 +151,7 @@ public class EmailTemplateService {
         EmailTemplate template = templateRepository.findById(id);
         if (Objects.isNull(template)) {
             log.error("模板不存在: id={}", id);
-            throw new EmailException(EmailErrorCode.TEMPLATE_NOT_FOUND);
+            throw new SystemException(EmailErrorMessageConstants.TEMPLATE_NOT_FOUND);
         }
         return template;
     }
@@ -166,7 +166,7 @@ public class EmailTemplateService {
         EmailTemplate template = templateRepository.findByTemplateCode(templateCode);
         if (Objects.isNull(template)) {
             log.error("模板不存在: code={}", templateCode);
-            throw new EmailException(EmailErrorCode.TEMPLATE_NOT_FOUND);
+            throw new SystemException(EmailErrorMessageConstants.TEMPLATE_NOT_FOUND);
         }
         return template;
     }
@@ -185,7 +185,7 @@ public class EmailTemplateService {
         // 2. 检查模板状态
         if (Objects.nonNull(template.getStatus()) && template.getStatus() == 1) {
             log.error("模板已停用: code={}", templateCode);
-            throw new EmailException(EmailErrorCode.TEMPLATE_DISABLED);
+            throw new SystemException(EmailErrorMessageConstants.TEMPLATE_DISABLED);
         }
 
         // 3. 渲染模板
@@ -204,7 +204,7 @@ public class EmailTemplateService {
             return renderedContent;
         } catch (Exception e) {
             log.error("模板渲染失败: code={}", templateCode, e);
-            throw new EmailException(EmailErrorCode.TEMPLATE_RENDER_FAILED, e);
+            throw new SystemException(EmailErrorMessageConstants.TEMPLATE_RENDER_FAILED, e);
         }
     }
 
@@ -232,7 +232,7 @@ public class EmailTemplateService {
             return engine.process(templateContent, context);
         } catch (Exception e) {
             log.error("模板内容渲染失败", e);
-            throw new EmailException(EmailErrorCode.TEMPLATE_RENDER_FAILED, e);
+            throw new SystemException(EmailErrorMessageConstants.TEMPLATE_RENDER_FAILED, e);
         }
     }
 

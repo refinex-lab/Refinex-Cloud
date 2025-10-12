@@ -1,6 +1,6 @@
 package cn.refinex.common.mail.service;
 
-import cn.hutool.core.util.RandomUtil;
+import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.mail.config.properties.MailProperties;
 import cn.refinex.common.mail.config.properties.SmtpConfig;
 import cn.refinex.common.mail.domain.dto.EmailSendRequest;
@@ -8,8 +8,7 @@ import cn.refinex.common.mail.domain.dto.EmailSendResult;
 import cn.refinex.common.mail.domain.entity.EmailSendLog;
 import cn.refinex.common.mail.domain.entity.EmailTemplate;
 import cn.refinex.common.mail.enums.EmailSendStatus;
-import cn.refinex.common.mail.exception.EmailErrorCode;
-import cn.refinex.common.mail.exception.EmailException;
+import cn.refinex.common.mail.constants.EmailErrorMessageConstants;
 import cn.refinex.common.mail.repository.EmailSendLogRepository;
 import cn.refinex.common.utils.Fn;
 import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
@@ -62,7 +61,7 @@ public class EmailSendService {
             JavaMailSender mailSender = javaMailSenderMap.get(smtpConfigId);
             if (Objects.isNull(mailSender)) {
                 log.error("SMTP 配置不存在: {}", smtpConfigId);
-                throw new EmailException(EmailErrorCode.SMTP_CONFIG_NOT_FOUND);
+                throw new SystemException(EmailErrorMessageConstants.SMTP_CONFIG_NOT_FOUND);
             }
 
             // 2. 准备邮件内容
@@ -196,7 +195,7 @@ public class EmailSendService {
         return mailProperties.getSmtpConfigs().stream()
                 .filter(config -> config.getConfigId().equals(smtpConfigId))
                 .findFirst()
-                .orElseThrow(() -> new EmailException(EmailErrorCode.SMTP_CONFIG_NOT_FOUND));
+                .orElseThrow(() -> new SystemException(EmailErrorMessageConstants.SMTP_CONFIG_NOT_FOUND));
     }
 
     /**

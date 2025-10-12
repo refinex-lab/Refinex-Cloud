@@ -10,7 +10,7 @@
     <artifactId>refinex-common-web</artifactId>
     <packaging>jar</packaging>
 
-    <name>refinex-common-web</name>
+    <name>${project.artifactId}</name>
     <description>Refinex Common Web</description>
 
     <dependencies>

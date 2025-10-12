@@ -15,7 +15,7 @@ public interface ErrorCode extends Serializable {
     /**
      * 返回标准化错误码字符串
      */
-    String getCode();
+    int getCode();
 
     /**
      * 返回中文提示信息

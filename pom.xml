@@ -53,6 +53,7 @@
         <podam.version>8.0.2.RELEASE</podam.version>
         <jedis-mock.version>1.1.4</jedis-mock.version>
         <mockito-inline.version>5.2.0</mockito-inline.version>
+        <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
 
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
@@ -104,28 +105,48 @@
             </dependency>
 
             <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-jwt</artifactId>
-                <version>${satoken.version}</version>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-bom</artifactId>
+                <version>${hutool.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
+
+            <!-- =================== 权限认证 =================== -->
+            <!-- Sa-Token 权限认证 (核心模块) -->
             <dependency>
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-core</artifactId>
                 <version>${satoken.version}</version>
             </dependency>
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-redis-template</artifactId>
-                <version>${satoken.version}</version>
-            </dependency>
+            <!-- Sa-Token 权限认证 (Spring Boot 3 集成) -->
             <dependency>
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-spring-boot3-starter</artifactId>
                 <version>${satoken.version}</version>
             </dependency>
+            <!-- Sa-Token 权限认证 (Gateway Reactor 响应式集成) -->
             <dependency>
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-reactor-spring-boot3-starter</artifactId>
+                <version>${satoken.version}</version>
+            </dependency>
+            <!-- Sa-Token 集成 Redis 持久化令牌 -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-redis-template</artifactId>
+                <version>${satoken.version}</version>
+            </dependency>
+            <!-- Sa-Token 集成 Redis 持久化令牌 (使用 Jackson 序列化方式) -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-redis-jackson</artifactId>
+                <version>${satoken.version}</version>
+            </dependency>
+            <!-- Sa-Token 集成 JWT 认证 -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-jwt</artifactId>
                 <version>${satoken.version}</version>
             </dependency>
 
@@ -319,6 +340,12 @@
 
             <dependency>
                 <groupId>cn.refinex</groupId>
+                <artifactId>refinex-common-satoken</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.refinex</groupId>
                 <artifactId>refinex-common-security</artifactId>
                 <version>${revision}</version>
             </dependency>
@@ -355,13 +382,13 @@
 
             <dependency>
                 <groupId>cn.refinex</groupId>
-                <artifactId>refinex-common-test</artifactId>
+                <artifactId>refinex-common-nacos</artifactId>
                 <version>${revision}</version>
             </dependency>
 
             <dependency>
                 <groupId>cn.refinex</groupId>
-                <artifactId>refinex-api-auth</artifactId>
+                <artifactId>refinex-common-test</artifactId>
                 <version>${revision}</version>
             </dependency>
 

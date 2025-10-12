@@ -14,31 +14,29 @@ import lombok.Data;
 @Schema(description = "登录请求")
 public class LoginRequest {
 
-    /**
-     * 用户名
-     */
     @NotBlank(message = "用户名不能为空")
     @Schema(description = "用户名", example = "admin", requiredMode = Schema.RequiredMode.REQUIRED)
     private String username;
 
-    /**
-     * 密码
-     */
     @NotBlank(message = "密码不能为空")
     @Schema(description = "密码", example = "123456", requiredMode = Schema.RequiredMode.REQUIRED)
     private String password;
 
-    /**
-     * 验证码唯一标识
-     */
     @Schema(description = "验证码唯一标识", example = "a1b2c3d4-e5f6-7890-abcd-ef1234567890")
     private String captchaUuid;
 
-    /**
-     * 验证码文本
-     */
     @Schema(description = "验证码文本", example = "8u6h")
     private String captchaCode;
+
+    /**
+     * 客户端 ID（可选，前端传递）
+     * <p>
+     * 可选值：web_admin、mobile_app
+     * 如果不传，则默认是 web_admin
+     * </p>
+     */
+    @Schema(description = "客户端 ID", example = "web_admin", allowableValues = {"web_admin", "mobile_app"})
+    private String clientId = "web_admin";
 
     /**
      * 设备类型（可选，前端传递）

@@ -10,7 +10,7 @@
     <artifactId>refinex-common-jdbc</artifactId>
     <packaging>jar</packaging>
 
-    <name>refinex-common-jdbc</name>
+    <name>${project.artifactId}</name>
     <description>Refinex Cloud Common JDBC</description>
 
     <dependencies>

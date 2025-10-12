@@ -10,7 +10,7 @@
     <artifactId>refinex-common-json</artifactId>
     <packaging>jar</packaging>
 
-    <name>refinex-common-json</name>
+    <name>${project.artifactId}</name>
     <description>Refinex Common JSON</description>
 
     <dependencies>

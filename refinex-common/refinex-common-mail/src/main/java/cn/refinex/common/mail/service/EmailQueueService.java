@@ -1,14 +1,14 @@
 package cn.refinex.common.mail.service;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.json.utils.JsonUtils;
 import cn.refinex.common.mail.config.properties.MailProperties;
 import cn.refinex.common.mail.domain.dto.EmailSendRequest;
 import cn.refinex.common.mail.domain.dto.EmailSendResult;
 import cn.refinex.common.mail.domain.entity.EmailSendQueue;
 import cn.refinex.common.mail.enums.EmailSendStatus;
-import cn.refinex.common.mail.exception.EmailErrorCode;
-import cn.refinex.common.mail.exception.EmailException;
+import cn.refinex.common.mail.constants.EmailErrorMessageConstants;
 import cn.refinex.common.mail.repository.EmailSendQueueRepository;
 import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -204,7 +204,7 @@ public class EmailQueueService {
         EmailSendQueue task = queueRepository.findByQueueId(queueId);
         if (task == null) {
             log.error("任务不存在: queueId={}", queueId);
-            throw new EmailException(EmailErrorCode.QUEUE_TASK_NOT_FOUND);
+            throw new SystemException(EmailErrorMessageConstants.QUEUE_TASK_NOT_FOUND);
         }
 
         // 2. 检查任务状态
@@ -241,7 +241,7 @@ public class EmailQueueService {
         EmailSendQueue task = queueRepository.findByQueueId(queueId);
         if (task == null) {
             log.error("任务不存在: queueId={}", queueId);
-            throw new EmailException(EmailErrorCode.QUEUE_TASK_NOT_FOUND);
+            throw new SystemException(EmailErrorMessageConstants.QUEUE_TASK_NOT_FOUND);
         }
 
         // 2. 只能取消待发送的任务

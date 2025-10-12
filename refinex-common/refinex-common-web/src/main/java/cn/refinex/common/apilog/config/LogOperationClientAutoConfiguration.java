@@ -1,6 +1,6 @@
 package cn.refinex.common.apilog.config;
 
-import cn.refinex.platform.client.logger.LogOperationClient;
+import cn.refinex.platform.api.LogOperationFeignClient;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
@@ -12,6 +12,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * @since 1.0.0
  */
 @AutoConfiguration
-@EnableFeignClients(clients = {LogOperationClient.class}) // 主要是引入相关的 Feign 客户端
+@EnableFeignClients(clients = {LogOperationFeignClient.class}) // 主要是引入相关的 Feign 客户端
 public class LogOperationClientAutoConfiguration {
 }

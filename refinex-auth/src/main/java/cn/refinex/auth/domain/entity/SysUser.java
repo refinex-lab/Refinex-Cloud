@@ -50,7 +50,7 @@ public class SysUser {
     /**
      * 用户状态：0待激活,1正常,2冻结,3注销
      */
-    private Integer userStatus;
+    private Integer status;
 
     /**
      * 最后登录时间
