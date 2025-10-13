@@ -3,7 +3,7 @@ package cn.refinex.platform.api;
 import cn.refinex.common.constants.SystemFeignConstants;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.platform.domain.dto.request.UserCreateRequest;
-import cn.refinex.platform.domain.model.LoginUser;
+import cn.refinex.common.domain.model.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

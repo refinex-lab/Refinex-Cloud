@@ -3,7 +3,7 @@ package cn.refinex.platform.web;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.platform.api.UserFeignClient;
 import cn.refinex.platform.domain.dto.request.UserCreateRequest;
-import cn.refinex.platform.domain.model.LoginUser;
+import cn.refinex.common.domain.model.LoginUser;
 import cn.refinex.platform.service.impl.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;

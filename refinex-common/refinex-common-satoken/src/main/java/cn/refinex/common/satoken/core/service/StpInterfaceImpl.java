@@ -3,14 +3,14 @@ package cn.refinex.common.satoken.core.service;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
+import cn.refinex.common.api.PermissionFeignClient;
 import cn.refinex.common.domain.ApiResult;
+import cn.refinex.common.domain.model.LoginUser;
 import cn.refinex.common.enums.UserType;
 import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.exception.code.ResultCode;
 import cn.refinex.common.satoken.core.util.LoginHelper;
 import cn.refinex.common.utils.spring.SpringUtils;
-import cn.refinex.platform.api.PermissionFeignClient;
-import cn.refinex.platform.domain.model.LoginUser;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 

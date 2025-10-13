@@ -1,4 +1,4 @@
-package cn.refinex.platform.api;
+package cn.refinex.common.api;
 
 import cn.refinex.common.constants.SystemFeignConstants;
 import cn.refinex.common.domain.ApiResult;

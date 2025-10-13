@@ -6,8 +6,8 @@ import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.refinex.common.constants.SystemRoleConstants;
+import cn.refinex.common.domain.model.LoginUser;
 import cn.refinex.common.enums.UserType;
-import cn.refinex.platform.domain.model.LoginUser;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

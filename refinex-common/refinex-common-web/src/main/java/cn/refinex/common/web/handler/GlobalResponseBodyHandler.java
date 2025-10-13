@@ -1,6 +1,5 @@
 package cn.refinex.common.web.handler;
 
-import cn.refinex.common.constants.GlobalAttributeKeyConstants;
 import cn.refinex.common.domain.ApiResult;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
@@ -60,7 +59,7 @@ public class GlobalResponseBodyHandler implements ResponseBodyAdvice {
     @SuppressWarnings("NullableProblems") // 避免 IDEA 警告
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         HttpServletRequest servletRequest = ((ServletServerHttpRequest) request).getServletRequest();
-        servletRequest.setAttribute(GlobalAttributeKeyConstants.API_RESULT_KEY, body);
+        servletRequest.setAttribute("api_result", body);
         return body;
     }
 }

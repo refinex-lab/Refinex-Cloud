@@ -7,7 +7,6 @@ import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.refinex.common.apilog.core.annotation.LogOperation;
 import cn.refinex.common.apilog.core.enums.OperateTypeEnum;
-import cn.refinex.common.constants.GlobalAttributeKeyConstants;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.exception.code.ResultCode;
 import cn.refinex.common.json.utils.JsonUtils;
@@ -179,7 +178,7 @@ public class LogOperationFilter extends ApiRequestFilter {
 
         // 设置响应结果或者异常信息
         HttpServletRequest servletRequest = ((ServletServerHttpRequest) request).getServletRequest();
-        ApiResult<?> apiResult = (ApiResult<?>) servletRequest.getAttribute(GlobalAttributeKeyConstants.API_RESULT_KEY);
+        ApiResult<?> apiResult = (ApiResult<?>) servletRequest.getAttribute("api_result");
         if (Objects.nonNull(apiResult)) {
             if (logOperationAnnotation != null && logOperationAnnotation.recordResponseBody()) {
                 logOperationRequest.setResponseResult(apiResult.toString());

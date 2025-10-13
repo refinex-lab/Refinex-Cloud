@@ -20,7 +20,7 @@ import cn.refinex.common.redis.RedisService;
 import cn.refinex.common.satoken.core.util.LoginHelper;
 import cn.refinex.common.utils.device.DeviceUtils;
 import cn.refinex.platform.api.UserFeignClient;
-import cn.refinex.platform.domain.model.LoginUser;
+import cn.refinex.common.domain.model.LoginUser;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

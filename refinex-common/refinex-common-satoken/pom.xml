@@ -44,10 +44,10 @@
             <artifactId>refinex-common-core</artifactId>
         </dependency>
 
-        <!-- Refinex 公共 API 平台模块 -->
+        <!-- Refinex 公共 JSON 模块 -->
         <dependency>
             <groupId>cn.refinex</groupId>
-            <artifactId>refinex-api-platform</artifactId>
+            <artifactId>refinex-common-json</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -4,7 +4,7 @@ import cn.refinex.platform.domain.dto.request.UserCreateRequest;
 import cn.refinex.platform.domain.dto.request.UserDisableRequest;
 import cn.refinex.platform.domain.dto.request.UserKickoutRequest;
 import cn.refinex.platform.domain.dto.response.UserDisableStatusResponse;
-import cn.refinex.platform.domain.model.LoginUser;
+import cn.refinex.common.domain.model.LoginUser;
 import cn.refinex.platform.domain.model.UserSessionDTO;
 
 import java.util.List;

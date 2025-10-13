@@ -1,7 +1,7 @@
 package cn.refinex.platform.web;
 
 import cn.refinex.common.domain.ApiResult;
-import cn.refinex.platform.api.PermissionFeignClient;
+import cn.refinex.common.api.PermissionFeignClient;
 import cn.refinex.platform.service.PermissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
