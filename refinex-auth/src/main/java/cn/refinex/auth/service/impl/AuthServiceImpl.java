@@ -3,7 +3,6 @@ package cn.refinex.auth.service.impl;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
 import cn.refinex.auth.domain.dto.request.LoginRequest;
 import cn.refinex.auth.domain.vo.LoginVo;
@@ -13,16 +12,13 @@ import cn.refinex.auth.properties.CaptchaProperties;
 import cn.refinex.auth.properties.UserPasswordProperties;
 import cn.refinex.auth.service.AuthService;
 import cn.refinex.auth.service.CaptchaService;
-import cn.refinex.auth.service.LoginAsyncService;
 import cn.refinex.common.constants.SystemRedisKeyConstants;
-import cn.refinex.common.constants.SystemStatusConstants;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.enums.LoginType;
 import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.redis.RedisService;
 import cn.refinex.common.satoken.core.util.LoginHelper;
 import cn.refinex.common.utils.device.DeviceUtils;
-import cn.refinex.common.utils.servlet.ServletUtils;
 import cn.refinex.platform.api.UserFeignClient;
 import cn.refinex.platform.domain.model.LoginUser;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +28,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -50,7 +45,6 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final CaptchaProperties captchaProperties;
     private final CaptchaService captchaService;
-    private final LoginAsyncService loginAsyncService;
     private final UserFeignClient userClient;
     private final RedisService redisService;
     private final UserPasswordProperties userPasswordProperties;
@@ -104,7 +98,7 @@ public class AuthServiceImpl implements AuthService {
                 // 设置设备类型
                 .setDeviceType(deviceType)
                 // 设置登录 token 有效期，后台登录 30 分钟，移动端登录 1 天
-                .setTimeout(request.getClientId().equalsIgnoreCase(ClientTypeEnum.MOBILE_ADMIN.getCode())
+                .setTimeout(request.getClientId().equalsIgnoreCase(ClientTypeEnum.WEB_ADMIN.getCode())
                         ? Duration.ofMinutes(30).getSeconds()
                         : Duration.ofDays(1).getSeconds())
                 // 设置登录 token 最低活跃频率，单位：秒（默认 5 分钟）
@@ -131,21 +125,6 @@ public class AuthServiceImpl implements AuthService {
         loginVo.setAccessToken(StpUtil.getTokenValue());
         loginVo.setExpireIn(StpUtil.getTokenTimeout());
         loginVo.setClientId(request.getClientId());
-
-        // 异步记录登录日志
-        String userAgent = ServletUtils.getUserAgent(httpRequest);
-        loginAsyncService.recordLoginLog(
-                loginUser.getUserId(),
-                loginUser.getUsername(),
-                clientIp,
-                userAgent,
-                deviceType,
-                Convert.toInt(SystemStatusConstants.NORMAL),
-                null
-        );
-
-        // 异步更新最后登录信息
-        loginAsyncService.updateLastLoginInfo(loginUser.getUserId(), LocalDateTime.now(), clientIp);
 
         // 返回登录响应 VO
         return loginVo;

@@ -353,6 +353,15 @@ public final class ServletUtils {
     }
 
     /**
+     * 获取当前请求的User-Agent
+     *
+     * @return User-Agent值
+     */
+    public static String getUserAgent() {
+        return getUserAgent(getRequest());
+    }
+
+    /**
      * 获取Referer
      *
      * @param request HttpServletRequest对象
