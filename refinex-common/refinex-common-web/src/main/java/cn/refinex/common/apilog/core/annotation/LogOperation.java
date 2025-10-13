@@ -47,8 +47,6 @@ public @interface LogOperation {
 
     /**
      * 操作模块, 为空则尝试获取 {@link io.swagger.v3.oas.annotations.tags.Tag#name()} 属性值
-     * <p>
-     * 参考 {@link cn.refinex.common.constants.ModuleConstants}
      */
     String operateModule() default "";
 

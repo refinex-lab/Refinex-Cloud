@@ -1,11 +1,11 @@
 package cn.refinex.common.file.service;
 
+import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.file.config.properties.FileProperties;
 import cn.refinex.common.file.core.FileStorage;
 import cn.refinex.common.file.core.FileStorageFactory;
 import cn.refinex.common.file.domain.entity.FileInfo;
-import cn.refinex.common.file.exception.FileErrorCode;
-import cn.refinex.common.file.exception.FileException;
+import cn.refinex.common.file.constants.FileErrorMessageConstants;
 import cn.refinex.common.file.repository.FileInfoRepository;
 import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
 import lombok.RequiredArgsConstructor;
@@ -63,7 +63,7 @@ public class ThumbnailService {
 
         } catch (Exception e) {
             log.error("缩略图生成失败", e);
-            throw new FileException(FileErrorCode.THUMBNAIL_GENERATE_FAILED, e);
+            throw new SystemException(FileErrorMessageConstants.THUMBNAIL_GENERATE_FAILED, e);
         }
     }
 

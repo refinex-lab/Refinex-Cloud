@@ -1,7 +1,10 @@
 package cn.refinex.auth.domain.dto.request;
 
+import cn.refinex.common.validation.annotation.ConditionalValidation;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -12,11 +15,30 @@ import lombok.Data;
  */
 @Data
 @Schema(description = "登录请求")
+@ConditionalValidation(
+        condition = "loginType == 1",
+        field = "username",
+        type = ConditionalValidation.ValidationType.NOT_BLANK,
+        message = "登录类型为密码登录时，用户名不能为空"
+)
+@ConditionalValidation(
+        condition = "loginType == 2",
+        field = "email",
+        type = ConditionalValidation.ValidationType.NOT_BLANK,
+        message = "登录类型为邮箱登录时，邮箱不能为空"
+)
 public class LoginRequest {
 
-    @NotBlank(message = "用户名不能为空")
-    @Schema(description = "用户名", example = "admin", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "登录类型不能为空")
+    @Schema(description = "登录类型(1=密码登录, 2=邮箱登录)", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Integer loginType;
+
+    @Schema(description = "用户名", example = "admin")
     private String username;
+
+    @Email(message = "邮箱格式不正确")
+    @Schema(description = "邮箱", example = "admin@example.com")
+    private String email;
 
     @NotBlank(message = "密码不能为空")
     @Schema(description = "密码", example = "123456", requiredMode = Schema.RequiredMode.REQUIRED)

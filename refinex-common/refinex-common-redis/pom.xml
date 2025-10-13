@@ -44,12 +44,21 @@
             <artifactId>commons-pool2</artifactId>
         </dependency>
 
+        <!--
+         作用：为 @ConfigurationProperties 自动生成 META-INF/spring-configuration-metadata.json 使 IDE 能自动提示配置属性。
+         - 只在编译期运行，不参与运行时；
+         - 不影响依赖关系，也不参与 Bean 加载；
+         - 适用于存在 @ConfigurationProperties 的模块。
+        -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
 
+        <!--
+        作用：提供 @Configuration 自动装配支持, 并在 META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports 中声明。
+        -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>

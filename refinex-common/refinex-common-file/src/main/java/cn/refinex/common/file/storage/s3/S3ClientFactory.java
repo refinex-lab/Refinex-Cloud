@@ -1,8 +1,8 @@
 package cn.refinex.common.file.storage.s3;
 
+import cn.refinex.common.exception.SystemException;
+import cn.refinex.common.file.constants.FileErrorMessageConstants;
 import cn.refinex.common.file.domain.entity.FileStorageConfig;
-import cn.refinex.common.file.exception.FileErrorCode;
-import cn.refinex.common.file.exception.FileException;
 import cn.refinex.common.jdbc.service.SensitiveDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +62,8 @@ public class S3ClientFactory {
             String secretKey = sensitiveDataService.queryAndDecrypt("sys_file_storage_config", config.getSecretKey(), "secret_key");
 
             if (accessKey == null || secretKey == null) {
-                throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND, "存储配置密钥不存在，configId=" + config.getId());
+                log.error("存储配置密钥不存在，configId={}", config.getId());
+                throw new SystemException(FileErrorMessageConstants.STORAGE_CONFIG_NOT_FOUND);
             }
 
             // 2. 创建凭证
@@ -88,7 +89,7 @@ public class S3ClientFactory {
 
         } catch (Exception e) {
             log.error("S3Client 创建失败，configId={}", config.getId(), e);
-            throw new FileException(FileErrorCode.STORAGE_INIT_FAILED, "S3Client 创建失败", e);
+            throw new SystemException(FileErrorMessageConstants.STORAGE_INIT_FAILED, e);
         }
     }
 

@@ -1,10 +1,10 @@
 package cn.refinex.common.file.storage.database;
 
+import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.file.core.FileStorage;
 import cn.refinex.common.file.domain.entity.FileContent;
 import cn.refinex.common.file.enums.StorageType;
-import cn.refinex.common.file.exception.FileErrorCode;
-import cn.refinex.common.file.exception.FileException;
+import cn.refinex.common.file.constants.FileErrorMessageConstants;
 import cn.refinex.common.file.repository.FileContentRepository;
 import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +65,8 @@ public class DatabaseFileStorage implements FileStorage {
             // 4. 插入到数据库
             int result = fileContentRepository.insert(fileContent);
             if (result <= 0) {
-                throw new FileException(FileErrorCode.FILE_UPLOAD_FAILED, "数据库插入失败");
+                log.error("数据库插入文件内容失败，fileId={}", fileId);
+                throw new SystemException(FileErrorMessageConstants.FILE_UPLOAD_FAILED);
             }
 
             log.info("文件已上传到数据库，fileId={}, size={} bytes", fileId, contentData.length);
@@ -73,7 +74,7 @@ public class DatabaseFileStorage implements FileStorage {
 
         } catch (Exception e) {
             log.error("文件上传到数据库失败，fileName={}", fileName, e);
-            throw new FileException(FileErrorCode.FILE_UPLOAD_FAILED, e);
+            throw new SystemException(FileErrorMessageConstants.FILE_UPLOAD_FAILED, e);
         }
     }
 
@@ -92,7 +93,8 @@ public class DatabaseFileStorage implements FileStorage {
             // 2. 查询文件内容
             FileContent fileContent = fileContentRepository.findByFileId(fileId);
             if (fileContent == null) {
-                throw new FileException(FileErrorCode.FILE_NOT_FOUND, "文件内容不存在，fileId=" + fileId);
+                log.warn("文件内容不存在，fileId={}", fileId);
+                throw new SystemException(FileErrorMessageConstants.FILE_NOT_FOUND);
             }
 
             // 3. 返回字节数组输入流
@@ -101,12 +103,12 @@ public class DatabaseFileStorage implements FileStorage {
 
         } catch (NumberFormatException e) {
             log.error("无效的存储路径，storageKey={}", storageKey, e);
-            throw new FileException(FileErrorCode.FILE_DOWNLOAD_FAILED, "无效的存储路径");
-        } catch (FileException e) {
+            throw new SystemException(FileErrorMessageConstants.FILE_DOWNLOAD_FAILED);
+        } catch (SystemException e) {
             throw e;
         } catch (Exception e) {
             log.error("文件从数据库下载失败，storageKey={}", storageKey, e);
-            throw new FileException(FileErrorCode.FILE_DOWNLOAD_FAILED, e);
+            throw new SystemException(FileErrorMessageConstants.FILE_DOWNLOAD_FAILED, e);
         }
     }
 
@@ -131,10 +133,10 @@ public class DatabaseFileStorage implements FileStorage {
 
         } catch (NumberFormatException e) {
             log.error("无效的存储路径，storageKey={}", storageKey, e);
-            throw new FileException(FileErrorCode.FILE_DELETE_FAILED, "无效的存储路径");
+            throw new SystemException(FileErrorMessageConstants.FILE_DELETE_FAILED, e);
         } catch (Exception e) {
             log.error("文件从数据库删除失败，storageKey={}", storageKey, e);
-            throw new FileException(FileErrorCode.FILE_DELETE_FAILED, e);
+            throw new SystemException(FileErrorMessageConstants.FILE_DELETE_FAILED, e);
         }
     }
 

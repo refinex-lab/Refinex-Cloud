@@ -47,6 +47,11 @@
 
         <dependency>
             <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-protection</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-security</artifactId>
         </dependency>
 
@@ -63,6 +68,12 @@
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>

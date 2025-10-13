@@ -1,7 +1,6 @@
 package cn.refinex.common.protection.ratelimiter.core.keyresolver.impl;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.refinex.common.constants.ModuleConstants;
 import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.exception.code.ResultCode;
 import cn.refinex.common.protection.ratelimiter.core.annotation.RateLimiter;
@@ -75,7 +74,7 @@ public class ExpressionRateLimiterKeyResolver implements RateLimiterKeyResolver 
                     .getClass()
                     .getDeclaredMethod(point.getSignature().getName(), method.getParameterTypes());
         } catch (NoSuchMethodException e) {
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.INTERNAL_ERROR);
+            throw new SystemException(ResultCode.INTERNAL_ERROR);
         }
     }
 }

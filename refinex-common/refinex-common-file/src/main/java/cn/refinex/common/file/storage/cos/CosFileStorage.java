@@ -1,10 +1,10 @@
 package cn.refinex.common.file.storage.cos;
 
+import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.file.core.FileStorage;
 import cn.refinex.common.file.domain.entity.FileStorageConfig;
 import cn.refinex.common.file.enums.StorageType;
-import cn.refinex.common.file.exception.FileErrorCode;
-import cn.refinex.common.file.exception.FileException;
+import cn.refinex.common.file.constants.FileErrorMessageConstants;
 import cn.refinex.common.file.repository.FileStorageConfigRepository;
 import cn.refinex.common.file.storage.s3.MultipartUploadContext;
 import cn.refinex.common.file.storage.s3.S3ClientFactory;
@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+
+import static cn.refinex.common.file.constants.FileErrorMessageConstants.STORAGE_CONFIG_NOT_FOUND;
 
 /**
  * 腾讯云 COS 文件存储实现
@@ -57,7 +59,8 @@ public class CosFileStorage implements FileStorage {
             Long configId = Long.parseLong(metadata.get("configId"));
             FileStorageConfig config = configRepository.findById(configId);
             if (config == null) {
-                throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND, "存储配置不存在，configId=" + configId);
+                log.error("腾讯云 COS 文件上传失败，fileName={}, 存储配置不存在，configId={}", fileName, configId);
+                throw new SystemException(STORAGE_CONFIG_NOT_FOUND);
             }
 
             // 2. 获取 S3Client（复用 S3ClientFactory）
@@ -83,7 +86,7 @@ public class CosFileStorage implements FileStorage {
 
         } catch (Exception e) {
             log.error("文件上传到腾讯云 COS 失败，fileName={}", fileName, e);
-            throw new FileException(FileErrorCode.FILE_UPLOAD_FAILED, e);
+            throw new SystemException(FileErrorMessageConstants.FILE_UPLOAD_FAILED, e);
         }
     }
 
@@ -105,7 +108,8 @@ public class CosFileStorage implements FileStorage {
             // 2. 获取配置
             FileStorageConfig config = configRepository.findById(configId);
             if (config == null) {
-                throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND, "存储配置不存在，configId=" + configId);
+                log.error("腾讯云 COS 文件下载失败，storageKey={}, 存储配置不存在，configId={}", storageKey, configId);
+                throw new SystemException(STORAGE_CONFIG_NOT_FOUND);
             }
 
             // 3. 获取 S3Client
@@ -123,7 +127,7 @@ public class CosFileStorage implements FileStorage {
 
         } catch (Exception e) {
             log.error("文件从腾讯云 COS 下载失败，storageKey={}", storageKey, e);
-            throw new FileException(FileErrorCode.FILE_DOWNLOAD_FAILED, e);
+            throw new SystemException(FileErrorMessageConstants.FILE_DOWNLOAD_FAILED, e);
         }
     }
 
@@ -144,7 +148,8 @@ public class CosFileStorage implements FileStorage {
             // 2. 获取配置
             FileStorageConfig config = configRepository.findById(configId);
             if (config == null) {
-                throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND, "存储配置不存在，configId=" + configId);
+                log.error("腾讯云 COS 文件删除失败，storageKey={}, 存储配置不存在，configId={}", storageKey, configId);
+                throw new SystemException(STORAGE_CONFIG_NOT_FOUND);
             }
 
             // 3. 获取 S3Client
@@ -161,7 +166,7 @@ public class CosFileStorage implements FileStorage {
 
         } catch (Exception e) {
             log.error("文件从腾讯云 COS 删除失败，storageKey={}", storageKey, e);
-            throw new FileException(FileErrorCode.FILE_DELETE_FAILED, e);
+            throw new SystemException(FileErrorMessageConstants.FILE_DELETE_FAILED, e);
         }
     }
 
@@ -184,7 +189,8 @@ public class CosFileStorage implements FileStorage {
             // 2. 获取配置
             FileStorageConfig config = configRepository.findById(configId);
             if (config == null) {
-                throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND, "存储配置不存在，configId=" + configId);
+                log.error("腾讯云 COS 预签名 URL 生成失败，storageKey={}, 存储配置不存在，configId={}", storageKey, configId);
+                throw new SystemException(STORAGE_CONFIG_NOT_FOUND);
             }
 
             // 3. 创建 S3Presigner
@@ -209,7 +215,7 @@ public class CosFileStorage implements FileStorage {
 
         } catch (Exception e) {
             log.error("腾讯云 COS 预签名 URL 生成失败，storageKey={}", storageKey, e);
-            throw new FileException(FileErrorCode.STORAGE_OPERATION_FAILED, "预签名 URL 生成失败", e);
+            throw new SystemException("预签名 URL 生成失败", e);
         }
     }
 
@@ -235,7 +241,8 @@ public class CosFileStorage implements FileStorage {
             // 2. 获取配置
             FileStorageConfig config = configRepository.findById(configId);
             if (config == null) {
-                throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND, "存储配置不存在，configId=" + configId);
+                log.error("腾讯云 COS 分片上传初始化失败，fileName={}, 存储配置不存在，configId={}", fileName, configId);
+                throw new SystemException(STORAGE_CONFIG_NOT_FOUND);
             }
 
             // 3. 获取 S3Client（复用 S3ClientFactory）
@@ -260,7 +267,7 @@ public class CosFileStorage implements FileStorage {
 
         } catch (Exception e) {
             log.error("腾讯云 COS 分片上传初始化失败，fileName={}", fileName, e);
-            throw new FileException(FileErrorCode.FILE_UPLOAD_FAILED, "分片上传初始化失败", e);
+            throw new SystemException("分片上传初始化失败", e);
         }
     }
 
@@ -281,7 +288,8 @@ public class CosFileStorage implements FileStorage {
             // 2. 获取配置
             FileStorageConfig config = configRepository.findById(context.getConfigId());
             if (config == null) {
-                throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND, "存储配置不存在，configId=" + context.getConfigId());
+                log.error("腾讯云 COS 分片上传失败，uploadId={}, 存储配置不存在，configId={}", uploadId, context.getConfigId());
+                throw new SystemException(STORAGE_CONFIG_NOT_FOUND);
             }
 
             // 3. 获取 S3Client
@@ -303,7 +311,7 @@ public class CosFileStorage implements FileStorage {
 
         } catch (Exception e) {
             log.error("腾讯云 COS 分片上传失败，uploadId={}, partNumber={}", uploadId, partNumber, e);
-            throw new FileException(FileErrorCode.FILE_UPLOAD_FAILED, "分片上传失败", e);
+            throw new SystemException("分片上传失败", e);
         }
     }
 
@@ -323,7 +331,8 @@ public class CosFileStorage implements FileStorage {
             // 2. 获取配置
             FileStorageConfig config = configRepository.findById(context.getConfigId());
             if (config == null) {
-                throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND, "存储配置不存在，configId=" + context.getConfigId());
+                log.error("腾讯云 COS 分片上传完成失败，uploadId={}, 存储配置不存在，configId={}", uploadId, context.getConfigId());
+                throw new SystemException(STORAGE_CONFIG_NOT_FOUND);
             }
 
             // 3. 获取 S3Client
@@ -356,7 +365,7 @@ public class CosFileStorage implements FileStorage {
 
         } catch (Exception e) {
             log.error("腾讯云 COS 分片上传完成失败，uploadId={}", uploadId, e);
-            throw new FileException(FileErrorCode.FILE_UPLOAD_FAILED, "分片上传完成失败", e);
+            throw new SystemException(FileErrorMessageConstants.FILE_UPLOAD_FAILED, e);
         }
     }
 

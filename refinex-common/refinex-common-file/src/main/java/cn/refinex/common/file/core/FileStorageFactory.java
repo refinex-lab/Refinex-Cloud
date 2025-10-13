@@ -1,8 +1,8 @@
 package cn.refinex.common.file.core;
 
+import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.file.enums.StorageType;
-import cn.refinex.common.file.exception.FileErrorCode;
-import cn.refinex.common.file.exception.FileException;
+import cn.refinex.common.file.constants.FileErrorMessageConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -43,7 +43,8 @@ public class FileStorageFactory {
     public FileStorage getStorage(StorageType storageType) {
         FileStorage storage = storageMap.get(storageType);
         if (storage == null) {
-            throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND, "未找到存储类型对应的实现：" + storageType);
+            log.error("未找到存储类型对应的实现：{}", storageType);
+            throw new SystemException(FileErrorMessageConstants.STORAGE_CONFIG_NOT_FOUND);
         }
         return storage;
     }

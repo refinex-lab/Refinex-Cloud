@@ -21,12 +21,12 @@
 
         <dependency>
             <groupId>cn.refinex</groupId>
-            <artifactId>refinex-common-redis</artifactId>
+            <artifactId>refinex-common-satoken</artifactId>
         </dependency>
 
         <dependency>
             <groupId>cn.refinex</groupId>
-            <artifactId>refinex-common-web</artifactId>
+            <artifactId>refinex-common-redis</artifactId>
         </dependency>
 
         <dependency>
@@ -38,6 +38,7 @@
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

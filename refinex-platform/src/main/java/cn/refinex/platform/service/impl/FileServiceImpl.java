@@ -1,13 +1,14 @@
 package cn.refinex.platform.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.refinex.common.exception.BusinessException;
+import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.file.core.FileStorage;
 import cn.refinex.common.file.core.FileStorageFactory;
 import cn.refinex.common.file.domain.entity.FileInfo;
 import cn.refinex.common.file.domain.entity.FileStorageConfig;
 import cn.refinex.common.file.enums.StorageType;
-import cn.refinex.common.file.exception.FileErrorCode;
-import cn.refinex.common.file.exception.FileException;
+import cn.refinex.common.file.constants.FileErrorMessageConstants;
 import cn.refinex.common.file.repository.FileInfoRepository;
 import cn.refinex.common.file.repository.FileStorageConfigRepository;
 import cn.refinex.common.file.service.FileDeduplicationService;
@@ -83,7 +84,8 @@ public class FileServiceImpl implements FileService {
                     : StorageType.S3;
             FileStorageConfig config = storageConfigRepository.findDefaultConfig(storageType.getCode());
             if (config == null) {
-                throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND);
+                log.error("未找到默认存储配置，storageType={}", storageType);
+                throw new BusinessException(FileErrorMessageConstants.STORAGE_CONFIG_NOT_FOUND);
             }
 
             // 3. 检测文件 MIME 类型、提取文件扩展名
@@ -137,7 +139,7 @@ public class FileServiceImpl implements FileService {
 
         } catch (Exception e) {
             log.error("生成上传 URL 失败", e);
-            throw new FileException(FileErrorCode.FILE_UPLOAD_FAILED, e);
+            throw new SystemException(FileErrorMessageConstants.FILE_UPLOAD_FAILED, e);
         }
     }
 
@@ -154,7 +156,8 @@ public class FileServiceImpl implements FileService {
             // 1. 查询文件元数据
             FileInfo fileInfo = fileInfoRepository.findByFileGuid(request.getFileGuid());
             if (fileInfo == null) {
-                throw new FileException(FileErrorCode.FILE_NOT_FOUND);
+                log.error("文件元数据不存在，fileGuid={}", request.getFileGuid());
+                throw new BusinessException(FileErrorMessageConstants.FILE_NOT_FOUND);
             }
 
             // 2. 更新文件大小和 MD5（如果提供）
@@ -178,7 +181,7 @@ public class FileServiceImpl implements FileService {
 
         } catch (Exception e) {
             log.error("确认上传失败，fileGuid={}", request.getFileGuid(), e);
-            throw new FileException(FileErrorCode.FILE_UPLOAD_FAILED, e);
+            throw new SystemException(FileErrorMessageConstants.FILE_UPLOAD_FAILED, e);
         }
     }
 
@@ -195,7 +198,8 @@ public class FileServiceImpl implements FileService {
             // 1. 查询文件元数据
             FileInfo fileInfo = fileInfoRepository.findByFileGuid(fileGuid);
             if (fileInfo == null) {
-                throw new FileException(FileErrorCode.FILE_NOT_FOUND);
+                log.error("文件元数据不存在，fileGuid={}", fileGuid);
+                throw new BusinessException(FileErrorMessageConstants.FILE_NOT_FOUND);
             }
 
             // 2. 获取存储实现
@@ -210,7 +214,7 @@ public class FileServiceImpl implements FileService {
 
         } catch (Exception e) {
             log.error("生成下载 URL 失败，fileGuid={}", fileGuid, e);
-            throw new FileException(FileErrorCode.FILE_DOWNLOAD_FAILED, e);
+            throw new SystemException(FileErrorMessageConstants.FILE_DOWNLOAD_FAILED, e);
         }
     }
 
@@ -224,7 +228,8 @@ public class FileServiceImpl implements FileService {
     public FileInfoDTO getFileInfo(String fileGuid) {
         FileInfo fileInfo = fileInfoRepository.findByFileGuid(fileGuid);
         if (fileInfo == null) {
-            throw new FileException(FileErrorCode.FILE_NOT_FOUND);
+            log.error("文件元数据不存在，fileGuid={}", fileGuid);
+            throw new BusinessException(FileErrorMessageConstants.FILE_NOT_FOUND);
         }
         return BeanConverter.toBean(fileInfo, FileInfoDTO.class);
     }
@@ -241,12 +246,14 @@ public class FileServiceImpl implements FileService {
             // 1. 查询文件元数据
             FileInfo fileInfo = fileInfoRepository.findByFileGuid(fileGuid);
             if (fileInfo == null) {
-                throw new FileException(FileErrorCode.FILE_NOT_FOUND);
+                log.error("文件元数据不存在，fileGuid={}", fileGuid);
+                throw new BusinessException(FileErrorMessageConstants.FILE_NOT_FOUND);
             }
 
             // 2. 检查引用计数
             if (fileInfo.getRefCount() > 0) {
-                throw new FileException(FileErrorCode.FILE_REF_COUNT_NOT_ZERO);
+                log.error("文件引用计数不为零，fileGuid={}", fileGuid);
+                throw new BusinessException(FileErrorMessageConstants.FILE_REF_COUNT_NOT_ZERO);
             }
 
             // 3. 逻辑删除文件元数据
@@ -260,7 +267,7 @@ public class FileServiceImpl implements FileService {
 
         } catch (Exception e) {
             log.error("文件删除失败，fileGuid={}", fileGuid, e);
-            throw new FileException(FileErrorCode.FILE_DELETE_FAILED, e);
+            throw new SystemException(FileErrorMessageConstants.FILE_DELETE_FAILED, e);
         }
     }
 

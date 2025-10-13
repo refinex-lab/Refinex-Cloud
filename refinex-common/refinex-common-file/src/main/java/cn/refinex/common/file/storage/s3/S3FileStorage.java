@@ -1,10 +1,10 @@
 package cn.refinex.common.file.storage.s3;
 
+import cn.refinex.common.exception.SystemException;
+import cn.refinex.common.file.constants.FileErrorMessageConstants;
 import cn.refinex.common.file.core.FileStorage;
 import cn.refinex.common.file.domain.entity.FileStorageConfig;
 import cn.refinex.common.file.enums.StorageType;
-import cn.refinex.common.file.exception.FileErrorCode;
-import cn.refinex.common.file.exception.FileException;
 import cn.refinex.common.file.repository.FileStorageConfigRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +54,8 @@ public class S3FileStorage implements FileStorage {
             Long configId = Long.parseLong(metadata.get("configId"));
             FileStorageConfig config = configRepository.findById(configId);
             if (config == null) {
-                throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND, "存储配置不存在，configId=" + configId);
+                log.error("S3 存储配置不存在，configId={}", configId);
+                throw new SystemException(FileErrorMessageConstants.STORAGE_CONFIG_NOT_FOUND);
             }
 
             // 2. 获取 S3Client
@@ -80,7 +81,7 @@ public class S3FileStorage implements FileStorage {
 
         } catch (Exception e) {
             log.error("文件上传到 S3 失败，fileName={}", fileName, e);
-            throw new FileException(FileErrorCode.FILE_UPLOAD_FAILED, e);
+            throw new SystemException(FileErrorMessageConstants.FILE_UPLOAD_FAILED, e);
         }
     }
 
@@ -102,7 +103,8 @@ public class S3FileStorage implements FileStorage {
             // 2. 获取配置
             FileStorageConfig config = configRepository.findById(configId);
             if (config == null) {
-                throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND, "存储配置不存在，configId=" + configId);
+                log.error("S3 存储配置不存在，configId={}", configId);
+                throw new SystemException(FileErrorMessageConstants.STORAGE_CONFIG_NOT_FOUND);
             }
 
             // 3. 获取 S3Client
@@ -120,7 +122,7 @@ public class S3FileStorage implements FileStorage {
 
         } catch (Exception e) {
             log.error("文件从 S3 下载失败，storageKey={}", storageKey, e);
-            throw new FileException(FileErrorCode.FILE_DOWNLOAD_FAILED, e);
+            throw new SystemException(FileErrorMessageConstants.FILE_DOWNLOAD_FAILED, e);
         }
     }
 
@@ -141,7 +143,8 @@ public class S3FileStorage implements FileStorage {
             // 2. 获取配置
             FileStorageConfig config = configRepository.findById(configId);
             if (config == null) {
-                throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND, "存储配置不存在，configId=" + configId);
+                log.error("S3 存储配置不存在，configId={}", configId);
+                throw new SystemException(FileErrorMessageConstants.STORAGE_CONFIG_NOT_FOUND);
             }
 
             // 3. 获取 S3Client
@@ -158,7 +161,7 @@ public class S3FileStorage implements FileStorage {
 
         } catch (Exception e) {
             log.error("文件从 S3 删除失败，storageKey={}", storageKey, e);
-            throw new FileException(FileErrorCode.FILE_DELETE_FAILED, e);
+            throw new SystemException(FileErrorMessageConstants.FILE_DELETE_FAILED, e);
         }
     }
 
@@ -181,7 +184,8 @@ public class S3FileStorage implements FileStorage {
             // 2. 获取配置
             FileStorageConfig config = configRepository.findById(configId);
             if (config == null) {
-                throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND, "存储配置不存在，configId=" + configId);
+                log.error("S3 存储配置不存在，configId={}", configId);
+                throw new SystemException(FileErrorMessageConstants.STORAGE_CONFIG_NOT_FOUND);
             }
 
             // 3. 创建 S3Presigner
@@ -206,7 +210,7 @@ public class S3FileStorage implements FileStorage {
 
         } catch (Exception e) {
             log.error("预签名 URL 生成失败，storageKey={}", storageKey, e);
-            throw new FileException(FileErrorCode.STORAGE_OPERATION_FAILED, "预签名 URL 生成失败", e);
+            throw new SystemException(FileErrorMessageConstants.STORAGE_OPERATION_FAILED, e);
         }
     }
 
@@ -232,7 +236,8 @@ public class S3FileStorage implements FileStorage {
             // 2. 获取配置
             FileStorageConfig config = configRepository.findById(configId);
             if (config == null) {
-                throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND, "存储配置不存在，configId=" + configId);
+                log.error("S3 存储配置不存在，configId={}", configId);
+                throw new SystemException(FileErrorMessageConstants.STORAGE_CONFIG_NOT_FOUND);
             }
 
             // 3. 获取 S3Client
@@ -257,7 +262,7 @@ public class S3FileStorage implements FileStorage {
 
         } catch (Exception e) {
             log.error("分片上传初始化失败，fileName={}", fileName, e);
-            throw new FileException(FileErrorCode.FILE_UPLOAD_FAILED, "分片上传初始化失败", e);
+            throw new SystemException(FileErrorMessageConstants.FILE_UPLOAD_FAILED, e);
         }
     }
 
@@ -278,7 +283,8 @@ public class S3FileStorage implements FileStorage {
             // 2. 获取配置
             FileStorageConfig config = configRepository.findById(context.getConfigId());
             if (config == null) {
-                throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND, "存储配置不存在，configId=" + context.getConfigId());
+                log.error("S3 存储配置不存在，configId={}", context.getConfigId());
+                throw new SystemException(FileErrorMessageConstants.STORAGE_CONFIG_NOT_FOUND);
             }
 
             // 3. 获取 S3Client
@@ -300,7 +306,7 @@ public class S3FileStorage implements FileStorage {
 
         } catch (Exception e) {
             log.error("分片上传失败，uploadId={}, partNumber={}", uploadId, partNumber, e);
-            throw new FileException(FileErrorCode.FILE_UPLOAD_FAILED, "分片上传失败", e);
+            throw new SystemException(FileErrorMessageConstants.FILE_UPLOAD_FAILED, e);
         }
     }
 
@@ -320,7 +326,8 @@ public class S3FileStorage implements FileStorage {
             // 2. 获取配置
             FileStorageConfig config = configRepository.findById(context.getConfigId());
             if (config == null) {
-                throw new FileException(FileErrorCode.STORAGE_CONFIG_NOT_FOUND, "存储配置不存在，configId=" + context.getConfigId());
+                log.error("S3 存储配置不存在，configId={}", context.getConfigId());
+                throw new SystemException(FileErrorMessageConstants.STORAGE_CONFIG_NOT_FOUND);
             }
 
             // 3. 获取 S3Client
@@ -353,7 +360,7 @@ public class S3FileStorage implements FileStorage {
 
         } catch (Exception e) {
             log.error("分片上传完成失败，uploadId={}", uploadId, e);
-            throw new FileException(FileErrorCode.FILE_UPLOAD_FAILED, "分片上传完成失败", e);
+            throw new SystemException(FileErrorMessageConstants.FILE_UPLOAD_FAILED, e);
         }
     }
 

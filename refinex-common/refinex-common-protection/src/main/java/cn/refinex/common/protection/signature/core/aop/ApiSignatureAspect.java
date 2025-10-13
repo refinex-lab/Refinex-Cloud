@@ -6,7 +6,6 @@ import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
-import cn.refinex.common.constants.ModuleConstants;
 import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.exception.code.ResultCode;
 import cn.refinex.common.protection.signature.core.annotation.ApiSignature;
@@ -54,7 +53,7 @@ public class ApiSignatureAspect {
 
         // 验签失败，抛出异常
         log.error("[beforePointCut][方法{} 参数({}) 签名失败]", joinPoint.getSignature().toString(), joinPoint.getArgs());
-        throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.UNAUTHORIZED.getCode(), StrUtil.blankToDefault(signature.message(), ResultCode.UNAUTHORIZED.getMessage()));
+        throw new SystemException(ResultCode.UNAUTHORIZED.getCode(), StrUtil.blankToDefault(signature.message(), ResultCode.UNAUTHORIZED.getMessage()));
     }
 
     /**
@@ -99,7 +98,7 @@ public class ApiSignatureAspect {
         if (BooleanUtil.isFalse(apiSignatureRedisService.setNonce(appId, nonce, signature.timeout() * 2, signature.timeUnit()))) {
             String timestamp = request.getHeader(signature.timestamp());
             log.info("[verifySignature][appId({}) timestamp({}) nonce({}) sign({}) 存在重复请求]", appId, timestamp, nonce, clientSignature);
-            throw new SystemException(ModuleConstants.MODULE_COMMON, ResultCode.REPEATED_REQUESTS);
+            throw new SystemException(ResultCode.REPEATED_REQUESTS);
         }
 
         return true;
