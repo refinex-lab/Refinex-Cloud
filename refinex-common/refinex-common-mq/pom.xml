@@ -4,44 +4,50 @@
     <parent>
         <groupId>cn.refinex</groupId>
         <artifactId>refinex-common</artifactId>
-        <version>${revision}</version>
+        <version>1.0.0</version>
     </parent>
 
-    <artifactId>refinex-common-redis</artifactId>
+    <artifactId>refinex-common-mq</artifactId>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
-    <description>Refinex Cloud Common Redis</description>
+    <description>
+        Refinex Cloud Common MQ：
+        基于 Spring Boot 3 封装的消息队列模块，其他模块需要引入获得使用消息队列相关功能的能力。
+    </description>
 
     <dependencies>
+        <!-- Redis 模块 -->
         <dependency>
             <groupId>cn.refinex</groupId>
-            <artifactId>refinex-common-core</artifactId>
+            <artifactId>refinex-common-redis</artifactId>
         </dependency>
 
+        <!-- JSON 模块 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cache</artifactId>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-json</artifactId>
         </dependency>
 
+        <!-- Kafka 消息队列 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <optional>true</optional>
         </dependency>
 
+        <!-- RabbitMQ 消息队列 -->
         <dependency>
-            <groupId>org.redisson</groupId>
-            <artifactId>redisson-spring-boot-starter</artifactId>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit</artifactId>
+            <optional>true</optional>
         </dependency>
 
+        <!-- RocketMQ 消息队列 -->
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- 配置元数据生成器 -->

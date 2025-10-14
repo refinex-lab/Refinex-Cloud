@@ -26,6 +26,7 @@
         <module>refinex-common-test</module>
         <module>refinex-common-nacos</module>
         <module>refinex-common-satoken</module>
+        <module>refinex-common-mq</module>
     </modules>
 
 </project>
