@@ -14,6 +14,24 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public enum LoginType {
 
-    PASSWORD,
-    EMAIL;
+    PASSWORD(1, "密码登录"),
+    EMAIL(2, "邮箱登录");
+
+    private final Integer code;
+    private final String info;
+
+    /**
+     * 根据状态码获取枚举
+     *
+     * @param code 状态码
+     * @return 枚举
+     */
+    public static LoginType fromCode(Integer code) {
+        for (LoginType status : values()) {
+            if (status.getCode().equals(code)) {
+                return status;
+            }
+        }
+        throw new IllegalArgumentException("未知的登录类型：" + code);
+    }
 }

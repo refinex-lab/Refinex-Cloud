@@ -14,13 +14,13 @@ import cn.refinex.auth.service.AuthService;
 import cn.refinex.auth.service.CaptchaService;
 import cn.refinex.common.constants.SystemRedisKeyConstants;
 import cn.refinex.common.domain.ApiResult;
+import cn.refinex.common.domain.model.LoginUser;
 import cn.refinex.common.enums.LoginType;
 import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.redis.RedisService;
 import cn.refinex.common.satoken.core.util.LoginHelper;
 import cn.refinex.common.utils.device.DeviceUtils;
 import cn.refinex.platform.api.UserFeignClient;
-import cn.refinex.common.domain.model.LoginUser;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.Objects;
-import java.util.function.Supplier;
+import java.util.Optional;
+import java.util.function.BooleanSupplier;
 
 /**
  * 认证服务实现类
@@ -64,8 +65,10 @@ public class AuthServiceImpl implements AuthService {
             captchaService.verify(request.getCaptchaUuid(), request.getCaptchaCode());
         }
 
-        // 根据用户名获取登录用户信息
-        ApiResult<LoginUser> userNameResult = userClient.getLoginUserByUserName(request.getUsername());
+        // 根据用户名/邮箱获取登录用户信息
+        ApiResult<LoginUser> userNameResult = Objects.equals(request.getLoginType(), LoginType.PASSWORD.getCode())
+                ? userClient.getLoginUserByUserName(request.getUsername())
+                : userClient.getLoginUserByEmail(request.getUsername());
         LoginUser loginUser = userNameResult.getData();
         if (Objects.isNull(loginUser)) {
             log.warn("根据用户名查询登录用户失败，username: {}", request.getUsername());
@@ -133,44 +136,55 @@ public class AuthServiceImpl implements AuthService {
     /**
      * 检查登录状态
      *
-     * @param loginType 登录类型
-     * @param username  用户名
-     * @param supplier  登录状态检查逻辑
+     * @param loginType              登录类型
+     * @param username               用户名
+     * @param passwordValidationFail 密码校验失败判断逻辑，返回 true 表示密码错误
      */
     @Override
-    public void checkLogin(LoginType loginType, String username, Supplier<Boolean> supplier) {
+    public void checkLogin(LoginType loginType, String username, BooleanSupplier passwordValidationFail) {
         if (loginType.equals(LoginType.PASSWORD)) {
+            // 获取配置参数
             Integer maxRetryCount = userPasswordProperties.getMaxRetryCount();
             Integer lockTime = userPasswordProperties.getLockTime();
 
-            // 检查密码登录错误次参数
+            // 构建 Redis 缓存键
             String loginErrorCountCacheKey = SystemRedisKeyConstants.Login.buildLoginErrorCountCacheKey(username);
-            int loginErrorCount = redisService.string().get(loginErrorCountCacheKey, Integer.class);
+
+            // 获取当前登录错误次数（使用 getOrDefault 避免空指针）
+            int currentErrorCount = Optional.ofNullable(
+                    redisService.string().get(loginErrorCountCacheKey, Integer.class)
+            ).orElse(0);
 
             // 如果用户登录错误次数超过最大次数，锁定用户
-            if (loginErrorCount >= maxRetryCount) {
+            if (currentErrorCount >= maxRetryCount) {
                 throw new BusinessException(StrUtil.format("密码错误次数超过最大次数，请 %s 分钟后重试", lockTime));
             }
 
-            // 密码比对: supplier.get() 返回 true 表示登录失败
-            if (supplier.get()) {
-                // 增加登录错误次数
-                loginErrorCount++;
+            // 执行密码校验
+            boolean isPasswordIncorrect = passwordValidationFail.getAsBoolean();
 
-                // 缓存登录错误次数
-                redisService.string().set(loginErrorCountCacheKey, loginErrorCount, Duration.ofMinutes(lockTime));
-
-                // 达到规定错误次数, 锁定用户
-                if (loginErrorCount >= maxRetryCount) {
-                    throw new BusinessException(StrUtil.format("密码错误次数超过最大次数，请 %s 分钟后重试", lockTime));
-                } else {
-                    // 没有达到规定次数，提示密码错误次数
-                    throw new BusinessException(StrUtil.format("密码错误，您还有 %s 次尝试机会", maxRetryCount - loginErrorCount));
-                }
+            // 密码校验通过，清除错误计数
+            if (!isPasswordIncorrect) {
+                redisService.delete(loginErrorCountCacheKey);
+                return;
             }
 
-            // 登录成功，删除登录错误次数缓存
-            redisService.delete(loginErrorCountCacheKey);
+            // 密码错误，增加错误计数
+            int newErrorCount = currentErrorCount + 1;
+            redisService.string().set(
+                    loginErrorCountCacheKey,
+                    newErrorCount,
+                    Duration.ofMinutes(lockTime)
+            );
+
+            // 判断是否达到锁定阈值
+            if (newErrorCount >= maxRetryCount) {
+                throw new BusinessException(String.format("密码错误次数已达上限，账户已被锁定 %d 分钟", lockTime));
+            }
+
+            // 提示剩余尝试次数
+            int remainingAttempts = maxRetryCount - newErrorCount;
+            throw new BusinessException(String.format("密码错误，您还有 %d 次尝试机会", remainingAttempts));
         }
     }
 
