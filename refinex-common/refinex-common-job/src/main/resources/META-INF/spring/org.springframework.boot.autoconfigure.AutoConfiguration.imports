@@ -1,0 +1,2 @@
+cn.refinex.common.job.config.RefinexAsyncAutoConfiguration
+cn.refinex.common.job.config.RefinexXxlJobAutoConfiguration

@@ -27,6 +27,7 @@
         <module>refinex-common-nacos</module>
         <module>refinex-common-satoken</module>
         <module>refinex-common-mq</module>
+        <module>refinex-common-job</module>
     </modules>
 
 </project>
