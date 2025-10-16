@@ -1,25 +1,84 @@
 import { request } from '../request';
 
+/** Login request params */
+export interface LoginRequest {
+  loginType: 1 | 2; // 1=密码登录, 2=邮箱登录
+  username?: string;
+  email?: string;
+  password: string;
+  captchaUuid?: string;
+  captchaCode?: string;
+  clientId?: string;
+  deviceType?: string;
+  rememberMe?: boolean;
+}
+
+/** Login response */
+export interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  expireIn: number;
+  refreshExpireIn: number;
+  clientId: string;
+}
+
+/** Captcha response */
+export interface CaptchaResponse {
+  captchaUuid: string;
+  captchaImage: string; // base64 image
+}
+
+/**
+ * Generate captcha
+ */
+export function fetchGenerateCaptcha() {
+  return request<CaptchaResponse>({
+    url: import.meta.env.VITE_BASE_MODELURL__AUTH + '/captcha/generate',
+    method: 'get'
+  });
+}
+
 /**
  * Login
  *
- * @param userName User name
- * @param password Password
+ * @param data Login request data
  */
-export function fetchLogin(userName: string, password: string) {
-  return request<Api.Auth.LoginToken>({
-    url: '/auth/login',
+export function fetchLogin(data: LoginRequest) {
+  return request<LoginResponse>({
+    url: import.meta.env.VITE_BASE_MODELURL__AUTH + '/login',
     method: 'post',
-    data: {
-      userName,
-      password
-    }
+    data
   });
 }
 
 /** Get user info */
 export function fetchGetUserInfo() {
-  return request<Api.Auth.UserInfo>({ url: '/auth/getUserInfo' });
+  return request<Api.Auth.UserInfo>({
+    url: import.meta.env.VITE_BASE_MODELURL__AUTH + '/getUserInfo'
+  });
+}
+
+/**
+ * Register user
+ *
+ * @param data Register request data
+ */
+export function fetchRegister(data: any) {
+  return request<boolean>({
+    url: import.meta.env.VITE_BASE_MODELURL__AUTH + '/register',
+    method: 'post',
+    data
+  });
+}
+
+/**
+ * Logout
+ */
+export function fetchLogout() {
+  return request<void>({
+    url: import.meta.env.VITE_BASE_MODELURL__AUTH + '/logout',
+    method: 'post'
+  });
 }
 
 /**
@@ -28,8 +87,8 @@ export function fetchGetUserInfo() {
  * @param refreshToken Refresh token
  */
 export function fetchRefreshToken(refreshToken: string) {
-  return request<Api.Auth.LoginToken>({
-    url: '/auth/refreshToken',
+  return request<LoginResponse>({
+    url: import.meta.env.VITE_BASE_MODELURL__AUTH + '/refreshToken',
     method: 'post',
     data: {
       refreshToken
@@ -44,5 +103,8 @@ export function fetchRefreshToken(refreshToken: string) {
  * @param msg error message
  */
 export function fetchCustomBackendError(code: string, msg: string) {
-  return request({ url: '/auth/error', params: { code, msg } });
+  return request({
+    url: import.meta.env.VITE_BASE_MODELURL__AUTH + '/error',
+    params: { code, msg }
+  });
 }

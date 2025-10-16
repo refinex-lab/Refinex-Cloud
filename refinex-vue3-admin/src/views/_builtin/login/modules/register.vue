@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { useRouterPush } from '@/hooks/common/router';
 import { useFormRules, useNaiveForm } from '@/hooks/common/form';
-import { useCaptcha } from '@/hooks/business/captcha';
 import { $t } from '@/locales';
+import { fetchGenerateCaptcha, fetchRegister } from '@/service/api/auth';
 
 defineOptions({
   name: 'Register'
@@ -11,67 +11,116 @@ defineOptions({
 
 const { toggleLoginModule } = useRouterPush();
 const { formRef, validate } = useNaiveForm();
-const { label, isCounting, loading, getCaptcha } = useCaptcha();
 
 interface FormModel {
-  phone: string;
-  code: string;
+  username: string;
+  email: string;
   password: string;
   confirmPassword: string;
+  captchaUuid: string;
+  captchaCode: string;
 }
 
 const model: FormModel = reactive({
-  phone: '',
-  code: '',
+  username: '',
+  email: '',
   password: '',
-  confirmPassword: ''
+  confirmPassword: '',
+  captchaUuid: '',
+  captchaCode: ''
 });
+
+const captchaImage = ref('');
+const loading = ref(false);
 
 const rules = computed<Record<keyof FormModel, App.Global.FormRule[]>>(() => {
   const { formRules, createConfirmPwdRule } = useFormRules();
 
   return {
-    phone: formRules.phone,
-    code: formRules.code,
+    username: formRules.userName,
+    email: [
+      { required: true, message: '邮箱不能为空', trigger: 'blur' },
+      { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
+    ],
     password: formRules.pwd,
-    confirmPassword: createConfirmPwdRule(model.password)
+    confirmPassword: createConfirmPwdRule(model.password),
+    captchaCode: [
+      { required: true, message: '验证码不能为空', trigger: 'blur' }
+    ]
   };
 });
 
+/** 获取验证码 */
+async function getCaptcha() {
+  try {
+    loading.value = true;
+    const { data } = await fetchGenerateCaptcha();
+    if (data) {
+      captchaImage.value = data.captchaImage;
+      model.captchaUuid = data.captchaUuid;
+      model.captchaCode = '';
+    }
+  } catch (error) {
+    window.$message?.error('获取验证码失败');
+  } finally {
+    loading.value = false;
+  }
+}
+
 async function handleSubmit() {
   await validate();
-  // request to register
-  window.$message?.success($t('page.login.common.validateSuccess'));
+
+  try {
+    const registerData = {
+      username: model.username,
+      email: model.email,
+      password: model.password,
+      captchaUuid: model.captchaUuid,
+      captchaCode: model.captchaCode
+    };
+
+    const { data, error } = await fetchRegister(registerData);
+
+    if (!error && data) {
+      window.$message?.success('注册成功，请登录');
+      toggleLoginModule('pwd-login');
+    } else {
+      window.$message?.error('注册失败，请重试');
+      getCaptcha(); // 重新获取验证码
+    }
+  } catch (error) {
+    window.$message?.error('注册失败，请重试');
+    getCaptcha();
+  }
 }
+
+onMounted(() => {
+  getCaptcha();
+});
 </script>
 
 <template>
   <NForm ref="formRef" :model="model" :rules="rules" size="large" :show-label="false" @keyup.enter="handleSubmit">
-    <NFormItem path="phone">
-      <NInput v-model:value="model.phone" :placeholder="$t('page.login.common.phonePlaceholder')">
+    <NFormItem path="username">
+      <NInput v-model:value="model.username" placeholder="请输入用户名">
         <template #prefix>
-          <SvgIcon icon="ph:phone" class="text-16px text-#999 dark:text-#bbb" />
+          <SvgIcon icon="ph:user" class="text-16px text-#999 dark:text-#bbb" />
         </template>
       </NInput>
     </NFormItem>
-    <NFormItem path="code">
-      <div class="w-full flex-y-center gap-16px">
-        <NInput v-model:value="model.code" :placeholder="$t('page.login.common.codePlaceholder')">
-          <template #prefix>
-            <SvgIcon icon="ph:key" class="text-16px text-#999 dark:text-#bbb" />
-          </template>
-        </NInput>
-        <NButton size="large" :disabled="isCounting" :loading="loading" @click="getCaptcha(model.phone)">
-          {{ label }}
-        </NButton>
-      </div>
+    <NFormItem path="email">
+      <NInput v-model:value="model.email" placeholder="请输入邮箱">
+        <template #prefix>
+          <SvgIcon icon="ph:envelope" class="text-16px text-#999 dark:text-#bbb" />
+        </template>
+      </NInput>
     </NFormItem>
     <NFormItem path="password">
       <NInput
         v-model:value="model.password"
         type="password"
         show-password-on="click"
-        :placeholder="$t('page.login.common.passwordPlaceholder')"
+        placeholder="请输入密码"
       >
         <template #prefix>
           <SvgIcon icon="ph:lock" class="text-16px text-#999 dark:text-#bbb" />
@@ -83,12 +132,36 @@ async function handleSubmit() {
         v-model:value="model.confirmPassword"
         type="password"
         show-password-on="click"
-        :placeholder="$t('page.login.common.confirmPasswordPlaceholder')"
+        placeholder="请确认密码"
       >
         <template #prefix>
           <SvgIcon icon="ph:lock" class="text-16px text-#999 dark:text-#bbb" />
         </template>
       </NInput>
+    </NFormItem>
+    <NFormItem path="captchaCode">
+      <div class="w-full flex gap-12px">
+        <NInput
+          v-model:value="model.captchaCode"
+          placeholder="请输入验证码"
+          class="flex-1"
+        >
+          <template #prefix>
+            <SvgIcon icon="ph:key" class="text-16px text-#999 dark:text-#bbb" />
+          </template>
+        </NInput>
+        <div class="captcha-container" @click="getCaptcha">
+          <img
+            v-if="captchaImage"
+            :src="`data:image/png;base64,${captchaImage}`"
+            alt="验证码"
+            class="captcha-image"
+          />
+          <div v-else class="captcha-placeholder">
+            {{ loading ? '加载中...' : '点击获取验证码' }}
+          </div>
+        </div>
+      </div>
     </NFormItem>
     <NSpace vertical :size="18" class="w-full">
       <NButton type="primary" size="large" block @click="handleSubmit" class="login-button">
@@ -104,5 +177,45 @@ async function handleSubmit() {
 <style scoped>
 .login-button {
   border-radius: 8px !important;
+}
+
+.captcha-container {
+  width: 120px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e0e0e6;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #f5f5f5;
+  transition: all 0.3s;
+}
+
+.captcha-container:hover {
+  border-color: #1890ff;
+}
+
+:global(.dark) .captcha-container {
+  border-color: #303030;
+  background: #1f1f1f;
+}
+
+:global(.dark) .captcha-container:hover {
+  border-color: #1890ff;
+}
+
+.captcha-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.captcha-placeholder {
+  font-size: 12px;
+  color: #999;
+  text-align: center;
+  user-select: none;
 }
 </style>
