@@ -114,6 +114,12 @@ const activeModule = computed(() => moduleMap[props.module || 'pwd-login']);
   display: flex;
   flex-direction: column;
   position: relative;
+  background: linear-gradient(135deg, #cfd8ff 0%, #ffffff 100%);
+}
+
+/* 暗色主题渐变背景 */
+html.dark .login-container {
+  background: linear-gradient(135deg, #191949 0%, #000000 50%, #0b2341 100%);
 }
 
 /* 右上角控制按钮 */
