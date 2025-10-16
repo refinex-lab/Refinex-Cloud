@@ -8,7 +8,9 @@
     <include resource="org/springframework/boot/logging/logback/file-appender.xml"/>
 
     <!-- 定义日志文件路径 -->
-    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/logs}}}/${spring.application.name}.log}"/>
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="refinex-auth"/>
+    <property name="LOG_PATH" value="${LOG_PATH:-./logs}"/>
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH}/${APP_NAME}.log}"/>
 
     <!-- 定义根日志级别 -->
     <root level="INFO">
