@@ -9,6 +9,7 @@ spring:
   config:
     import:
       - nacos:refinex-common.yml?group=${nacos.group:DEFAULT_GROUP}&namespace=${nacos.namespace:public}&refreshEnabled=true
+      - nacos:refinex-common-servlet.yml?group=${nacos.group:DEFAULT_GROUP}&namespace=${nacos.namespace:public}&refreshEnabled=true
       - nacos:${spring.application.name}.yml?group=${nacos.group:DEFAULT_GROUP}&namespace=${nacos.namespace:}&refreshEnabled=true
   cloud:
     nacos:
