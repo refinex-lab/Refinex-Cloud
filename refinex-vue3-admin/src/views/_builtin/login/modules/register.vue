@@ -91,14 +91,18 @@ async function handleSubmit() {
       </NInput>
     </NFormItem>
     <NSpace vertical :size="18" class="w-full">
-      <NButton type="primary" size="large" round block @click="handleSubmit">
+      <NButton type="primary" size="large" block @click="handleSubmit" class="login-button">
         {{ $t('common.confirm') }}
       </NButton>
-      <NButton size="large" round block @click="toggleLoginModule('pwd-login')">
+      <NButton size="large" block @click="toggleLoginModule('pwd-login')" class="login-button">
         {{ $t('page.login.common.back') }}
       </NButton>
     </NSpace>
   </NForm>
 </template>
 
-<style scoped></style>
+<style scoped>
+.login-button {
+  border-radius: 8px !important;
+}
+</style>

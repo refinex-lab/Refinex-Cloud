@@ -256,7 +256,10 @@ const local: App.I18n.Schema = {
         back: 'Back',
         validateSuccess: 'Verification passed',
         loginSuccess: 'Login successfully',
-        welcomeBack: 'Welcome back, {userName} !'
+        welcomeBack: 'Welcome back, {userName} !',
+        loginTo: 'Login to',
+        noAccount: "Don't have an account?",
+        register: 'Create new account'
       },
       pwdLogin: {
         title: 'Password Login',

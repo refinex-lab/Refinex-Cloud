@@ -256,7 +256,10 @@ const local: App.I18n.Schema = {
         back: '返回',
         validateSuccess: '验证成功',
         loginSuccess: '登录成功',
-        welcomeBack: '欢迎回来，{userName} ！'
+        welcomeBack: '欢迎回来，{userName} ！',
+        loginTo: '登录到',
+        noAccount: '没有账号吗？',
+        register: '注册新账号'
       },
       pwdLogin: {
         title: '密码登录',

@@ -438,6 +438,9 @@ declare namespace App {
             validateSuccess: string;
             loginSuccess: string;
             welcomeBack: string;
+            loginTo: string;
+            noAccount: string;
+            register: string;
           };
           pwdLogin: {
             title: string;
