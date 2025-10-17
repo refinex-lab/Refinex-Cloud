@@ -1,29 +1,6 @@
 # Refinex Auth 服务配置
 
-spring:
-  # 数据源配置
-  datasource:
-    dynamic:
-      datasource:
-        # 主数据源（refinex_platform 数据库）
-        master:
-          driver-class-name: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://localhost:3306/refinex_platform?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
-          username: root
-          password: 123456
-
 refinex:
-  # 自定义安全配置
-  security:
-    # 启用安全模块
-    enabled: true
-    # 缓存配置
-    cache:
-      # 启用缓存
-      enabled: true
-      # 缓存过期时间（秒）
-      ttl: 1800
-
   # 验证码配置
   captcha:
     # 是否启用验证码

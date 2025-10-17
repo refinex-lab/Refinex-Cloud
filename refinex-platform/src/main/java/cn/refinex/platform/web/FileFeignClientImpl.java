@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class FileController implements FileFeignClient {
+public class FileFeignClientImpl implements FileFeignClient {
 
     private final FileServiceImpl fileService;
 

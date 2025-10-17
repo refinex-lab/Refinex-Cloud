@@ -18,7 +18,11 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @since 1.0.0
  */
 @Tag(name = "操作日志服务 Feign API")
-@FeignClient(name = SystemFeignConstants.PLATFORM_SERVICE, path = "/logger")
+@FeignClient(
+        name = SystemFeignConstants.PLATFORM_SERVICE,
+        path = "/logger",
+        contextId = "logOperationFeignClient"
+)
 public interface LogOperationFeignClient {
 
     @PostMapping("/logger/create")

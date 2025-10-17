@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequiredArgsConstructor
-public class UserController implements UserFeignClient {
+public class UserFeignClientImpl implements UserFeignClient {
 
     private final UserServiceImpl userService;
 

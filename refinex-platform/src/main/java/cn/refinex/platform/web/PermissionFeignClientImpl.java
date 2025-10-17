@@ -16,7 +16,7 @@ import java.util.Set;
  */
 @RestController
 @RequiredArgsConstructor
-public class PermissionController implements PermissionFeignClient {
+public class PermissionFeignClientImpl implements PermissionFeignClient {
 
     private final PermissionService permissionService;
 

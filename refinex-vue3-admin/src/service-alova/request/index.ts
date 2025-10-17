@@ -51,6 +51,12 @@ export const alova = createAlovaRequest(
       // to change this logic by yourself, you can modify the `VITE_SERVICE_SUCCESS_CODE` in `.env` file
       const resp = response.clone();
       const data = await resp.json();
+
+      // 优先检查 success 字段，如果不存在则回退到检查 code 字段
+      if (typeof data.success === 'boolean') {
+        return data.success;
+      }
+
       return String(data.code) === import.meta.env.VITE_SERVICE_SUCCESS_CODE;
     },
     async transformBackendResponse(response) {
@@ -63,7 +69,8 @@ export const alova = createAlovaRequest(
       let responseCode = '';
       if (response) {
         const data = await response?.clone().json();
-        message = data.msg;
+        // 优先使用 message 字段，如果不存在则使用 msg 字段作为后备
+        message = data.message || data.msg || message;
         responseCode = String(data.code);
       }
 
@@ -108,6 +115,11 @@ export const alova = createAlovaRequest(
         });
         throw error;
       }
+      // 如果 message 为空或未定义，使用默认错误提示
+      if (!message || message.trim() === '') {
+        message = '请求失败，请稍后重试';
+      }
+
       showErrorMsg(state, message);
       throw error;
     }

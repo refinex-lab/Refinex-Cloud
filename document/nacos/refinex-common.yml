@@ -1,4 +1,8 @@
 spring:
+  main:
+    # 允许 Bean 定义覆盖, 解决多个模块定义相同 Bean 时的冲突问题
+    allow-bean-definition-overriding: true
+
   # 定义 Jackson 相关配置
   jackson:
     # 定义日期格式
@@ -120,35 +124,6 @@ lock4j:
   acquire-timeout: 3000
   # 定义锁的过期时间, 单位毫秒
   expire: 30000
-
-# Xss 相关配置
-xss:
-  # 定义是否开启 Xss 过滤
-  enabled: true
-  # 定义要排除的路径
-  exclude-paths:
-    - /platform/notice
-
-# Api Doc 相关配置
-springdoc:
-  api-doc:
-    # 定义是否开启 Api Doc
-    enabled: true
-  info:
-    # 定义 Api Doc 标题
-    title: Refinex API Doc
-    # 定义 Api Doc 描述
-    description: Refinex API Doc
-    # 定义 Api Doc 版本
-    version: 1.0.0
-    # 定义 Api Doc 联系人
-    contact:
-      # 定义 Api Doc 联系人名称
-      name: Refinex
-      # 定义 Api Doc 联系人邮箱
-      email: refinex@gmail.com
-      # 定义 Api Doc 联系人 URL
-      url: https://refinex.cn
 
 # Refinex 相关配置
 refinex:

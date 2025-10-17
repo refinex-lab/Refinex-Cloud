@@ -20,7 +20,11 @@ import java.util.Map;
  * @since 1.0.0
  */
 @Tag(name = "邮件发送 Feign API")
-@FeignClient(name = SystemFeignConstants.PLATFORM_SERVICE, path = "/email")
+@FeignClient(
+        name = SystemFeignConstants.PLATFORM_SERVICE,
+        path = "/email",
+        contextId = "emailFeignClient"
+)
 public interface EmailFeignClient {
 
     @PostMapping("/sendSimpleEmail")

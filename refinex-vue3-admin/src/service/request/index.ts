@@ -33,6 +33,9 @@ export const request = createFlatRequest<App.Service.Response, RequestInstanceSt
       const authStore = useAuthStore();
       const responseCode = String(response.data.code);
 
+      // 优先使用 message 字段，如果不存在则使用 msg 字段作为后备
+      const responseMessage = response.data.message || response.data.msg || '';
+
       function handleLogout() {
         authStore.resetStore();
       }
@@ -41,7 +44,7 @@ export const request = createFlatRequest<App.Service.Response, RequestInstanceSt
         handleLogout();
         window.removeEventListener('beforeunload', handleLogout);
 
-        request.state.errMsgStack = request.state.errMsgStack.filter(msg => msg !== response.data.msg);
+        request.state.errMsgStack = request.state.errMsgStack.filter(msg => msg !== responseMessage);
       }
 
       // when the backend response code is in `logoutCodes`, it means the user will be logged out and redirected to login page
@@ -53,15 +56,15 @@ export const request = createFlatRequest<App.Service.Response, RequestInstanceSt
 
       // when the backend response code is in `modalLogoutCodes`, it means the user will be logged out by displaying a modal
       const modalLogoutCodes = import.meta.env.VITE_SERVICE_MODAL_LOGOUT_CODES?.split(',') || [];
-      if (modalLogoutCodes.includes(responseCode) && !request.state.errMsgStack?.includes(response.data.msg)) {
-        request.state.errMsgStack = [...(request.state.errMsgStack || []), response.data.msg];
+      if (modalLogoutCodes.includes(responseCode) && !request.state.errMsgStack?.includes(responseMessage)) {
+        request.state.errMsgStack = [...(request.state.errMsgStack || []), responseMessage];
 
         // prevent the user from refreshing the page
         window.addEventListener('beforeunload', handleLogout);
 
         window.$dialog?.error({
           title: $t('common.error'),
-          content: response.data.msg,
+          content: responseMessage,
           positiveText: $t('common.confirm'),
           maskClosable: false,
           closeOnEsc: false,
@@ -102,7 +105,8 @@ export const request = createFlatRequest<App.Service.Response, RequestInstanceSt
 
       // get backend error message and code
       if (error.code === BACKEND_ERROR_CODE) {
-        message = error.response?.data?.msg || message;
+        // 优先使用 message 字段，如果不存在则使用 msg 字段作为后备
+        message = error.response?.data?.message || error.response?.data?.msg || message;
         backendErrorCode = String(error.response?.data?.code || '');
       }
 
@@ -116,6 +120,11 @@ export const request = createFlatRequest<App.Service.Response, RequestInstanceSt
       const expiredTokenCodes = import.meta.env.VITE_SERVICE_EXPIRED_TOKEN_CODES?.split(',') || [];
       if (expiredTokenCodes.includes(backendErrorCode)) {
         return;
+      }
+
+      // 如果 message 为空或未定义，使用默认错误提示
+      if (!message || message.trim() === '') {
+        message = '请求失败，请稍后重试';
       }
 
       showErrorMsg(request.state, message);

@@ -9,3 +9,7 @@
 
 Spring Boot Version: ${spring-boot.version}
 Spring Application Name: ${spring.application.name}
+
+#========================================================
+# 🎉 Refinex Auth 启动成功！ 端口：${server.port}
+#========================================================

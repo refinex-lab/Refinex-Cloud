@@ -19,7 +19,7 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     dynamic:
       # 定义默认数据源
-      default-datasource: master
+      primary: master
       # 严格匹配数据源, 未匹配到数据源时抛出异常
       strict: true
       # 定义 Hikari 连接池配置
@@ -38,6 +38,14 @@ spring:
         keepalive-time: 30000
         # 定义验证连接是否活动的超时时间, 单位毫秒
         validation-timeout: 5000
+      # 数据源配置
+      datasource:
+        # 主数据源（refinex_platform 数据库）
+        master:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://127.0.0.1:3306/refinex_platform?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+          username: root
+          password: 123456
 
 # Feign 配置
 feign:

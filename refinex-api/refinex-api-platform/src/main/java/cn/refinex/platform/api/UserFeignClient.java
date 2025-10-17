@@ -22,7 +22,11 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @Validated
 @Tag(name = "用户服务 Feign API")
-@FeignClient(name = SystemFeignConstants.PLATFORM_SERVICE, path = "/user")
+@FeignClient(
+        name = SystemFeignConstants.PLATFORM_SERVICE,
+        path = "/user",
+        contextId = "userFeignClient"
+)
 public interface UserFeignClient {
 
     @PostMapping("/registerUser")

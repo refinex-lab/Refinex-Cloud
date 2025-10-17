@@ -39,49 +39,49 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ApiResult<Void> handleBusinessException(BusinessException e, HttpServletRequest request) {
         String requestUri = ServletUtils.getRequestUri(request);
-        log.error("请求地址 {} 发生业务异常 {}", requestUri, e.getMessage());
+        log.error("请求地址 {} 发生业务异常", requestUri, e);
         return ApiResult.fromException(e);
     }
 
     @ExceptionHandler(SystemException.class)
     public ApiResult<Void> handleSystemException(SystemException e, HttpServletRequest request) {
         String requestUri = ServletUtils.getRequestUri(request);
-        log.error("请求地址 {} 发生系统异常 {}", requestUri, e.getMessage());
+        log.error("请求地址 {} 发生系统异常", requestUri, e);
         return ApiResult.fromException(e);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ApiResult<Void> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException e, HttpServletRequest request) {
         String requestUri = ServletUtils.getRequestUri(request);
-        log.error("请求地址 {} 不支持 {} 方法", requestUri, e.getMethod());
+        log.error("请求地址 {} 不支持 {} 方法", requestUri, e.getMethod(), e);
         return ApiResult.failure(ResultCode.METHOD_NOT_ALLOWED);
     }
 
     @ExceptionHandler(ServletException.class)
     public ApiResult<Void> handleServletException(ServletException e, HttpServletRequest request) {
         String requestUri = ServletUtils.getRequestUri(request);
-        log.error("请求地址 {} 发生 Servlet 异常 {}", requestUri, e.getMessage());
+        log.error("请求地址 {} 发生 Servlet 异常", requestUri, e);
         return ApiResult.failure(ResultCode.INTERNAL_ERROR);
     }
 
     @ExceptionHandler(MissingPathVariableException.class)
     public ApiResult<Void> handleMissingPathVariableException(MissingPathVariableException e, HttpServletRequest request) {
         String requestUri = ServletUtils.getRequestUri(request);
-        log.error("请求地址 {} 缺失路径变量 {}", requestUri, e.getVariableName());
+        log.error("请求地址 {} 缺失路径变量 {}", requestUri, e.getVariableName(), e);
         return ApiResult.failure(ResultCode.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ApiResult<Void> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e, HttpServletRequest request) {
         String requestUri = ServletUtils.getRequestUri(request);
-        log.error("请求地址 {} 路径变量 {} 类型错误", requestUri, e.getName());
+        log.error("请求地址 {} 路径变量 {} 类型错误", requestUri, e.getName(), e);
         return ApiResult.failure(ResultCode.BAD_REQUEST);
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ApiResult<Void> handleNoHandlerFoundException(NoHandlerFoundException e, HttpServletRequest request) {
         String requestUri = ServletUtils.getRequestUri(request);
-        log.error("请求地址 {} 未找到对应的 Handler", requestUri);
+        log.error("请求地址 {} 未找到对应的 Handler", requestUri, e);
         return ApiResult.failure(ResultCode.NOT_FOUND);
     }
 
@@ -89,28 +89,28 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IOException.class)
     public ApiResult<Void> handleIOException(IOException e, HttpServletRequest request) {
         String requestUri = ServletUtils.getRequestUri(request);
-        log.error("请求地址 {} 发生 IO 异常 {}", requestUri, e.getMessage());
+        log.error("请求地址 {} 发生 IO 异常", requestUri, e);
         return ApiResult.failure(ResultCode.INTERNAL_ERROR);
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ApiResult<Void> handleRuntimeException(RuntimeException e, HttpServletRequest request) {
         String requestUri = ServletUtils.getRequestUri(request);
-        log.error("请求地址 {} 发生运行时异常 {}", requestUri, e.getMessage());
+        log.error("请求地址 {} 发生运行时异常", requestUri, e);
         return ApiResult.failure(ResultCode.INTERNAL_ERROR);
     }
 
     @ExceptionHandler(Exception.class)
     public ApiResult<Void> handleException(Exception e, HttpServletRequest request) {
         String requestUri = ServletUtils.getRequestUri(request);
-        log.error("请求地址 {} 发生异常 {}", requestUri, e.getMessage());
+        log.error("请求地址 {} 发生异常", requestUri, e);
         return ApiResult.failure(ResultCode.INTERNAL_ERROR);
     }
 
     @ExceptionHandler(BindException.class)
     public ApiResult<Void> handleBindException(BindException e, HttpServletRequest request) {
         String requestUri = ServletUtils.getRequestUri(request);
-        log.error("请求地址 {} 绑定异常 {}", requestUri, e.getMessage());
+        log.error("请求地址 {} 绑定异常", requestUri, e);
         String errorMessage = e.getBindingResult().getAllErrors().stream()
                 .map(ObjectError::getDefaultMessage)
                 .collect(Collectors.joining("; "));
@@ -120,7 +120,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public ApiResult<Void> handleConstraintViolationException(ConstraintViolationException e, HttpServletRequest request) {
         String requestUri = ServletUtils.getRequestUri(request);
-        log.error("请求地址 {} 约束校验异常 {}", requestUri, e.getMessage());
+        log.error("请求地址 {} 约束校验异常", requestUri, e);
         String errorMessage = e.getConstraintViolations().stream()
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.joining("; "));
@@ -130,7 +130,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ApiResult<Void> handleMethodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
         String requestUri = ServletUtils.getRequestUri(request);
-        log.error("请求地址 {} 方法参数校验异常 {}", requestUri, e.getMessage());
+        log.error("请求地址 {} 方法参数校验异常", requestUri, e);
         String errorMessage = e.getBindingResult().getAllErrors().stream()
                 .map(ObjectError::getDefaultMessage)
                 .collect(Collectors.joining("; "));
@@ -140,14 +140,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(JsonParseException.class)
     public ApiResult<Void> handleJsonParseException(JsonParseException e, HttpServletRequest request) {
         String requestUri = ServletUtils.getRequestUri(request);
-        log.error("请求地址 {} JSON 解析异常 {}", requestUri, e.getMessage());
+        log.error("请求地址 {} JSON 解析异常", requestUri, e);
         return ApiResult.failure(ResultCode.BAD_REQUEST.getCode(), e.getMessage());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ApiResult<Void> handleHttpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletRequest request) {
         String requestUri = ServletUtils.getRequestUri(request);
-        log.error("请求地址 {} 参数解析异常 {}", requestUri, e.getMessage());
+        log.error("请求地址 {} 参数解析异常", requestUri, e);
         return ApiResult.failure(ResultCode.BAD_REQUEST.getCode(), e.getMessage());
     }
 }

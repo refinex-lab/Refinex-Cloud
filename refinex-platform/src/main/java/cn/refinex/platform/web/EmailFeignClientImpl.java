@@ -17,7 +17,7 @@ import java.util.Map;
  */
 @RestController
 @RequiredArgsConstructor
-public class EmailController implements EmailFeignClient {
+public class EmailFeignClientImpl implements EmailFeignClient {
 
     private final EmailService emailService;
 

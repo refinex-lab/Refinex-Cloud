@@ -45,6 +45,7 @@ public class SaTokenAuthFilter {
         // 添加白名单路径
         List<String> whitelistPaths = ignoreWhiteProperties.getWhites();
         if (CollectionUtils.isNotEmpty(whitelistPaths)) {
+            log.info("Sa-Token 网关白名单路径：{}", whitelistPaths);
             whitelistPaths.forEach(filter::addExclude);
         }
 

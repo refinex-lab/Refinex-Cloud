@@ -57,6 +57,7 @@
         <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
         <rocketmq-spring.version>2.3.2</rocketmq-spring.version>
         <xxl-job.version>2.4.0</xxl-job.version>
+        <dynamic-ds.version>4.3.1</dynamic-ds.version>
 
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
@@ -207,6 +208,13 @@
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
+            </dependency>
+
+            <!-- Dynamic DataSource -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>dynamic-datasource-spring-boot3-starter</artifactId>
+                <version>${dynamic-ds.version}</version>
             </dependency>
 
             <!-- Apache Common Collections -->

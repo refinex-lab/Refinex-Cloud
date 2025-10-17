@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class LogOperationController implements LogOperationFeignClient {
+public class LogOperationFeignClientImpl implements LogOperationFeignClient {
 
     private final LogOperationServiceImpl logOperationService;
 
