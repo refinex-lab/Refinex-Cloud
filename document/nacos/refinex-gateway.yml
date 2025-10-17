@@ -12,20 +12,21 @@ spring:
         webflux:
           routes:
             # 认证服务路由
-            - id: auth
-              uri: lb://auth
+            - id: refinex-auth
+              uri: lb://refinex-auth
               predicates:
-                - Path=/auth/**
+                - Path=/refinex-auth/**
               filters:
-                - StripPrefix=0
+                # 去掉第一个路径前缀, 即服务名(0: 不去掉任何路径段 1: 去掉第一个路径段 2: 去掉前两个路径段，以此类推)
+                - StripPrefix=1
 
             # 平台服务路由
-            - id: platform
-              uri: lb://platform
+            - id: refinex-platform
+              uri: lb://refinex-platform
               predicates:
-                - Path=/platform/**
+                - Path=/refinex-platform/**
               filters:
-                - StripPrefix=0
+                - StripPrefix=1
 
 # 网关安全配置
 security:

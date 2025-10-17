@@ -1,149 +1,280 @@
+# ====================================================================
+# Spring Boot 核心配置
+# ====================================================================
 spring:
   main:
-    # 允许 Bean 定义覆盖, 解决多个模块定义相同 Bean 时的冲突问题
+    # 允许 Bean 定义覆盖,解决多模块场景下的 Bean 冲突
     allow-bean-definition-overriding: true
+    # 延迟初始化, 加速应用启动(生产环境可根据实际情况调整)
+    lazy-initialization: false
+    # 允许循环依赖(建议在代码层面避免循环依赖)
+    allow-circular-references: true
 
-  # 定义 Jackson 相关配置
+  # Jackson JSON 序列化配置
   jackson:
-    # 定义日期格式
+    # 全局日期时间格式
     date-format: yyyy-MM-dd HH:mm:ss
-    # 定义序列化配置
+    # 时区设置
+    time-zone: GMT+8
+    # 序列化配置
     serialization:
-      # 定义是否缩进输出
+      # 格式化输出(开发环境可设为 true, 生产环境建议 false 以减少流量)
       indent-output: false
-      # 定义是否在序列化时失败时抛出异常
+      # 允许序列化空对象
       fail-on-empty-beans: false
-    # 定义反序列化配置
+      # 将日期序列化为时间戳(建议使用字符串格式,设为 false)
+      write-dates-as-timestamps: false
+      # 将枚举序列化为索引(建议使用字符串,设为 false)
+      write-enums-using-index: false
+    # 反序列化配置
     deserialization:
-      # 定义是否在反序列化时未知属性失败时抛出异常
+      # 忽略未知属性, 提高接口向后兼容性
       fail-on-unknown-properties: false
+      # 接受单个值作为数组
+      accept-single-value-as-array: true
+    # 默认属性包含策略(ALWAYS:全部字段 NON_NULL:非空字段 NON_EMPTY:非空且非Empty)
+    default-property-inclusion: always
 
+  # 虚拟线程配置(JDK 21+, Spring Boot 3.2+)
   threads:
     virtual:
-      # 开启虚拟线程, JDK >= 21
+      # 启用虚拟线程(注意:当前使用 JDK17, 此配置无效, 需要升级到 JDK21 及以上版本)
       enabled: true
 
+  # 异步任务执行配置
   task:
     execution:
-      # 定义任务执行线程名称前缀
-      thread-name-prefix: task-
-      # 由 Spring 管理任务执行线程池, SpringBoot 3.5+ SpringBoot 会自动配置线程池
-      mode: force
+      # 异步任务执行线程池配置
+      pool:
+        # 核心线程数(建议根据 CPU 核心数调整)
+        core-size: 8
+        # 最大线程数(建议根据 CPU 核心数调整)
+        max-size: 16
+        # 队列容量(建议根据任务量调整)
+        queue-capacity: 200
+        # 线程保持活动时间(建议根据任务量调整)
+        keep-alive: 60s
+      # 线程名称前缀,便于问题排查
+      thread-name-prefix: async-task-
+      # Spring 托管线程池生命周期
+      shutdown:
+        # 是否等待线程池任务完成后关闭
+        await-termination: true
+        # 等待线程池任务完成的最大时间, 单位秒
+        await-termination-period: 60s
 
+    # 定时任务调度配置
+    scheduling:
+      pool:
+        # 定时任务调度线程池大小(建议根据任务量调整)
+        size: 4
+      # 定时任务调度线程名称前缀, 便于问题排查
+      thread-name-prefix: scheduled-task-
+      shutdown:
+        # 是否等待线程池任务完成后关闭
+        await-termination: true
+        # 等待线程池任务完成的最大时间, 单位秒
+        await-termination-period: 60s
+
+  # Redis 数据源配置
   data:
-    # 定义 Redis 相关配置
     redis:
-      # 定义 Redis 主机地址
+      # Redis 主机地址
       host: 127.0.0.1
-      # 定义 Redis 端口号
+      # Redis 端口号
       port: 6379
-      # 定义 Redis 密码, 默认空字符串
-      # password:
-      # 定义 Redis 数据库索引, 默认 0
+      # Redis 密码, 默认空字符串
+      password:
+      # Redis 数据库索引, 默认 0
       database: 0
-      # 定义 Redis 连接超时时间, 单位毫秒
+      # Redis 连接超时时间, 单位毫秒
       timeout: 10s
-      # 定义 Lettuce 连接池配置
+      # Lettuce 连接池配置
       lettuce:
         pool:
-          # 连接池最大连接数
-          max-active: 200
-          # 连接池最大阻塞等待时间 (使用负值表示没有限制)
-          max-wait: -1ms
-          # 连接池中的最大空闲连接
-          max-idle: 10
-          # 连接池中的最小空闲连接
-          min-idle: 0
+          # 最大连接数(建议根据并发量调整,一般为 CPU 核心数的 2-4 倍)
+          max-active: 32
+          # 最大空闲连接
+          max-idle: 16
+          # 最小空闲连接(保持一定数量连接池预热)
+          min-idle: 8
+          # 连接耗尽时最大等待时间
+          max-wait: 3000ms
+          # 空闲连接检测间隔
+          time-between-eviction-runs: 60s
+        # 关闭超时
+        shutdown-timeout: 200ms
 
-# Sa-Token 相关配置
+# ====================================================================
+# 认证授权配置 (Sa-Token)
+# ====================================================================
 sa-token:
-  # Token 名称, 同时也是 Cookie 名称
+  # Token 名称(同时作为 Cookie 和 Header 的键名)
   token-name: Authorization
+  # Token 前缀(建议加上 Bearer 前缀, 符合 OAuth2 规范)
+  # token-prefix: Bearer
   # Token 有效期, 单位：秒, 默认 30 天, -1 代表永久有效
-  # 本系统设置为 30 分钟, 通过 Token 续期进行扩展
-  timeout: 1800
-  # Token 最低活跃频率, 单位：秒, 如果 Token 超过此时间没有访问系统就会被冻结, 默认 -1 代表不限制永不冻结
-  # 本系统设置为 30 分钟, 超过 30 分钟未访问系统就会被冻结
-  active-timeout: 1800
-  # 是否允许同一账号并发登录, true：允许一起登录, false：新登录挤掉旧登录
+  # Token 有效期(秒), 建议 2 小时, 通过刷新机制延长
+  timeout: 7200
+  # 最小活跃间隔(秒), 超过此时间未活跃则 Token 失效, 默认 -1 表示不限制
+  active-timeout: 3600
+  # 是否允许同一账号多端登录, true：允许一起登录, false：新登录挤掉旧登录
   is-concurrent: true
-  # 在多人登录同一账号时是否共用一个 Token, true：所有登录共用一个 Token, false：每次登录新建一个 Token
+  # 多端登录是否共享同一 Token(建议 false, 提高安全性)
   is-share: false
-  # Token 风格 (可选值：uuid、simple-uuid、random-32、random-64、random-128、tik、jwt-simple)
+  # Token 风格 (可选值：uuid(性能好)、simple-uuid、random-32、random-64、random-128、tik、jwt-simple(便于携带信息))
   token-style: uuid
-  # 是否输出操作日志
+  # 是否输出操作日志(生产环境建议关闭)
   is-log: false
-  # 开启内网服务调用鉴权, 不允许越过 Gateway 访问内网服务, 保障服务安全
+  # 是否尝试从 Cookie 中读取 Token
+  is-read-cookie: false
+  # 是否尝试从 Header 中读取 Token
+  is-read-header: true
+  # 是否在登录后将 Token 写入 Cookie
+  is-write-header: true
+  # 同 Token 检查(用于微服务网关鉴权)
   check-same-token: true
+  # Token 续期配置, 单位秒, 默认 -1 表示不限制
+  token-session-timeout: -1
+  # 自动续签(每次访问自动续期)
+  auto-renew: true
 
-# Logback 配置
+# ====================================================================
+# 日志配置
+# ====================================================================
 logging:
-  logback:
-    # 定义日志滚动策略
-    rollingpolicy:
-      # 定义日志文件最大大小
-      max-file-size: 100MB
-      # 定义是否在启动时清理历史日志文件
-      clean-history-on-start: true
-      # 定义日志文件总大小上限
-      total-size-cap: 1GB
-      # 定义保留的最大历史日志文件数量
-      max-history: 7
+  # 日志级别配置(开发环境可适当调高,生产环境应控制日志量)
   level:
-    org.springframework: warn
-    com.alibaba.nacos: error
-    org.apache.fury: warn
-    io.micrometer: error
+    root: INFO
+    # Spring 框架日志
+    org.springframework: WARN
+    org.springframework.web: INFO
+    org.springframework.boot.autoconfigure: ERROR
+    # 数据库相关
+    org.mybatis: WARN
+    com.zaxxer.hikari: WARN
+    # Nacos 客户端
+    com.alibaba.nacos: ERROR
+    # 其他第三方框架
+    org.apache.fury: ERROR
+    io.micrometer: WARN
+    io.lettuce: WARN
+    # 业务包日志(根据实际包名调整)
+    cn.refinex: INFO
+  # Logback 滚动策略
+  logback:
+    rollingpolicy:
+      # 单个日志文件最大大小
+      max-file-size: 100MB
+      # 日志文件总大小上限
+      total-size-cap: 10GB
+      # 保留的历史日志天数
+      max-history: 30
+      # 启动时清理历史日志(建议关闭, 避免误删)
+      clean-history-on-start: false
 
-# Redisson 相关配置
+# ====================================================================
+# Redisson 分布式框架配置
+# ====================================================================
 redisson:
-  # 定义 Redisson 键前缀
-  key-prefix:
-  # 定义 Redisson 线程数
-  threads: 4
-  # 定义 Redisson Netty 线程数
-  netty-threads: 8
-  # 定义 Redisson 单节点配置
+  # 统一键前缀, 避免多应用共用 Redis 时的键冲突
+  key-prefix: "refinex:"
+  # Redisson 线程池配置(建议为 CPU 核心数)
+  threads: 8
+  # Netty 线程数(建议为 CPU 核心数的 2 倍)
+  netty-threads: 16
+  # 编解码器(建议使用 Kryo 或 FST, 性能优于 JDK 序列化)
+  codec: org.redisson.codec.Kryo5Codec
+  # 单节点配置
   single-server-config:
-    # 定义 Redisson 客户端名称
+    # 客户端名称
     client-name: ${spring.application.name}
-    # 定义 Redisson 连接池大小
-    connection-pool-size: 32
-    # 定义 Redisson 连接池最小空闲连接数
-    connection-minimum-idle-size: 8
-    # 定义 Redisson 连接超时时间, 单位毫秒
+    # 连接池大小(建议根据并发量调整)
+    connection-pool-size: 64
+    # 最小空闲连接数
+    connection-minimum-idle-size: 16
+    # 空闲连接超时(毫秒)
     idle-connection-timeout: 10000
-    # 定义 Redisson 连接超时时间, 单位毫秒
+    # 命令执行超时(毫秒)
     timeout: 3000
-    # 定义 Redisson 订阅连接池大小
+    # 连接超时(毫秒)
+    connect-timeout: 3000
+    # 命令重试次数
+    retry-attempts: 3
+    # 命令重试间隔(毫秒)
+    retry-interval: 1500
+    # 订阅连接池大小
     subscription-connection-pool-size: 50
+    # 订阅连接最小空闲数
+    subscription-connection-minimum-idle-size: 1
+    # DNS 监控间隔(毫秒)
+    dns-monitoring-interval: 5000
 
-# Lock4J 相关配置
+# ====================================================================
+# 分布式锁配置 (Lock4j)
+# ====================================================================
 lock4j:
-  # 定义获取锁的超时时间, 单位毫秒
+  # 获取锁超时时间(毫秒)
   acquire-timeout: 3000
-  # 定义锁的过期时间, 单位毫秒
+  # 锁过期时间(毫秒), 防止死锁
   expire: 30000
 
-# Refinex 相关配置
+# ====================================================================
+# 监控端点配置 (Actuator)
+# ====================================================================
+management:
+  endpoints:
+    web:
+      # 端点基础路径
+      base-path: /actuator
+      exposure:
+        # 暴露的端点(生产环境建议限制暴露范围)
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      # 健康检查显示详情(生产环境建议 when-authorized)
+      show-details: when-authorized
+      # 启用探针(用于 Kubernetes 健康检查)
+      probes:
+        enabled: true
+  # 指标导出配置
+  metrics:
+    tags:
+      # 添加应用标签,便于 Prometheus 区分不同服务
+      application: ${spring.application.name}
+    export:
+      prometheus:
+        enabled: true
+  # 健康检查配置
+  health:
+    redis:
+      enabled: true
+    db:
+      enabled: true
+
+# ====================================================================
+# 业务自定义配置
+# ====================================================================
 refinex:
   # Xss 过滤配置
   xss:
     # 是否开启 Xss 过滤
     enabled: true
-    # 定义要排除的路径
+    # 排除路径(不进行 XSS 过滤)
     exclude-paths:
-      # 不处理 Actuator 的请求
-      - ${management.endpoints.web.base-path}/**
+      - /actuator/**
+      - /swagger-ui/**
+      - /v3/api-docs/**
+      - /webjars/**
 
-  # Swagger 配置
+  # API 文档配置 (Swagger/OpenAPI)
   swagger:
-    # 是否开启 Swagger
+    # 是否启用(生产环境建议关闭)
     enabled: true
     # 标题
-    title: Refinex API Doc
+    title: ${spring.application.name} API 文档
     # 描述
-    description: Refinex API Doc
+    description: ${spring.application.name} RESTful API 接口文档
     # 版本
     version: 1.0.0
     # 联系人名称
@@ -153,6 +284,6 @@ refinex:
     # 联系人 URL
     contact-url: https://refinex.cn
     # 许可证
-    license: Apache 2.0
+    license: Apache License 2.0
     # 许可证 URL
     license-url: https://www.apache.org/licenses/LICENSE-2.0.html
