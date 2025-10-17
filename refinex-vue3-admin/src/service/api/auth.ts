@@ -24,8 +24,9 @@ export interface LoginResponse {
 
 /** Captcha response */
 export interface CaptchaResponse {
-  captchaUuid: string;
-  captchaImage: string; // base64 image
+  uuid: string;
+  image: string; // base64 image (data:image/png;base64,xxx)
+  expireSeconds: number;
 }
 
 /**

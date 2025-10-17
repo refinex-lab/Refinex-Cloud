@@ -56,8 +56,8 @@ async function getCaptcha() {
     loading.value = true;
     const { data } = await fetchGenerateCaptcha();
     if (data) {
-      captchaImage.value = data.captchaImage;
-      model.captchaUuid = data.captchaUuid;
+      captchaImage.value = data.image;
+      model.captchaUuid = data.uuid;
       model.captchaCode = '';
     }
   } catch (error) {
@@ -153,9 +153,10 @@ onMounted(() => {
         <div class="captcha-container" @click="getCaptcha">
           <img
             v-if="captchaImage"
-            :src="`data:image/png;base64,${captchaImage}`"
+            :src="captchaImage"
             alt="验证码"
             class="captcha-image"
+            :title="'点击刷新验证码'"
           />
           <div v-else class="captcha-placeholder">
             {{ loading ? '加载中...' : '点击获取验证码' }}
@@ -194,6 +195,12 @@ onMounted(() => {
 
 .captcha-container:hover {
   border-color: #1890ff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+}
+
+.captcha-container:active {
+  transform: translateY(0);
 }
 
 :global(.dark) .captcha-container {
@@ -203,6 +210,7 @@ onMounted(() => {
 
 :global(.dark) .captcha-container:hover {
   border-color: #1890ff;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
 }
 
 .captcha-image {
@@ -210,6 +218,12 @@ onMounted(() => {
   height: 100%;
   object-fit: cover;
   border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.captcha-image:hover {
+  opacity: 0.9;
 }
 
 .captcha-placeholder {
@@ -217,5 +231,10 @@ onMounted(() => {
   color: #999;
   text-align: center;
   user-select: none;
+  line-height: 40px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
