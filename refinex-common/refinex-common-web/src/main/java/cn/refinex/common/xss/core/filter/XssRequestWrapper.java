@@ -3,6 +3,7 @@ package cn.refinex.common.xss.core.filter;
 import cn.refinex.common.xss.core.clean.XssCleaner;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.Map;
  * @author Refinex
  * @since 1.0.0
  */
+@Slf4j
 public class XssRequestWrapper extends HttpServletRequestWrapper {
 
     private final XssCleaner xssCleaner;
@@ -42,8 +44,14 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
         for (Map.Entry<String, String[]> entry : parameters.entrySet()) {
             String[] values = entry.getValue();
             for (int i = 0; i < values.length; i++) {
-                // 对参数值进行 XSS 清理
-                values[i] = xssCleaner.clean(values[i]);
+                // 对参数值进行 XSS 清理，添加异常保护
+                try {
+                    values[i] = xssCleaner.clean(values[i]);
+                } catch (Exception e) {
+                    // 如果 XSS 清理失败，记录日志并保留原始值
+                    log.error("XSS cleaning failed for parameter, error: {}", e.getMessage(), e);
+                    // values[i] 保持原值不变
+                }
             }
             map.put(entry.getKey(), values);
         }
@@ -67,8 +75,14 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
         int count = values.length;
         String[] encodedValues = new String[count];
         for (int i = 0; i < count; i++) {
-            // 对参数值进行 XSS 清理
-            encodedValues[i] = xssCleaner.clean(values[i]);
+            // 对参数值进行 XSS 清理，添加异常保护
+            try {
+                encodedValues[i] = xssCleaner.clean(values[i]);
+            } catch (Exception e) {
+                // 如果 XSS 清理失败，记录日志并使用原始值
+                log.error("XSS cleaning failed for parameter value, error: {}", e.getMessage(), e);
+                encodedValues[i] = values[i];
+            }
         }
 
         return encodedValues;
@@ -87,8 +101,14 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
             return null;
         }
 
-        // 对参数值进行 XSS 清理
-        return xssCleaner.clean(value);
+        // 对参数值进行 XSS 清理，添加异常保护
+        try {
+            return xssCleaner.clean(value);
+        } catch (Exception e) {
+            // 如果 XSS 清理失败，记录日志并返回原始值
+            log.error("XSS cleaning failed for parameter, error: {}", e.getMessage(), e);
+            return value;
+        }
     }
 
     /**
@@ -101,8 +121,14 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
     public Object getAttribute(String name) {
         Object value = super.getAttribute(name);
         if (value instanceof String strValue) {
-            // 对属性值进行 XSS 清理
-            return xssCleaner.clean(strValue);
+            // 对属性值进行 XSS 清理，添加异常保护
+            try {
+                return xssCleaner.clean(strValue);
+            } catch (Exception e) {
+                // 如果 XSS 清理失败，记录日志并返回原始值
+                log.error("XSS cleaning failed for attribute, error: {}", e.getMessage(), e);
+                return strValue;
+            }
         }
 
         return value;
@@ -121,8 +147,14 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
             return null;
         }
 
-        // 对头值进行 XSS 清理
-        return xssCleaner.clean(value);
+        // 对头值进行 XSS 清理，添加异常保护
+        try {
+            return xssCleaner.clean(value);
+        } catch (Exception e) {
+            // 如果 XSS 清理失败，记录日志并返回原始值，避免影响正常请求处理
+            log.error("XSS cleaning failed for header: {}, error: {}", name, e.getMessage(), e);
+            return value;
+        }
     }
 
     /**
@@ -137,7 +169,13 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
             return null;
         }
 
-        // 对查询字符串进行 XSS 清理
-        return xssCleaner.clean(value);
+        // 对查询字符串进行 XSS 清理，添加异常保护
+        try {
+            return xssCleaner.clean(value);
+        } catch (Exception e) {
+            // 如果 XSS 清理失败，记录日志并返回原始值
+            log.error("XSS cleaning failed for query string, error: {}", e.getMessage(), e);
+            return value;
+        }
     }
 }

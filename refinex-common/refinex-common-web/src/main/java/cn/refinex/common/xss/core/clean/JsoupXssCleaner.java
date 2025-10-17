@@ -1,5 +1,6 @@
 package cn.refinex.common.xss.core.clean;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Safelist;
@@ -10,6 +11,7 @@ import org.jsoup.safety.Safelist;
  * @author 芋道源码
  * @since 1.0.0
  */
+@Slf4j
 public class JsoupXssCleaner implements XssCleaner {
 
     /**
@@ -38,7 +40,23 @@ public class JsoupXssCleaner implements XssCleaner {
      */
     @Override
     public String clean(String inputHtml) {
-        return Jsoup.clean(inputHtml, baseUri, safelist, new Document.OutputSettings().prettyPrint(false));
+        // 处理空值情况，避免 Jsoup 抛出 ValidationException
+        if (inputHtml == null) {
+            return null;
+        }
+
+        // 处理空字符串情况
+        if (inputHtml.trim().isEmpty()) {
+            return inputHtml;
+        }
+
+        try {
+            return Jsoup.clean(inputHtml, baseUri, safelist, new Document.OutputSettings().prettyPrint(false));
+        } catch (Exception e) {
+            // 如果 Jsoup 清理失败，记录日志并返回原始值
+            log.error("Jsoup XSS cleaning failed, error: {}", e.getMessage(), e);
+            return inputHtml;
+        }
     }
 
     /**
