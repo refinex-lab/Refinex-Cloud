@@ -1,6 +1,7 @@
 export default {
-  'pages.layouts.userLayout.title': 'Refinex Cloud is a microservice architecture scaffold based on SpringCloud',
+  'pages.layouts.userLayout.title': 'Refinex Knowledge Workshop',
   'pages.login.accountLogin.tab': 'Account Login',
+  'pages.login.welcomeTitle': 'Welcome to Knowledge Workshop',
   'pages.login.accountLogin.errorMessage': 'Incorrect username/password(admin/ant.design)',
   'pages.login.failure': 'Login failed, please try again!',
   'pages.login.success': 'Login successful!',
