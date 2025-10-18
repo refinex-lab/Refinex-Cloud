@@ -1,14 +1,13 @@
 module.exports = {
   'GET /api/currentUser': {
     data: {
-      name: 'Serati Ma',
-      avatar:
-        'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png',
+      name: 'Refinex Cloud',
+      avatar: '/avatar.svg',
       userid: '00000001',
-      email: 'antdesign@alipay.com',
+      email: 'refinex@163.com',
       signature: '海纳百川，有容乃大',
-      title: '交互专家',
-      group: '蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED',
+      title: '干饭专家',
+      group: '后端牛马组',
       tags: [
         { key: '0', label: '很有想法的' },
         { key: '1', label: '专注设计' },

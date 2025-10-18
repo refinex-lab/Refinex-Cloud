@@ -10,6 +10,7 @@ import {
   Footer,
   Question,
   SelectLang,
+  ThemeSwitch,
 } from '@/components';
 import { currentUser as queryCurrentUser } from '@/services/ant-design-pro/api';
 import defaultSettings from '../config/defaultSettings';
@@ -40,6 +41,20 @@ export async function getInitialState(): Promise<{
     }
     return undefined;
   };
+  // 从 localStorage 读取保存的主题模式
+  const getThemeFromMode = () => {
+    const themeMode = localStorage.getItem('themeMode') as 'light' | 'dark';
+    if (!themeMode) {
+      return 'light';
+    }
+    return themeMode === 'dark' ? 'realDark' : 'light';
+  };
+
+  const settingsWithTheme = {
+    ...defaultSettings,
+    navTheme: getThemeFromMode() as 'light' | 'realDark',
+  };
+
   // 如果不是登录页面，执行
   const { location } = history;
   if (
@@ -51,12 +66,12 @@ export async function getInitialState(): Promise<{
     return {
       fetchUserInfo,
       currentUser,
-      settings: defaultSettings as Partial<LayoutSettings>,
+      settings: settingsWithTheme as Partial<LayoutSettings>,
     };
   }
   return {
     fetchUserInfo,
-    settings: defaultSettings as Partial<LayoutSettings>,
+    settings: settingsWithTheme as Partial<LayoutSettings>,
   };
 }
 
@@ -69,6 +84,7 @@ export const layout: RunTimeLayoutConfig = ({
     actionsRender: () => [
       <Question key="doc" />,
       <SelectLang key="SelectLang" />,
+      <ThemeSwitch key="ThemeSwitch" />,
     ],
     avatarProps: {
       src: initialState?.currentUser?.avatar,

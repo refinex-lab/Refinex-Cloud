@@ -22,7 +22,7 @@ const Settings: ProLayoutProps & {
   // 是否开启弱色模式
   colorWeak: false,
   // 标题
-  title: 'Refinex Hub',
+  title: '知识工坊',
   // 是否拆分菜单
   splitMenus: false,
   // Siderbar 菜单类型
