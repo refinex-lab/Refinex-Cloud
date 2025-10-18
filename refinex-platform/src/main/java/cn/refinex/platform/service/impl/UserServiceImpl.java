@@ -11,6 +11,7 @@ import cn.refinex.common.utils.Fn;
 import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
 import cn.refinex.common.utils.object.BeanConverter;
 import cn.refinex.common.utils.regex.RegexUtils;
+import cn.refinex.platform.domain.dto.request.ResetPasswordRequest;
 import cn.refinex.platform.domain.dto.request.UserCreateRequest;
 import cn.refinex.platform.domain.dto.request.UserDisableRequest;
 import cn.refinex.platform.domain.dto.request.UserKickoutRequest;
@@ -440,6 +441,28 @@ public class UserServiceImpl implements UserService {
 
         // 发送踢人下线通知邮件
         notificationService.sendKickoutNotification(userId, null, "管理员操作");
+    }
+
+    /**
+     * 重置用户密码
+     *
+     * @param request 重置密码请求
+     * @return 是否重置成功
+     */
+    @Override
+    public Boolean resetPassword(ResetPasswordRequest request) {
+        try {
+            // 获取密文邮箱
+            String emailEncrypted = sensitiveDataService.encryptValue(request.getEmail());
+            // 加密密码
+            String passwordEncrypted = passwordEncoder.encode(request.getPassword());
+            // 更新密码
+            int updateCount = sysUserRepository.updatePassword(emailEncrypted, passwordEncrypted);
+            return updateCount > 0;
+        } catch (Exception e) {
+            log.error("重置用户密码失败，email: {}", request.getEmail(), e);
+            throw new BusinessException("重置用户密码失败");
+        }
     }
 
     //============================== 私有辅助方法 ======================================

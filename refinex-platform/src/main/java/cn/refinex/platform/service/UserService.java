@@ -1,10 +1,11 @@
 package cn.refinex.platform.service;
 
+import cn.refinex.common.domain.model.LoginUser;
+import cn.refinex.platform.domain.dto.request.ResetPasswordRequest;
 import cn.refinex.platform.domain.dto.request.UserCreateRequest;
 import cn.refinex.platform.domain.dto.request.UserDisableRequest;
 import cn.refinex.platform.domain.dto.request.UserKickoutRequest;
 import cn.refinex.platform.domain.dto.response.UserDisableStatusResponse;
-import cn.refinex.common.domain.model.LoginUser;
 import cn.refinex.platform.domain.model.UserSessionDTO;
 
 import java.util.List;
@@ -102,4 +103,12 @@ public interface UserService {
      * @param userId 用户 ID
      */
     void kickoutAll(Long userId);
+
+     /**
+      * 重置密码
+      *
+      * @param request 重置密码请求参数
+      * @return 重置结果
+      */
+    Boolean resetPassword(ResetPasswordRequest request);
 }

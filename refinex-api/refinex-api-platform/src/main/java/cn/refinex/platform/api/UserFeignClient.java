@@ -2,8 +2,9 @@ package cn.refinex.platform.api;
 
 import cn.refinex.common.constants.SystemFeignConstants;
 import cn.refinex.common.domain.ApiResult;
-import cn.refinex.platform.domain.dto.request.UserCreateRequest;
 import cn.refinex.common.domain.model.LoginUser;
+import cn.refinex.platform.domain.dto.request.ResetPasswordRequest;
+import cn.refinex.platform.domain.dto.request.UserCreateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,4 +54,9 @@ public interface UserFeignClient {
     @Operation(summary = "根据用户邮箱获取登录用户", description = "根据用户邮箱获取登录用户")
     @Parameter(name = "email", description = "用户邮箱", required = true)
     ApiResult<LoginUser> getLoginUserByEmail(@RequestParam("email") @NotBlank(message = "用户邮箱不能为空") String email);
+
+    @PostMapping("/resetPassword")
+    @Operation(summary = "重置密码", description = "根据重置密码请求参数重置密码")
+    @Parameter(name = "request", description = "重置密码请求参数", required = true)
+    ApiResult<Boolean> resetPassword(@RequestBody ResetPasswordRequest request);
 }

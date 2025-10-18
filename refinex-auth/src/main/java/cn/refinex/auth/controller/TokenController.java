@@ -1,12 +1,19 @@
 package cn.refinex.auth.controller;
 
 import cn.refinex.auth.domain.dto.request.LoginRequest;
+import cn.refinex.platform.domain.dto.request.ResetPasswordRequest;
 import cn.refinex.auth.domain.vo.LoginVo;
+import cn.refinex.auth.enums.EmailVerifyCodeType;
 import cn.refinex.auth.service.AuthService;
 import cn.refinex.common.domain.ApiResult;
+import cn.refinex.common.domain.model.LoginUser;
+import cn.refinex.common.mail.domain.dto.VerifyCodeRequest;
+import cn.refinex.common.mail.domain.dto.VerifyCodeResult;
+import cn.refinex.common.mail.domain.dto.VerifyCodeValidateRequest;
 import cn.refinex.common.protection.ratelimiter.core.annotation.RateLimiter;
 import cn.refinex.common.protection.ratelimiter.core.keyresolver.impl.ClientIpRateLimiterKeyResolver;
 import cn.refinex.common.utils.servlet.ServletUtils;
+import cn.refinex.platform.api.EmailFeignClient;
 import cn.refinex.platform.api.UserFeignClient;
 import cn.refinex.platform.domain.dto.request.UserCreateRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,40 +47,70 @@ import java.util.concurrent.TimeUnit;
 public class TokenController {
 
     private final AuthService authService;
-    private final UserFeignClient userClient;
+    private final UserFeignClient userFeignClient;
+    private final EmailFeignClient emailFeignClient;
 
     @PostMapping("/register")
     @Operation(summary = "注册用户", description = "根据创建用户请求参数注册用户")
     @Parameter(name = "request", description = "创建用户请求参数", required = true)
     @RateLimiter(time = 10, timeUnit = TimeUnit.MINUTES, count = 5, keyResolver = ClientIpRateLimiterKeyResolver.class)
     ApiResult<Boolean> registerUser(UserCreateRequest request) {
-        return userClient.registerUser(request);
+        return userFeignClient.registerUser(request);
     }
 
-    /**
-     * 用户登录
-     *
-     * @param request     登录请求
-     * @param httpRequest HTTP 请求对象
-     * @return 登录响应
-     */
     @PostMapping("/login")
     @Operation(summary = "用户登录", description = "用户名密码登录，返回 JWT Token")
+    @Parameter(name = "request", description = "登录请求参数", required = true)
     public ApiResult<LoginVo> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         String clientIp = ServletUtils.getClientIp(httpRequest);
         return ApiResult.success(authService.login(request, clientIp, httpRequest));
     }
 
-    /**
-     * 用户登出
-     *
-     * @return 成功响应
-     */
     @PostMapping("/logout")
     @Operation(summary = "用户登出", description = "退出登录，清除 Token")
     public ApiResult<Void> logout() {
         authService.logout();
         return ApiResult.success(null);
+    }
+
+    @PostMapping("/sendEmailVerifyCode")
+    @Operation(summary = "发送邮箱验证码", description = "根据邮箱发送验证码")
+    @Parameter(name = "request", description = "发送验证码请求参数", required = true)
+    public ApiResult<VerifyCodeResult> sendEmailVerifyCode(@Valid @RequestBody VerifyCodeRequest request, HttpServletRequest httpRequest) {
+        // 验证用户存在性
+        ApiResult<LoginUser> checkUserResult = userFeignClient.getLoginUserByEmail(request.getEmail());
+        if (!checkUserResult.isSuccess()) {
+            return ApiResult.failure(checkUserResult.getCode(), checkUserResult.getMessage());
+        }
+
+        // 发送验证码
+        request.setClientIp(ServletUtils.getClientIp(httpRequest));
+        return emailFeignClient.sendVerifyCode(request);
+    }
+
+    @PostMapping("/resetPassword")
+    @Operation(summary = "重置密码", description = "根据邮箱验证码重置密码")
+    @Parameter(name = "request", description = "重置密码请求参数", required = true)
+    public ApiResult<Boolean> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        // 验证用户存在性
+        ApiResult<LoginUser> checkUserResult = userFeignClient.getLoginUserByEmail(request.getEmail());
+        if (!checkUserResult.isSuccess()) {
+            return ApiResult.failure(checkUserResult.getCode(), checkUserResult.getMessage());
+        }
+
+        // 验证验证码
+        VerifyCodeValidateRequest verifyCodeValidateRequest = VerifyCodeValidateRequest.builder()
+                .email(request.getEmail())
+                .verifyCode(request.getVerifyCode())
+                .codeType(EmailVerifyCodeType.RESET_PASSWORD.getCode())
+                .build();
+        ApiResult<Boolean> verifyCodeResult = emailFeignClient.verifyCode(verifyCodeValidateRequest);
+        if (verifyCodeResult.isSuccess() && Boolean.TRUE.equals(!verifyCodeResult.getData())) {
+            // 重置密码
+            return userFeignClient.resetPassword(request);
+        }
+
+        return ApiResult.failure(verifyCodeResult.getCode(), verifyCodeResult.getMessage());
     }
 }
 

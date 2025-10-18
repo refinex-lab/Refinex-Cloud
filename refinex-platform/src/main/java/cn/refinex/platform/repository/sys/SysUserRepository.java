@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -206,6 +207,30 @@ public class SysUserRepository {
 
         Map<String, Object> params = BeanConverter.beanToMap(sysUser, false, false);
         jdbcManager.insert(sql, params, true);
+    }
+
+    /**
+     * 更新用户密码
+     *
+     * @param emailEncrypted 加密邮箱
+     * @param password       加密后的密码
+     * @return 更新影响的行数
+     */
+    public int updatePassword(String emailEncrypted, String password) {
+        String sql = """
+                UPDATE sys_user AS u
+                INNER JOIN sys_sensitive AS s ON u.user_id = s.row_guid AND s.table_name = 'sys_user' AND s.field_code = 'email'
+                SET u.password = :password, u.update_time = :updateTime
+                WHERE s.encrypted_value = :emailEncrypted
+                """;
+
+        Map<String, Object> params = Map.of(
+                "password", password,
+                "updateTime", LocalDateTime.now(),
+                "emailEncrypted", emailEncrypted
+        );
+
+        return jdbcManager.update(sql, params, true);
     }
 }
 

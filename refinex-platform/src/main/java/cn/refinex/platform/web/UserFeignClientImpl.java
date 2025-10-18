@@ -2,6 +2,7 @@ package cn.refinex.platform.web;
 
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.platform.api.UserFeignClient;
+import cn.refinex.platform.domain.dto.request.ResetPasswordRequest;
 import cn.refinex.platform.domain.dto.request.UserCreateRequest;
 import cn.refinex.common.domain.model.LoginUser;
 import cn.refinex.platform.service.impl.UserServiceImpl;
@@ -73,5 +74,16 @@ public class UserFeignClientImpl implements UserFeignClient {
     @Override
     public ApiResult<LoginUser> getLoginUserByEmail(String email) {
         return ApiResult.success(userService.getUserInfoByEmail(email));
+    }
+
+    /**
+     * 重置密码
+     *
+     * @param request 重置密码请求参数
+     * @return 重置结果
+     */
+    @Override
+    public ApiResult<Boolean> resetPassword(ResetPasswordRequest request) {
+        return ApiResult.success(userService.resetPassword(request));
     }
 }
