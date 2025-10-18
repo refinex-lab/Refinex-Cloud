@@ -8,24 +8,24 @@ const Footer: React.FC = () => {
       style={{
         background: 'none',
       }}
-      copyright="Powered by Ant Desgin"
+      copyright="Powered by Refinex Cloud"
       links={[
         {
-          key: 'Ant Design Pro',
-          title: 'Ant Design Pro',
-          href: 'https://pro.ant.design',
+          key: 'Refinex Cloud',
+          title: 'Refinex Cloud',
+          href: 'https://refinex.cn',
           blankTarget: true,
         },
         {
           key: 'github',
           title: <GithubOutlined />,
-          href: 'https://github.com/ant-design/ant-design-pro',
+          href: 'https://github.com/refinex-lab/Refinex-Cloud',
           blankTarget: true,
         },
         {
-          key: 'Ant Design',
-          title: 'Ant Design',
-          href: 'https://ant.design',
+          key: 'Refinex',
+          title: 'Refinex',
+          href: 'https://refinex.cn',
           blankTarget: true,
         },
       ]}
