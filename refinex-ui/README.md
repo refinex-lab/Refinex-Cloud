@@ -1,57 +1,45 @@
-# Ant Design Pro
+# Refinex UI
 
-This project is initialized with [Ant Design Pro](https://pro.ant.design). Follow is the quick guide for how to use.
+本项目使用 [Ant Design Pro](https://pro.ant.design) 初始化。以下是快速使用指南。
 
-## Environment Prepare
+## 环境准备
 
-Install `node_modules`:
+安装 `node_modules`：
 
 ```bash
 npm install
 ```
 
-or
+### 启动项目
 
 ```bash
-yarn
+npm run start
 ```
 
-## Provided Scripts
-
-Ant Design Pro provides some useful script to help you quick start and build with web project, code style check and test.
-
-Scripts provided in `package.json`. It's safe to modify or add additional script:
-
-### Start project
-
-```bash
-npm start
-```
-
-### Build project
+### 构建项目
 
 ```bash
 npm run build
 ```
 
-### Check code style
+### 检查代码风格
 
 ```bash
 npm run lint
 ```
 
-You can also use script to auto fix some lint error:
+您也可以使用脚本自动修复一些 lint 错误：
 
 ```bash
 npm run lint:fix
 ```
 
-### Test code
+### 测试代码
 
 ```bash
 npm test
 ```
 
-## More
+## 更多信息
 
-You can view full document on our [official website](https://pro.ant.design). And welcome any feedback in our [github](https://github.com/ant-design/ant-design-pro).
+您可以在我们的[官方网站](https://pro.ant.design)上查看完整文档。欢迎在我们的 [GitHub](https://github.com/ant-design/ant-design-pro) 中提供任何反馈。
