@@ -1,5 +1,6 @@
 import { QuestionCircleOutlined } from '@ant-design/icons';
 import { SelectLang as UmiSelectLang } from '@umijs/max';
+import { ThemeSwitch } from './ThemeSwitch';
 
 export type SiderTheme = 'light' | 'dark';
 
@@ -16,7 +17,7 @@ export const SelectLang: React.FC = () => {
 export const Question: React.FC = () => {
   return (
     <a
-      href="https://pro.ant.design/docs/getting-started"
+      href="https://github.com/refinex-lab/Refinex-Cloud/wiki"
       target="_blank"
       rel="noreferrer"
       style={{
@@ -30,3 +31,5 @@ export const Question: React.FC = () => {
     </a>
   );
 };
+
+export { ThemeSwitch };
