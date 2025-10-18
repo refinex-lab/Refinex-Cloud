@@ -2,11 +2,18 @@ package cn.refinex.platform.service.impl;
 
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
+import cn.refinex.common.constants.SystemRoleConstants;
+import cn.refinex.common.constants.SystemStatusConstants;
+import cn.refinex.common.domain.model.LoginUser;
+import cn.refinex.common.domain.model.SysRoleDTO;
+import cn.refinex.common.enums.UserSex;
 import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.exception.code.ResultCode;
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
 import cn.refinex.common.jdbc.service.SensitiveDataService;
+import cn.refinex.common.properties.RefinexBizProperties;
 import cn.refinex.common.utils.Fn;
 import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
 import cn.refinex.common.utils.object.BeanConverter;
@@ -18,19 +25,20 @@ import cn.refinex.platform.domain.dto.request.UserKickoutRequest;
 import cn.refinex.platform.domain.dto.response.UserDisableStatusResponse;
 import cn.refinex.platform.domain.entity.sys.SysRole;
 import cn.refinex.platform.domain.entity.sys.SysUser;
-import cn.refinex.common.domain.model.LoginUser;
-import cn.refinex.common.domain.model.SysRoleDTO;
 import cn.refinex.platform.domain.model.UserSessionDTO;
 import cn.refinex.platform.domain.vo.SysUserVo;
+import cn.refinex.platform.enums.RegisterSource;
 import cn.refinex.platform.enums.UserRegisterType;
 import cn.refinex.platform.enums.UserStatus;
 import cn.refinex.platform.repository.sys.SysUserRepository;
 import cn.refinex.platform.service.PermissionService;
+import cn.refinex.platform.service.SysRoleService;
 import cn.refinex.platform.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -58,6 +66,8 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserNotificationServiceImpl notificationService;
     private final PermissionService permissionService;
+    private final RefinexBizProperties bizProperties;
+    private final SysRoleService sysRoleService;
 
     /**
      * 根据用户名获取用户信息
@@ -454,8 +464,12 @@ public class UserServiceImpl implements UserService {
         try {
             // 获取密文邮箱
             String emailEncrypted = sensitiveDataService.encryptValue(request.getEmail());
+            // 校验确认密码是否与新密码一致
+            if (!request.getConfirmPassword().equals(request.getNewPassword())) {
+                throw new BusinessException("确认密码与新密码不一致");
+            }
             // 加密密码
-            String passwordEncrypted = passwordEncoder.encode(request.getPassword());
+            String passwordEncrypted = passwordEncoder.encode(request.getNewPassword());
             // 更新密码
             int updateCount = sysUserRepository.updatePassword(emailEncrypted, passwordEncrypted);
             return updateCount > 0;
@@ -463,6 +477,65 @@ public class UserServiceImpl implements UserService {
             log.error("重置用户密码失败，email: {}", request.getEmail(), e);
             throw new BusinessException("重置用户密码失败");
         }
+    }
+
+    /**
+     * 初始化超级管理员
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void initSuperAdmin() {
+        // 检查是否已存在超级管理员
+        SysUser sysUser = sysUserRepository.selectById(SystemRoleConstants.SUPER_ADMIN_ID);
+        if (Objects.nonNull(sysUser)) {
+            log.info("超级管理员已存在，跳过初始化");
+            return;
+        }
+
+        log.info("开始初始化超级管理员...");
+
+        // 创建超级管理员用户
+        SysUser superAdmin = new SysUser();
+        superAdmin.setId(SystemRoleConstants.SUPER_ADMIN_ID);
+        superAdmin.setUsername(bizProperties.getSuperAdmin().getUsername());
+        superAdmin.setMobile(RegexUtils.desensitizeMobile(bizProperties.getSuperAdmin().getMobile()));
+        superAdmin.setEmail(RegexUtils.desensitizeEmail(bizProperties.getSuperAdmin().getEmail()));
+        superAdmin.setPassword(passwordEncoder.encode(bizProperties.getSuperAdmin().getPassword()));
+        superAdmin.setNickname(bizProperties.getSuperAdmin().getNickname());
+        superAdmin.setUserStatus(UserStatus.NORMAL.getValue());
+        superAdmin.setRegisterSource(RegisterSource.WEB.name());
+        superAdmin.setCreateBy(SystemRoleConstants.SUPER_ADMIN_ID);
+        superAdmin.setCreateTime(LocalDateTime.now());
+        superAdmin.setUpdateBy(SystemRoleConstants.SUPER_ADMIN_ID);
+        superAdmin.setUpdateTime(LocalDateTime.now());
+        superAdmin.setSort(1);
+        superAdmin.setSex(UserSex.MALE.getCode());
+        superAdmin.setStatus(Convert.toInt(SystemStatusConstants.NORMAL));
+
+        sysUserRepository.initSuperAdmin(superAdmin);
+
+        // 维护邮箱、手机号的敏感数据
+        sensitiveDataService.encryptAndStore(
+                "sys_user",
+                Convert.toStr(SystemRoleConstants.SUPER_ADMIN_ID),
+                "mobile",
+                bizProperties.getSuperAdmin().getMobile()
+        );
+        sensitiveDataService.encryptAndStore(
+                "sys_user",
+                Convert.toStr(SystemRoleConstants.SUPER_ADMIN_ID),
+                "email",
+                bizProperties.getSuperAdmin().getEmail()
+        );
+
+        // 绑定超级管理员角色
+        sysRoleService.bindUserRole(
+                SystemRoleConstants.SUPER_ADMIN_ROLE_ID,
+                List.of(SystemRoleConstants.SUPER_ADMIN_ID),
+                SystemRoleConstants.SUPER_ADMIN_ID)
+        ;
+
+        log.info("初始化超级管理员成功!");
     }
 
     //============================== 私有辅助方法 ======================================

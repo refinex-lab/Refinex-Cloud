@@ -256,6 +256,22 @@ management:
 # 业务自定义配置
 # ====================================================================
 refinex:
+  biz:
+    # 数据库敏感数据加密密钥(通过 CryptoUtilsTest.handleKeyGenerationOperations[1] 生成)
+    dbSensitiveDataKey: dg6y46DTyCvlAoL/vUfB/HOKAcz2t87BdJf3uYCkj3w=
+    # 超级管理员配置(自动初始化)
+    superAdmin:
+      # 用户名
+      username: refinex
+      # 昵称
+      nickname: 沉默的老李
+      # 手机号
+      mobile: 18800000000
+      # 邮箱
+      email: refinex@163.com
+      # 密码(默认 refinex.cn)
+      password: refinex.cn
+
   # Xss 过滤配置
   xss:
     # 是否开启 Xss 过滤

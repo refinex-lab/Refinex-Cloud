@@ -210,6 +210,27 @@ public class SysUserRepository {
     }
 
     /**
+     * 初始化超级管理员
+     *
+     * @param superAdmin 超级管理员实体
+     */
+    public void initSuperAdmin(SysUser superAdmin) {
+        String sql = """
+                INSERT INTO sys_user (
+                    id, username, mobile, email, password, nickname, user_status,
+                    register_source, create_by, create_time, update_by, update_time, sort, status
+                )
+                VALUES (
+                    :id, :username, :mobile, :email, :password, :nickname, :userStatus,
+                    :registerSource, :createBy, :createTime, :updateBy, :updateTime, :sort, :status
+                )
+                """;
+
+        Map<String, Object> params = BeanConverter.beanToMap(superAdmin, false, false);
+        jdbcManager.insert(sql, params, true);
+    }
+
+    /**
      * 更新用户密码
      *
      * @param emailEncrypted 加密邮箱

@@ -9,5 +9,6 @@ import Footer from './Footer';
 import { Question, SelectLang } from './RightContent';
 import { AvatarDropdown, AvatarName } from './RightContent/AvatarDropdown';
 import { ThemeSwitch} from "@/components/RightContent";
+import Captcha from './Captcha';
 
-export { AvatarDropdown, AvatarName, Footer, Question, SelectLang, ThemeSwitch };
+export { AvatarDropdown, AvatarName, Footer, Question, SelectLang, ThemeSwitch, Captcha };

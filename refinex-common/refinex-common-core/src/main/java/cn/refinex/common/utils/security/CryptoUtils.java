@@ -144,6 +144,17 @@ public final class CryptoUtils {
     }
 
     /**
+     * 生成 AES-256 随机密钥（返回 Base64 编码字符串）
+     * <p>适用于配置文件中存储的密钥格式</p>
+     *
+     * @return Base64 编码的 32 字节密钥字符串
+     */
+    public static String generateAes256KeyBase64() {
+        final byte[] key = generateAes256Key();
+        return Base64.getEncoder().encodeToString(key);
+    }
+
+    /**
      * 使用 AES/GCM/NoPadding 加密（返回 Base64(iv + ciphertext)）
      *
      * @param plainBytes 明文

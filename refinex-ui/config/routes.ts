@@ -22,6 +22,12 @@ export default [
         component: './user/login',
       },
       {
+        path: '/user/forgot-password',
+        layout: false,
+        name: 'forgot-password',
+        component: './user/ForgotPassword',
+      },
+      {
         path: '/user',
         redirect: '/user/login',
       },

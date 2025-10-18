@@ -1,7 +1,6 @@
 package cn.refinex.auth.controller;
 
 import cn.refinex.auth.domain.dto.request.LoginRequest;
-import cn.refinex.platform.domain.dto.request.ResetPasswordRequest;
 import cn.refinex.auth.domain.vo.LoginVo;
 import cn.refinex.auth.enums.EmailVerifyCodeType;
 import cn.refinex.auth.service.AuthService;
@@ -15,6 +14,7 @@ import cn.refinex.common.protection.ratelimiter.core.keyresolver.impl.ClientIpRa
 import cn.refinex.common.utils.servlet.ServletUtils;
 import cn.refinex.platform.api.EmailFeignClient;
 import cn.refinex.platform.api.UserFeignClient;
+import cn.refinex.platform.domain.dto.request.ResetPasswordRequest;
 import cn.refinex.platform.domain.dto.request.UserCreateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -101,7 +101,7 @@ public class TokenController {
         // 验证验证码
         VerifyCodeValidateRequest verifyCodeValidateRequest = VerifyCodeValidateRequest.builder()
                 .email(request.getEmail())
-                .verifyCode(request.getVerifyCode())
+                .verifyCode(request.getEmailCode())
                 .codeType(EmailVerifyCodeType.RESET_PASSWORD.getCode())
                 .build();
         ApiResult<Boolean> verifyCodeResult = emailFeignClient.verifyCode(verifyCodeValidateRequest);

@@ -62,7 +62,7 @@ CREATE TABLE `sys_sensitive`
 CREATE TABLE `sys_role`
 (
     `id`          BIGINT      NOT NULL COMMENT '主键ID',
-    `role_code`   VARCHAR(50) NOT NULL COMMENT '角色编码,如ROLE_ADMIN,ROLE_USER,ROLE_VIP_MONTHLY',
+    `role_code`   VARCHAR(50) NOT NULL COMMENT '角色编码,如SUPER_ADMIN,ROLE_USER,ROLE_VIP_MONTHLY',
     `role_name`   VARCHAR(50) NOT NULL COMMENT '角色名称,如普通用户,月度会员',
     `role_type`   TINYINT     NOT NULL DEFAULT 0 COMMENT '角色类型:0前台角色,1后台角色',
     `data_scope`  INT         NOT NULL COMMENT '角色权限范围(1:所有数据权限 2:自定义数据权限 3:仅本人数据权限)',
@@ -83,6 +83,17 @@ CREATE TABLE `sys_role`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci COMMENT ='角色表-定义系统中的所有角色';
+
+-- 补充系统内置角色标识(0: 非系统内部角色，1: 系统内部角色，禁止删除)
+ALTER TABLE `sys_role` ADD COLUMN `system_flags` TINYINT NOT NULL DEFAULT 0 COMMENT '系统内置角色标识:0非系统内部角色,1系统内部角色' AFTER `id`;
+
+-- 初始化超级管理员角色
+INSERT INTO `sys_role` (`id`, `system_flags`, `role_code`, `role_name`, `role_type`, `data_scope`, `priority`, `remark`, `status`)
+VALUES (1, 1, 'SUPER_ADMIN', '超级管理员', 1, 1, 1000, '系统最高权限角色', 0);
+
+-- 初始化普通用户角色
+INSERT INTO `sys_role` (`id`, `system_flags`, `role_code`, `role_name`, `role_type`, `data_scope`, `priority`, `remark`, `status`)
+VALUES (2, 1, 'ROLE_USER', '普通用户', 0, 3, 100, '默认普通用户角色', 0);
 
 CREATE TABLE `sys_permission`
 (
@@ -819,26 +830,6 @@ CREATE TABLE `video_quality`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci COMMENT ='视频清晰度表-转码后的多清晰度版本';
-
-CREATE TABLE `video_play_record`
-(
-    `id`              BIGINT   NOT NULL COMMENT '主键ID',
-    `user_id`         BIGINT   NOT NULL COMMENT '用户ID',
-    `video_id`        BIGINT   NOT NULL COMMENT '视频资源ID',
-    `course_id`       BIGINT            DEFAULT NULL COMMENT '课程ID',
-    `play_progress`   INT      NOT NULL DEFAULT 0 COMMENT '播放进度,单位秒',
-    `total_duration`  INT      NOT NULL COMMENT '视频总时长,单位秒',
-    `play_percentage` DECIMAL(5, 2)     DEFAULT NULL COMMENT '播放百分比',
-    `quality_level`   VARCHAR(20)       DEFAULT NULL COMMENT '当前清晰度',
-    `is_completed`    TINYINT  NOT NULL DEFAULT 0 COMMENT '是否已完成:0否,1是',
-    `last_play_time`  DATETIME NOT NULL COMMENT '最后播放时间',
-    `update_time`     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uni_user_video` (`user_id`, `video_id`) COMMENT '用户视频唯一索引',
-    KEY `idx_user_course` (`user_id`, `course_id`) COMMENT '用户课程联合索引'
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='播放记录表-记录用户视频播放进度';
 
 CREATE TABLE `video_play_record`
 (

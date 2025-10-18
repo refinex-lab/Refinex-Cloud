@@ -111,4 +111,9 @@ public interface UserService {
       * @return 重置结果
       */
     Boolean resetPassword(ResetPasswordRequest request);
+
+    /**
+     * 初始化超级管理员
+     */
+    void initSuperAdmin();
 }

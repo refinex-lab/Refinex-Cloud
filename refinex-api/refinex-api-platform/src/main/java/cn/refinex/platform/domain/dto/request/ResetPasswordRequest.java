@@ -22,9 +22,13 @@ public class ResetPasswordRequest {
 
     @NotBlank(message = "密码不能为空")
     @Schema(description = "密码", example = "123456")
-    private String password;
+    private String newPassword;
+
+    @NotBlank(message = "确认密码不能为空")
+    @Schema(description = "确认密码", example = "123456")
+    private String confirmPassword;
 
     @NotBlank(message = "邮箱验证码不能为空")
     @Schema(description = "邮箱验证码", example = "123456")
-    private String verifyCode;
+    private String emailCode;
 }

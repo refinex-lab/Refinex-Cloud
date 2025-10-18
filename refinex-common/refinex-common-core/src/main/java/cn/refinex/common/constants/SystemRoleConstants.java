@@ -17,6 +17,11 @@ public final class SystemRoleConstants {
     public static final Long SUPER_ADMIN_ID = 1L;
 
     /**
+     * 超级管理员角色ID
+     */
+    public static final Long SUPER_ADMIN_ROLE_ID = 1L;
+
+    /**
      * 超级管理员角色
      */
     public static final String SUPER_ADMIN = "SUPER_ADMIN";

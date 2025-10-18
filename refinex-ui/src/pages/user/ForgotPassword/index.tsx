@@ -1,28 +1,27 @@
 import {
+  LockOutlined,
+  MailOutlined,
+  SafetyCertificateOutlined,
+} from '@ant-design/icons';
+import {
+  LoginForm,
+  ProFormText,
+} from '@ant-design/pro-components';
+import {
   FormattedMessage,
   Helmet,
   SelectLang,
-  history,
   useIntl,
   useModel,
+  history,
 } from '@umijs/max';
 import { Alert, App, Button, Form, Steps } from 'antd';
 import { createStyles } from 'antd-style';
 import React, { useState } from 'react';
 import { Footer } from '@/components';
 import { ThemeSwitch } from '@/components/RightContent';
-import { sendEmailVerifyCode, register } from '@/services/auth';
+import { sendEmailVerifyCode, resetPassword } from '@/services/auth';
 import Settings from '../../../../config/defaultSettings';
-import {
-  LoginForm,
-  ProFormText,
-} from '@ant-design/pro-components';
-import {
-  LockOutlined,
-  MailOutlined,
-  SafetyCertificateOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
 
 const useStyles = createStyles(({ token }) => {
   return {
@@ -100,7 +99,6 @@ const useStyles = createStyles(({ token }) => {
         color: token.colorPrimary,
       },
     },
-    // 亮色主题 - 浅蓝白色优雅渐变（与登录页面一致）
     containerLight: {
       display: 'flex',
       flexDirection: 'column',
@@ -108,7 +106,6 @@ const useStyles = createStyles(({ token }) => {
       background: 'linear-gradient(180deg, #e0f2fe 0%, #f0f9ff 25%, #ffffff 50%, #f0f9ff 75%, #e0f2fe 100%)',
       position: 'relative',
     },
-    // 暗色主题 - 深蓝黑色专业渐变（与登录页面一致）
     containerDark: {
       display: 'flex',
       flexDirection: 'column',
@@ -116,7 +113,6 @@ const useStyles = createStyles(({ token }) => {
       background: 'linear-gradient(180deg, #0a0e1a 0%, #131825 25%, #1a1f35 50%, #131825 75%, #0a0e1a 100%)',
       position: 'relative',
     },
-    // 品牌标识区域（与登录页面一致）
     brandContainer: {
       position: 'absolute',
       top: '32px',
@@ -167,7 +163,6 @@ const useStyles = createStyles(({ token }) => {
     brandSubtitleDark: {
       color: '#94a3b8',
     },
-    // 主内容区域（与登录页面一致）
     contentWrapper: {
       flex: '1',
       display: 'flex',
@@ -181,11 +176,11 @@ const useStyles = createStyles(({ token }) => {
     formContainerLight: {
       width: '100%',
       maxWidth: '500px',
-      padding: '48px 40px',
       backgroundColor: '#ffffff',
       borderRadius: '16px',
-      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
-      border: '1px solid rgba(255, 255, 255, 0.2)',
+      padding: '40px 36px',
+      boxShadow: '0 4px 20px rgba(30, 58, 138, 0.08), 0 2px 8px rgba(30, 58, 138, 0.04)',
+      border: '1px solid rgba(226, 232, 240, 0.8)',
       '@media (max-width: 768px)': {
         maxWidth: '100%',
         padding: '32px 24px',
@@ -195,10 +190,10 @@ const useStyles = createStyles(({ token }) => {
     formContainerDark: {
       width: '100%',
       maxWidth: '500px',
-      padding: '48px 40px',
       backgroundColor: '#1e293b',
       borderRadius: '16px',
-      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+      padding: '40px 36px',
+      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3)',
       border: '1px solid rgba(148, 163, 184, 0.15)',
       '@media (max-width: 768px)': {
         maxWidth: '100%',
@@ -206,7 +201,6 @@ const useStyles = createStyles(({ token }) => {
         borderRadius: '12px',
       },
     },
-    // 表单标题样式
     formTitle: {
       fontSize: '26px',
       fontWeight: 600,
@@ -218,16 +212,13 @@ const useStyles = createStyles(({ token }) => {
     formTitleDark: {
       color: '#f8fafc',
     },
-    // 步骤条样式
     stepsContainer: {
       marginBottom: '32px',
     },
-    // 返回登录链接
     backToLogin: {
       textAlign: 'center',
       marginTop: '24px',
     },
-    // 暗色主题下的表单样式优化
     darkFormStyles: {
       '& .ant-form': {
         width: '100%',
@@ -342,7 +333,6 @@ const useStyles = createStyles(({ token }) => {
         },
       },
     },
-    // 亮色主题表单样式
     lightFormStyles: {
       '& .ant-form': {
         width: '100%',
@@ -360,7 +350,6 @@ const useStyles = createStyles(({ token }) => {
         borderRadius: '8px',
       },
     },
-    // Footer 样式优化
     footerLight: {
       '& .ant-pro-global-footer': {
         '& a, & span': {
@@ -383,7 +372,6 @@ const useStyles = createStyles(({ token }) => {
 
 const Lang = ({ isDark }: { isDark: boolean }) => {
   const { styles } = useStyles();
-
   return (
     <div className={isDark ? styles.langDark : styles.lang} data-lang>
       {SelectLang && <SelectLang />}
@@ -391,9 +379,8 @@ const Lang = ({ isDark }: { isDark: boolean }) => {
   );
 };
 
-const RegisterThemeSwitch = ({ isDark }: { isDark: boolean }) => {
+const ForgotPasswordThemeSwitch = ({ isDark }: { isDark: boolean }) => {
   const { styles } = useStyles();
-
   return (
     <div className={isDark ? styles.themeSwitchDark : styles.themeSwitch}>
       <ThemeSwitch />
@@ -401,14 +388,10 @@ const RegisterThemeSwitch = ({ isDark }: { isDark: boolean }) => {
   );
 };
 
-const ErrorMessage: React.FC<{
-  content: string;
-}> = ({ content }) => {
+const ErrorMessage: React.FC<{ content: string }> = ({ content }) => {
   return (
     <Alert
-      style={{
-        marginBottom: 24,
-      }}
+      style={{ marginBottom: 24 }}
       message={content}
       type="error"
       showIcon
@@ -416,14 +399,10 @@ const ErrorMessage: React.FC<{
   );
 };
 
-const SuccessMessage: React.FC<{
-  content: string;
-}> = ({ content }) => {
+const SuccessMessage: React.FC<{ content: string }> = ({ content }) => {
   return (
     <Alert
-      style={{
-        marginBottom: 24,
-      }}
+      style={{ marginBottom: 24 }}
       message={content}
       type="success"
       showIcon
@@ -431,7 +410,7 @@ const SuccessMessage: React.FC<{
   );
 };
 
-const Register: React.FC = () => {
+const ForgotPassword: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -443,7 +422,6 @@ const Register: React.FC = () => {
   const intl = useIntl();
   const [form] = Form.useForm();
 
-  // 获取当前主题
   const getCurrentTheme = (): 'light' | 'realDark' => {
     const themeMode = localStorage.getItem('themeMode') as 'light' | 'dark' || 'light';
     return themeMode === 'dark' ? 'realDark' : 'light';
@@ -452,18 +430,15 @@ const Register: React.FC = () => {
   const currentTheme = initialState?.settings?.navTheme || getCurrentTheme();
   const isDark = currentTheme === 'realDark';
 
-  // 发送验证码
   const handleSendCode = async (values: { email: string }) => {
     setLoading(true);
     setError('');
     setSuccess('');
-
     try {
       const response = await sendEmailVerifyCode({
         email: values.email,
-        codeType: 'REGISTER',
+        codeType: 'RESET_PASSWORD',
       });
-
       if (response.success) {
         setEmail(values.email);
         setCurrentStep(1);
@@ -471,7 +446,7 @@ const Register: React.FC = () => {
         message.success('验证码发送成功');
       } else {
         setError(response.message || intl.formatMessage({
-          id: 'pages.register.sendCodeFailed',
+          id: 'pages.forgotPassword.sendCodeFailed',
           defaultMessage: '发送验证码失败，请重试',
         }));
       }
@@ -483,51 +458,44 @@ const Register: React.FC = () => {
     }
   };
 
-  // 注册
-  const handleRegister = async (values: {
-    username: string;
-    password: string;
-    confirmPassword: string;
+  const handleResetPassword = async (values: {
     verifyCode: string;
+    newPassword: string;
+    confirmPassword: string;
   }) => {
-    if (values.password !== values.confirmPassword) {
+    if (values.newPassword !== values.confirmPassword) {
       setError('两次输入的密码不一致');
       return;
     }
-
     setLoading(true);
     setError('');
     setSuccess('');
-
     try {
-      const response = await register({
+      const response = await resetPassword({
         email,
-        username: values.username,
-        password: values.password,
-        verifyCode: values.verifyCode,
+        emailCode: values.verifyCode,
+        newPassword: values.newPassword,
+        confirmPassword: values.confirmPassword,
       });
-
       if (response.success) {
         setCurrentStep(2);
-        setSuccess(intl.formatMessage({ id: 'pages.register.success.message', defaultMessage: '注册成功，请登录' }));
-        message.success(intl.formatMessage({ id: 'pages.register.success.notification', defaultMessage: '注册成功' }));
+        setSuccess('密码重置成功，请使用新密码登录');
+        message.success('密码重置成功');
       } else {
-        setError(response.message || '注册失败，请重试');
+        setError(response.message || '密码重置失败，请重试');
       }
     } catch (error) {
-      console.error('注册失败:', error);
+      console.error('密码重置失败:', error);
       setError('网络错误，请重试');
     } finally {
       setLoading(false);
     }
   };
 
-  // 返回登录页面
   const goToLogin = () => {
     history.push('/user/login');
   };
 
-  // 重新开始
   const restart = () => {
     setCurrentStep(0);
     setEmail('');
@@ -539,21 +507,24 @@ const Register: React.FC = () => {
   const steps = [
     {
       title: intl.formatMessage({
-        id: 'pages.register.step.verifyEmail',
+        id: 'pages.forgotPassword.step.verifyEmail',
         defaultMessage: '验证邮箱',
       }),
       icon: <MailOutlined />,
     },
     {
       title: intl.formatMessage({
-        id: 'pages.register.step.createAccount',
-        defaultMessage: '完善信息',
+        id: 'pages.forgotPassword.step.verifyIdentity',
+        defaultMessage: '验证身份',
       }),
-      icon: <UserOutlined />,
+      icon: <SafetyCertificateOutlined />,
     },
     {
-      title: intl.formatMessage({ id: 'pages.register.success.title', defaultMessage: '注册成功' }),
-      icon: <SafetyCertificateOutlined />,
+      title: intl.formatMessage({
+        id: 'pages.forgotPassword.step.resetPassword',
+        defaultMessage: '重置密码',
+      }),
+      icon: <LockOutlined />,
     },
   ];
 
@@ -569,7 +540,7 @@ const Register: React.FC = () => {
             submitter={{
               searchConfig: {
                 submitText: intl.formatMessage({
-                  id: 'pages.register.sendCode',
+                  id: 'pages.forgotPassword.sendCode',
                   defaultMessage: '发送验证码',
                 }),
               },
@@ -591,7 +562,7 @@ const Register: React.FC = () => {
                 prefix: <MailOutlined />,
               }}
               placeholder={intl.formatMessage({
-                id: 'pages.register.email.placeholder',
+                id: 'pages.forgotPassword.email.placeholder',
                 defaultMessage: '请输入您的邮箱地址',
               })}
               rules={[
@@ -607,7 +578,6 @@ const Register: React.FC = () => {
             />
           </LoginForm>
         );
-
       case 1:
         return (
           <LoginForm
@@ -617,7 +587,10 @@ const Register: React.FC = () => {
             }}
             submitter={{
               searchConfig: {
-                submitText: '注册',
+                submitText: intl.formatMessage({
+                  id: 'pages.forgotPassword.resetPassword',
+                  defaultMessage: '重置密码',
+                }),
               },
               submitButtonProps: {
                 loading,
@@ -627,7 +600,7 @@ const Register: React.FC = () => {
             logo={false}
             title={false}
             subTitle={false}
-            onFinish={handleRegister}
+            onFinish={handleResetPassword}
             form={form}
           >
             <div style={{ marginBottom: 16, color: isDark ? '#94a3b8' : '#64748b' }}>
@@ -641,7 +614,7 @@ const Register: React.FC = () => {
                 prefix: <SafetyCertificateOutlined />,
               }}
               placeholder={intl.formatMessage({
-                id: 'pages.register.verifyCode.placeholder',
+                id: 'pages.forgotPassword.verifyCode.placeholder',
                 defaultMessage: '请输入邮箱验证码',
               })}
               rules={[
@@ -652,42 +625,20 @@ const Register: React.FC = () => {
               ]}
             />
 
-            <ProFormText
-              name="username"
-              fieldProps={{
-                size: 'large',
-                prefix: <UserOutlined />,
-              }}
-              placeholder={intl.formatMessage({
-                id: 'pages.register.username.placeholder',
-                defaultMessage: '请输入用户名',
-              })}
-              rules={[
-                {
-                  required: true,
-                  message: '请输入用户名！',
-                },
-                {
-                  min: 3,
-                  message: '用户名至少3位字符！',
-                },
-              ]}
-            />
-
             <ProFormText.Password
-              name="password"
+              name="newPassword"
               fieldProps={{
                 size: 'large',
                 prefix: <LockOutlined />,
               }}
               placeholder={intl.formatMessage({
-                id: 'pages.register.password.placeholder',
-                defaultMessage: '请输入密码',
+                id: 'pages.forgotPassword.newPassword.placeholder',
+                defaultMessage: '请输入新密码',
               })}
               rules={[
                 {
                   required: true,
-                  message: '请输入密码！',
+                  message: '请输入新密码！',
                 },
                 {
                   min: 6,
@@ -703,17 +654,17 @@ const Register: React.FC = () => {
                 prefix: <LockOutlined />,
               }}
               placeholder={intl.formatMessage({
-                id: 'pages.register.confirmPassword.placeholder',
-                defaultMessage: '请确认密码',
+                id: 'pages.forgotPassword.confirmPassword.placeholder',
+                defaultMessage: '请确认新密码',
               })}
               rules={[
                 {
                   required: true,
-                  message: '请确认密码！',
+                  message: '请确认新密码！',
                 },
                 ({ getFieldValue }) => ({
                   validator(_, value) {
-                    if (!value || getFieldValue('password') === value) {
+                    if (!value || getFieldValue('newPassword') === value) {
                       return Promise.resolve();
                     }
                     return Promise.reject(new Error('两次输入的密码不一致！'));
@@ -724,15 +675,14 @@ const Register: React.FC = () => {
 
             <div style={{ textAlign: 'center', marginTop: 16 }}>
               <Button type="link" onClick={restart}>
-                {intl.formatMessage({
-                  id: 'pages.register.resendCode',
+{intl.formatMessage({
+                  id: 'pages.forgotPassword.resendCode',
                   defaultMessage: '重新发送验证码',
                 })}
               </Button>
             </div>
           </LoginForm>
         );
-
       case 2:
         return (
           <div style={{ textAlign: 'center' }}>
@@ -740,17 +690,16 @@ const Register: React.FC = () => {
               ✓
             </div>
             <h3 style={{ color: isDark ? '#f8fafc' : '#0f172a', marginBottom: '16px' }}>
-              {intl.formatMessage({ id: 'pages.register.success.title', defaultMessage: '注册成功' })}
+              密码重置成功
             </h3>
             <p style={{ color: isDark ? '#94a3b8' : '#64748b', marginBottom: '24px' }}>
-              {intl.formatMessage({ id: 'pages.register.success.description', defaultMessage: '恭喜您成功注册，请使用您的账号登录' })}
+              您的密码已成功重置，请使用新密码登录
             </p>
             <Button type="primary" size="large" onClick={goToLogin}>
-              {intl.formatMessage({ id: 'pages.register.success.loginButton', defaultMessage: '立即登录' })}
+              返回登录
             </Button>
           </div>
         );
-
       default:
         return null;
     }
@@ -760,12 +709,14 @@ const Register: React.FC = () => {
     <div className={isDark ? styles.containerDark : styles.containerLight}>
       <Helmet>
         <title>
-          {intl.formatMessage({ id: 'pages.register.title', defaultMessage: '用户注册' })}
+          {intl.formatMessage({
+            id: 'pages.forgotPassword.title',
+            defaultMessage: '忘记密码',
+          })}
           {Settings.title && ` - ${Settings.title}`}
         </title>
       </Helmet>
 
-      {/* 品牌标识 */}
       <div className={styles.brandContainer}>
         <img
           src="/logo.svg"
@@ -782,20 +733,19 @@ const Register: React.FC = () => {
         </div>
       </div>
 
-      {/* 主题切换和语言切换 */}
-      <RegisterThemeSwitch isDark={isDark} />
+      <ForgotPasswordThemeSwitch isDark={isDark} />
       <Lang isDark={isDark} />
 
-      {/* 表单区域 */}
       <div className={styles.contentWrapper}>
         <div className={isDark ? styles.formContainerDark : styles.formContainerLight}>
           <div className={isDark ? styles.darkFormStyles : styles.lightFormStyles}>
-            {/* 表单标题 */}
             <h2 className={`${styles.formTitle} ${isDark ? styles.formTitleDark : ''}`}>
-              {intl.formatMessage({ id: 'pages.register.title', defaultMessage: '用户注册' })}
+              {intl.formatMessage({
+                id: 'pages.forgotPassword.title',
+                defaultMessage: '忘记密码',
+              })}
             </h2>
 
-            {/* 步骤条 */}
             {currentStep < 2 && (
               <div className={styles.stepsContainer}>
                 <Steps
@@ -806,22 +756,17 @@ const Register: React.FC = () => {
               </div>
             )}
 
-            {/* 错误信息 */}
             {error && <ErrorMessage content={error} />}
-
-            {/* 成功信息 */}
             {success && <SuccessMessage content={success} />}
 
-            {/* 步骤内容 */}
             {renderStepContent()}
 
-            {/* 返回登录链接 */}
             {currentStep < 2 && (
               <div className={styles.backToLogin}>
                 <Button type="link" onClick={goToLogin}>
                   <FormattedMessage
-                    id="pages.register.backToLogin"
-                    defaultMessage="已有账号？立即登录"
+                    id="pages.forgotPassword.backToLogin"
+                    defaultMessage="返回登录"
                   />
                 </Button>
               </div>
@@ -831,10 +776,10 @@ const Register: React.FC = () => {
       </div>
 
       <div className={isDark ? styles.footerDark : styles.footerLight}>
-        <Footer/>
+        <Footer />
       </div>
     </div>
   );
 };
 
-export default Register;
+export default ForgotPassword;

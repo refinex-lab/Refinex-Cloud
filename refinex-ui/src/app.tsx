@@ -167,6 +167,7 @@ export const layout: RunTimeLayoutConfig = ({
  * @doc https://umijs.org/docs/max/request#配置
  */
 export const request: RequestConfig = {
-  baseURL: 'https://proapi.azurewebsites.net',
+  // 使用相对路径，通过代理转发到本地网关 (开发环境: localhost:8082)
+  baseURL: '/api',
   ...errorConfig,
 };

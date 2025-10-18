@@ -1,15 +1,15 @@
 package cn.refinex.platform.repository.sys;
 
+import cn.refinex.common.constants.SystemRoleConstants;
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
+import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
 import cn.refinex.platform.domain.entity.sys.SysRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * 用户角色数据访问层
@@ -23,6 +23,7 @@ import java.util.Set;
 public class SysUserRoleRepository {
 
     private final JdbcTemplateManager jdbcManager;
+    private final SnowflakeIdGenerator idGenerator;
 
     /**
      * 根据用户ID查询用户角色列表
@@ -103,5 +104,31 @@ public class SysUserRoleRepository {
             log.error("获取用户权限失败，userId: {}", userId, e);
             return Collections.emptySet();
         }
+    }
+
+    /**
+     * 绑定用户角色
+     *
+     * @param userId   用户ID
+     * @param roleIds  角色ID列表
+     * @param actionBy 操作人ID
+     */
+    public void bindUserRole(Long userId, List<Long> roleIds, Long actionBy) {
+        String sql = """
+                INSERT INTO sys_user_role (id, user_id, role_id, create_by, create_time)
+                VALUES (:id, :userId, :roleId, :actionBy, :now)
+                """;
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object>[] params = roleIds.stream()
+                .map(roleId -> Map.of(
+                        "id", idGenerator.nextId(),
+                        "userId", userId,
+                        "roleId", roleId,
+                        "actionBy", Objects.isNull(actionBy) ? SystemRoleConstants.SUPER_ADMIN_ID : actionBy,
+                        "now", LocalDateTime.now()))
+                .toArray(Map[]::new);
+
+        jdbcManager.batchUpdate(sql, params, true);
     }
 }
