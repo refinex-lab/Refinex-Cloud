@@ -18,15 +18,15 @@ import java.util.Set;
  * @since 1.0.0
  */
 @Tag(name = "权限服务 Feign API")
-@FeignClient(name = SystemFeignConstants.PLATFORM_SERVICE, path = "/permission")
+@FeignClient(name = SystemFeignConstants.PLATFORM_SERVICE)
 public interface PermissionFeignClient {
 
-    @PostMapping("/getUserRolePermissions")
+    @PostMapping("/permission/getUserRolePermissions")
     @Operation(summary = "获取用户角色权限列表", description = "根据用户ID获取用户拥有的所有角色权限")
     @Parameter(name = "userId", description = "用户ID", required = true)
     ApiResult<Set<String>> getUserRolePermissions(@RequestParam("userId") Long userId);
 
-    @PostMapping("/getUserMenuPermissions")
+    @PostMapping("/permission/getUserMenuPermissions")
     @Operation(summary = "获取用户菜单权限列表", description = "根据用户ID获取用户拥有的所有菜单权限")
     @Parameter(name = "userId", description = "用户ID", required = true)
     ApiResult<Set<String>> getUserMenuPermissions(@RequestParam("userId") Long userId);

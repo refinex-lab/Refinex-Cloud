@@ -134,8 +134,9 @@ public class RedisService {
     public Long getExpire(String key) {
         try {
             if (key == null) {
-                log.error("获取 key 过期时间失败，key 为 null");
-                throw new SystemException(ResultCode.INTERNAL_ERROR);
+                // 返回 -2 表示 key 不存在，避免上层空指针或异常中断流程
+                log.warn("获取 key 过期时间时 key 为 null，按不存在处理并返回 -2");
+                return -2L;
             }
             return redisTemplate.getExpire(key);
         } catch (Exception e) {
@@ -154,8 +155,9 @@ public class RedisService {
     public Long getExpire(String key, TimeUnit unit) {
         try {
             if (key == null) {
-                log.error("获取 key 过期时间失败，key 为 null, unit: {}", unit);
-                throw new SystemException(ResultCode.INTERNAL_ERROR);
+                // 返回 -2 表示 key 不存在，避免上层空指针或异常中断流程
+                log.warn("获取 key 过期时间时 key 为 null, unit: {}，按不存在处理并返回 -2", unit);
+                return -2L;
             }
             return redisTemplate.getExpire(key, unit);
         } catch (Exception e) {

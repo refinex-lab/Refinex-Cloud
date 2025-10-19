@@ -51,6 +51,9 @@ public class EnhancedSaTokenDao implements SaTokenDaoBySessionFollowObject {
      */
     @Override
     public String get(String key) {
+        if (key == null) {
+            return null;
+        }
         Object valueObj = CAFFEINE_CACHE.get(key, redisService.string()::get);
         return Convert.toStr(valueObj);
     }
@@ -64,6 +67,9 @@ public class EnhancedSaTokenDao implements SaTokenDaoBySessionFollowObject {
      */
     @Override
     public void set(String key, String value, long timeout) {
+        if (key == null) {
+            return;
+        }
         // 如果有效期为 0 或者小于 -2 (表示系统中不存在这个缓存)，则不存储
         if (timeout == 0 || timeout <= NOT_VALUE_EXPIRE) {
             return;
@@ -88,6 +94,9 @@ public class EnhancedSaTokenDao implements SaTokenDaoBySessionFollowObject {
      */
     @Override
     public void update(String key, String value) {
+        if (key == null) {
+            return;
+        }
         Boolean hasKey = redisService.hasKey(key);
         if (Boolean.TRUE.equals(hasKey)) {
             // 更新 Redis 中的值
@@ -105,6 +114,9 @@ public class EnhancedSaTokenDao implements SaTokenDaoBySessionFollowObject {
      */
     @Override
     public void delete(String key) {
+        if (key == null) {
+            return;
+        }
         Boolean hasKey = redisService.hasKey(key);
         if (Boolean.TRUE.equals(hasKey)) {
             // 删除 Redis 中的值
@@ -123,6 +135,9 @@ public class EnhancedSaTokenDao implements SaTokenDaoBySessionFollowObject {
      */
     @Override
     public long getTimeout(String key) {
+        if (key == null) {
+            return NOT_VALUE_EXPIRE; // 表示 key 不存在
+        }
         // 获取 TTL（单位: 秒）
         Long expire = redisService.getExpire(key);
         // 如果 TTL 为 null，则表示永不过期(-1)，否则返回实际 TTL
@@ -137,6 +152,9 @@ public class EnhancedSaTokenDao implements SaTokenDaoBySessionFollowObject {
      */
     @Override
     public void updateTimeout(String key, long timeout) {
+        if (key == null) {
+            return;
+        }
         // 如果有效期为 0 或者小于 -2 (表示系统中不存在这个缓存)，则不更新
         if (timeout == 0 || timeout <= NOT_VALUE_EXPIRE) {
             return;
@@ -157,6 +175,9 @@ public class EnhancedSaTokenDao implements SaTokenDaoBySessionFollowObject {
      */
     @Override
     public Object getObject(String key) {
+        if (key == null) {
+            return null;
+        }
         return CAFFEINE_CACHE.get(key, redisService.string()::get);
     }
 
@@ -169,6 +190,9 @@ public class EnhancedSaTokenDao implements SaTokenDaoBySessionFollowObject {
      */
     @Override
     public <T> T getObject(String key, Class<T> classType) {
+        if (key == null) {
+            return null;
+        }
         Object valueObj = CAFFEINE_CACHE.get(key, redisService.string()::get);
         return BeanConverter.toBean(valueObj, classType);
     }
@@ -182,6 +206,9 @@ public class EnhancedSaTokenDao implements SaTokenDaoBySessionFollowObject {
      */
     @Override
     public void setObject(String key, Object object, long timeout) {
+        if (key == null) {
+            return;
+        }
         // 如果有效期为 0 或者小于 -2 (表示系统中不存在这个缓存)，则不存储
         if (timeout == 0 || timeout <= NOT_VALUE_EXPIRE) {
             return;
@@ -206,6 +233,9 @@ public class EnhancedSaTokenDao implements SaTokenDaoBySessionFollowObject {
      */
     @Override
     public void updateObject(String key, Object object) {
+        if (key == null) {
+            return;
+        }
         Boolean hasKey = redisService.hasKey(key);
         if (Boolean.TRUE.equals(hasKey)) {
             // 更新 Redis 中的值
@@ -222,6 +252,9 @@ public class EnhancedSaTokenDao implements SaTokenDaoBySessionFollowObject {
      */
     @Override
     public void deleteObject(String key) {
+        if (key == null) {
+            return;
+        }
         delete(key);
     }
 
@@ -233,6 +266,9 @@ public class EnhancedSaTokenDao implements SaTokenDaoBySessionFollowObject {
      */
     @Override
     public long getObjectTimeout(String key) {
+        if (key == null) {
+            return NOT_VALUE_EXPIRE;
+        }
         return getTimeout(key);
     }
 
@@ -244,6 +280,9 @@ public class EnhancedSaTokenDao implements SaTokenDaoBySessionFollowObject {
      */
     @Override
     public void updateObjectTimeout(String key, long timeout) {
+        if (key == null) {
+            return;
+        }
         updateTimeout(key, timeout);
     }
 
@@ -260,6 +299,9 @@ public class EnhancedSaTokenDao implements SaTokenDaoBySessionFollowObject {
     @SuppressWarnings("unchecked")
     @Override
     public List<String> searchData(String prefix, String keyword, int start, int size, boolean sortType) {
+        if (prefix == null) {
+            return new ArrayList<>();
+        }
         String pattern = prefix + "*" + keyword + "*";
         Object resultObj = CAFFEINE_CACHE.get(pattern, k -> {
             Set<String> keys = redisService.keys(pattern);
