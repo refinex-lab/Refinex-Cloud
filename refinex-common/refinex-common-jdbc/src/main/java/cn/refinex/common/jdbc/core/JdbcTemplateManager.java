@@ -1,5 +1,6 @@
 package cn.refinex.common.jdbc.core;
 
+import cn.hutool.core.util.StrUtil;
 import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.exception.code.ResultCode;
 import cn.refinex.common.jdbc.callback.InputStreamCallback;
@@ -1554,9 +1555,18 @@ public class JdbcTemplateManager {
      */
     private void logSqlAsText(String operation, String sql, Object params, long elapsedMs, Integer rowsAffected, Integer resultSize, Exception exception) {
         String logMessage = String.format(
-                "op=%s, sql=%s, params=%s, elapsedMs=%dms, rowsAffected=%s, resultSize=%s, error=%s",
+                """
+                SQL execution log: ⬇
+                method=[%s],
+                sql=[%s],
+                params=[%s],
+                elapsedMs=[%dms],
+                rowsAffected=[%s],
+                resultSize=[%s],
+                error=[%s]
+                """,
                 operation,
-                sql,
+                toOneLine(sql),
                 sanitizeParams(params),
                 elapsedMs,
                 rowsAffected,
@@ -1571,6 +1581,21 @@ public class JdbcTemplateManager {
         } else {
             log.info(logMessage);
         }
+    }
+
+    /**
+     * 将多行文本转换为单行文本
+     *
+     * @param text 多行文本
+     * @return 单行文本
+     */
+    private static String toOneLine(String text) {
+        if (StrUtil.isBlank(text)) {
+            return "";
+        }
+        return text.replaceAll("[\\r\\n]+", " ")
+                .replaceAll("\\s+", " ")
+                .trim();
     }
 
     /**
