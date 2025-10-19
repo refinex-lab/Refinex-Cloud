@@ -1,7 +1,7 @@
 package cn.refinex.platform.controller;
 
 import cn.refinex.common.domain.ApiResult;
-import cn.refinex.common.domain.model.LoginUser;
+import cn.refinex.platform.api.domain.vo.CurrentUserVo;
 import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.satoken.core.util.LoginHelper;
 import cn.refinex.platform.domain.dto.request.UserDisableRequest;
@@ -35,18 +35,14 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/current")
-    @Operation(summary = "获取当前登录用户信息", description = "获取当前登录用户的详细信息")
-    public ApiResult<LoginUser> getCurrentUser() {
-        LoginUser loginUser = LoginHelper.getLoginUser();
-        if (Objects.isNull(loginUser)) {
-            Long userId = LoginHelper.getUserId();
-            if (Objects.isNull(userId)) {
-                throw new BusinessException("用户 ID 不能为空");
-            }
-            loginUser = userService.getUserInfoByUserId(userId);
+    @Operation(summary = "获取当前登录用户信息", description = "获取当前登录用户的详细信息（安全字段）")
+    public ApiResult<CurrentUserVo> getCurrentUser() {
+        Long userId = LoginHelper.getUserId();
+        if (Objects.isNull(userId)) {
+            throw new BusinessException("用户 ID 不能为空");
         }
-
-        return ApiResult.success(loginUser);
+        CurrentUserVo currentUser = userService.buildCurrentUserVo(userId);
+        return ApiResult.success(currentUser);
     }
 
     /**

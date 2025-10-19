@@ -4,6 +4,8 @@ import { SettingDrawer } from '@ant-design/pro-components';
 import type { RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
 import { history, Link } from '@umijs/max';
 import React from 'react';
+import avatarMale from '@/assets/images/user/avatar_male.png';
+import avatarFemale from '@/assets/images/user/avatar_female.png';
 import {
   AvatarDropdown,
   AvatarName,
@@ -29,15 +31,26 @@ const loginPath = '/user/login';
  * */
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
-  currentUser?: API.CurrentUser;
+  currentUser?: AUTH.CurrentUser;
   loading?: boolean;
-  fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+  fetchUserInfo?: () => Promise<AUTH.CurrentUser | undefined>;
 }> {
   // 获取用户信息
   const fetchUserInfo = async () => {
     try {
       const msg = await getCurrentUser();
-      return msg.data;
+      const apiUser = msg.data as AUTH.CurrentUser | undefined;
+      const resolvedAvatar = !apiUser?.avatar
+        ? apiUser?.sex === 'female'
+          ? avatarFemale
+          : avatarMale
+        : apiUser.avatar;
+      const normalizedUser = apiUser
+        ? { ...apiUser, avatar: resolvedAvatar }
+        : undefined;
+      // 将当前用户缓存，便于页面级快速读取
+      localStorage.setItem('current_user', JSON.stringify(normalizedUser || {}));
+      return normalizedUser;
     } catch (_error) {
       history.push(loginPath);
     }
@@ -97,7 +110,7 @@ export const layout: RunTimeLayoutConfig = ({
       },
     },
     waterMarkProps: {
-      content: initialState?.currentUser?.name,
+      content: initialState?.currentUser?.nickname || initialState?.currentUser?.username,
     },
     footerRender: () => <Footer />,
     onPageChange: () => {

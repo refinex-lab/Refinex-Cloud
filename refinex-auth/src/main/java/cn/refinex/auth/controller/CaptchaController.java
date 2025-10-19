@@ -3,6 +3,8 @@ package cn.refinex.auth.controller;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.refinex.auth.domain.dto.response.CaptchaGenerateResponse;
 import cn.refinex.auth.service.CaptchaService;
+import cn.refinex.common.apilog.core.annotation.LogOperation;
+import cn.refinex.common.apilog.core.enums.OperateTypeEnum;
 import cn.refinex.common.domain.ApiResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,6 +43,7 @@ public class CaptchaController {
      */
     @SaIgnore
     @GetMapping("/generate")
+    @LogOperation(operateModule = "验证码管理", operateDesc = "生成验证码图片和唯一标识", operationType = OperateTypeEnum.OTHER)
     @Operation(summary = "生成验证码", description = "生成验证码图片和唯一标识")
     public ApiResult<CaptchaGenerateResponse> generate() {
         CaptchaGenerateResponse response = captchaService.generate();

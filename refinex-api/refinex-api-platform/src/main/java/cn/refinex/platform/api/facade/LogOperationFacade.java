@@ -17,12 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @author Refinex
  * @since 1.0.0
  */
-@Tag(name = "操作日志服务 Feign API")
-@FeignClient(
-        name = SystemFeignConstants.PLATFORM_SERVICE,
-        path = "/logger",
-        contextId = "logOperationFeignClient"
-)
+@Tag(name = "操作日志服务 Feign 客户端")
+@FeignClient(name = SystemFeignConstants.PLATFORM_SERVICE)
 public interface LogOperationFacade {
 
     @PostMapping("/logger/create")

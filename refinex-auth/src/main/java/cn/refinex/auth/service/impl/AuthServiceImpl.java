@@ -12,7 +12,6 @@ import cn.refinex.auth.properties.CaptchaProperties;
 import cn.refinex.auth.properties.UserPasswordProperties;
 import cn.refinex.auth.service.AuthService;
 import cn.refinex.auth.service.CaptchaService;
-import cn.refinex.auth.service.feign.UserService;
 import cn.refinex.common.constants.SystemRedisKeyConstants;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.domain.model.LoginUser;
@@ -21,6 +20,7 @@ import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.redis.RedisService;
 import cn.refinex.common.satoken.core.util.LoginHelper;
 import cn.refinex.common.utils.device.DeviceUtils;
+import cn.refinex.platform.api.facade.UserFacade;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final CaptchaProperties captchaProperties;
     private final CaptchaService captchaService;
-    private final UserService userService;
+    private final UserFacade userFacade;
     private final RedisService redisService;
     private final UserPasswordProperties userPasswordProperties;
 
@@ -67,8 +67,8 @@ public class AuthServiceImpl implements AuthService {
 
         // 根据用户名/邮箱获取登录用户信息
         ApiResult<LoginUser> userNameResult = Objects.equals(request.getLoginType(), LoginType.PASSWORD.getCode())
-                ? userService.getLoginUserByUserName(request.getUsername())
-                : userService.getLoginUserByEmail(request.getUsername());
+                ? userFacade.getLoginUserByUserName(request.getUsername())
+                : userFacade.getLoginUserByEmail(request.getUsername());
         LoginUser loginUser = userNameResult.getData();
         if (Objects.isNull(loginUser)) {
             log.warn("根据用户名查询登录用户失败，username: {}", request.getUsername());
@@ -76,15 +76,15 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // 验证用户状态
-        if (loginUser.getStatus() == null) {
+        if (loginUser.getUserStatus() == null) {
             log.warn("用户状态异常，username: {}, status: null", request.getUsername());
             throw new BusinessException("用户状态异常，无法登录");
         }
-        if (loginUser.getStatus().equals(UserStatusEnum.FROZEN.getValue())) {
+        if (loginUser.getUserStatus().equals(UserStatusEnum.FROZEN.getValue())) {
             log.warn("用户已被冻结，username: {}", request.getUsername());
             throw new BusinessException("用户已被冻结，无法登录");
         }
-        if (loginUser.getStatus().equals(UserStatusEnum.LOGGED_OUT.getValue())) {
+        if (loginUser.getUserStatus().equals(UserStatusEnum.LOGGED_OUT.getValue())) {
             log.warn("用户已注销，username: {}", request.getUsername());
             throw new BusinessException("用户已注销，无法登录");
         }

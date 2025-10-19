@@ -86,9 +86,14 @@ declare namespace AUTH {
     userId: number;
     username: string;
     nickname: string;
-    email: string;
     avatar?: string;
-    status: number;
+    sex?: 'male' | 'female' | 'other';
+    email?: string; // 已脱敏
+    mobile?: string; // 已脱敏
+    userStatus: number;
+    userType?: string;
+    lastLoginTime?: string;
+    lastLoginIp?: string;
     roles?: string[];
     permissions?: string[];
   }

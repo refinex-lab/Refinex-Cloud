@@ -1,6 +1,7 @@
 package cn.refinex.platform.service;
 
 import cn.refinex.common.domain.model.LoginUser;
+import cn.refinex.platform.api.domain.vo.CurrentUserVo;
 import cn.refinex.platform.api.domain.dto.request.ResetPasswordRequest;
 import cn.refinex.platform.api.domain.dto.request.UserCreateRequest;
 import cn.refinex.platform.domain.dto.request.UserDisableRequest;
@@ -116,4 +117,11 @@ public interface UserService {
      * 初始化超级管理员
      */
     void initSuperAdmin();
+
+    /**
+     * 构建安全的当前用户视图
+     * @param userId 用户ID
+     * @return 当前用户安全视图
+     */
+    CurrentUserVo buildCurrentUserVo(Long userId);
 }

@@ -443,6 +443,12 @@
 
             <dependency>
                 <groupId>cn.refinex</groupId>
+                <artifactId>refinex-common-openfeign</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.refinex</groupId>
                 <artifactId>refinex-common-nacos</artifactId>
                 <version>${revision}</version>
             </dependency>

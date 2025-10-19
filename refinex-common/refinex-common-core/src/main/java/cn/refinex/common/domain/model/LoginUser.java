@@ -30,7 +30,7 @@ public class LoginUser implements Serializable {
     private Long userId;
 
     @Schema(description = "用户状态(0待激活,1正常,2冻结,3注销)")
-    private Integer status;
+    private Integer userStatus;
 
     @Schema(description = "用户唯一标识")
     private String token;
@@ -44,7 +44,7 @@ public class LoginUser implements Serializable {
     @Schema(description = "密码")
     private String password;
 
-    @Schema(description = "用户类型")
+    @Schema(description = "用户类型(sys_user:后台用户, app_user:移动端用户)")
     private String userType;
 
     @Schema(description = "登录时间")

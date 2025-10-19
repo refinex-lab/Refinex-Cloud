@@ -91,10 +91,19 @@ export const errorConfig: RequestConfig = {
       // 拦截请求配置，进行个性化处理。
       // 添加认证token
       const token = localStorage.getItem('access_token');
+      const clientId = localStorage.getItem('clientId');
       if (token) {
         config.headers = {
           ...config.headers,
           'Authorization': `Bearer ${token}`,
+        };
+      }
+      // 透传客户端ID到网关，需与 Token Extra 中的 clientid 一致
+      if (clientId) {
+        config.headers = {
+          ...config.headers,
+          // 注意：后端要求的键名为全小写 clientid
+          'clientid': clientId,
         };
       }
       return config;

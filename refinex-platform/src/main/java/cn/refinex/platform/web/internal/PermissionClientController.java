@@ -1,10 +1,10 @@
-package cn.refinex.platform.web;
+package cn.refinex.platform.web.internal;
 
-import cn.refinex.common.domain.ApiResult;
+import cn.dev33.satoken.annotation.SaIgnore;
 import cn.refinex.common.api.PermissionFeignClient;
+import cn.refinex.common.domain.ApiResult;
 import cn.refinex.platform.service.PermissionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Set;
@@ -15,6 +15,7 @@ import java.util.Set;
  * @author Refinex
  * @since 1.0.0
  */
+@SaIgnore // 内部接口，不需要用户令牌
 @RestController
 @RequiredArgsConstructor
 public class PermissionClientController implements PermissionFeignClient {
@@ -28,7 +29,7 @@ public class PermissionClientController implements PermissionFeignClient {
      * @return 用户角色列表
      */
     @Override
-    public ApiResult<Set<String>> getUserRolePermissions(@RequestParam("userId") Long userId) {
+    public ApiResult<Set<String>> getUserRolePermissions(Long userId) {
         return ApiResult.success(permissionService.getUserRolePermissions(userId));
     }
 
@@ -39,7 +40,7 @@ public class PermissionClientController implements PermissionFeignClient {
      * @return 用户权限列表
      */
     @Override
-    public ApiResult<Set<String>> getUserMenuPermissions(@RequestParam("userId") Long userId) {
+    public ApiResult<Set<String>> getUserMenuPermissions(Long userId) {
         return ApiResult.success(permissionService.getUserMenuPermissions(userId));
     }
 }

@@ -49,5 +49,12 @@
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-json</artifactId>
         </dependency>
+
+        <!-- OpenFeign 核心，用于提供 RequestInterceptor 接口 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 </project>

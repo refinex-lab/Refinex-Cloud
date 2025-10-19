@@ -26,7 +26,7 @@ public class SysUserVo implements Serializable {
     private Long userId;
 
     @Schema(description = "用户状态(0待激活,1正常,2冻结,3注销)")
-    private String status;
+    private Integer userStatus;
 
     @Schema(description = "用户名")
     private String userName;

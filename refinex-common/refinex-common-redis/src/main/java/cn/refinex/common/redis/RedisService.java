@@ -94,6 +94,10 @@ public class RedisService {
      */
     public Boolean expire(String key, long timeout, TimeUnit unit) {
         try {
+            if (key == null) {
+                log.error("设置 key 过期时间失败，key 为 null, timeout: {}, unit: {}", timeout, unit);
+                throw new SystemException(ResultCode.INTERNAL_ERROR);
+            }
             return redisTemplate.expire(key, timeout, unit);
         } catch (Exception e) {
             log.error("设置 key 过期时间失败，key: {}, timeout: {}, unit: {}", key, timeout, unit, e);
@@ -110,6 +114,10 @@ public class RedisService {
      */
     public Boolean expire(String key, Duration duration) {
         try {
+            if (key == null) {
+                log.error("设置 key 过期时间失败，key 为 null, duration: {}", duration);
+                throw new SystemException(ResultCode.INTERNAL_ERROR);
+            }
             return redisTemplate.expire(key, duration);
         } catch (Exception e) {
             log.error("设置 key 过期时间失败，key: {}, duration: {}", key, duration, e);
@@ -125,6 +133,10 @@ public class RedisService {
      */
     public Long getExpire(String key) {
         try {
+            if (key == null) {
+                log.error("获取 key 过期时间失败，key 为 null");
+                throw new SystemException(ResultCode.INTERNAL_ERROR);
+            }
             return redisTemplate.getExpire(key);
         } catch (Exception e) {
             log.error("获取 key 过期时间失败，key: {}", key, e);
@@ -141,6 +153,10 @@ public class RedisService {
      */
     public Long getExpire(String key, TimeUnit unit) {
         try {
+            if (key == null) {
+                log.error("获取 key 过期时间失败，key 为 null, unit: {}", unit);
+                throw new SystemException(ResultCode.INTERNAL_ERROR);
+            }
             return redisTemplate.getExpire(key, unit);
         } catch (Exception e) {
             log.error("获取 key 过期时间失败，key: {}, unit: {}", key, unit, e);

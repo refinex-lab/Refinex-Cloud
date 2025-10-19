@@ -15,8 +15,8 @@ import cn.refinex.common.utils.device.DeviceUtils;
 import cn.refinex.common.utils.servlet.ServletUtils;
 import cn.refinex.common.web.config.properties.WebProperties;
 import cn.refinex.common.web.core.filter.ApiRequestFilter;
-import cn.refinex.platform.api.facade.LogOperationFacade;
 import cn.refinex.platform.api.domain.dto.request.LogOperationCreateRequest;
+import cn.refinex.platform.api.facade.LogOperationFacade;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import nl.basjes.parse.useragent.yauaa.shaded.org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.method.HandlerMethod;
 
@@ -40,6 +39,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import static cn.refinex.common.apilog.core.interceptor.LogOperationInterceptor.ATTRIBUTE_HANDLER_METHOD;
+import static cn.refinex.common.constants.SystemCommonConstants.API_RESULT_ATTR_NAME;
 
 /**
  * 日志操作过滤器，记录操作日志
@@ -90,6 +90,13 @@ public class LogOperationFilter extends ApiRequestFilter {
         Map<String, String> parameterMap = ServletUtils.getParameterMapFlat(request);
         // 注意这里只记录 JSON 请求的 body，因为只有 JSON 请求 CacheRequestBodyFilter 才会进行缓存以支持重复读取
         String requestBody = ServletUtils.isJsonRequest(request) ? ServletUtils.getRequestBody(request) : null;
+
+        // 避免对自身日志写入接口进行记录，防止递归调用
+        String uri = request.getRequestURI();
+        if (uri != null && uri.startsWith("/logger/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         try {
             filterChain.doFilter(request, response);
@@ -143,7 +150,7 @@ public class LogOperationFilter extends ApiRequestFilter {
         if (Objects.nonNull(handlerMethod)) {
             // 只有方法上使用了 @LogOperation 注解，并且开启了记录日志，才记录日志
             logOperationAnnotation = handlerMethod.getMethodAnnotation(LogOperation.class);
-            if (Objects.nonNull(logOperationAnnotation) && BooleanUtil.isFalse(logOperationAnnotation.enabled())) {
+            if (Objects.isNull(logOperationAnnotation) || BooleanUtil.isFalse(logOperationAnnotation.enabled())) {
                 return false;
             }
         }
@@ -151,11 +158,20 @@ public class LogOperationFilter extends ApiRequestFilter {
         // 设置应用名称
         logOperationRequest.setApplicationName(applicationName);
 
-        // 处理用户信息(看下直接使用 StpUtil.getLoginId() 获取是否有问题？)
-        Long userId = Long.valueOf(StpUtil.getLoginId().toString());
-        String username = StpUtil.getSession().get("username").toString();
-        logOperationRequest.setUserId(userId);
-        logOperationRequest.setUsername(username);
+        // 处理用户信息：未登录时兜底为空，避免 NotLoginException
+        try {
+            Object loginId = StpUtil.getLoginIdDefaultNull();
+            if (Objects.nonNull(loginId)) {
+                Long userId = Long.valueOf(loginId.toString());
+                logOperationRequest.setUserId(userId);
+                Object usernameObj = StpUtil.getSession().get("username");
+                if (Objects.nonNull(usernameObj)) {
+                    logOperationRequest.setUsername(usernameObj.toString());
+                }
+            }
+        } catch (Exception ignore) {
+            // 忽略未登录场景
+        }
 
         // 提取请求方式
         String requestMethod = request.getMethod();
@@ -177,9 +193,8 @@ public class LogOperationFilter extends ApiRequestFilter {
             }
         }
 
-        // 设置响应结果或者异常信息
-        HttpServletRequest servletRequest = ((ServletServerHttpRequest) request).getServletRequest();
-        ApiResult<?> apiResult = (ApiResult<?>) servletRequest.getAttribute("api_result");
+        // 设置响应结果或者异常信息 - 直接从 HttpServletRequest 读取，不进行类型强转
+        ApiResult<?> apiResult = (ApiResult<?>) request.getAttribute(API_RESULT_ATTR_NAME);
         if (Objects.nonNull(apiResult)) {
             if (logOperationAnnotation != null && logOperationAnnotation.recordResponseBody()) {
                 logOperationRequest.setResponseResult(apiResult.toString());
@@ -213,7 +228,7 @@ public class LogOperationFilter extends ApiRequestFilter {
 
         // 设置执行时间(毫秒)
         long executeTime = Duration.between(beginTime, LocalDateTime.now()).toMillis();
-        logOperationRequest.setExecutionTime(Fn.getInt(executeTime, null));
+        logOperationRequest.setExecutionTime(Fn.getInt(executeTime, 0));
 
         // 设置创建时间
         logOperationRequest.setCreateTime(LocalDateTime.now());

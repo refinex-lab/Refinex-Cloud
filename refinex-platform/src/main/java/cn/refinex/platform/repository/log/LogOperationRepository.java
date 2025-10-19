@@ -28,7 +28,7 @@ public class LogOperationRepository {
     public void saveLogOperation(LogOperation logOperation) {
         String sql = """
                 INSERT INTO log_operation(
-                    user_id, username, operation_module, operation_type, operation_desc, request_method, request_url
+                    user_id, username, operation_module, operation_type, operation_desc, request_method, request_url,
                     request_params, response_result, operation_ip, operation_location, browser, os, operation_status,
                     error_message, execution_time, create_time, request_body, application_name
                 )

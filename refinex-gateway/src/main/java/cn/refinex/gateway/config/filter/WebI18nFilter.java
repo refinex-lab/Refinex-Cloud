@@ -4,6 +4,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.i18n.SimpleLocaleContext;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -29,7 +30,7 @@ public class WebI18nFilter implements WebFilter, Ordered {
      * @return 响应 Mono
      */
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+    public @NonNull Mono<Void> filter(@NonNull ServerWebExchange exchange, @NonNull WebFilterChain chain) {
         String language = exchange.getRequest().getHeaders().getFirst(HttpHeaders.CONTENT_LANGUAGE);
         Locale locale = Locale.getDefault();
 

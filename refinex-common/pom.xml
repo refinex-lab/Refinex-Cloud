@@ -28,6 +28,7 @@
         <module>refinex-common-satoken</module>
         <module>refinex-common-mq</module>
         <module>refinex-common-job</module>
+        <module>refinex-common-openfeign</module>
     </modules>
 
 </project>

@@ -549,8 +549,8 @@ const Login: React.FC = () => {
         localStorage.setItem('access_token', response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken);
         localStorage.setItem('clientId', response.data.clientId);
-        localStorage.setItem('expireIn', response.data.expireIn.toString());
-        localStorage.setItem('refreshExpireIn', response.data.refreshExpireIn.toString());
+        localStorage.setItem('expireIn', String(response.data.expireIn ?? ''));
+        localStorage.setItem('refreshExpireIn', String(response.data.refreshExpireIn ?? ''));
 
         // 获取用户信息
         await fetchUserInfo();

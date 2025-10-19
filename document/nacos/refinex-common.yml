@@ -134,10 +134,14 @@ sa-token:
   is-write-header: true
   # 同 Token 检查(用于微服务网关鉴权)
   check-same-token: true
+  # Same-Token 头名称（显式指定，避免环境差异）
+  same-token-name: Same-Token
   # Token 续期配置, 单位秒, 默认 -1 表示不限制
   token-session-timeout: -1
   # 自动续签(每次访问自动续期)
   auto-renew: true
+  # JWT 密钥
+  jwt-secret-key: abcdefghijklmnopqrstuvwxyz
 
 # ====================================================================
 # 日志配置

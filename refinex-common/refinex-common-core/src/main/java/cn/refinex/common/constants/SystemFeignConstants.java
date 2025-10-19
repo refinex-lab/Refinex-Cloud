@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SystemFeignConstants {
 
+    // 内部接口前缀，内部接口调用时使用，不需要用户令牌
+    public static final String INNER_API_PREFIX = "/internal";
+
     // 统一 OpenFeign API 前缀
     public static final String FEIGN_API_PREFIX = "/feign-api";
 

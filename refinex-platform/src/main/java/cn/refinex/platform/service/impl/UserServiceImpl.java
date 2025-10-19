@@ -9,6 +9,7 @@ import cn.refinex.common.constants.SystemStatusConstants;
 import cn.refinex.common.domain.model.LoginUser;
 import cn.refinex.common.domain.model.SysRoleDTO;
 import cn.refinex.common.enums.UserSex;
+import cn.refinex.common.enums.UserType;
 import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.exception.code.ResultCode;
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
@@ -27,6 +28,7 @@ import cn.refinex.platform.domain.entity.sys.SysRole;
 import cn.refinex.platform.domain.entity.sys.SysUser;
 import cn.refinex.platform.domain.model.UserSessionDTO;
 import cn.refinex.platform.api.domain.vo.SysUserVo;
+import cn.refinex.platform.api.domain.vo.CurrentUserVo;
 import cn.refinex.platform.api.enums.RegisterSource;
 import cn.refinex.platform.api.enums.UserRegisterType;
 import cn.refinex.platform.enums.UserStatus;
@@ -511,6 +513,7 @@ public class UserServiceImpl implements UserService {
         superAdmin.setSort(1);
         superAdmin.setSex(UserSex.MALE.getCode());
         superAdmin.setStatus(Convert.toInt(SystemStatusConstants.NORMAL));
+        superAdmin.setUserType(UserType.SYS_USER.getCode());
 
         sysUserRepository.initSuperAdmin(superAdmin);
 
@@ -551,6 +554,7 @@ public class UserServiceImpl implements UserService {
 
         LoginUser loginUser = new LoginUser();
         loginUser.setUserId(userId);
+        loginUser.setUserStatus(userVo.getUserStatus());
         loginUser.setUsername(userVo.getUserName());
         loginUser.setNickname(userVo.getNickName());
         loginUser.setPassword(userVo.getPassword());
@@ -563,5 +567,32 @@ public class UserServiceImpl implements UserService {
         loginUser.setRoles(sysRoleVos);
 
         return loginUser;
+    }
+
+    @Override
+    public CurrentUserVo buildCurrentUserVo(Long userId) {
+        SysUser sysUser = sysUserRepository.selectById(userId);
+        if (Objects.isNull(sysUser)) {
+            throw new BusinessException("用户不存在");
+        }
+
+        CurrentUserVo vo = new CurrentUserVo();
+        vo.setUserId(sysUser.getId());
+        vo.setUsername(sysUser.getUsername());
+        vo.setNickname(sysUser.getNickname());
+        vo.setSex(sysUser.getSex());
+        vo.setAvatar(sysUser.getAvatar());
+        vo.setEmail(sysUser.getEmail()); // 已是脱敏邮箱
+        vo.setMobile(sysUser.getMobile()); // 已是脱敏手机号
+        vo.setUserStatus(sysUser.getUserStatus());
+        vo.setUserType(sysUser.getUserType());
+        vo.setLastLoginIp(sysUser.getLastLoginIp());
+        vo.setLastLoginTime(sysUser.getLastLoginTime());
+
+        // 角色与权限
+        List<SysRole> userRoles = permissionService.getUserRoles(userId);
+        vo.setRoles(userRoles.stream().map(SysRole::getRoleCode).toList());
+        vo.setPermissions(permissionService.getUserMenuPermissions(userId).stream().toList());
+        return vo;
     }
 }

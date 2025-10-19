@@ -2,6 +2,8 @@ import { Radar } from '@ant-design/plots';
 import { PageContainer } from '@ant-design/pro-components';
 import { Link, useRequest } from '@umijs/max';
 import { Avatar, Card, Col, List, Row, Skeleton, Statistic } from 'antd';
+import avatarMale from '@/assets/images/user/avatar_male.png';
+import avatarFemale from '@/assets/images/user/avatar_female.png';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import type { FC } from 'react';
@@ -39,7 +41,7 @@ const links = [
   },
 ];
 const PageHeaderContent: FC<{
-  currentUser: Partial<CurrentUser>;
+  currentUser: Partial<AUTH.CurrentUser>;
 }> = ({ currentUser }) => {
   const { styles } = useStyles();
   const loading = currentUser && Object.keys(currentUser).length;
@@ -57,17 +59,18 @@ const PageHeaderContent: FC<{
   return (
     <div className={styles.pageHeaderContent}>
       <div className={styles.avatar}>
-        <Avatar size="large" src={currentUser.avatar} />
+        <Avatar
+          size="large"
+          src={currentUser.avatar || (currentUser.sex === 'female' ? avatarFemale : avatarMale)}
+        />
       </div>
       <div className={styles.content}>
         <div className={styles.contentTitle}>
           早安，
-          {currentUser.name}
+          {currentUser.nickname || currentUser.username}
           ，祝你开心每一天！
         </div>
-        <div>
-          {currentUser.title} |{currentUser.group}
-        </div>
+        <div>{currentUser.lastLoginTime ? `上次登录：${currentUser.lastLoginTime}` : ''}</div>
       </div>
     </div>
   );
@@ -131,18 +134,7 @@ const Workplace: FC = () => {
   return (
     <PageContainer
       content={
-        <PageHeaderContent
-          currentUser={{
-            avatar:
-              'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png',
-            name: '吴彦祖',
-            userid: '00000001',
-            email: 'antdesign@alipay.com',
-            signature: '海纳百川，有容乃大',
-            title: '干饭专家',
-            group: '后端牛马组',
-          }}
-        />
+        <PageHeaderContent currentUser={JSON.parse(localStorage.getItem('current_user') || '{}')} />
       }
       extraContent={<ExtraContent />}
     >

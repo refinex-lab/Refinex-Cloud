@@ -217,11 +217,11 @@ public class SysUserRepository {
     public void initSuperAdmin(SysUser superAdmin) {
         String sql = """
                 INSERT INTO sys_user (
-                    id, username, mobile, email, password, nickname, user_status,
+                    id, username, mobile, email, password, nickname, user_status, user_type,
                     register_source, create_by, create_time, update_by, update_time, sort, status
                 )
                 VALUES (
-                    :id, :username, :mobile, :email, :password, :nickname, :userStatus,
+                    :id, :username, :mobile, :email, :password, :nickname, :userStatus, :userType,
                     :registerSource, :createBy, :createTime, :updateBy, :updateTime, :sort, :status
                 )
                 """;

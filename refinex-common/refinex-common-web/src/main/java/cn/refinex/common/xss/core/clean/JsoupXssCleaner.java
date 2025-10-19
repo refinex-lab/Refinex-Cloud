@@ -29,7 +29,8 @@ public class JsoupXssCleaner implements XssCleaner {
      */
     public JsoupXssCleaner() {
         this.safelist = buildSafelist();
-        this.baseUri = null;
+        // 使用空字符串而不是 null，避免 Jsoup Parser.createShell(null) 抛出 ValidationException
+        this.baseUri = "";
     }
 
     /**

@@ -1,11 +1,11 @@
-package cn.refinex.platform.web;
+package cn.refinex.platform.web.external;
 
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.platform.api.domain.dto.request.LogOperationCreateRequest;
-import cn.refinex.platform.api.facade.LogOperationFacade;
 import cn.refinex.platform.service.LogOperationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class LogOperationClientController implements LogOperationFacade {
+public class LogOperationClientController {
 
     private final LogOperationService logOperationService;
 
@@ -28,7 +28,7 @@ public class LogOperationClientController implements LogOperationFacade {
      * @param request 操作日志创建请求
      * @return 操作日志创建结果
      */
-    @Override
+    @PostMapping("/logger/create")
     public ApiResult<Boolean> saveLogOperation(@RequestBody LogOperationCreateRequest request) {
         logOperationService.saveLogOperation(request);
         return ApiResult.success(true);

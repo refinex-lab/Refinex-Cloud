@@ -46,6 +46,9 @@ public class SysUser {
     @Schema(description = "性别：male,female,other", example = "male")
     private String sex;
 
+    @Schema(description = "用户类型(sys_user:后台用户, app_user:移动端用户)")
+    private String userType;
+
     @Schema(description = "头像URL", example = "https://example.com/avatar.jpg")
     private String avatar;
 

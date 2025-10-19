@@ -13,6 +13,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
+import static cn.refinex.common.constants.SystemCommonConstants.API_RESULT_ATTR_NAME;
+
 /**
  * 全局响应体处理器
  * <p>
@@ -59,7 +61,7 @@ public class GlobalResponseBodyHandler implements ResponseBodyAdvice {
     @SuppressWarnings("NullableProblems") // 避免 IDEA 警告
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         HttpServletRequest servletRequest = ((ServletServerHttpRequest) request).getServletRequest();
-        servletRequest.setAttribute("api_result", body);
+        servletRequest.setAttribute(API_RESULT_ATTR_NAME, body);
         return body;
     }
 }

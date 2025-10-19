@@ -18,12 +18,8 @@ import org.springframework.web.bind.annotation.*;
  * @author Refinex
  * @since 1.0.0
  */
-@Tag(name = "文件服务 Feign API")
-@FeignClient(
-        name = SystemFeignConstants.PLATFORM_SERVICE,
-        path = "/file",
-        contextId = "fileFeignClient"
-)
+@Tag(name = "文件服务 Feign 客户端")
+@FeignClient(name = SystemFeignConstants.PLATFORM_SERVICE)
 public interface FileFacade {
 
     @PostMapping("/files/upload-url")

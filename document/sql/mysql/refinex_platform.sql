@@ -20,6 +20,7 @@ CREATE TABLE `sys_user`
     `sex`             VARCHAR(10)           DEFAULT NULL COMMENT '性别:male,female,other',
     `avatar`          VARCHAR(500)          DEFAULT NULL COMMENT '头像URL',
     `user_status`     TINYINT      NOT NULL DEFAULT 0 COMMENT '用户状态:0待激活,1正常,2冻结,3注销',
+    `user_type`        VARCHAR(20)  NOT NULL DEFAULT 'sys_user' COMMENT '用户类型(sys_user:后台用户, app_user:移动端用户)',
     `register_source` VARCHAR(20)           DEFAULT NULL COMMENT '注册来源:web,ios,android,h5',
     `last_login_time` DATETIME              DEFAULT NULL COMMENT '最后登录时间',
     `last_login_ip`   VARCHAR(50)           DEFAULT NULL COMMENT '最后登录IP',
@@ -1373,7 +1374,7 @@ CREATE TABLE `email_verify_code`
 
 CREATE TABLE `log_operation`
 (
-    `id`                 BIGINT      NOT NULL COMMENT '主键ID',
+    `id`                 BIGINT      AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `user_id`            BIGINT               DEFAULT NULL COMMENT '操作人ID',
     `username`           VARCHAR(50)          DEFAULT NULL COMMENT '操作人用户名',
     `application_name`   VARCHAR(50)          DEFAULT NULL COMMENT '应用名称',
@@ -1403,7 +1404,7 @@ CREATE TABLE `log_operation`
 
 CREATE TABLE `log_login`
 (
-    `id`             BIGINT      NOT NULL COMMENT '主键ID',
+    `id`             BIGINT      AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `user_id`        BIGINT               DEFAULT NULL COMMENT '用户ID',
     `username`       VARCHAR(50) NOT NULL COMMENT '登录用户名',
     `login_type`     VARCHAR(20) NOT NULL COMMENT '登录方式:PASSWORD,VERIFY_CODE,WECHAT',
@@ -1425,7 +1426,7 @@ CREATE TABLE `log_login`
 
 CREATE TABLE `log_api`
 (
-    `id`              BIGINT       NOT NULL COMMENT '主键ID',
+    `id`              BIGINT       AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `trace_id`        VARCHAR(64)           DEFAULT NULL COMMENT '链路追踪ID',
     `user_id`         BIGINT                DEFAULT NULL COMMENT '用户ID',
     `request_method`  VARCHAR(10)  NOT NULL COMMENT '请求方法',
