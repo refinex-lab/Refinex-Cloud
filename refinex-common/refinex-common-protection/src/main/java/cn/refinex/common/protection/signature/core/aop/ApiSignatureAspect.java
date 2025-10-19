@@ -161,7 +161,8 @@ public class ApiSignatureAspect {
     private String buildSignatureString(ApiSignature signature, HttpServletRequest request, String appSecret) {
         SortedMap<String, String> parameterMap = getRequestParameterMap(request);
         SortedMap<String, String> headerMap = getRequestHeaderMap(signature, request);
-        String requestBody = StrUtil.nullToDefault(ServletUtils.getRequestBody(request), "");
+        // 注意这里只记录 JSON 请求的 body，因为只有 JSON 请求 CacheRequestBodyFilter 才会进行缓存以支持重复读取
+        String requestBody = StrUtil.nullToDefault(ServletUtils.isJsonRequest(request) ? ServletUtils.getRequestBody(request) : "", "");
 
         return MapUtil.join(parameterMap, "&", "=")
                 + requestBody

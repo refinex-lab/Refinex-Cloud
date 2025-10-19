@@ -1,10 +1,13 @@
 package cn.refinex.common.web.config;
 
+import cn.refinex.common.constants.WebFilterOrderConstants;
 import cn.refinex.common.web.config.properties.WebProperties;
+import cn.refinex.common.web.core.filter.CacheRequestBodyFilter;
 import jakarta.servlet.Filter;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -17,6 +20,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @AutoConfiguration
 @EnableConfigurationProperties(WebProperties.class)
 public class WebAutoConfiguration implements WebMvcConfigurer {
+
+    /**
+     * 缓存请求体过滤器
+     * <p>
+     * 作用：将原始请求体包装成缓存请求体，方便后续支持 JSON 请求重复读取请求体
+     *
+     * @return FilterRegistrationBean
+     */
+    @Bean
+    public FilterRegistrationBean<CacheRequestBodyFilter> requestBodyCacheFilter() {
+        return createFilterBean(new CacheRequestBodyFilter(), WebFilterOrderConstants.REQUEST_BODY_CACHE_FILTER);
+    }
 
     /**
      * 创建 Filter 注册 Bean

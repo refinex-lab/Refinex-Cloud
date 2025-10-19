@@ -57,7 +57,8 @@ public class LogOperationInterceptor implements HandlerInterceptor {
         // 如果不是生产环境，就打印 request 日志
         if (!SpringUtils.isProd()) {
             Map<String, String> parameterMap = ServletUtils.getParameterMapFlat(request);
-            String requestBody = ServletUtils.getRequestBody(request);
+            // 注意这里只记录 JSON 请求的 body，因为只有 JSON 请求 CacheRequestBodyFilter 才会进行缓存以支持重复读取
+            String requestBody = ServletUtils.isJsonRequest(request) ? ServletUtils.getRequestBody(request) : null;
             String uri = ServletUtils.getRequestUri(request);
 
             if (MapUtils.isEmpty(parameterMap) && StringUtils.isBlank(requestBody)) {

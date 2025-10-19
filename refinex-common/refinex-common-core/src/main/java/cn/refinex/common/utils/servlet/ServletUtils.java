@@ -1,9 +1,9 @@
 package cn.refinex.common.utils.servlet;
 
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
+import cn.hutool.extra.servlet.JakartaServletUtil;
 import cn.hutool.json.JSONUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,11 +12,11 @@ import jakarta.servlet.http.HttpSession;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -399,13 +399,13 @@ public final class ServletUtils {
      */
     public static String getRequestBody(HttpServletRequest request) {
         validateRequest(request);
-        try {
-            BufferedReader reader = request.getReader();
-            return IoUtil.read(reader);
-        } catch (IOException e) {
-            log.error("读取请求体失败", e);
+
+        // 仅 JSON 请求才读取，因为只有 JSON 请求 CacheRequestBodyFilter 才会进行缓存以支持重复读取
+        if (!isJsonRequest(request)) {
             return null;
         }
+
+        return JakartaServletUtil.getBody(request);
     }
 
     /**
@@ -417,12 +417,24 @@ public final class ServletUtils {
      */
     public static byte[] getRequestBodyBytes(HttpServletRequest request) {
         validateRequest(request);
-        try {
-            return IoUtil.readBytes(request.getInputStream());
-        } catch (IOException e) {
-            log.error("读取请求体字节失败", e);
-            return null;
+        // 仅 JSON 请求才读取，因为只有 JSON 请求 CacheRequestBodyFilter 才会进行缓存以支持重复读取
+        if (!isJsonRequest(request)) {
+            return new byte[0];
         }
+
+        return JakartaServletUtil.getBodyBytes(request);
+    }
+
+    /**
+     * 判断是否为JSON请求
+     *
+     * @param request HttpServletRequest对象
+     * @return 是否为JSON请求, true为JSON请求, false为非JSON请求
+     * @throws IllegalArgumentException 如果request为null
+     */
+    public static boolean isJsonRequest(HttpServletRequest request) {
+        validateRequest(request);
+        return StrUtil.startWithIgnoreCase(request.getContentType(), MediaType.APPLICATION_JSON_VALUE);
     }
 
     /**

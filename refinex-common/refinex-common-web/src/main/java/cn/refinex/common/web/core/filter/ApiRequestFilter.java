@@ -1,8 +1,6 @@
 package cn.refinex.common.web.core.filter;
 
-import cn.hutool.core.util.StrUtil;
 import cn.refinex.common.web.config.properties.WebProperties;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -23,12 +21,11 @@ public abstract class ApiRequestFilter extends OncePerRequestFilter {
      *
      * @param request 当前请求
      * @return 是否需要过滤
-     * @throws ServletException 异常
      */
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        // 只过滤 API 请求地址
-        String apiUri = request.getRequestURI().substring(request.getContextPath().length());
-        return !StrUtil.startWithAny(apiUri, webProperties.getAdminApi().getPrefix(), webProperties.getAppApi().getPrefix());
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        // 只过滤 API 请求地址, 暂时使用总控开关，后期考虑根据各服务请求前缀进行过滤
+        // String apiUri = request.getRequestURI().substring(request.getContextPath().length());
+        return !webProperties.getFilterApiRequest();
     }
 }

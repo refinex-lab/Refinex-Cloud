@@ -88,7 +88,8 @@ public class LogOperationFilter extends ApiRequestFilter {
 
         // 提前拿到参数，避免被 Xss 过滤处理
         Map<String, String> parameterMap = ServletUtils.getParameterMapFlat(request);
-        String requestBody = ServletUtils.getRequestBody(request);
+        // 注意这里只记录 JSON 请求的 body，因为只有 JSON 请求 CacheRequestBodyFilter 才会进行缓存以支持重复读取
+        String requestBody = ServletUtils.isJsonRequest(request) ? ServletUtils.getRequestBody(request) : null;
 
         try {
             filterChain.doFilter(request, response);
