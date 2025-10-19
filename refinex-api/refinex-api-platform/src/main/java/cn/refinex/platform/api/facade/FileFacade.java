@@ -1,11 +1,11 @@
-package cn.refinex.platform.api;
+package cn.refinex.platform.api.facade;
 
 import cn.refinex.common.constants.SystemFeignConstants;
 import cn.refinex.common.domain.ApiResult;
-import cn.refinex.platform.domain.dto.request.FileConfirmUploadRequest;
-import cn.refinex.platform.domain.dto.request.FileUploadUrlRequest;
-import cn.refinex.platform.domain.dto.response.FileUploadUrlResponse;
-import cn.refinex.platform.domain.model.FileInfoDTO;
+import cn.refinex.platform.api.domain.dto.request.FileConfirmUploadRequest;
+import cn.refinex.platform.api.domain.dto.request.FileUploadUrlRequest;
+import cn.refinex.platform.api.domain.dto.response.FileUploadUrlResponse;
+import cn.refinex.platform.api.domain.model.FileInfoDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
         path = "/file",
         contextId = "fileFeignClient"
 )
-public interface FileFeignClient {
+public interface FileFacade {
 
     @PostMapping("/files/upload-url")
     @Operation(summary = "生成文件上传 URL")

@@ -12,10 +12,10 @@ import cn.refinex.common.mail.domain.dto.VerifyCodeValidateRequest;
 import cn.refinex.common.protection.ratelimiter.core.annotation.RateLimiter;
 import cn.refinex.common.protection.ratelimiter.core.keyresolver.impl.ClientIpRateLimiterKeyResolver;
 import cn.refinex.common.utils.servlet.ServletUtils;
-import cn.refinex.platform.api.EmailFeignClient;
-import cn.refinex.platform.api.UserFeignClient;
-import cn.refinex.platform.domain.dto.request.ResetPasswordRequest;
-import cn.refinex.platform.domain.dto.request.UserCreateRequest;
+import cn.refinex.platform.api.facade.EmailFacade;
+import cn.refinex.platform.api.facade.UserFacade;
+import cn.refinex.platform.api.domain.dto.request.ResetPasswordRequest;
+import cn.refinex.platform.api.domain.dto.request.UserCreateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,8 +47,8 @@ import java.util.concurrent.TimeUnit;
 public class TokenController {
 
     private final AuthService authService;
-    private final UserFeignClient userFeignClient;
-    private final EmailFeignClient emailFeignClient;
+    private final UserFacade userFeignClient;
+    private final EmailFacade emailFeignClient;
 
     @PostMapping("/register")
     @Operation(summary = "注册用户", description = "根据创建用户请求参数注册用户")

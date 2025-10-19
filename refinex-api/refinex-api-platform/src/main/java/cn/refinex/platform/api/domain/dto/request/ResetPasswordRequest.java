@@ -1,4 +1,4 @@
-package cn.refinex.platform.domain.dto.request;
+package cn.refinex.platform.api.domain.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;

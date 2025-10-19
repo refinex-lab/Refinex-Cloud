@@ -12,6 +12,7 @@ import cn.refinex.auth.properties.CaptchaProperties;
 import cn.refinex.auth.properties.UserPasswordProperties;
 import cn.refinex.auth.service.AuthService;
 import cn.refinex.auth.service.CaptchaService;
+import cn.refinex.auth.service.feign.UserService;
 import cn.refinex.common.constants.SystemRedisKeyConstants;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.domain.model.LoginUser;
@@ -20,7 +21,6 @@ import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.redis.RedisService;
 import cn.refinex.common.satoken.core.util.LoginHelper;
 import cn.refinex.common.utils.device.DeviceUtils;
-import cn.refinex.platform.api.UserFeignClient;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final CaptchaProperties captchaProperties;
     private final CaptchaService captchaService;
-    private final UserFeignClient userClient;
+    private final UserService userService;
     private final RedisService redisService;
     private final UserPasswordProperties userPasswordProperties;
 
@@ -67,8 +67,8 @@ public class AuthServiceImpl implements AuthService {
 
         // 根据用户名/邮箱获取登录用户信息
         ApiResult<LoginUser> userNameResult = Objects.equals(request.getLoginType(), LoginType.PASSWORD.getCode())
-                ? userClient.getLoginUserByUserName(request.getUsername())
-                : userClient.getLoginUserByEmail(request.getUsername());
+                ? userService.getLoginUserByUserName(request.getUsername())
+                : userService.getLoginUserByEmail(request.getUsername());
         LoginUser loginUser = userNameResult.getData();
         if (Objects.isNull(loginUser)) {
             log.warn("根据用户名查询登录用户失败，username: {}", request.getUsername());

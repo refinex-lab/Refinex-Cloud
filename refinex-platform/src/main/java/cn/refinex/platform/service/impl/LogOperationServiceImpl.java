@@ -2,7 +2,7 @@ package cn.refinex.platform.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import cn.refinex.common.utils.object.BeanConverter;
-import cn.refinex.platform.domain.dto.request.LogOperationCreateRequest;
+import cn.refinex.platform.api.domain.dto.request.LogOperationCreateRequest;
 import cn.refinex.platform.domain.entity.log.LogOperation;
 import cn.refinex.platform.repository.log.LogOperationRepository;
 import cn.refinex.platform.service.LogOperationService;

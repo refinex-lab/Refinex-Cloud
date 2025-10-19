@@ -1,8 +1,8 @@
-package cn.refinex.platform.api;
+package cn.refinex.platform.api.facade;
 
 import cn.refinex.common.constants.SystemFeignConstants;
 import cn.refinex.common.domain.ApiResult;
-import cn.refinex.platform.domain.dto.request.LogOperationCreateRequest;
+import cn.refinex.platform.api.domain.dto.request.LogOperationCreateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
         path = "/logger",
         contextId = "logOperationFeignClient"
 )
-public interface LogOperationFeignClient {
+public interface LogOperationFacade {
 
     @PostMapping("/logger/create")
     @Operation(summary = "保存操作日志")

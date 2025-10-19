@@ -5,7 +5,7 @@ import cn.refinex.common.apilog.core.interceptor.LogOperationInterceptor;
 import cn.refinex.common.constants.WebFilterOrderConstants;
 import cn.refinex.common.web.config.WebAutoConfiguration;
 import cn.refinex.common.web.config.properties.WebProperties;
-import cn.refinex.platform.api.LogOperationFeignClient;
+import cn.refinex.platform.api.facade.LogOperationFacade;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -34,7 +34,7 @@ public class LogOperationAutoConfiguration implements WebMvcConfigurer {
      */
     @Bean
     @ConditionalOnProperty(prefix = "refinex.log-operation", value = "enabled", matchIfMissing = true)
-    public FilterRegistrationBean<LogOperationFilter> logOperationFilter(WebProperties webProperties, @Value("${spring.application.name}") String applicationName, LogOperationFeignClient logOperationClient) {
+    public FilterRegistrationBean<LogOperationFilter> logOperationFilter(WebProperties webProperties, @Value("${spring.application.name}") String applicationName, LogOperationFacade logOperationClient) {
         LogOperationFilter logOperationFilter = new LogOperationFilter(webProperties, applicationName, logOperationClient);
         return WebAutoConfiguration.createFilterBean(logOperationFilter, WebFilterOrderConstants.API_ACCESS_LOG_FILTER);
     }

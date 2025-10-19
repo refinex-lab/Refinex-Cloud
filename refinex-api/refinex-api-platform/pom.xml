@@ -14,28 +14,32 @@
     <description>Refinex Cloud API Platform</description>
 
     <dependencies>
+        <!-- 公共核心模块 -->
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-core</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
+        <!-- 邮件服务 -->
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-mail</artifactId>
         </dependency>
 
+        <!-- 参数校验 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
             <optional>true</optional>
         </dependency>
 
+        <!-- 负载均衡器 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+        </dependency>
+
+        <!-- Feign 客户端 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>

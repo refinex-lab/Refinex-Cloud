@@ -2,15 +2,18 @@ package cn.refinex.platform.web;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.refinex.common.domain.ApiResult;
-import cn.refinex.platform.api.FileFeignClient;
-import cn.refinex.platform.domain.dto.request.FileConfirmUploadRequest;
-import cn.refinex.platform.domain.model.FileInfoDTO;
-import cn.refinex.platform.domain.dto.request.FileUploadUrlRequest;
-import cn.refinex.platform.domain.dto.response.FileUploadUrlResponse;
-import cn.refinex.platform.service.impl.FileServiceImpl;
+import cn.refinex.platform.api.domain.dto.request.FileConfirmUploadRequest;
+import cn.refinex.platform.api.domain.dto.request.FileUploadUrlRequest;
+import cn.refinex.platform.api.domain.dto.response.FileUploadUrlResponse;
+import cn.refinex.platform.api.domain.model.FileInfoDTO;
+import cn.refinex.platform.api.facade.FileFacade;
+import cn.refinex.platform.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 文件服务 Feign API 实现
@@ -21,9 +24,9 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class FileFeignClientImpl implements FileFeignClient {
+public class FileClientController implements FileFacade {
 
-    private final FileServiceImpl fileService;
+    private final FileService fileService;
 
     /**
      * 生成文件上传 URL
@@ -58,7 +61,8 @@ public class FileFeignClientImpl implements FileFeignClient {
      * @return 下载 URL
      */
     @Override
-    public ApiResult<String> generateDownloadUrl(String fileGuid, Long expiresIn) {
+    public ApiResult<String> generateDownloadUrl(@PathVariable("fileGuid") String fileGuid,
+                                                 @RequestParam(value = "expiresIn", required = false, defaultValue = "3600") Long expiresIn) {
         String downloadUrl = fileService.generateDownloadUrl(fileGuid, expiresIn);
         return ApiResult.success(downloadUrl);
     }
@@ -70,7 +74,7 @@ public class FileFeignClientImpl implements FileFeignClient {
      * @return 文件信息
      */
     @Override
-    public ApiResult<FileInfoDTO> getFileInfo(String fileGuid) {
+    public ApiResult<FileInfoDTO> getFileInfo(@PathVariable("fileGuid") String fileGuid) {
         FileInfoDTO fileInfo = fileService.getFileInfo(fileGuid);
         return ApiResult.success(fileInfo);
     }
@@ -82,7 +86,7 @@ public class FileFeignClientImpl implements FileFeignClient {
      * @return 删除结果
      */
     @Override
-    public ApiResult<Void> deleteFile(String fileGuid) {
+    public ApiResult<Void> deleteFile(@PathVariable("fileGuid") String fileGuid) {
         fileService.deleteFile(fileGuid);
         return ApiResult.success(null);
     }

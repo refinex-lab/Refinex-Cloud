@@ -1,8 +1,8 @@
 package cn.refinex.platform.service;
 
 import cn.refinex.common.domain.model.LoginUser;
-import cn.refinex.platform.domain.dto.request.ResetPasswordRequest;
-import cn.refinex.platform.domain.dto.request.UserCreateRequest;
+import cn.refinex.platform.api.domain.dto.request.ResetPasswordRequest;
+import cn.refinex.platform.api.domain.dto.request.UserCreateRequest;
 import cn.refinex.platform.domain.dto.request.UserDisableRequest;
 import cn.refinex.platform.domain.dto.request.UserKickoutRequest;
 import cn.refinex.platform.domain.dto.response.UserDisableStatusResponse;

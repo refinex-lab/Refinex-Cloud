@@ -4,6 +4,7 @@ import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.api.PermissionFeignClient;
 import cn.refinex.platform.service.PermissionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Set;
@@ -16,7 +17,7 @@ import java.util.Set;
  */
 @RestController
 @RequiredArgsConstructor
-public class PermissionFeignClientImpl implements PermissionFeignClient {
+public class PermissionClientController implements PermissionFeignClient {
 
     private final PermissionService permissionService;
 
@@ -27,7 +28,7 @@ public class PermissionFeignClientImpl implements PermissionFeignClient {
      * @return 用户角色列表
      */
     @Override
-    public ApiResult<Set<String>> getUserRolePermissions(Long userId) {
+    public ApiResult<Set<String>> getUserRolePermissions(@RequestParam("userId") Long userId) {
         return ApiResult.success(permissionService.getUserRolePermissions(userId));
     }
 
@@ -38,7 +39,7 @@ public class PermissionFeignClientImpl implements PermissionFeignClient {
      * @return 用户权限列表
      */
     @Override
-    public ApiResult<Set<String>> getUserMenuPermissions(Long userId) {
+    public ApiResult<Set<String>> getUserMenuPermissions(@RequestParam("userId") Long userId) {
         return ApiResult.success(permissionService.getUserMenuPermissions(userId));
     }
 }

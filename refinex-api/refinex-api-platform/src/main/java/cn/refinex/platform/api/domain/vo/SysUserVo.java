@@ -1,4 +1,4 @@
-package cn.refinex.platform.domain.vo;
+package cn.refinex.platform.api.domain.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

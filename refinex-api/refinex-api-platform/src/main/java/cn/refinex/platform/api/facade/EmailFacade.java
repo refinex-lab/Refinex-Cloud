@@ -1,12 +1,9 @@
-package cn.refinex.platform.api;
+package cn.refinex.platform.api.facade;
 
-import cn.refinex.common.constants.SystemFeignConstants;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.mail.domain.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,13 +16,7 @@ import java.util.Map;
  * @author Refinex
  * @since 1.0.0
  */
-@Tag(name = "邮件发送 Feign API")
-@FeignClient(
-        name = SystemFeignConstants.PLATFORM_SERVICE,
-        path = "/email",
-        contextId = "emailFeignClient"
-)
-public interface EmailFeignClient {
+public interface EmailFacade {
 
     @PostMapping("/sendSimpleEmail")
     @Operation(summary = "发送简单邮件", description = "发送纯文本或 HTML 邮件")

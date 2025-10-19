@@ -1,15 +1,13 @@
-package cn.refinex.platform.api;
+package cn.refinex.platform.api.facade;
 
-import cn.refinex.common.constants.SystemFeignConstants;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.domain.model.LoginUser;
-import cn.refinex.platform.domain.dto.request.ResetPasswordRequest;
-import cn.refinex.platform.domain.dto.request.UserCreateRequest;
+import cn.refinex.platform.api.domain.dto.request.ResetPasswordRequest;
+import cn.refinex.platform.api.domain.dto.request.UserCreateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,12 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @Validated
 @Tag(name = "用户服务 Feign API")
-@FeignClient(
-        name = SystemFeignConstants.PLATFORM_SERVICE,
-        path = "/user",
-        contextId = "userFeignClient"
-)
-public interface UserFeignClient {
+public interface UserFacade {
 
     @PostMapping("/registerUser")
     @Operation(summary = "注册用户", description = "根据创建用户请求参数注册用户")

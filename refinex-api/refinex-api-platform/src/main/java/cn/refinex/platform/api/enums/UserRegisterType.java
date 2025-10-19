@@ -1,4 +1,4 @@
-package cn.refinex.platform.enums;
+package cn.refinex.platform.api.enums;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
