@@ -33,10 +33,7 @@ security:
   ignore:
     # 白名单列表, 网关将忽略这些路径的认证
     whites:
-      - /auth/login
-      - /auth/register
-      - /auth/logout
-      - /auth/captcha/generate
+      - /refinex-auth/**
       - /favicon.ico
       - /actuator/**
       - /doc.html

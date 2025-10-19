@@ -12,16 +12,19 @@ import {
   SelectLang,
   ThemeSwitch,
 } from '@/components';
-import { currentUser as queryCurrentUser } from '@/services/ant-design-pro/api';
+import { getCurrentUser } from '@/services/auth';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
 import '@ant-design/v5-patch-for-react-19';
 
-const isDev =
-  process.env.NODE_ENV === 'development' || process.env.CI;
+// 是否测试环境
+const isDev = process.env.NODE_ENV === 'development' || process.env.CI;
+// 登录地址路由
 const loginPath = '/user/login';
 
 /**
+ * 获取初始化状态
+ *
  * @see https://umijs.org/docs/api/runtime-config#getinitialstate
  * */
 export async function getInitialState(): Promise<{
@@ -30,17 +33,17 @@ export async function getInitialState(): Promise<{
   loading?: boolean;
   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
 }> {
+  // 获取用户信息
   const fetchUserInfo = async () => {
     try {
-      const msg = await queryCurrentUser({
-        skipErrorHandler: true,
-      });
+      const msg = await getCurrentUser();
       return msg.data;
     } catch (_error) {
       history.push(loginPath);
     }
     return undefined;
   };
+
   // 从 localStorage 读取保存的主题模式
   const getThemeFromMode = () => {
     const themeMode = localStorage.getItem('themeMode') as 'light' | 'dark';
@@ -167,7 +170,8 @@ export const layout: RunTimeLayoutConfig = ({
  * @doc https://umijs.org/docs/max/request#配置
  */
 export const request: RequestConfig = {
-  // 使用相对路径，通过代理转发到本地网关 (开发环境: localhost:8082)
-  baseURL: '/api',
+  // 给所有请求添加 /api 前缀，使代理 refinex-ui/config/proxy.ts 生效
+  // 生产环境不会生效代理，这里使用三目判断下，非开发环境就保持 '/'
+  baseURL: isDev ? '/api' : '/',
   ...errorConfig,
 };

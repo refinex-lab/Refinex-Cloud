@@ -1,5 +1,6 @@
 package cn.refinex.auth.controller;
 
+import cn.dev33.satoken.annotation.SaIgnore;
 import cn.refinex.auth.domain.dto.request.LoginRequest;
 import cn.refinex.auth.domain.vo.LoginVo;
 import cn.refinex.auth.enums.EmailVerifyCodeType;
@@ -50,6 +51,7 @@ public class TokenController {
     private final UserFacade userFeignClient;
     private final EmailFacade emailFeignClient;
 
+    @SaIgnore
     @PostMapping("/register")
     @Operation(summary = "注册用户", description = "根据创建用户请求参数注册用户")
     @Parameter(name = "request", description = "创建用户请求参数", required = true)
@@ -58,6 +60,7 @@ public class TokenController {
         return userFeignClient.registerUser(request);
     }
 
+    @SaIgnore
     @PostMapping("/login")
     @Operation(summary = "用户登录", description = "用户名密码登录，返回 JWT Token")
     @Parameter(name = "request", description = "登录请求参数", required = true)
@@ -66,6 +69,7 @@ public class TokenController {
         return ApiResult.success(authService.login(request, clientIp, httpRequest));
     }
 
+    @SaIgnore
     @PostMapping("/logout")
     @Operation(summary = "用户登出", description = "退出登录，清除 Token")
     public ApiResult<Void> logout() {
@@ -73,6 +77,7 @@ public class TokenController {
         return ApiResult.success(null);
     }
 
+    @SaIgnore
     @PostMapping("/sendEmailVerifyCode")
     @Operation(summary = "发送邮箱验证码", description = "根据邮箱发送验证码")
     @Parameter(name = "request", description = "发送验证码请求参数", required = true)
@@ -88,6 +93,7 @@ public class TokenController {
         return emailFeignClient.sendVerifyCode(request);
     }
 
+    @SaIgnore
     @PostMapping("/resetPassword")
     @Operation(summary = "重置密码", description = "根据邮箱验证码重置密码")
     @Parameter(name = "request", description = "重置密码请求参数", required = true)

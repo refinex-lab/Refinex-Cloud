@@ -1,5 +1,6 @@
 package cn.refinex.auth.controller;
 
+import cn.dev33.satoken.annotation.SaIgnore;
 import cn.refinex.auth.domain.dto.response.CaptchaGenerateResponse;
 import cn.refinex.auth.service.CaptchaService;
 import cn.refinex.common.domain.ApiResult;
@@ -38,6 +39,7 @@ public class CaptchaController {
      *
      * @return 验证码生成响应
      */
+    @SaIgnore
     @GetMapping("/generate")
     @Operation(summary = "生成验证码", description = "生成验证码图片和唯一标识")
     public ApiResult<CaptchaGenerateResponse> generate() {

@@ -10,17 +10,19 @@
  * @doc https://umijs.org/docs/guides/proxy
  */
 export default {
-  // 开发环境代理配置 - 指向本地 Refinex Gateway
+  // 如果需要自定义本地开发服务器  请取消注释按需调整
   dev: {
-    // localhost:8000/api/** -> http://localhost:8082/**
+    // localhost:8000/api/** -> http://localhost:8082/api/**
     '/api/': {
-      // 代理到本地网关服务
+      // 要代理的地址（代理到本地后端网关服务）
       target: 'http://localhost:8082',
       // 配置了这个可以从 http 代理到 https
       // 依赖 origin 的功能可能需要这个，比如 cookie
       changeOrigin: true,
-      // 重写路径：去掉 /api 前缀
+      // 本地开发环境不走 Nginx，因此网关不会处理 /api，这里需要将地址进行重写去除 /api 前缀
       pathRewrite: { '^/api': '' },
+      // 本地开发环境开启日志调试，可以在控制台查看代理日志
+      logLevel: 'debug'
     },
   },
   /**
