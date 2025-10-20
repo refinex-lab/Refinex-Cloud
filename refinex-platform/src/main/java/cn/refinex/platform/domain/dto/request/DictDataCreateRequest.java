@@ -16,35 +16,35 @@ import lombok.Data;
 @Schema(description = "字典数据创建请求")
 public class DictDataCreateRequest {
 
-    @NotNull
+    @NotNull(message = "字典类型ID不能为空")
     @Schema(description = "字典类型ID", example = "1")
     private Long dictTypeId;
 
-    @NotBlank
-    @Size(max = 128)
+    @NotBlank(message = "字典标签不能为空")
+    @Size(max = 128, message = "字典标签长度不能超过128个字符")
     @Schema(description = "字典标签", example = "正常")
     private String dictLabel;
 
-    @NotBlank
-    @Size(max = 128)
+    @NotBlank(message = "字典值不能为空")
+    @Size(max = 128, message = "字典值长度不能超过128个字符")
     @Schema(description = "字典值", example = "1")
     private String dictValue;
 
     @Schema(description = "排序", example = "0")
     private Integer dictSort;
 
-    @Size(max = 64)
+    @Size(max = 64, message = "样式类名长度不能超过64个字符")
     @Schema(description = "样式类名", example = "success")
     private String cssClass;
 
-    @Size(max = 64)
+    @Size(max = 64, message = "列表样式长度不能超过64个字符")
     @Schema(description = "列表样式", example = "default")
     private String listClass;
 
     @Schema(description = "是否默认：0否,1是", example = "0")
     private Integer isDefault;
 
-    @Size(max = 256)
+    @Size(max = 256, message = "备注长度不能超过256个字符")
     @Schema(description = "备注")
     private String remark;
 

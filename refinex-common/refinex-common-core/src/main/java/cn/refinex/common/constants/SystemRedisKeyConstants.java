@@ -387,4 +387,27 @@ public final class SystemRedisKeyConstants {
             return LOGIN_ERROR_COUNT_CACHE_PREFIX + username;
         }
     }
+
+    /**
+     * 系统配置模块缓存键
+     */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class SysConfig {
+
+        /**
+         * 前端可见配置缓存 Key 前缀
+         * KEY 格式：config:frontend:{configKey}
+         */
+        public static final String FRONTEND_CONFIG_CACHE_PREFIX = "config:frontend:";
+
+        /**
+         * 构建前端可见配置缓存 Key
+         *
+         * @param configKey 配置键
+         * @return 缓存 Key
+         */
+        public static String buildFrontendConfigCacheKey(String configKey) {
+            return FRONTEND_CONFIG_CACHE_PREFIX + configKey;
+        }
+    }
 }

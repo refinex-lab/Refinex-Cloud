@@ -98,7 +98,7 @@ VALUES (2, 1, 'ROLE_USER', '普通用户', 0, 3, 100, '默认普通用户角色'
 
 CREATE TABLE `sys_permission`
 (
-    `id`              BIGINT       NOT NULL COMMENT '主键ID',
+    `id`              BIGINT       AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `permission_code` VARCHAR(100) NOT NULL COMMENT '权限编码,如content:create,ai:chat',
     `permission_name` VARCHAR(100) NOT NULL COMMENT '权限名称',
     `permission_type` VARCHAR(20)  NOT NULL COMMENT '权限类型:menu菜单,button按钮,api接口',
@@ -125,7 +125,7 @@ CREATE TABLE `sys_permission`
 
 CREATE TABLE `sys_menu`
 (
-    `id`             BIGINT      NOT NULL COMMENT '主键ID',
+    `id`             BIGINT      AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `menu_name`      VARCHAR(50) NOT NULL COMMENT '菜单名称',
     `parent_id`      BIGINT      NOT NULL DEFAULT 0 COMMENT '父菜单ID,根菜单为0',
     `menu_type`      CHAR(1)     NOT NULL COMMENT '菜单类型:M目录,C菜单,F按钮',
@@ -1204,7 +1204,7 @@ CREATE TABLE `file_access_log`
 
 CREATE TABLE `sys_config`
 (
-    `id`           BIGINT       NOT NULL COMMENT '主键ID',
+    `id`           BIGINT       AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `config_key`   VARCHAR(100) NOT NULL COMMENT '配置键,如system.title',
     `config_value` TEXT                  DEFAULT NULL COMMENT '配置值',
     `config_type`  VARCHAR(20)  NOT NULL DEFAULT 'STRING' COMMENT '配置类型:STRING,NUMBER,BOOLEAN,JSON',

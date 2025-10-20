@@ -9,6 +9,7 @@ import cn.refinex.platform.domain.entity.sys.SysMenu;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -205,23 +206,23 @@ public class SysMenuRepository {
      *
      * @param tx 数据库事务管理器
      * @param menu 系统菜单
-     * @return 影响行数
+     * @return 新插入的菜单ID
      */
-    public int insert(JdbcTemplateManager tx, SysMenu menu) {
+    public long insert(JdbcTemplateManager tx, SysMenu menu) {
         String sql = """
                 INSERT INTO sys_menu (
-                    id, menu_name, parent_id, menu_type, route_path, component_path, menu_icon,
+                    menu_name, parent_id, menu_type, route_path, component_path, menu_icon,
                     is_external, is_cached, is_visible, create_by, create_time, update_by, update_time,
-                    deleted, version, remark, sort, status, extra_data
+                    remark, sort, status, extra_data
                 ) VALUES (
-                    :id, :menuName, :parentId, :menuType, :routePath, :componentPath, :menuIcon,
+                    :menuName, :parentId, :menuType, :routePath, :componentPath, :menuIcon,
                     :isExternal, :isCached, :isVisible, :createBy, :createTime, :updateBy, :updateTime,
-                    :deleted, :version, :remark, :sort, :status, :extraData
+                    :remark, :sort, :status, :extraData
                 )
                 """;
 
-        Map<String, Object> params = BeanConverter.beanToMap(menu, false, false);
-        return tx.insert(sql, params);
+        BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(menu);
+        return tx.insertAndGetKey(sql, paramSource);
     }
 
     /**

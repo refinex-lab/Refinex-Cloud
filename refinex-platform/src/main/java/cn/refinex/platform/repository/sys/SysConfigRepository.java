@@ -9,6 +9,7 @@ import cn.refinex.platform.domain.entity.sys.SysConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -166,23 +167,21 @@ public class SysConfigRepository {
      *
      * @param tx     事务管理器
      * @param config 系统配置
-     * @return 影响行数
+     * @return 系统配置ID
      */
-    public int insert(JdbcTemplateManager tx, SysConfig config) {
+    public long insert(JdbcTemplateManager tx, SysConfig config) {
         String sql = """
                 INSERT INTO sys_config (
-                    id, config_key, config_value, config_type, config_group, config_label, config_desc,
-                    is_sensitive, is_frontend, create_by, create_time, update_by, update_time, deleted,
-                    version, remark, sort
+                    config_key, config_value, config_type, config_group, config_label, config_desc,
+                    is_sensitive, is_frontend, create_by, create_time, update_by, update_time, remark, sort
                 ) VALUES (
-                    :id, :configKey, :configValue, :configType, :configGroup, :configLabel, :configDesc,
-                    :isSensitive, :isFrontend, :createBy, :createTime, :updateBy, :updateTime, :deleted,
-                    :version, :remark, :sort
+                    :configKey, :configValue, :configType, :configGroup, :configLabel, :configDesc,
+                    :isSensitive, :isFrontend, :createBy, :createTime, :updateBy, :updateTime, :remark, :sort
                 )
                 """;
 
-        Map<String, Object> params = BeanConverter.beanToMap(config, false, false);
-        return tx.insert(sql, params);
+        BeanPropertySqlParameterSource params = new BeanPropertySqlParameterSource(config);
+        return tx.insertAndGetKey(sql, params);
     }
 
     /**

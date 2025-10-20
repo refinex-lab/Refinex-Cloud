@@ -15,21 +15,21 @@ import lombok.Data;
 @Schema(description = "字典类型创建请求")
 public class DictTypeCreateRequest {
 
-    @NotBlank
-    @Size(max = 128)
+    @NotBlank(message = "字典编码不能为空")
+    @Size(max = 128, message = "字典编码长度不能超过128个字符")
     @Schema(description = "字典编码", example = "user_status")
     private String dictCode;
 
-    @NotBlank
-    @Size(max = 128)
+    @NotBlank(message = "字典名称不能为空")
+    @Size(max = 128, message = "字典名称长度不能超过128个字符")
     @Schema(description = "字典名称", example = "用户状态")
     private String dictName;
 
-    @Size(max = 256)
+    @Size(max = 256, message = "字典描述长度不能超过256个字符")
     @Schema(description = "字典描述", example = "用户账号状态字典")
     private String dictDesc;
 
-    @Size(max = 256)
+    @Size(max = 256, message = "备注长度不能超过256个字符")
     @Schema(description = "备注")
     private String remark;
 

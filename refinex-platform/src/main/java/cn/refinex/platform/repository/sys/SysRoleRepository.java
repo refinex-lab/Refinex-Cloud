@@ -29,6 +29,7 @@ public class SysRoleRepository {
     public boolean checkRoleExistsById(Long roleId) {
         String sql = "SELECT COUNT(*) FROM sys_role WHERE id = :roleId";
         Map<String, Object> params = Map.of("roleId", roleId);
+
         try {
             return jdbcManager.queryInt(sql, params) > 0;
         } catch (Exception e) {

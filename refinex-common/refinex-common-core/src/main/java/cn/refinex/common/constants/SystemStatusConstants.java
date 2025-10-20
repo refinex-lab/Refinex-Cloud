@@ -17,11 +17,13 @@ public final class SystemStatusConstants {
      * 正常状态
      */
     public static final String NORMAL = "0";
+    public static final Integer NORMAL_VALUE = 0;
 
     /**
      * 异常状态
      */
     public static final String DISABLE = "1";
+    public static final Integer DISABLE_VALUE = 1;
 
     /**
      * 是否为系统默认(是)

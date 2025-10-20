@@ -9,6 +9,7 @@ import cn.refinex.platform.domain.entity.sys.SysPermission;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -171,23 +172,23 @@ public class SysPermissionRepository {
      *
      * @param tx 事务管理器
      * @param p  权限
-     * @return 影响行数
+     * @return 新插入的权限ID
      */
-    public int insert(JdbcTemplateManager tx, SysPermission p) {
+    public long insert(JdbcTemplateManager tx, SysPermission p) {
         String sql = """
                 INSERT INTO sys_permission (
-                    id, permission_code, permission_name, permission_type, parent_id, module_name,
-                    resource_path, http_method, create_by, create_time, update_by, update_time, deleted,
-                    version, remark, sort, status, extra_data
+                    permission_code, permission_name, permission_type, parent_id, module_name,
+                    resource_path, http_method, create_by, create_time, update_by, update_time,
+                    remark, sort, status, extra_data
                 ) VALUES (
-                    :id, :permissionCode, :permissionName, :permissionType, :parentId, :moduleName,
-                    :resourcePath, :httpMethod, :createBy, :createTime, :updateBy, :updateTime, :deleted,
-                    :version, :remark, :sort, :status, :extraData
+                    ::permissionCode, :permissionName, :permissionType, :parentId, :moduleName,
+                    :resourcePath, :httpMethod, :createBy, :createTime, :updateBy, :updateTime,
+                    :remark, :sort, :status, :extraData
                 )
                 """;
 
-        Map<String, Object> params = BeanConverter.beanToMap(p, false, false);
-        return tx.insert(sql, params);
+        BeanPropertySqlParameterSource paramSource = new BeanPropertySqlParameterSource(p);
+        return tx.insertAndGetKey(sql, paramSource);
     }
 
     /**
