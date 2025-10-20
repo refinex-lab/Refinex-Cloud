@@ -38,6 +38,11 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.G
 public final class WebFluxUtils {
 
     /**
+     * 定义需要脱敏的参数名称
+     */
+    private static final String[] SENSITIVE_PARAM_NAMES = {"password", "confirmPassword", "mobile", "email"};
+
+    /**
      * 获取原始请求URL
      *
      * @param exchange 服务器Web交换对象

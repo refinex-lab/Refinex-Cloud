@@ -6,6 +6,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+/**
+ * 字典类型更新请求
+ *
+ * @author Refinex
+ * @since 1.0.0
+ */
 @Data
 @Schema(description = "字典类型更新请求")
 public class DictTypeUpdateRequest {
