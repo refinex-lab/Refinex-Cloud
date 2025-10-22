@@ -1,7 +1,7 @@
 package cn.refinex.common.utils.security;
 
+import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.exception.SystemException;
-import cn.refinex.common.exception.code.ResultCode;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -106,7 +106,7 @@ public final class CryptoUtils {
             return encryptor.encrypt(plainText);
         } catch (Exception e) {
             log.error("Jasypt 加密失败", e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "Jasypt 加密失败", e);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR.getCode(), "Jasypt 加密失败", e);
         }
     }
 
@@ -126,7 +126,7 @@ public final class CryptoUtils {
             return encryptor.decrypt(encryptedText);
         } catch (Exception e) {
             log.error("Jasypt 解密失败", e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "Jasypt 解密失败", e);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR.getCode(), "Jasypt 解密失败", e);
         }
     }
 

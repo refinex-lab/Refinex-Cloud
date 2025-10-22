@@ -1,7 +1,7 @@
 package cn.refinex.common.redis;
 
+import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.exception.SystemException;
-import cn.refinex.common.exception.code.ResultCode;
 import cn.refinex.common.redis.basic.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +50,7 @@ public class RedisService {
             return redisTemplate.hasKey(key);
         } catch (Exception e) {
             log.error("判断 key 是否存在失败，key: {}", key, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -65,7 +65,7 @@ public class RedisService {
             return redisTemplate.delete(key);
         } catch (Exception e) {
             log.error("删除 key 失败，key: {}", key, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -80,7 +80,7 @@ public class RedisService {
             return redisTemplate.delete(keys);
         } catch (Exception e) {
             log.error("批量删除 key 失败，keys: {}", keys, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -96,12 +96,12 @@ public class RedisService {
         try {
             if (key == null) {
                 log.error("设置 key 过期时间失败，key 为 null, timeout: {}, unit: {}", timeout, unit);
-                throw new SystemException(ResultCode.INTERNAL_ERROR);
+                throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
             }
             return redisTemplate.expire(key, timeout, unit);
         } catch (Exception e) {
             log.error("设置 key 过期时间失败，key: {}, timeout: {}, unit: {}", key, timeout, unit, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -116,12 +116,12 @@ public class RedisService {
         try {
             if (key == null) {
                 log.error("设置 key 过期时间失败，key 为 null, duration: {}", duration);
-                throw new SystemException(ResultCode.INTERNAL_ERROR);
+                throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
             }
             return redisTemplate.expire(key, duration);
         } catch (Exception e) {
             log.error("设置 key 过期时间失败，key: {}, duration: {}", key, duration, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -141,7 +141,7 @@ public class RedisService {
             return redisTemplate.getExpire(key);
         } catch (Exception e) {
             log.error("获取 key 过期时间失败，key: {}", key, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -162,7 +162,7 @@ public class RedisService {
             return redisTemplate.getExpire(key, unit);
         } catch (Exception e) {
             log.error("获取 key 过期时间失败，key: {}, unit: {}", key, unit, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -177,7 +177,7 @@ public class RedisService {
             return redisTemplate.persist(key);
         } catch (Exception e) {
             log.error("移除 key 过期时间失败，key: {}", key, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -192,7 +192,7 @@ public class RedisService {
             return redisTemplate.keys(pattern);
         } catch (Exception e) {
             log.error("查找匹配的 key 失败，pattern: {}", pattern, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 

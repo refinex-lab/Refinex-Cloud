@@ -1,7 +1,7 @@
 package cn.refinex.common.jdbc.service;
 
+import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.exception.SystemException;
-import cn.refinex.common.exception.code.ResultCode;
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
 import cn.refinex.common.properties.RefinexBizProperties;
 import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
@@ -94,7 +94,7 @@ public class SensitiveDataService {
 
         } catch (Exception e) {
             log.error("敏感数据加密存储失败，table={}, field={}", tableName, fieldCode, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "敏感数据加密存储失败: " + e.getMessage(), e);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR, "敏感数据加密存储失败: " + e.getMessage(), e);
         }
     }
 
@@ -135,7 +135,7 @@ public class SensitiveDataService {
 
         } catch (Exception e) {
             log.error("敏感数据查询解密失败，rowGuid={}", rowGuid, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "敏感数据查询解密失败: " + e.getMessage(), e);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR, "敏感数据查询解密失败: " + e.getMessage(), e);
         }
     }
 
@@ -177,7 +177,7 @@ public class SensitiveDataService {
 
         } catch (Exception e) {
             log.error("批量查询解密敏感数据失败", e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "批量查询解密敏感数据失败: " + e.getMessage(), e);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR, "批量查询解密敏感数据失败: " + e.getMessage(), e);
         }
     }
 
@@ -212,14 +212,14 @@ public class SensitiveDataService {
 
             if (updated == 0) {
                 log.warn("敏感数据不存在，无法更新，rowGuid={}", rowGuid);
-                throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "敏感数据不存在，rowGuid=" + rowGuid);
+                throw new SystemException(HttpStatusCode.NOT_FOUND, "敏感数据不存在，rowGuid=" + rowGuid);
             }
 
             log.debug("敏感数据已更新，rowGuid={}", rowGuid);
 
         } catch (Exception e) {
             log.error("更新敏感数据失败，rowGuid={}", rowGuid, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "更新敏感数据失败: " + e.getMessage(), e);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR, "更新敏感数据失败: " + e.getMessage(), e);
         }
     }
 
@@ -247,7 +247,7 @@ public class SensitiveDataService {
 
         } catch (Exception e) {
             log.error("删除敏感数据失败，rowGuid={}", rowGuid, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "删除敏感数据失败: " + e.getMessage(), e);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR, "删除敏感数据失败: " + e.getMessage(), e);
         }
     }
 
@@ -274,7 +274,7 @@ public class SensitiveDataService {
 
         } catch (Exception e) {
             log.error("批量删除敏感数据失败", e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "批量删除敏感数据失败: " + e.getMessage(), e);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR, "批量删除敏感数据失败: " + e.getMessage(), e);
         }
     }
 

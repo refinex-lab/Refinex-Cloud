@@ -1,4 +1,4 @@
-package cn.refinex.platform.api.enums;
+package cn.refinex.api.platform.enums;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import lombok.Getter;
  * @since 1.0.0
  */
 @Getter
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum UserRegisterType {
     MOBILE,
     EMAIL

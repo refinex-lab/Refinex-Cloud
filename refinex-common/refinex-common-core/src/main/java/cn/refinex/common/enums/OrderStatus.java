@@ -11,7 +11,7 @@ import lombok.Getter;
  * @since 1.0.0
  */
 @Getter
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum OrderStatus {
 
     WAIT_PAY(0, "待支付"),

@@ -6,9 +6,9 @@ import cn.hutool.core.util.StrUtil;
 import cn.refinex.common.api.PermissionFeignClient;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.domain.model.LoginUser;
+import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.enums.UserType;
 import cn.refinex.common.exception.SystemException;
-import cn.refinex.common.exception.code.ResultCode;
 import cn.refinex.common.satoken.core.util.LoginHelper;
 import cn.refinex.common.utils.spring.SpringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -49,13 +49,13 @@ public class StpInterfaceImpl implements StpInterface {
                 // 调用 platform 服务获取用户权限
                 ApiResult<Set<String>> result = permissionFeignClient.getUserMenuPermissions(Convert.toLong(loginIdList.get(1)));
                 if (!result.isSuccess()) {
-                    log.error("获取用户权限失败，userId: {}, error: {}", loginId, result.getMessage());
+                    log.error("获取用户权限失败，userId: {}, error: {}", loginId, result.message());
                     return List.of();
                 }
-                return result.getData().stream().toList();
+                return result.data().stream().toList();
             } else {
                 log.error("PermissionFeignClient 未初始化");
-                throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "PermissionFeignClient 未初始化");
+                throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR.getCode(), "PermissionFeignClient 未初始化");
             }
         }
 
@@ -94,12 +94,12 @@ public class StpInterfaceImpl implements StpInterface {
                 // 调用 platform 服务获取用户角色
                 ApiResult<Set<String>> result = permissionFeignClient.getUserRolePermissions(Convert.toLong(loginIdList.get(1)));
                 if (!result.isSuccess()) {
-                    log.error("获取用户角色失败，userId: {}, error: {}", loginId, result.getMessage());
+                    log.error("获取用户角色失败，userId: {}, error: {}", loginId, result.message());
                     return List.of();
                 }
             } else {
                 log.error("PermissionFeignClient 未初始化");
-                throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "PermissionFeignClient 未初始化");
+                throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR.getCode(), "PermissionFeignClient 未初始化");
             }
         }
 

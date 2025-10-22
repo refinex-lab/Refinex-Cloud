@@ -1,7 +1,7 @@
 package cn.refinex.common.protection.lock4j.core.callback;
 
+import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.exception.SystemException;
-import cn.refinex.common.exception.code.ResultCode;
 import com.baomidou.lock.LockFailureStrategy;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,6 +27,6 @@ public class DefaultLockFailureStrategy implements LockFailureStrategy {
     @Override
     public void onLockFailure(String key, Method method, Object[] arguments) {
         log.debug("[onLockFailure][线程:{} 获取锁失败，key:{} 获取失败:{} ]", Thread.currentThread().getName(), key, arguments);
-        throw new SystemException(ResultCode.INTERNAL_ERROR.getCode(), "请求失败，请稍后重试");
+        throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR.getCode(), "请求失败，请稍后重试");
     }
 }

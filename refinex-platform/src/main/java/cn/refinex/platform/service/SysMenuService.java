@@ -29,11 +29,12 @@ public interface SysMenuService {
     /**
      * 更新系统菜单
      *
+     * @param id         菜单ID
      * @param request    更新请求
      * @param operatorId 操作人ID
      * @return 是否更新成功
      */
-    boolean update(SysMenuUpdateRequest request, Long operatorId);
+    boolean update(Long id, SysMenuUpdateRequest request, Long operatorId);
 
     /**
      * 删除系统菜单

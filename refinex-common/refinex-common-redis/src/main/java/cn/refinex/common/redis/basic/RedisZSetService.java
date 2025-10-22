@@ -1,7 +1,7 @@
 package cn.refinex.common.redis.basic;
 
+import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.exception.SystemException;
-import cn.refinex.common.exception.code.ResultCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.Cursor;
@@ -41,7 +41,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().add(key, value, score);
         } catch (Exception e) {
             log.error("添加元素到有序集合失败，key: {}, value: {}, score: {}", key, value, score, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -57,7 +57,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().add(key, tuples);
         } catch (Exception e) {
             log.error("批量添加元素到有序集合失败，key: {}, tuples: {}", key, tuples, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -73,7 +73,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().remove(key, values);
         } catch (Exception e) {
             log.error("从有序集合中移除元素失败，key: {}, values: {}", key, values, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -90,7 +90,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().incrementScore(key, value, delta);
         } catch (Exception e) {
             log.error("递增元素的分数失败，key: {}, value: {}, delta: {}", key, value, delta, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -106,7 +106,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().score(key, value);
         } catch (Exception e) {
             log.error("获取元素的分数失败，key: {}, value: {}", key, value, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -122,7 +122,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().score(key, values);
         } catch (Exception e) {
             log.error("批量获取元素的分数失败，key: {}, values: {}", key, values, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -140,7 +140,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().rank(key, value);
         } catch (Exception e) {
             log.error("获取元素的排名（从小到大）失败，key: {}, value: {}", key, value, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -156,7 +156,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().reverseRank(key, value);
         } catch (Exception e) {
             log.error("获取元素的排名（从大到小）失败，key: {}, value: {}", key, value, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -175,7 +175,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().range(key, start, end);
         } catch (Exception e) {
             log.error("根据排名范围获取元素（从小到大）失败，key: {}, start: {}, end: {}", key, start, end, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -192,7 +192,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().rangeWithScores(key, start, end);
         } catch (Exception e) {
             log.error("根据排名范围获取元素和分数（从小到大）失败，key: {}, start: {}, end: {}", key, start, end, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -209,7 +209,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().reverseRange(key, start, end);
         } catch (Exception e) {
             log.error("根据排名范围获取元素（从大到小）失败，key: {}, start: {}, end: {}", key, start, end, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -226,7 +226,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().reverseRangeWithScores(key, start, end);
         } catch (Exception e) {
             log.error("根据排名范围获取元素和分数（从大到小）失败，key: {}, start: {}, end: {}", key, start, end, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -243,7 +243,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().rangeByScore(key, min, max);
         } catch (Exception e) {
             log.error("根据分数范围获取元素失败，key: {}, min: {}, max: {}", key, min, max, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -260,7 +260,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().rangeByScoreWithScores(key, min, max);
         } catch (Exception e) {
             log.error("根据分数范围获取元素和分数失败，key: {}, min: {}, max: {}", key, min, max, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -279,7 +279,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().rangeByScore(key, min, max, offset, count);
         } catch (Exception e) {
             log.error("根据分数范围获取限定数量的元素失败，key: {}, min: {}, max: {}, offset: {}, count: {}", key, min, max, offset, count, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -298,7 +298,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().rangeByScoreWithScores(key, min, max, offset, count);
         } catch (Exception e) {
             log.error("根据分数范围获取限定数量的元素和分数失败，key: {}, min: {}, max: {}, offset: {}, count: {}", key, min, max, offset, count, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -315,7 +315,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().reverseRangeByScore(key, min, max);
         } catch (Exception e) {
             log.error("根据分数范围获取元素（从大到小）失败，key: {}, min: {}, max: {}", key, min, max, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -332,7 +332,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().reverseRangeByScoreWithScores(key, min, max);
         } catch (Exception e) {
             log.error("根据分数范围获取元素和分数（从大到小）失败，key: {}, min: {}, max: {}", key, min, max, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -351,7 +351,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().reverseRangeByScore(key, min, max, offset, count);
         } catch (Exception e) {
             log.error("根据分数范围获取限定数量的元素（从大到小）失败，key: {}, min: {}, max: {}, offset: {}, count: {}", key, min, max, offset, count, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -370,7 +370,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().count(key, min, max);
         } catch (Exception e) {
             log.error("统计分数范围内的元素数量失败，key: {}, min: {}, max: {}", key, min, max, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -385,7 +385,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().size(key);
         } catch (Exception e) {
             log.error("获取有序集合大小失败，key: {}", key, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -400,7 +400,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().zCard(key);
         } catch (Exception e) {
             log.error("获取有序集合大小失败，key: {}", key, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -417,7 +417,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().removeRange(key, start, end);
         } catch (Exception e) {
             log.error("根据排名范围删除元素失败，key: {}, start: {}, end: {}", key, start, end, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -434,7 +434,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().removeRangeByScore(key, min, max);
         } catch (Exception e) {
             log.error("根据分数范围删除元素失败，key: {}, min: {}, max: {}", key, min, max, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -453,7 +453,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().intersectAndStore(key, otherKeys, destKey);
         } catch (Exception e) {
             log.error("计算多个有序集合的交集并存储到目标集合失败，key: {}, otherKeys: {}, destKey: {}", key, otherKeys, destKey, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -470,7 +470,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().unionAndStore(key, otherKeys, destKey);
         } catch (Exception e) {
             log.error("计算多个有序集合的并集并存储到目标集合失败，key: {}, otherKeys: {}, destKey: {}", key, otherKeys, destKey, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -488,7 +488,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().scan(key, options);
         } catch (Exception e) {
             log.error("扫描有序集合元素失败，key: {}, options: {}", key, options, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -505,7 +505,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().scan(key, options);
         } catch (Exception e) {
             log.error("扫描匹配模式的有序集合元素失败，key: {}, pattern: {}", key, pattern, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -523,7 +523,7 @@ public class RedisZSetService {
             return redisTemplate.opsForZSet().scan(key, options);
         } catch (Exception e) {
             log.error("扫描匹配模式的有序集合元素（限制数量）失败，key: {}, pattern: {}, count: {}", key, pattern, count, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 }

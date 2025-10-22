@@ -1,9 +1,9 @@
 package cn.refinex.platform.service;
 
 import cn.refinex.common.domain.model.LoginUser;
-import cn.refinex.platform.api.domain.vo.CurrentUserVo;
-import cn.refinex.platform.api.domain.dto.request.ResetPasswordRequest;
-import cn.refinex.platform.api.domain.dto.request.UserCreateRequest;
+import cn.refinex.api.platform.domain.vo.CurrentUserVo;
+import cn.refinex.api.platform.domain.dto.request.ResetPasswordRequest;
+import cn.refinex.api.platform.domain.dto.request.UserCreateRequest;
 import cn.refinex.platform.domain.dto.request.UserDisableRequest;
 import cn.refinex.platform.domain.dto.request.UserKickoutRequest;
 import cn.refinex.platform.domain.dto.response.UserDisableStatusResponse;
@@ -62,9 +62,10 @@ public interface UserService {
     /**
      * 封禁账号
      *
+     * @param userId  用户 ID
      * @param request 封禁请求
      */
-    void disableUser(UserDisableRequest request);
+    void disableUser(Long userId, UserDisableRequest request);
 
     /**
      * 解封账号

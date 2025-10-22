@@ -11,7 +11,7 @@ import lombok.Getter;
  * @since 1.0.0
  */
 @Getter
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum ChannelCode {
 
     WXPAY("WXPAY", "微信支付"),

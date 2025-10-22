@@ -11,7 +11,7 @@ import lombok.Getter;
  * @since 1.0.0
  */
 @Getter
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum ContentAccessType {
 
     INHERIT("0", "继承空间"),

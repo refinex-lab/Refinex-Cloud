@@ -1,22 +1,24 @@
 package cn.refinex.auth.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
+import cn.refinex.api.platform.client.EmailServiceClient;
+import cn.refinex.api.platform.client.UserServiceClient;
+import cn.refinex.api.platform.domain.dto.request.ResetPasswordRequest;
+import cn.refinex.api.platform.domain.dto.request.UserCreateRequest;
 import cn.refinex.auth.domain.dto.request.LoginRequest;
 import cn.refinex.auth.domain.vo.LoginVo;
 import cn.refinex.auth.enums.EmailVerifyCodeType;
 import cn.refinex.auth.service.AuthService;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.domain.model.LoginUser;
+import cn.refinex.common.enums.HttpStatusCode;
+import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.mail.domain.dto.VerifyCodeRequest;
 import cn.refinex.common.mail.domain.dto.VerifyCodeResult;
 import cn.refinex.common.mail.domain.dto.VerifyCodeValidateRequest;
 import cn.refinex.common.protection.ratelimiter.core.annotation.RateLimiter;
 import cn.refinex.common.protection.ratelimiter.core.keyresolver.impl.ClientIpRateLimiterKeyResolver;
 import cn.refinex.common.utils.servlet.ServletUtils;
-import cn.refinex.platform.api.facade.EmailFacade;
-import cn.refinex.platform.api.facade.UserFacade;
-import cn.refinex.platform.api.domain.dto.request.ResetPasswordRequest;
-import cn.refinex.platform.api.domain.dto.request.UserCreateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,68 +26,67 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.TimeUnit;
 
 /**
  * 认证控制器
- * <p>
- * 提供用户登录、登出、Token 管理等接口
- * </p>
  *
  * @author Refinex
  * @since 1.0.0
  */
 @Slf4j
+@SaIgnore
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@Tag(name = "认证管理", description = "用户登录、登出、Token 管理")
+@Tag(name = "认证管理", description = "用户注册、登录、登出、密码重置等认证接口")
 public class TokenController {
 
     private final AuthService authService;
-    private final UserFacade userFeignClient;
-    private final EmailFacade emailFeignClient;
+    private final UserServiceClient userFeignClient;
+    private final EmailServiceClient emailFeignClient;
 
-    @SaIgnore
     @PostMapping("/register")
-    @Operation(summary = "注册用户", description = "根据创建用户请求参数注册用户")
-    @Parameter(name = "request", description = "创建用户请求参数", required = true)
+    @Operation(summary = "用户注册", description = "创建新用户账号")
+    @Parameter(name = "request", description = "用户注册请求参数", required = true)
     @RateLimiter(time = 10, timeUnit = TimeUnit.MINUTES, count = 5, keyResolver = ClientIpRateLimiterKeyResolver.class)
-    ApiResult<Boolean> registerUser(UserCreateRequest request) {
-        return userFeignClient.registerUser(request);
+    public ApiResult<Boolean> registerUser(@Valid @RequestBody UserCreateRequest request) {
+        ApiResult<Boolean> result = userFeignClient.registerUser(request);
+        if (result.isSuccess()) {
+            return ApiResult.success(HttpStatusCode.CREATED, result.data());
+        }
+        return result;
     }
 
-    @SaIgnore
     @PostMapping("/login")
-    @Operation(summary = "用户登录", description = "用户名密码登录，返回 JWT Token")
-    @Parameter(name = "request", description = "登录请求参数", required = true)
+    @Operation(summary = "用户登录", description = "用户名密码登录，返回访问令牌")
+    @Parameter(name = "request", description = "用户登录请求参数", required = true)
     public ApiResult<LoginVo> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         String clientIp = ServletUtils.getClientIp(httpRequest);
-        return ApiResult.success(authService.login(request, clientIp, httpRequest));
+        LoginVo loginVo = authService.login(request, clientIp, httpRequest);
+        return ApiResult.success(loginVo);
     }
 
-    @SaIgnore
     @PostMapping("/logout")
-    @Operation(summary = "用户登出", description = "退出登录，清除 Token")
+    @Operation(summary = "用户登出", description = "退出登录，清除访问令牌")
     public ApiResult<Void> logout() {
         authService.logout();
-        return ApiResult.success(null);
+        return ApiResult.success(HttpStatusCode.NO_CONTENT, null);
     }
 
-    @SaIgnore
-    @PostMapping("/sendEmailVerifyCode")
-    @Operation(summary = "发送邮箱验证码", description = "根据邮箱发送验证码")
-    @Parameter(name = "request", description = "发送验证码请求参数", required = true)
-    public ApiResult<VerifyCodeResult> sendEmailVerifyCode(@Valid @RequestBody VerifyCodeRequest request, HttpServletRequest httpRequest) {
+    @PostMapping("/verify-codes/email")
+    @Operation(summary = "发送邮箱验证码", description = "向指定邮箱发送验证码")
+    @Parameter(name = "request", description = "验证码请求参数", required = true)
+    @Parameter(name = "httpRequest", description = "HTTP 请求", required = true)
+    public ApiResult<VerifyCodeResult> sendEmailVerifyCode(
+            @Valid @RequestBody VerifyCodeRequest request,
+            HttpServletRequest httpRequest) {
         // 验证用户存在性
         ApiResult<LoginUser> checkUserResult = userFeignClient.getLoginUserByEmail(request.getEmail());
         if (!checkUserResult.isSuccess()) {
-            return ApiResult.failure(checkUserResult.getCode(), checkUserResult.getMessage());
+            throw new BusinessException(HttpStatusCode.NOT_FOUND, "用户不存在");
         }
 
         // 发送验证码
@@ -93,15 +94,14 @@ public class TokenController {
         return emailFeignClient.sendVerifyCode(request);
     }
 
-    @SaIgnore
-    @PostMapping("/resetPassword")
-    @Operation(summary = "重置密码", description = "根据邮箱验证码重置密码")
+    @PutMapping("/password/reset")
+    @Operation(summary = "重置密码", description = "根据邮箱验证码重置用户密码")
     @Parameter(name = "request", description = "重置密码请求参数", required = true)
     public ApiResult<Boolean> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         // 验证用户存在性
         ApiResult<LoginUser> checkUserResult = userFeignClient.getLoginUserByEmail(request.getEmail());
         if (!checkUserResult.isSuccess()) {
-            return ApiResult.failure(checkUserResult.getCode(), checkUserResult.getMessage());
+            throw new BusinessException(HttpStatusCode.NOT_FOUND, "用户不存在");
         }
 
         // 验证验证码
@@ -111,12 +111,13 @@ public class TokenController {
                 .codeType(EmailVerifyCodeType.RESET_PASSWORD.getCode())
                 .build();
         ApiResult<Boolean> verifyCodeResult = emailFeignClient.verifyCode(verifyCodeValidateRequest);
-        if (verifyCodeResult.isSuccess() && Boolean.TRUE.equals(!verifyCodeResult.getData())) {
-            // 重置密码
-            return userFeignClient.resetPassword(request);
+        
+        if (!verifyCodeResult.isSuccess() || !Boolean.TRUE.equals(verifyCodeResult.data())) {
+            throw new BusinessException(HttpStatusCode.BAD_REQUEST, "验证码无效或已过期");
         }
 
-        return ApiResult.failure(verifyCodeResult.getCode(), verifyCodeResult.getMessage());
+        // 重置密码
+        return userFeignClient.resetPassword(request);
     }
 }
 

@@ -20,7 +20,7 @@ import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.redis.RedisService;
 import cn.refinex.common.satoken.core.util.LoginHelper;
 import cn.refinex.common.utils.device.DeviceUtils;
-import cn.refinex.platform.api.facade.UserFacade;
+import cn.refinex.api.platform.client.UserServiceClient;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final CaptchaProperties captchaProperties;
     private final CaptchaService captchaService;
-    private final UserFacade userFacade;
+    private final UserServiceClient userFacade;
     private final RedisService redisService;
     private final UserPasswordProperties userPasswordProperties;
 
@@ -69,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
         ApiResult<LoginUser> userNameResult = Objects.equals(request.getLoginType(), LoginType.PASSWORD.getCode())
                 ? userFacade.getLoginUserByUserName(request.getUsername())
                 : userFacade.getLoginUserByEmail(request.getUsername());
-        LoginUser loginUser = userNameResult.getData();
+        LoginUser loginUser = userNameResult.data();
         if (Objects.isNull(loginUser)) {
             log.warn("根据用户名查询登录用户失败，username: {}", request.getUsername());
             throw new BusinessException("用户不存在");

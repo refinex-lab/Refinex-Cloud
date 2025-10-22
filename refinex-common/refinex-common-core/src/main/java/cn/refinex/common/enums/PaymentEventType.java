@@ -11,7 +11,7 @@ import lombok.Getter;
  * @since 1.0.0
  */
 @Getter
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum PaymentEventType {
 
     CREATE_ORDER("CREATE_ORDER", "创建订单"),

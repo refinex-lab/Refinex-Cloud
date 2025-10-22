@@ -80,14 +80,15 @@ public class SysMenuServiceImpl implements SysMenuService {
     /**
      * 更新系统菜单
      *
+     * @param id         菜单ID
      * @param request    更新请求
      * @param operatorId 操作人ID
      * @return 是否更新成功
      */
     @Override
-    public boolean update(SysMenuUpdateRequest request, Long operatorId) {
+    public boolean update(Long id, SysMenuUpdateRequest request, Long operatorId) {
         // 检查菜单是否存在
-        SysMenu exist = sysMenuRepository.selectById(request.getId());
+        SysMenu exist = sysMenuRepository.selectById(id);
         if (exist == null) {
             throw new BusinessException("菜单不存在");
         }

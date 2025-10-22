@@ -73,14 +73,15 @@ public class SysConfigServiceImpl implements SysConfigService {
     /**
      * 更新系统配置
      *
+     * @param id         配置ID
      * @param request    更新请求
      * @param operatorId 操作人ID
      * @return 是否更新成功
      */
     @Override
-    public boolean update(SysConfigUpdateRequest request, Long operatorId) {
+    public boolean update(Long id, SysConfigUpdateRequest request, Long operatorId) {
         // 校验配置是否存在
-        SysConfig exist = sysConfigRepository.selectById(request.getId());
+        SysConfig exist = sysConfigRepository.selectById(id);
         if (exist == null) {
             throw new BusinessException("配置不存在");
         }

@@ -33,7 +33,7 @@ public interface SysConfigService {
      * @param operatorId 操作人ID
      * @return 是否更新成功
      */
-    boolean update(SysConfigUpdateRequest request, Long operatorId);
+    boolean update(Long id, SysConfigUpdateRequest request, Long operatorId);
 
     /**
      * 删除系统配置

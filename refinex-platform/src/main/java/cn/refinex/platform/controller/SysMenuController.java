@@ -1,17 +1,19 @@
 package cn.refinex.platform.controller;
 
 import cn.refinex.common.domain.ApiResult;
+import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
 import cn.refinex.common.satoken.core.util.LoginHelper;
+import cn.refinex.common.utils.object.BeanConverter;
 import cn.refinex.platform.domain.dto.request.SysMenuCreateRequest;
 import cn.refinex.platform.domain.dto.request.SysMenuQueryRequest;
 import cn.refinex.platform.domain.dto.request.SysMenuUpdateRequest;
-import cn.refinex.platform.domain.entity.sys.SysMenu;
 import cn.refinex.platform.domain.dto.response.SysMenuResponse;
-import cn.refinex.common.utils.object.BeanConverter;
+import cn.refinex.platform.domain.entity.sys.SysMenu;
 import cn.refinex.platform.service.SysMenuService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,57 +27,72 @@ import java.util.List;
  * @author Refinex
  * @since 1.0.0
  */
-@Tag(name = "系统菜单管理")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/system/menu")
+@RequestMapping("/system/menus")
+@Tag(name = "系统菜单管理", description = "系统菜单的增删改查、状态管理等接口")
 public class SysMenuController {
 
     private final SysMenuService sysMenuService;
 
-    @Operation(summary = "创建菜单")
-    @PostMapping("/create")
-    public ApiResult<Long> create(@Valid @RequestBody SysMenuCreateRequest request) {
-        return ApiResult.success(sysMenuService.create(request, LoginHelper.getUserId()));
+    @PostMapping
+    @Operation(summary = "创建菜单", description = "创建新的系统菜单")
+    @Parameter(name = "request", description = "菜单创建请求", required = true)
+    public ApiResult<Long> createMenu(@Valid @RequestBody SysMenuCreateRequest request) {
+        Long menuId = sysMenuService.create(request, LoginHelper.getUserId());
+        return ApiResult.success(HttpStatusCode.CREATED, menuId);
     }
 
-    @Operation(summary = "更新菜单")
-    @PostMapping("/update")
-    public ApiResult<Boolean> update(@Valid @RequestBody SysMenuUpdateRequest request) {
-        return ApiResult.success(sysMenuService.update(request, LoginHelper.getUserId()));
+    @PutMapping("/{id}")
+    @Operation(summary = "更新菜单", description = "更新指定菜单的信息")
+    @Parameter(name = "id", description = "菜单 ID", required = true)
+    @Parameter(name = "request", description = "菜单更新请求", required = true)
+    public ApiResult<Boolean> updateMenu(@PathVariable Long id, @Valid @RequestBody SysMenuUpdateRequest request) {
+        Boolean result = sysMenuService.update(id, request, LoginHelper.getUserId());
+        return ApiResult.success(result);
     }
 
-    @Operation(summary = "删除菜单")
-    @PostMapping("/delete/{id}")
-    public ApiResult<Boolean> delete(@PathVariable Long id) {
-        return ApiResult.success(sysMenuService.delete(id, LoginHelper.getUserId()));
+    @DeleteMapping("/{id}")
+    @Operation(summary = "删除菜单", description = "删除指定的系统菜单")
+    @Parameter(name = "id", description = "菜单 ID", required = true)
+    public ApiResult<Void> deleteMenu(@PathVariable Long id) {
+        sysMenuService.delete(id, LoginHelper.getUserId());
+        return ApiResult.success(HttpStatusCode.NO_CONTENT, null);
     }
 
-    @Operation(summary = "修改状态")
-    @PostMapping("/status/{id}/{status}")
-    public ApiResult<Boolean> updateStatus(@PathVariable Long id, @PathVariable Integer status) {
-        return ApiResult.success(sysMenuService.updateStatus(id, status, LoginHelper.getUserId()));
+    @PatchMapping("/{id}/status")
+    @Operation(summary = "修改菜单状态", description = "启用或禁用指定菜单")
+    @Parameter(name = "id", description = "菜单 ID", required = true)
+    @Parameter(name = "status", description = "状态值", required = true)
+    public ApiResult<Boolean> updateMenuStatus(@PathVariable Long id, @RequestParam Integer status) {
+        Boolean result = sysMenuService.updateStatus(id, status, LoginHelper.getUserId());
+        return ApiResult.success(result);
     }
 
-    @Operation(summary = "菜单详情")
-    @GetMapping("/detail/{id}")
-    public ApiResult<SysMenuResponse> detail(@PathVariable Long id) {
+    @GetMapping("/{id}")
+    @Operation(summary = "获取菜单详情", description = "根据 ID 获取菜单详细信息")
+    @Parameter(name = "id", description = "菜单 ID", required = true)
+    public ApiResult<SysMenuResponse> getMenu(@PathVariable Long id) {
         SysMenu entity = sysMenuService.getById(id);
         return ApiResult.success(BeanConverter.toBean(entity, SysMenuResponse.class));
     }
 
-    @Operation(summary = "全部菜单列表")
-    @GetMapping("/list")
-    public ApiResult<List<SysMenuResponse>> listAll() {
+    @GetMapping
+    @Operation(summary = "获取所有菜单列表", description = "获取系统中所有菜单（树形结构）")
+    public ApiResult<List<SysMenuResponse>> listMenus() {
         List<SysMenu> list = sysMenuService.listAll();
         return ApiResult.success(BeanConverter.copyToList(list, SysMenuResponse.class));
     }
 
-    @Operation(summary = "分页查询")
-    @PostMapping("/page")
-    public ApiResult<PageResult<SysMenuResponse>> page(@RequestBody SysMenuQueryRequest query,
-                                               @RequestParam(defaultValue = "1") int pageNum,
-                                               @RequestParam(defaultValue = "10") int pageSize) {
+    @PostMapping("/search")
+    @Operation(summary = "分页查询菜单", description = "根据条件分页查询系统菜单")
+    @Parameter(name = "query", description = "查询条件", required = true)
+    @Parameter(name = "pageNum", description = "页码", required = true)
+    @Parameter(name = "pageSize", description = "每页数量", required = true)
+    public ApiResult<PageResult<SysMenuResponse>> searchMenus(
+            @RequestBody SysMenuQueryRequest query,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
         PageResult<SysMenu> result = sysMenuService.page(query, new PageRequest(pageNum, pageSize));
         PageResult<SysMenuResponse> mapped = new PageResult<>(
                 BeanConverter.copyToList(result.getRecords(), SysMenuResponse.class),

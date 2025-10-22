@@ -2,11 +2,11 @@ package cn.refinex.platform.web.external;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.refinex.common.domain.ApiResult;
-import cn.refinex.platform.api.domain.dto.request.FileConfirmUploadRequest;
-import cn.refinex.platform.api.domain.dto.request.FileUploadUrlRequest;
-import cn.refinex.platform.api.domain.dto.response.FileUploadUrlResponse;
-import cn.refinex.platform.api.domain.model.FileInfoDTO;
-import cn.refinex.platform.api.facade.FileFacade;
+import cn.refinex.api.platform.domain.dto.request.FileConfirmUploadRequest;
+import cn.refinex.api.platform.domain.dto.request.FileUploadUrlRequest;
+import cn.refinex.api.platform.domain.dto.response.FileUploadUrlResponse;
+import cn.refinex.api.platform.domain.model.FileInfoDTO;
+import cn.refinex.api.platform.client.FileServiceClient;
 import cn.refinex.platform.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class FileClientController implements FileFacade {
+public class FileClientController implements FileServiceClient {
 
     private final FileService fileService;
 
@@ -84,7 +84,7 @@ public class FileClientController implements FileFacade {
     @Override
     public ApiResult<Void> deleteFile(String fileGuid) {
         fileService.deleteFile(fileGuid);
-        return ApiResult.success(null);
+        return ApiResult.success(cn.refinex.common.enums.HttpStatusCode.NO_CONTENT, null);
     }
 }
 

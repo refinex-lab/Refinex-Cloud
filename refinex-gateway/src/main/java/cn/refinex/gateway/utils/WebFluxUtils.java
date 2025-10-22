@@ -2,7 +2,7 @@ package cn.refinex.gateway.utils;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.refinex.common.domain.ApiResult;
-import cn.refinex.common.exception.code.ResultCode;
+import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.json.utils.JsonUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -133,7 +133,7 @@ public final class WebFluxUtils {
      * @return 响应写入器
      */
     public static Mono<Void> webFluxResponseWriter(ServerHttpResponse response, Object value) {
-        return webFluxResponseWriter(response, HttpStatus.OK, value, ResultCode.INTERNAL_ERROR.getCode());
+        return webFluxResponseWriter(response, HttpStatus.OK, value, HttpStatusCode.INTERNAL_SERVER_ERROR.getCode());
     }
 
     /**

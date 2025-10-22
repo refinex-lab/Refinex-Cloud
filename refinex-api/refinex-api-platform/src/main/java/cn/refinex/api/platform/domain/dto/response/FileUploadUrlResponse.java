@@ -1,6 +1,6 @@
-package cn.refinex.platform.api.domain.dto.response;
+package cn.refinex.api.platform.domain.dto.response;
 
-import cn.refinex.platform.api.domain.model.FileInfoDTO;
+import cn.refinex.api.platform.domain.model.FileInfoDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,7 +1,7 @@
 package cn.refinex.common.redis.basic;
 
+import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.exception.SystemException;
-import cn.refinex.common.exception.code.ResultCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisCallback;
@@ -40,7 +40,7 @@ public class RedisStringService {
             redisTemplate.opsForValue().set(key, value);
         } catch (Exception e) {
             log.error("设置值失败，key: {}, value: {}", key, value, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -57,7 +57,7 @@ public class RedisStringService {
             redisTemplate.opsForValue().set(key, value, timeout, unit);
         } catch (Exception e) {
             log.error("设置值并指定过期时间失败，key: {}, value: {}, timeout: {}, unit: {}", key, value, timeout, unit, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -73,7 +73,7 @@ public class RedisStringService {
             redisTemplate.opsForValue().set(key, value, duration);
         } catch (Exception e) {
             log.error("设置值并指定过期时间失败，key: {}, value: {}, duration: {}", key, value, duration, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -89,7 +89,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().setIfAbsent(key, value);
         } catch (Exception e) {
             log.error("仅当 key 不存在时设置值失败，key: {}, value: {}", key, value, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -107,7 +107,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().setIfAbsent(key, value, timeout, unit);
         } catch (Exception e) {
             log.error("仅当 key 不存在时设置值并指定过期时间失败，key: {}, value: {}, timeout: {}, unit: {}", key, value, timeout, unit, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -124,7 +124,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().setIfAbsent(key, value, duration);
         } catch (Exception e) {
             log.error("仅当 key 不存在时设置值并指定过期时间失败，key: {}, value: {}, duration: {}", key, value, duration, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -140,7 +140,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().setIfPresent(key, value);
         } catch (Exception e) {
             log.error("仅当 key 存在时设置值失败，key: {}, value: {}", key, value, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -158,7 +158,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().setIfPresent(key, value, timeout, unit);
         } catch (Exception e) {
             log.error("仅当 key 存在时设置值并指定过期时间失败，key: {}, value: {}, timeout: {}, unit: {}", key, value, timeout, unit, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -175,7 +175,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().setIfPresent(key, value, duration);
         } catch (Exception e) {
             log.error("仅当 key 存在时设置值并指定过期时间失败，key: {}, value: {}, duration: {}", key, value, duration, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -190,7 +190,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().get(key);
         } catch (Exception e) {
             log.error("获取值失败，key: {}", key, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -215,7 +215,7 @@ public class RedisStringService {
             throw new ClassCastException("无法将值转换为指定类型: " + clazz.getName());
         } catch (Exception e) {
             log.error("获取值并转换类型失败，key: {}, clazz: {}", key, clazz, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -231,7 +231,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().getAndSet(key, value);
         } catch (Exception e) {
             log.error("获取并设置新值失败，key: {}, value: {}", key, value, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -247,7 +247,7 @@ public class RedisStringService {
             redisTemplate.opsForValue().multiSet(map);
         } catch (Exception e) {
             log.error("批量设置值失败，map: {}", map, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -262,7 +262,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().multiSetIfAbsent(map);
         } catch (Exception e) {
             log.error("仅当所有 key 都不存在时批量设置值失败，map: {}", map, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -277,7 +277,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().multiGet(keys);
         } catch (Exception e) {
             log.error("批量获取值失败，keys: {}", keys, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -294,7 +294,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().increment(key);
         } catch (Exception e) {
             log.error("递增失败，key: {}", key, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -310,7 +310,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().increment(key, delta);
         } catch (Exception e) {
             log.error("递增指定值失败，key: {}, delta: {}", key, delta, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -326,7 +326,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().increment(key, delta);
         } catch (Exception e) {
             log.error("递增指定浮点值失败，key: {}, delta: {}", key, delta, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -341,7 +341,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().decrement(key);
         } catch (Exception e) {
             log.error("递减失败，key: {}", key, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -357,7 +357,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().decrement(key, delta);
         } catch (Exception e) {
             log.error("递减指定值失败，key: {}, delta: {}", key, delta, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -375,7 +375,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().append(key, value);
         } catch (Exception e) {
             log.error("追加字符串失败，key: {}, value: {}", key, value, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -390,7 +390,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().size(key);
         } catch (Exception e) {
             log.error("获取字符串长度失败，key: {}", key, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -407,7 +407,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().get(key, start, end);
         } catch (Exception e) {
             log.error("获取子字符串失败，key: {}, start: {}, end: {}", key, start, end, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -423,7 +423,7 @@ public class RedisStringService {
             redisTemplate.opsForValue().set(key, value, offset);
         } catch (Exception e) {
             log.error("设置子字符串失败，key: {}, value: {}, offset: {}", key, value, offset, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -441,7 +441,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().getBit(key, offset);
         } catch (Exception e) {
             log.error("获取位值失败，key: {}, offset: {}", key, offset, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -458,7 +458,7 @@ public class RedisStringService {
             return redisTemplate.opsForValue().setBit(key, offset, value);
         } catch (Exception e) {
             log.error("设置位值失败，key: {}, offset: {}, value: {}", key, offset, value, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -474,7 +474,7 @@ public class RedisStringService {
                     connection.stringCommands().bitCount(key.getBytes()));
         } catch (Exception e) {
             log.error("统计位值为 1 的数量失败，key: {}", key, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -492,7 +492,7 @@ public class RedisStringService {
                     connection.stringCommands().bitCount(key.getBytes(), start, end));
         } catch (Exception e) {
             log.error("统计指定范围内位值为 1 的数量失败，key: {}, start: {}, end: {}", key, start, end, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 }

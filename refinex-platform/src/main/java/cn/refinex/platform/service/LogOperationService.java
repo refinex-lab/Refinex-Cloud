@@ -1,6 +1,6 @@
 package cn.refinex.platform.service;
 
-import cn.refinex.platform.api.domain.dto.request.LogOperationCreateRequest;
+import cn.refinex.api.platform.domain.dto.request.LogOperationCreateRequest;
 
 /**
  * 日志操作服务

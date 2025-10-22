@@ -14,34 +14,32 @@
     <description>Refinex Cloud Common OpenFeign</description>
 
     <dependencies>
-        <!-- Refinex Cloud Common Core -->
-        <dependency>
-            <groupId>cn.refinex</groupId>
-            <artifactId>refinex-common-core</artifactId>
-        </dependency>
-
-        <!-- Spring Cloud LoadBalancer -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
-        </dependency>
-
         <!-- Spring Cloud OpenFeign -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
-        <!-- Feign OkHttp -->
+        <!-- Spring Cloud LoadBalancer (必需，用于负载均衡) -->
         <dependency>
-            <groupId>io.github.openfeign</groupId>
-            <artifactId>feign-okhttp</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
         </dependency>
 
-        <!-- Jakarta Validation API -->
+        <!-- 推荐使用 Apache HttpClient 5 (性能更好，支持连接池) -->
         <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+        </dependency>
+
+        <!-- Feign 支持文件上传 -->
+        <dependency>
+            <groupId>io.github.openfeign.form</groupId>
+            <artifactId>feign-form</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.openfeign.form</groupId>
+            <artifactId>feign-form-spring</artifactId>
         </dependency>
     </dependencies>
 </project>

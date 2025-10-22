@@ -5,18 +5,18 @@ import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.refinex.api.platform.client.LogOperationServiceClient;
+import cn.refinex.api.platform.domain.dto.request.LogOperationCreateRequest;
 import cn.refinex.common.apilog.core.annotation.LogOperation;
 import cn.refinex.common.apilog.core.enums.OperateTypeEnum;
 import cn.refinex.common.domain.ApiResult;
-import cn.refinex.common.exception.code.ResultCode;
+import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.json.utils.JsonUtils;
 import cn.refinex.common.utils.Fn;
 import cn.refinex.common.utils.device.DeviceUtils;
 import cn.refinex.common.utils.servlet.ServletUtils;
 import cn.refinex.common.web.config.properties.WebProperties;
 import cn.refinex.common.web.core.filter.ApiRequestFilter;
-import cn.refinex.platform.api.domain.dto.request.LogOperationCreateRequest;
-import cn.refinex.platform.api.facade.LogOperationFacade;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -57,7 +57,7 @@ public class LogOperationFilter extends ApiRequestFilter {
     private static final String[] SANITIZE_KEYS = new String[]{"password", "token", "accessToken", "refreshToken"};
 
     private final String applicationName;
-    private final LogOperationFacade logOperationClient;
+    private final LogOperationServiceClient logOperationClient;
 
     /**
      * 构造函数
@@ -66,7 +66,7 @@ public class LogOperationFilter extends ApiRequestFilter {
      * @param applicationName    应用名称
      * @param logOperationClient 操作日志客户端
      */
-    public LogOperationFilter(WebProperties webProperties, String applicationName, LogOperationFacade logOperationClient) {
+    public LogOperationFilter(WebProperties webProperties, String applicationName, LogOperationServiceClient logOperationClient) {
         super(webProperties);
         this.applicationName = applicationName;
         this.logOperationClient = logOperationClient;
@@ -203,7 +203,7 @@ public class LogOperationFilter extends ApiRequestFilter {
             String exceptionMsg = ExceptionUtil.getRootCause(ex).toString();
             logOperationRequest.setErrorMessage(exceptionMsg);
             logOperationRequest.setResponseResult(ApiResult.failure(
-                    ResultCode.INTERNAL_ERROR.getCode(),
+                    HttpStatusCode.INTERNAL_SERVER_ERROR,
                     ExceptionUtil.getRootCauseMessage(ex)).toString()
             );
         }

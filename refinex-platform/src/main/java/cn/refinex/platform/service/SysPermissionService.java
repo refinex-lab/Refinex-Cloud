@@ -29,11 +29,12 @@ public interface SysPermissionService {
     /**
      * 更新系统权限
      *
+     * @param id         权限ID
      * @param request    更新请求
      * @param operatorId 操作人ID
      * @return 是否更新成功
      */
-    boolean update(SysPermissionUpdateRequest request, Long operatorId);
+    boolean update(Long id, SysPermissionUpdateRequest request, Long operatorId);
 
     /**
      * 删除系统权限

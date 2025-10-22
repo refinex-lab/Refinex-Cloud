@@ -1,8 +1,8 @@
 package cn.refinex.common.protection.ratelimiter.core.aop;
 
 import cn.hutool.core.util.StrUtil;
+import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.exception.BusinessException;
-import cn.refinex.common.exception.code.ResultCode;
 import cn.refinex.common.protection.ratelimiter.core.annotation.RateLimiter;
 import cn.refinex.common.protection.ratelimiter.core.keyresolver.RateLimiterKeyResolver;
 import cn.refinex.common.protection.ratelimiter.core.redis.RateLimiterRedisService;
@@ -62,8 +62,8 @@ public class RateLimiterAspect {
         boolean success = rateLimiterRedisService.tryAcquire(key, rateLimiter.count(), rateLimiter.time(), rateLimiter.timeUnit());
         if (!success) {
             log.info("[beforePointCut][方法({}) 参数({}) 请求过于频繁]", joinPoint.getSignature().toString(), joinPoint.getArgs());
-            String message = StrUtil.blankToDefault(rateLimiter.message(), ResultCode.TOO_MANY_REQUESTS.getMessage());
-            throw new BusinessException(ResultCode.TOO_MANY_REQUESTS.getCode(), message);
+            String message = StrUtil.blankToDefault(rateLimiter.message(), HttpStatusCode.TOO_MANY_REQUESTS.getMessage());
+            throw new BusinessException(HttpStatusCode.TOO_MANY_REQUESTS, message);
         }
     }
 }

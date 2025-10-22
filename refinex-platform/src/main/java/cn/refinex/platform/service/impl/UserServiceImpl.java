@@ -4,14 +4,20 @@ import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
+import cn.refinex.api.platform.domain.dto.request.ResetPasswordRequest;
+import cn.refinex.api.platform.domain.dto.request.UserCreateRequest;
+import cn.refinex.api.platform.domain.vo.CurrentUserVo;
+import cn.refinex.api.platform.domain.vo.SysUserVo;
+import cn.refinex.api.platform.enums.RegisterSource;
+import cn.refinex.api.platform.enums.UserRegisterType;
 import cn.refinex.common.constants.SystemRoleConstants;
 import cn.refinex.common.constants.SystemStatusConstants;
 import cn.refinex.common.domain.model.LoginUser;
 import cn.refinex.common.domain.model.SysRoleDTO;
+import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.enums.UserSex;
 import cn.refinex.common.enums.UserType;
 import cn.refinex.common.exception.BusinessException;
-import cn.refinex.common.exception.code.ResultCode;
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
 import cn.refinex.common.jdbc.service.SensitiveDataService;
 import cn.refinex.common.properties.RefinexBizProperties;
@@ -19,18 +25,12 @@ import cn.refinex.common.utils.Fn;
 import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
 import cn.refinex.common.utils.object.BeanConverter;
 import cn.refinex.common.utils.regex.RegexUtils;
-import cn.refinex.platform.api.domain.dto.request.ResetPasswordRequest;
-import cn.refinex.platform.api.domain.dto.request.UserCreateRequest;
 import cn.refinex.platform.domain.dto.request.UserDisableRequest;
 import cn.refinex.platform.domain.dto.request.UserKickoutRequest;
 import cn.refinex.platform.domain.dto.response.UserDisableStatusResponse;
 import cn.refinex.platform.domain.entity.sys.SysRole;
 import cn.refinex.platform.domain.entity.sys.SysUser;
 import cn.refinex.platform.domain.model.UserSessionDTO;
-import cn.refinex.platform.api.domain.vo.SysUserVo;
-import cn.refinex.platform.api.domain.vo.CurrentUserVo;
-import cn.refinex.platform.api.enums.RegisterSource;
-import cn.refinex.platform.api.enums.UserRegisterType;
 import cn.refinex.platform.enums.UserStatus;
 import cn.refinex.platform.repository.sys.SysUserRepository;
 import cn.refinex.platform.service.PermissionService;
@@ -47,7 +47,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static cn.refinex.common.exception.code.ResultCode.BAD_REQUEST;
 import static cn.refinex.platform.constants.PlatformErrorMessageConstants.*;
 
 /**
@@ -133,7 +132,7 @@ public class UserServiceImpl implements UserService {
             return buildLoginUser(sysUserVo);
         } catch (Exception e) {
             log.error("根据手机号获取用户信息失败，mobile: {}", mobile, e);
-            throw new BusinessException(ResultCode.INTERNAL_ERROR.getCode(), "根据手机号获取用户信息失败");
+            throw new BusinessException(HttpStatusCode.INTERNAL_SERVER_ERROR, "根据手机号获取用户信息失败");
         }
     }
 
@@ -164,7 +163,7 @@ public class UserServiceImpl implements UserService {
             return buildLoginUser(sysUserVo);
         } catch (Exception e) {
             log.error("根据邮箱获取用户信息失败，email: {}", email, e);
-            throw new BusinessException(ResultCode.INTERNAL_ERROR.getCode(), "根据邮箱获取用户信息失败");
+            throw new BusinessException(HttpStatusCode.INTERNAL_SERVER_ERROR, "根据邮箱获取用户信息失败");
         }
     }
 
@@ -217,7 +216,7 @@ public class UserServiceImpl implements UserService {
                         throw new BusinessException(PHONE_EXIST);
                     }
                 }
-                default -> throw new BusinessException(BAD_REQUEST.getCode(), "注册类型错误");
+                default -> throw new BusinessException(HttpStatusCode.BAD_REQUEST, "注册类型错误");
             }
 
             SysUser sysUser = BeanConverter.toBean(request, SysUser.class);
@@ -262,16 +261,17 @@ public class UserServiceImpl implements UserService {
     /**
      * 封禁账号
      *
+     * @param userId  用户 ID
      * @param request 封禁请求
      */
     @Override
-    public void disableUser(UserDisableRequest request) {
-        log.info("封禁账号，request: {}", request);
+    public void disableUser(Long userId, UserDisableRequest request) {
+        log.info("封禁账号，userId: {}, request: {}", userId, request);
 
         // 1. 如果需要踢人下线，先踢下线
         if (Boolean.TRUE.equals(request.getKickout())) {
-            StpUtil.kickout(request.getUserId());
-            log.info("踢人下线成功，userId: {}", request.getUserId());
+            StpUtil.kickout(userId);
+            log.info("踢人下线成功，userId: {}", userId);
         }
 
         // 2. 执行封禁

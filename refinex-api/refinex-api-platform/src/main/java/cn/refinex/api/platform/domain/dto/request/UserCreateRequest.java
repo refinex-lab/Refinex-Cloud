@@ -1,7 +1,7 @@
-package cn.refinex.platform.api.domain.dto.request;
+package cn.refinex.api.platform.domain.dto.request;
 
-import cn.refinex.platform.api.enums.RegisterSource;
-import cn.refinex.platform.api.enums.UserRegisterType;
+import cn.refinex.api.platform.enums.RegisterSource;
+import cn.refinex.api.platform.enums.UserRegisterType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;

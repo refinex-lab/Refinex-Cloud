@@ -1,4 +1,4 @@
-package cn.refinex.platform.api.domain.vo;
+package cn.refinex.api.platform.domain.vo;
 
 import cn.refinex.common.constants.SystemRoleConstants;
 import com.fasterxml.jackson.annotation.JsonFormat;

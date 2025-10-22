@@ -1,7 +1,7 @@
 package cn.refinex.auth.config;
 
-import cn.refinex.platform.api.facade.EmailFacade;
-import cn.refinex.platform.api.facade.UserFacade;
+import cn.refinex.api.platform.client.EmailServiceClient;
+import cn.refinex.api.platform.client.UserServiceClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,6 +12,6 @@ import org.springframework.context.annotation.Configuration;
  * @since 1.0.0
  */
 @Configuration(value = "authFeignConfiguration", proxyBeanMethods = false)
-@EnableFeignClients(clients = {UserFacade.class, EmailFacade.class})
+@EnableFeignClients(clients = {UserServiceClient.class, EmailServiceClient.class})
 public class FeignConfiguration {
 }

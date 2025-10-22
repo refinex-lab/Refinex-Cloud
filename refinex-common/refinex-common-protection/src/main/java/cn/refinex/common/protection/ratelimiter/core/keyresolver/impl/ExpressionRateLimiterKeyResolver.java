@@ -1,8 +1,8 @@
 package cn.refinex.common.protection.ratelimiter.core.keyresolver.impl;
 
 import cn.hutool.core.util.ArrayUtil;
+import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.exception.SystemException;
-import cn.refinex.common.exception.code.ResultCode;
 import cn.refinex.common.protection.ratelimiter.core.annotation.RateLimiter;
 import cn.refinex.common.protection.ratelimiter.core.keyresolver.RateLimiterKeyResolver;
 import org.aspectj.lang.JoinPoint;
@@ -74,7 +74,7 @@ public class ExpressionRateLimiterKeyResolver implements RateLimiterKeyResolver 
                     .getClass()
                     .getDeclaredMethod(point.getSignature().getName(), method.getParameterTypes());
         } catch (NoSuchMethodException e) {
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 }

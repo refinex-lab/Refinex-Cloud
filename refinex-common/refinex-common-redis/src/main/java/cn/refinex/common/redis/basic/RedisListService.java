@@ -1,7 +1,7 @@
 package cn.refinex.common.redis.basic;
 
+import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.exception.SystemException;
-import cn.refinex.common.exception.code.ResultCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -39,7 +39,7 @@ public class RedisListService {
             return redisTemplate.opsForList().leftPush(key, value);
         } catch (Exception e) {
             log.error("从左端推入元素失败，key: {}, value: {}", key, value, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -55,7 +55,7 @@ public class RedisListService {
             return redisTemplate.opsForList().leftPushAll(key, values);
         } catch (Exception e) {
             log.error("从左端批量推入元素失败，key: {}, values: {}", key, values, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -71,7 +71,7 @@ public class RedisListService {
             return redisTemplate.opsForList().leftPushAll(key, values);
         } catch (Exception e) {
             log.error("从左端批量推入元素失败，key: {}, values: {}", key, values, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -87,7 +87,7 @@ public class RedisListService {
             return redisTemplate.opsForList().leftPushIfPresent(key, value);
         } catch (Exception e) {
             log.error("仅当列表存在时从左端推入元素失败，key: {}, value: {}", key, value, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -104,7 +104,7 @@ public class RedisListService {
             return redisTemplate.opsForList().leftPush(key, pivot, value);
         } catch (Exception e) {
             log.error("在指定元素前推入元素失败，key: {}, pivot: {}, value: {}", key, pivot, value, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -119,7 +119,7 @@ public class RedisListService {
             return redisTemplate.opsForList().leftPop(key);
         } catch (Exception e) {
             log.error("从左端弹出元素失败，key: {}", key, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -135,7 +135,7 @@ public class RedisListService {
             return redisTemplate.opsForList().leftPop(key, count);
         } catch (Exception e) {
             log.error("从左端弹出指定数量的元素失败，key: {}, count: {}", key, count, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -152,7 +152,7 @@ public class RedisListService {
             return redisTemplate.opsForList().leftPop(key, timeout, unit);
         } catch (Exception e) {
             log.error("阻塞式从左端弹出元素失败，key: {}, timeout: {}, unit: {}", key, timeout, unit, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -168,7 +168,7 @@ public class RedisListService {
             return redisTemplate.opsForList().leftPop(key, duration);
         } catch (Exception e) {
             log.error("阻塞式从左端弹出元素失败，key: {}, duration: {}", key, duration, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -186,7 +186,7 @@ public class RedisListService {
             return redisTemplate.opsForList().rightPush(key, value);
         } catch (Exception e) {
             log.error("从右端推入元素失败，key: {}, value: {}", key, value, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -202,7 +202,7 @@ public class RedisListService {
             return redisTemplate.opsForList().rightPushAll(key, values);
         } catch (Exception e) {
             log.error("从右端批量推入元素失败，key: {}, values: {}", key, values, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -218,7 +218,7 @@ public class RedisListService {
             return redisTemplate.opsForList().rightPushAll(key, values);
         } catch (Exception e) {
             log.error("从右端批量推入元素失败，key: {}, values: {}", key, values, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -234,7 +234,7 @@ public class RedisListService {
             return redisTemplate.opsForList().rightPushIfPresent(key, value);
         } catch (Exception e) {
             log.error("仅当列表存在时从右端推入元素失败，key: {}, value: {}", key, value, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -251,7 +251,7 @@ public class RedisListService {
             return redisTemplate.opsForList().rightPush(key, pivot, value);
         } catch (Exception e) {
             log.error("在指定元素后推入元素失败，key: {}, pivot: {}, value: {}", key, pivot, value, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -266,7 +266,7 @@ public class RedisListService {
             return redisTemplate.opsForList().rightPop(key);
         } catch (Exception e) {
             log.error("从右端弹出元素失败，key: {}", key, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -282,7 +282,7 @@ public class RedisListService {
             return redisTemplate.opsForList().rightPop(key, count);
         } catch (Exception e) {
             log.error("从右端弹出指定数量的元素失败，key: {}, count: {}", key, count, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -299,7 +299,7 @@ public class RedisListService {
             return redisTemplate.opsForList().rightPop(key, timeout, unit);
         } catch (Exception e) {
             log.error("阻塞式从右端弹出元素失败，key: {}, timeout: {}, unit: {}", key, timeout, unit, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -315,7 +315,7 @@ public class RedisListService {
             return redisTemplate.opsForList().rightPop(key, duration);
         } catch (Exception e) {
             log.error("阻塞式从右端弹出元素失败，key: {}, duration: {}", key, duration, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -333,7 +333,7 @@ public class RedisListService {
             return redisTemplate.opsForList().rightPopAndLeftPush(sourceKey, destinationKey);
         } catch (Exception e) {
             log.error("从源列表右端弹出元素并推入目标列表左端失败，sourceKey: {}, destinationKey: {}", sourceKey, destinationKey, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -351,7 +351,7 @@ public class RedisListService {
             return redisTemplate.opsForList().rightPopAndLeftPush(sourceKey, destinationKey, timeout, unit);
         } catch (Exception e) {
             log.error("阻塞式从源列表右端弹出元素并推入目标列表左端失败，sourceKey: {}, destinationKey: {}, timeout: {}, unit: {}", sourceKey, destinationKey, timeout, unit, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -368,7 +368,7 @@ public class RedisListService {
             return redisTemplate.opsForList().rightPopAndLeftPush(sourceKey, destinationKey, duration);
         } catch (Exception e) {
             log.error("阻塞式从源列表右端弹出元素并推入目标列表左端失败，sourceKey: {}, destinationKey: {}, duration: {}", sourceKey, destinationKey, duration, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -386,7 +386,7 @@ public class RedisListService {
             return redisTemplate.opsForList().index(key, index);
         } catch (Exception e) {
             log.error("根据索引获取元素失败，key: {}, index: {}", key, index, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -402,7 +402,7 @@ public class RedisListService {
             redisTemplate.opsForList().set(key, index, value);
         } catch (Exception e) {
             log.error("根据索引设置元素失败，key: {}, index: {}, value: {}", key, index, value, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -421,7 +421,7 @@ public class RedisListService {
             return redisTemplate.opsForList().range(key, start, end);
         } catch (Exception e) {
             log.error("获取指定范围的元素失败，key: {}, start: {}, end: {}", key, start, end, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -437,7 +437,7 @@ public class RedisListService {
             redisTemplate.opsForList().trim(key, start, end);
         } catch (Exception e) {
             log.error("修剪列表失败，key: {}, start: {}, end: {}", key, start, end, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -456,7 +456,7 @@ public class RedisListService {
             return redisTemplate.opsForList().remove(key, count, value);
         } catch (Exception e) {
             log.error("移除列表中的元素失败，key: {}, count: {}, value: {}", key, count, value, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -473,7 +473,7 @@ public class RedisListService {
             return redisTemplate.opsForList().size(key);
         } catch (Exception e) {
             log.error("获取列表长度失败，key: {}", key, e);
-            throw new SystemException(ResultCode.INTERNAL_ERROR);
+            throw new SystemException(HttpStatusCode.INTERNAL_SERVER_ERROR);
         }
     }
 }

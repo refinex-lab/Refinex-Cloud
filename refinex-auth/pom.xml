@@ -26,6 +26,12 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- 公共模块 -->
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-core</artifactId>
+        </dependency>
+
         <!-- 服务保障模块 -->
         <dependency>
             <groupId>cn.refinex</groupId>

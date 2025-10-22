@@ -1,7 +1,8 @@
 package cn.refinex.platform.controller;
 
+import cn.refinex.api.platform.domain.vo.CurrentUserVo;
 import cn.refinex.common.domain.ApiResult;
-import cn.refinex.platform.api.domain.vo.CurrentUserVo;
+import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.satoken.core.util.LoginHelper;
 import cn.refinex.platform.domain.dto.request.UserDisableRequest;
@@ -10,6 +11,7 @@ import cn.refinex.platform.domain.dto.response.UserDisableStatusResponse;
 import cn.refinex.platform.domain.model.UserSessionDTO;
 import cn.refinex.platform.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,71 +22,57 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 用户控制器
+ * 用户管理控制器
  *
  * @author Refinex
  * @since 1.0.0
  */
 @Slf4j
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 @RequiredArgsConstructor
-@Tag(name = "用户管理", description = "管理用户相关操作")
+@Tag(name = "用户管理", description = "用户信息、账号状态、会话管理等接口")
 public class UserController {
 
     private final UserService userService;
 
     @GetMapping("/current")
-    @Operation(summary = "获取当前登录用户信息", description = "获取当前登录用户的详细信息（安全字段）")
+    @Operation(summary = "获取当前登录用户信息", description = "获取当前登录用户的详细信息")
     public ApiResult<CurrentUserVo> getCurrentUser() {
         Long userId = LoginHelper.getUserId();
         if (Objects.isNull(userId)) {
-            throw new BusinessException("用户 ID 不能为空");
+            throw new BusinessException(HttpStatusCode.UNAUTHORIZED, "用户未登录");
         }
         CurrentUserVo currentUser = userService.buildCurrentUserVo(userId);
         return ApiResult.success(currentUser);
     }
 
-    /**
-     * 封禁账号
-     *
-     * @param request 封禁请求
-     * @return 成功响应
-     */
-    @PostMapping("/disable")
-    @Operation(summary = "封禁账号", description = "封禁指定用户账号，支持全局封禁和分类封禁")
-    public ApiResult<Void> disable(@Valid @RequestBody UserDisableRequest request) {
-        userService.disableUser(request);
-        return ApiResult.success(null);
+    @PostMapping("/{userId}/disable")
+    @Operation(summary = "封禁用户账号", description = "封禁指定用户账号，支持全局封禁和分类封禁")
+    @Parameter(name = "userId", description = "用户 ID", required = true)
+    @Parameter(name = "request", description = "封禁请求", required = true)
+    public ApiResult<Void> disableUser(@PathVariable Long userId, @Valid @RequestBody UserDisableRequest request) {
+        userService.disableUser(userId, request);
+        return ApiResult.success(HttpStatusCode.NO_CONTENT, null);
     }
 
-    /**
-     * 解封账号
-     *
-     * @param userId  用户 ID
-     * @param service 服务类型（可选）
-     * @return 成功响应
-     */
-    @PostMapping("/untie/{userId}")
-    @Operation(summary = "解封账号", description = "解封指定用户账号")
-    public ApiResult<Void> untie(
+    @DeleteMapping("/{userId}/disable")
+    @Operation(summary = "解封用户账号", description = "解封指定用户账号")
+    @Parameter(name = "userId", description = "用户 ID", required = true)
+    @Parameter(name = "service", description = "服务类型", required = false)
+    public ApiResult<Void> enableUser(
             @PathVariable Long userId,
             @RequestParam(required = false) String service
     ) {
         userService.untieUser(userId, service);
-        return ApiResult.success(null);
+        return ApiResult.success(HttpStatusCode.NO_CONTENT, null);
     }
 
-    /**
-     * 查询封禁状态
-     *
-     * @param userId  用户 ID
-     * @param service 服务类型（可选）
-     * @return 封禁状态
-     */
-    @GetMapping("/status/{userId}")
-    @Operation(summary = "查询封禁状态", description = "查询指定用户的封禁状态")
-    public ApiResult<UserDisableStatusResponse> getStatus(
+    @GetMapping("/{userId}/disable-status")
+    @Operation(summary = "查询用户封禁状态", description = "查询指定用户的封禁状态")
+    @Parameter(name = "userId", description = "用户 ID", required = true)
+    @Parameter(name = "service", description = "服务类型")
+    public ApiResult<UserDisableStatusResponse> getDisableStatus(
             @PathVariable Long userId,
             @RequestParam(required = false) String service
     ) {
@@ -92,43 +80,28 @@ public class UserController {
         return ApiResult.success(status);
     }
 
-    /**
-     * 查询用户登录设备列表
-     *
-     * @param userId 用户 ID
-     * @return 会话列表
-     */
-    @GetMapping("/list/{userId}")
-    @Operation(summary = "查询用户登录设备列表", description = "查询指定用户的所有登录设备和会话信息")
+    @GetMapping("/{userId}/sessions")
+    @Operation(summary = "查询用户登录会话列表", description = "查询指定用户的所有登录设备和会话信息")
+    @Parameter(name = "userId", description = "用户 ID", required = true)
     public ApiResult<List<UserSessionDTO>> listUserSessions(@PathVariable Long userId) {
         List<UserSessionDTO> sessions = userService.listUserSessions(userId);
         return ApiResult.success(sessions);
     }
 
-    /**
-     * 踢人下线
-     *
-     * @param request 踢人下线请求
-     * @return 成功响应
-     */
-    @PostMapping("/kickout")
-    @Operation(summary = "踢人下线", description = "将指定用户踢下线，支持按设备类型或 Token 踢出")
-    public ApiResult<Void> kickout(@Valid @RequestBody UserKickoutRequest request) {
+    @DeleteMapping("/sessions")
+    @Operation(summary = "踢除用户会话", description = "将指定用户会话踢下线，支持按设备类型或 Token 踢出")
+    @Parameter(name = "request", description = "踢除请求", required = true)
+    public ApiResult<Void> kickoutSession(@Valid @RequestBody UserKickoutRequest request) {
         userService.kickoutUser(request);
-        return ApiResult.success(null);
+        return ApiResult.success(HttpStatusCode.NO_CONTENT, null);
     }
 
-    /**
-     * 踢出用户所有设备
-     *
-     * @param userId 用户 ID
-     * @return 成功响应
-     */
-    @PostMapping("/kickout-all/{userId}")
-    @Operation(summary = "踢出用户所有设备", description = "将指定用户的所有设备踢下线")
-    public ApiResult<Void> kickoutAll(@PathVariable Long userId) {
+    @DeleteMapping("/{userId}/sessions")
+    @Operation(summary = "踢除用户所有会话", description = "将指定用户的所有设备踢下线")
+    @Parameter(name = "userId", description = "用户 ID", required = true)
+    public ApiResult<Void> kickoutAllSessions(@PathVariable Long userId) {
         userService.kickoutAll(userId);
-        return ApiResult.success(null);
+        return ApiResult.success(HttpStatusCode.NO_CONTENT, null);
     }
 }
 
