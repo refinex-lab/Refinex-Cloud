@@ -7,6 +7,7 @@ import cn.refinex.auth.repository.SysUserRepository;
 import cn.refinex.auth.service.LoginAsyncService;
 import cn.refinex.common.enums.LoginType;
 import cn.refinex.common.utils.device.DeviceUtils;
+import cn.refinex.common.utils.ip.Ip2RegionUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -67,8 +68,8 @@ public class LoginAsyncServiceImpl implements LoginAsyncService {
                     // 当前仅支持密码登录
                     .loginType(LoginType.fromCode(loginType).getInfo())
                     .loginIp(loginIp)
-                    // 暂不实现 IP 地址解析
-                    .loginLocation(null)
+                    // IP 地址解析
+                    .loginLocation(Ip2RegionUtils.getRegionInfo(loginIp).getFullAddress())
                     .browser(browser)
                     .os(os)
                     .deviceType(deviceType)
