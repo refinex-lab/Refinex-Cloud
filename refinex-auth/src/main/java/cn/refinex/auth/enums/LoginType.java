@@ -12,7 +12,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public enum LoginTypeEnum {
+public enum LoginType {
 
     PASSWORD(1, "密码登录"),
     EMAIL(2, "邮箱登录");
@@ -33,8 +33,8 @@ public enum LoginTypeEnum {
      * @param code 登录类型编码
      * @return 登录类型枚举
      */
-    public static LoginTypeEnum fromCode(Integer code) {
-        for (LoginTypeEnum type : values()) {
+    public static LoginType fromCode(Integer code) {
+        for (LoginType type : values()) {
             if (type.getCode().equals(code)) {
                 return type;
             }

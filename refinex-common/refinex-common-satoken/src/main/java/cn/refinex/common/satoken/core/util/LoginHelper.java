@@ -30,6 +30,7 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoginHelper {
 
+    public static final String LOGIN_TYPE = "loginType";
     public static final String LOGIN_USER_KEY = "loginUser";
     public static final String USER_KEY = "userId";
     public static final String USER_NAME_KEY = "userName";
@@ -62,7 +63,7 @@ public class LoginHelper {
      * @param loginUser      登录用户对象
      * @param loginParameter 登录参数
      */
-    public static void login(LoginUser loginUser, SaLoginParameter loginParameter) {
+    public static void login(LoginUser loginUser, Integer loginType, SaLoginParameter loginParameter) {
         // 如果没有传入自定义 Sa-Token 登录参数就使用默认参数
         loginParameter = ObjectUtil.defaultIfNull(loginParameter, new SaLoginParameter());
 
@@ -73,6 +74,7 @@ public class LoginHelper {
                         // 额外参数：用户ID、用户名 (按需补充即可)
                         .setExtra(USER_KEY, loginUser.getUserId())
                         .setExtra(USER_NAME_KEY, loginUser.getUsername())
+                        .setExtra(LOGIN_TYPE, loginType)
         );
 
         // 将登录用户对象写入 Sa-Token 会话

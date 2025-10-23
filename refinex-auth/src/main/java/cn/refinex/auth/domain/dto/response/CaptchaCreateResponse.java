@@ -20,7 +20,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "验证码生成响应")
-public class CaptchaGenerateResponse implements Serializable {
+public class CaptchaCreateResponse implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -31,7 +31,7 @@ public class CaptchaGenerateResponse implements Serializable {
     @Schema(description = "验证码图片（Base64 编码）")
     private String image;
 
-    @Schema(description = "验证码过期时间（秒）", example = "60")
+    @Schema(description = "验证码过期时间（秒）", defaultValue = "300", example = "60")
     private Integer expireSeconds;
 }
 

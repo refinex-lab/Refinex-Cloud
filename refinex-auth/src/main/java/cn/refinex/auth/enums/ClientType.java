@@ -12,7 +12,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public enum ClientTypeEnum {
+public enum ClientType {
 
     WEB_ADMIN("web_admin"),
     MOBILE_ADMIN("mobile_admin");
@@ -25,8 +25,8 @@ public enum ClientTypeEnum {
      * @param code 类型代码
      * @return 客户端类型枚举
      */
-    public static ClientTypeEnum fromCode(String code) {
-        for (ClientTypeEnum type : values()) {
+    public static ClientType fromCode(String code) {
+        for (ClientType type : values()) {
             if (type.getCode().equals(code)) {
                 return type;
             }

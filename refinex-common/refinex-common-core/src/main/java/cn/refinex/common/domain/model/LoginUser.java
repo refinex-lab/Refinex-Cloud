@@ -1,5 +1,6 @@
 package cn.refinex.common.domain.model;
 
+import cn.refinex.common.enums.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -98,6 +99,23 @@ public class LoginUser implements Serializable {
 
         // 拼接用户类型和用户ID，作为登录用户ID
         return userType + ":" + userId;
+    }
+
+    /**
+     * 校验用户状态是否正常
+     *
+     * @throws IllegalArgumentException 如果用户状态异常
+     */
+    public void validateUserStatus() {
+        if (Objects.equals(userStatus, UserStatus.PENDING_ACTIVATION.getValue())) {
+            throw new IllegalArgumentException("用户状态为待激活，无法登录");
+        }
+        if (Objects.equals(userStatus, UserStatus.FROZEN.getValue())) {
+            throw new IllegalArgumentException("用户状态为冻结，无法登录");
+        }
+        if (Objects.equals(userStatus, UserStatus.LOGGED_OUT.getValue())) {
+            throw new IllegalArgumentException("用户状态为注销，无法登录");
+        }
     }
 
 }

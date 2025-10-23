@@ -1,6 +1,6 @@
 package cn.refinex.auth.service;
 
-import cn.refinex.auth.domain.dto.response.CaptchaGenerateResponse;
+import cn.refinex.auth.domain.dto.response.CaptchaCreateResponse;
 import cn.refinex.common.exception.BusinessException;
 
 /**
@@ -16,7 +16,7 @@ public interface CaptchaService {
      *
      * @return 验证码生成响应
      */
-    CaptchaGenerateResponse generate();
+    CaptchaCreateResponse generate();
 
     /**
      * 验证验证码

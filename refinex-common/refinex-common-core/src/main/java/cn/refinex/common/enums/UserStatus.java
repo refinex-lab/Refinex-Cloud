@@ -1,4 +1,4 @@
-package cn.refinex.auth.enums;
+package cn.refinex.common.enums;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public enum UserStatusEnum {
+public enum UserStatus {
 
     PENDING_ACTIVATION(0, "待激活"),
     NORMAL(1, "正常"),
@@ -28,8 +28,8 @@ public enum UserStatusEnum {
      * @param code 状态码
      * @return 枚举
      */
-    public static UserStatusEnum fromCode(Integer code) {
-        for (UserStatusEnum status : values()) {
+    public static UserStatus fromCode(Integer code) {
+        for (UserStatus status : values()) {
             if (status.getValue().equals(code)) {
                 return status;
             }

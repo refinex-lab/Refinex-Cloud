@@ -7,8 +7,9 @@ import cn.refinex.api.platform.domain.dto.request.ResetPasswordRequest;
 import cn.refinex.api.platform.domain.dto.request.UserCreateRequest;
 import cn.refinex.auth.domain.dto.request.LoginRequest;
 import cn.refinex.auth.domain.vo.LoginVo;
-import cn.refinex.auth.enums.EmailVerifyCodeType;
 import cn.refinex.auth.service.AuthService;
+import cn.refinex.common.apilog.core.annotation.LogOperation;
+import cn.refinex.common.apilog.core.enums.OperateTypeEnum;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.domain.model.LoginUser;
 import cn.refinex.common.enums.HttpStatusCode;
@@ -16,13 +17,13 @@ import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.mail.domain.dto.VerifyCodeRequest;
 import cn.refinex.common.mail.domain.dto.VerifyCodeResult;
 import cn.refinex.common.mail.domain.dto.VerifyCodeValidateRequest;
+import cn.refinex.common.mail.enums.VerifyCodeType;
 import cn.refinex.common.protection.ratelimiter.core.annotation.RateLimiter;
 import cn.refinex.common.protection.ratelimiter.core.keyresolver.impl.ClientIpRateLimiterKeyResolver;
 import cn.refinex.common.utils.servlet.ServletUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,23 +50,25 @@ public class TokenController {
     private final EmailServiceClient emailFeignClient;
 
     @PostMapping("/register")
+    @RateLimiter(
+            time = 10,
+            timeUnit = TimeUnit.MINUTES,
+            count = 5,
+            keyResolver = ClientIpRateLimiterKeyResolver.class,
+            message = "注册频率过快，请稍后重试"
+    )
+    @LogOperation(sensitiveParams = {"password", "confirmPassword", "email", "mobile"}, operationType = OperateTypeEnum.CREATE)
     @Operation(summary = "用户注册", description = "创建新用户账号")
     @Parameter(name = "request", description = "用户注册请求参数", required = true)
-    @RateLimiter(time = 10, timeUnit = TimeUnit.MINUTES, count = 5, keyResolver = ClientIpRateLimiterKeyResolver.class)
     public ApiResult<Boolean> registerUser(@Valid @RequestBody UserCreateRequest request) {
-        ApiResult<Boolean> result = userFeignClient.registerUser(request);
-        if (result.isSuccess()) {
-            return ApiResult.success(HttpStatusCode.CREATED, result.data());
-        }
-        return result;
+        return userFeignClient.registerUser(request);
     }
 
     @PostMapping("/login")
     @Operation(summary = "用户登录", description = "用户名密码登录，返回访问令牌")
     @Parameter(name = "request", description = "用户登录请求参数", required = true)
-    public ApiResult<LoginVo> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
-        String clientIp = ServletUtils.getClientIp(httpRequest);
-        LoginVo loginVo = authService.login(request, clientIp, httpRequest);
+    public ApiResult<LoginVo> login(@Valid @RequestBody LoginRequest request) {
+        LoginVo loginVo = authService.login(request);
         return ApiResult.success(loginVo);
     }
 
@@ -77,24 +80,23 @@ public class TokenController {
     }
 
     @PostMapping("/verify-codes/email")
+    @RateLimiter(
+            time = 10,
+            timeUnit = TimeUnit.MINUTES,
+            count = 5,
+            keyResolver = ClientIpRateLimiterKeyResolver.class,
+            message = "发送验证码频率过快，请稍后重试"
+    )
+    @LogOperation(sensitiveParams = {"email"}, operationType = OperateTypeEnum.OTHER)
     @Operation(summary = "发送邮箱验证码", description = "向指定邮箱发送验证码")
     @Parameter(name = "request", description = "验证码请求参数", required = true)
-    @Parameter(name = "httpRequest", description = "HTTP 请求", required = true)
-    public ApiResult<VerifyCodeResult> sendEmailVerifyCode(
-            @Valid @RequestBody VerifyCodeRequest request,
-            HttpServletRequest httpRequest) {
-        // 验证用户存在性
-        ApiResult<LoginUser> checkUserResult = userFeignClient.getLoginUserByEmail(request.getEmail());
-        if (!checkUserResult.isSuccess()) {
-            throw new BusinessException(HttpStatusCode.NOT_FOUND, "用户不存在");
-        }
-
-        // 发送验证码
-        request.setClientIp(ServletUtils.getClientIp(httpRequest));
+    public ApiResult<VerifyCodeResult> sendEmailVerifyCode(@Valid @RequestBody VerifyCodeRequest request) {
+        request.setClientIp(ServletUtils.getClientIp());
         return emailFeignClient.sendVerifyCode(request);
     }
 
     @PutMapping("/password/reset")
+    @LogOperation(sensitiveParams = {"email", "newPassword", "confirmPassword"}, operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "重置密码", description = "根据邮箱验证码重置用户密码")
     @Parameter(name = "request", description = "重置密码请求参数", required = true)
     public ApiResult<Boolean> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
@@ -108,7 +110,7 @@ public class TokenController {
         VerifyCodeValidateRequest verifyCodeValidateRequest = VerifyCodeValidateRequest.builder()
                 .email(request.getEmail())
                 .verifyCode(request.getEmailCode())
-                .codeType(EmailVerifyCodeType.RESET_PASSWORD.getCode())
+                .codeType(VerifyCodeType.RESET_PASSWORD.getCode())
                 .build();
         ApiResult<Boolean> verifyCodeResult = emailFeignClient.verifyCode(verifyCodeValidateRequest);
         

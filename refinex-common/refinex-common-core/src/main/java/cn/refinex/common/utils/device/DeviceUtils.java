@@ -1,6 +1,7 @@
 package cn.refinex.common.utils.device;
 
 import cn.hutool.core.util.StrUtil;
+import cn.refinex.common.utils.servlet.ServletUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 
 /**
  * 设备识别工具类
@@ -65,6 +65,16 @@ public final class DeviceUtils {
         // 降级方案：解析 User-Agent
         String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
         return parseDeviceType(userAgent);
+    }
+
+    /**
+     * 从 HttpServletRequest 中获取设备类型（默认使用当前请求）
+     *
+     * @param clientDeviceType 前端传递的设备类型（可选）
+     * @return 设备类型（PC、APP、H5、UNKNOWN）
+     */
+    public static String getDeviceType(String clientDeviceType) {
+        return getDeviceType(ServletUtils.getRequest(), clientDeviceType);
     }
 
     /**

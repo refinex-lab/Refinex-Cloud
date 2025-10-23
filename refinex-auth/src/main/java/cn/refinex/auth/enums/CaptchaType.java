@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum CaptchaTypeEnum {
+public enum CaptchaType {
 
     /**
      * PNG 类型（线段干扰）
@@ -54,8 +54,8 @@ public enum CaptchaTypeEnum {
      * @param code 类型代码
      * @return 验证码类型枚举
      */
-    public static CaptchaTypeEnum fromCode(String code) {
-        for (CaptchaTypeEnum type : values()) {
+    public static CaptchaType fromCode(String code) {
+        for (CaptchaType type : values()) {
             if (type.getCode().equals(code)) {
                 return type;
             }

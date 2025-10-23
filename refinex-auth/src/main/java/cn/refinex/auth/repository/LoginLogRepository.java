@@ -36,10 +36,10 @@ public class LoginLogRepository {
     public void insert(LogLogin logLogin) {
         String sql = """
                 INSERT INTO log_login (
-                    id, user_id, username, login_type, login_ip, login_location,
+                    user_id, username, login_type, login_ip, login_location,
                     browser, os, device_type, login_status, fail_reason, create_time
                 ) VALUES (
-                    :id, :userId, :username, :loginType, :loginIp, :loginLocation,
+                    :userId, :username, :loginType, :loginIp, :loginLocation,
                     :browser, :os, :deviceType, :loginStatus, :failReason, :createTime
                 )
                 """;

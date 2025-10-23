@@ -1,11 +1,12 @@
 package cn.refinex.auth.service.impl;
 
-import cn.refinex.auth.domain.dto.response.CaptchaGenerateResponse;
-import cn.refinex.auth.enums.CaptchaTypeEnum;
+import cn.refinex.auth.domain.dto.response.CaptchaCreateResponse;
+import cn.refinex.auth.enums.CaptchaType;
 import cn.refinex.auth.properties.CaptchaProperties;
 import cn.refinex.auth.service.CaptchaService;
 import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.redis.RedisService;
+import cn.refinex.common.utils.Fn;
 import com.wf.captcha.*;
 import com.wf.captcha.base.Captcha;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +16,7 @@ import org.springframework.util.StringUtils;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
-import static cn.refinex.auth.constants.AuthErrorMessageConstants.*;
 
 /**
  * 验证码服务实现类
@@ -40,15 +38,13 @@ public class CaptchaServiceImpl implements CaptchaService {
      * @return 验证码生成响应
      */
     @Override
-    public CaptchaGenerateResponse generate() {
+    public CaptchaCreateResponse generate() {
         try {
             // 生成验证码对象
             Captcha captcha = createCaptcha();
+            String uuid = Fn.getUuid32();
 
-            // 生成唯一标识
-            String uuid = UUID.randomUUID().toString();
-
-            // 获取验证码文本
+            // 获取验证码文本, 处理大消息转换
             String code = captcha.text();
             if (Boolean.FALSE.equals(captchaProperties.getCaseSensitive())) {
                 code = code.toLowerCase();
@@ -63,7 +59,7 @@ public class CaptchaServiceImpl implements CaptchaService {
 
             log.debug("生成验证码成功，uuid={}, code={}", uuid, code);
 
-            return CaptchaGenerateResponse.builder()
+            return CaptchaCreateResponse.builder()
                     .uuid(uuid)
                     .image(image)
                     .expireSeconds(captchaProperties.getExpireSeconds())
@@ -84,26 +80,23 @@ public class CaptchaServiceImpl implements CaptchaService {
      */
     @Override
     public void verify(String uuid, String code) {
-        // 检查参数
         if (!StringUtils.hasText(uuid) || !StringUtils.hasText(code)) {
-            throw new BusinessException(CAPTCHA_REQUIRED);
+            throw new BusinessException("验证码不能为空");
         }
 
         // 从 Redis 中获取验证码
         String redisKey = captchaProperties.getRedisKeyPrefix() + uuid;
         String correctCode = redisService.string().get(redisKey, String.class);
-
-        // 验证码不存在或已过期
         if (!StringUtils.hasText(correctCode)) {
             log.warn("验证码已过期或不存在，uuid={}", uuid);
-            throw new BusinessException(CAPTCHA_EXPIRED);
+            throw new BusinessException("验证码已过期");
         }
 
-        // 比对验证码（忽略大小写）
+        // 比对验证码（兼容大小写配置规则）
         String inputCode = Boolean.TRUE.equals(captchaProperties.getCaseSensitive()) ? code : code.toLowerCase();
         if (!correctCode.equals(inputCode)) {
             log.warn("验证码不正确，uuid={}, input={}, correct={}", uuid, inputCode, correctCode);
-            throw new BusinessException(CAPTCHA_INVALID);
+            throw new BusinessException("验证码错误");
         }
 
         // 验证成功，删除验证码（一次性使用）
@@ -117,14 +110,13 @@ public class CaptchaServiceImpl implements CaptchaService {
      * @return 验证码对象
      */
     private Captcha createCaptcha() throws IOException, FontFormatException {
-        // 获取配置
         int width = captchaProperties.getWidth();
         int height = captchaProperties.getHeight();
         int length = captchaProperties.getLength();
         String type = captchaProperties.getType();
 
         // 根据类型创建验证码
-        CaptchaTypeEnum typeEnum = CaptchaTypeEnum.fromCode(type);
+        CaptchaType typeEnum = CaptchaType.fromCode(type);
         Captcha captcha;
 
         switch (typeEnum) {

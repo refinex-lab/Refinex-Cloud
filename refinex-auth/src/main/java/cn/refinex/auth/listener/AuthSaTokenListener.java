@@ -4,12 +4,17 @@ import cn.dev33.satoken.listener.SaTokenListenerForSimple;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import cn.hutool.core.convert.Convert;
 import cn.refinex.auth.service.LoginAsyncService;
-import cn.refinex.common.constants.SystemStatusConstants;
 import cn.refinex.common.satoken.core.util.LoginHelper;
 import cn.refinex.common.utils.servlet.ServletUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+
+import static cn.refinex.common.constants.SystemStatusConstants.NORMAL_VALUE;
+import static cn.refinex.common.satoken.core.util.LoginHelper.USER_NAME_KEY;
 
 /**
  * 自定义 Sa-Token 事件监听器
@@ -44,41 +49,24 @@ public class AuthSaTokenListener extends SaTokenListenerForSimple {
     @Override
     public void doLogin(String loginType, Object loginId, String tokenValue, SaLoginParameter loginParameter) {
         try {
-            log.debug("Sa-Token 登录事件触发，loginId: {}, loginType: {}", loginId, loginType);
-
-            // 从 Login Extra 中获取客户端 ID
-            String clientId = loginParameter.getExtra(LoginHelper.CLIENT_KEY).toString();
-
             // 获取设备类型
             String deviceType = loginParameter.getDeviceType();
-
             // 获取客户端 IP
             String clientIp = ServletUtils.getClientIp();
-
             // 获取 User-Agent
             String userAgent = ServletUtils.getUserAgent();
 
+            // 提取用户ID
+            Long userId = Convert.toLong(StringUtils.split(Convert.toStr(loginId), ":")[0]);
+            // 提取用户名
+            String userName = Convert.toStr(loginParameter.getExtra(USER_NAME_KEY));
+            // 提取登录类型
+            Integer loginTypeCode = Convert.toInt(loginParameter.getExtra(LoginHelper.LOGIN_TYPE));
+
             // 记录登录日志（成功）
-            loginAsyncService.recordLoginLog(
-                    Convert.toLong(loginId),
-                    loginId.toString(),
-                    clientIp,
-                    userAgent,
-                    deviceType,
-                    Convert.toInt(SystemStatusConstants.NORMAL),
-                    null
-            );
-
+            loginAsyncService.recordLoginLog(userId, userName, loginTypeCode, clientIp, userAgent, deviceType, NORMAL_VALUE, null);
             // 更新最后登录信息
-            loginAsyncService.updateLastLoginInfo(
-                    Convert.toLong(loginId),
-                    java.time.LocalDateTime.now(),
-                    clientIp
-            );
-
-            log.info("Sa-Token 登录事件处理完成，loginId: {}, clientId: {}, deviceType: {}",
-                    loginId, clientId, deviceType);
-
+            loginAsyncService.updateLastLoginInfo(userId, LocalDateTime.now(), clientIp);
         } catch (Exception e) {
             // 使用 try-catch 包裹不安全的代码，防止异常影响 Sa-Token 登录流程
             log.error("Sa-Token 登录事件处理失败，loginId: {}", loginId, e);

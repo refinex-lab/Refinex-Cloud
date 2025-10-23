@@ -4,10 +4,9 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import cn.hutool.core.util.StrUtil;
+import cn.refinex.api.platform.client.UserServiceClient;
 import cn.refinex.auth.domain.dto.request.LoginRequest;
 import cn.refinex.auth.domain.vo.LoginVo;
-import cn.refinex.auth.enums.ClientTypeEnum;
-import cn.refinex.auth.enums.UserStatusEnum;
 import cn.refinex.auth.properties.CaptchaProperties;
 import cn.refinex.auth.properties.UserPasswordProperties;
 import cn.refinex.auth.service.AuthService;
@@ -20,8 +19,6 @@ import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.redis.RedisService;
 import cn.refinex.common.satoken.core.util.LoginHelper;
 import cn.refinex.common.utils.device.DeviceUtils;
-import cn.refinex.api.platform.client.UserServiceClient;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -54,19 +51,20 @@ public class AuthServiceImpl implements AuthService {
      * 用户登录
      *
      * @param request     登录请求
-     * @param clientIp    客户端 IP
-     * @param httpRequest HttpServletRequest 对象（用于获取 User-Agent）
      * @return 登录响应（包含 Token）
      */
     @Override
-    public LoginVo login(LoginRequest request, String clientIp, HttpServletRequest httpRequest) {
+    public LoginVo login(LoginRequest request) {
+        // 校验登录类型
+        LoginType loginType = LoginType.fromCode(request.getLoginType());
+
         // 验证码校验（如果启用）
         if (Boolean.TRUE.equals(captchaProperties.getEnabled())) {
             captchaService.verify(request.getCaptchaUuid(), request.getCaptchaCode());
         }
 
         // 根据用户名/邮箱获取登录用户信息
-        ApiResult<LoginUser> userNameResult = Objects.equals(request.getLoginType(), LoginType.PASSWORD.getCode())
+        ApiResult<LoginUser> userNameResult = Objects.equals(request.getLoginType(), loginType.getCode())
                 ? userFacade.getLoginUserByUserName(request.getUsername())
                 : userFacade.getLoginUserByEmail(request.getUsername());
         LoginUser loginUser = userNameResult.data();
@@ -76,52 +74,27 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // 验证用户状态
-        if (loginUser.getUserStatus() == null) {
-            log.warn("用户状态异常，username: {}, status: null", request.getUsername());
-            throw new BusinessException("用户状态异常，无法登录");
-        }
-        if (loginUser.getUserStatus().equals(UserStatusEnum.FROZEN.getValue())) {
-            log.warn("用户已被冻结，username: {}", request.getUsername());
-            throw new BusinessException("用户已被冻结，无法登录");
-        }
-        if (loginUser.getUserStatus().equals(UserStatusEnum.LOGGED_OUT.getValue())) {
-            log.warn("用户已注销，username: {}", request.getUsername());
-            throw new BusinessException("用户已注销，无法登录");
-        }
+        loginUser.validateUserStatus();
 
-        // 验证密码
-        checkLogin(LoginType.PASSWORD, request.getUsername(), () -> !passwordEncoder.matches(request.getPassword(), loginUser.getPassword()));
-
-        // 获取设备类型（优先使用前端传递，降级使用 User-Agent 解析）
-        String deviceType = DeviceUtils.getDeviceType(httpRequest, request.getDeviceType());
-        log.info("识别设备类型，userId: {}, deviceType: {}", loginUser.getUserId(), deviceType);
+        // 验证用户密码
+        checkLogin(LoginType.PASSWORD, request.getUsername(), () ->
+                !passwordEncoder.matches(request.getPassword(), loginUser.getPassword()));
 
         // 构建登录参数
         SaLoginParameter loginParameter = new SaLoginParameter()
                 // 设置设备类型
-                .setDeviceType(deviceType)
-                // 设置登录 token 有效期，后台登录 30 分钟，移动端登录 1 天
-                .setTimeout(request.getClientId().equalsIgnoreCase(ClientTypeEnum.WEB_ADMIN.getCode())
-                        ? Duration.ofMinutes(30).getSeconds()
-                        : Duration.ofDays(1).getSeconds())
-                // 设置登录 token 最低活跃频率，单位：秒（默认 5 分钟）
-                .setActiveTimeout(Duration.ofMinutes(5).getSeconds())
-                // 允许多设备并发登录
-                .setIsConcurrent(true)
+                .setDeviceType(DeviceUtils.getDeviceType(request.getDeviceType()))
                 // 设置客户端 ID 到 Extra 中，用于后续权限校验
                 .setExtra(LoginHelper.CLIENT_KEY, request.getClientId());
 
-        // [记住我] 模式：延长 Token 有效期
+        // [记住我] 模式
         if (Boolean.TRUE.equals(request.getRememberMe())) {
-            // 7 天有效期
-            loginParameter.setTimeout(Duration.ofDays(7).getSeconds());
             // 持久化 Cookie (临时 Cookie 在浏览器关闭时会自动删除，持久 Cookie 在重新打开后依然存在)
             loginParameter.setIsLastingCookie(true);
-            log.info("启用 [记住我] 模式，userId: {}, timeout: 7 days", loginUser.getUserId());
         }
 
         // 执行登录（Sa-Token）生成 Token
-        LoginHelper.login(loginUser, loginParameter);
+        LoginHelper.login(loginUser, loginType.getCode(), loginParameter);
 
         // 构建登录响应 VO
         LoginVo loginVo = new LoginVo();
@@ -150,7 +123,7 @@ public class AuthServiceImpl implements AuthService {
             // 构建 Redis 缓存键
             String loginErrorCountCacheKey = SystemRedisKeyConstants.Login.buildLoginErrorCountCacheKey(username);
 
-            // 获取当前登录错误次数（使用 getOrDefault 避免空指针）
+            // 获取当前登录错误次数
             int currentErrorCount = Optional.ofNullable(
                     redisService.string().get(loginErrorCountCacheKey, Integer.class)
             ).orElse(0);
