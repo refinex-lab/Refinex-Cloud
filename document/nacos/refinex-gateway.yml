@@ -40,13 +40,29 @@ security:
       - /swagger-ui/**
       - /v3/api-docs/**
 
-# # Gateway 聚合 Swagger 文档
+# Knife4j 网关聚合配置
 knife4j:
   gateway:
+    # 是否启用 Knife4j 网关聚合
     enable: true
-    # 指定服务发现的模式聚合微服务文档，并且是默认`default`分组
+
+    # 排序规则
+    tags-sorter: order
+    operations-sorter: order
+
+    # 聚合策略: manual-手动配置, discover-服务发现(自动聚合所有服务)
     strategy: discover
+
+    # 服务发现配置
     discover:
       enable: true
-      # 指定版本号(Swagger2|OpenAPI3)
+      # 指定版本号(openapi3|swagger2)
       version : openapi3
+
+      # 排除的服务(网关本身、非业务服务等)
+      excluded-services:
+        - refinex-gateway
+
+      # OpenAPI3 配置
+      oas3:
+        url: /v3/api-docs
