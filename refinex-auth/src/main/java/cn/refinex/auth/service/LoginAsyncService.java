@@ -1,5 +1,7 @@
 package cn.refinex.auth.service;
 
+import cn.refinex.auth.domain.dto.request.RecordLoginLogRequest;
+
 import java.time.LocalDateTime;
 
 /**
@@ -22,16 +24,9 @@ public interface LoginAsyncService {
      * 3. 异常不会传播到调用方
      * </p>
      *
-     * @param userId      用户 ID（失败时可能为 null）
-     * @param username    用户名（失败时可能为 null）
-     * @param loginType   登录类型
-     * @param loginIp     登录 IP
-     * @param userAgent   User-Agent 字符串
-     * @param deviceType  设备类型（PC、APP、H5）
-     * @param loginStatus 登录状态（0 成功, 1 失败）
-     * @param failReason  失败原因（成功时为 null）
+     * @param request 记录登录日志请求 DTO
      */
-    void recordLoginLog(Long userId, String username, Integer loginType, String loginIp, String userAgent, String deviceType, Integer loginStatus, String failReason);
+    void recordLoginLog(RecordLoginLogRequest request);
 
     /**
      * 异步更新用户最后登录信息

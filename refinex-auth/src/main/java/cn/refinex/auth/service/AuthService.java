@@ -27,9 +27,16 @@ public interface AuthService {
      *
      * @param loginType              登录类型
      * @param username               用户名
+     * @param userId                 用户 ID
+     * @param loginTypeCode          登录类型代码
+     * @param clientIp               客户端 IP
+     * @param userAgent              User-Agent
+     * @param deviceType             设备类型
      * @param passwordValidationFail 密码校验失败判断逻辑，返回 true 表示密码错误
      */
-    void checkLogin(LoginType loginType, String username, BooleanSupplier passwordValidationFail);
+    void checkLogin(LoginType loginType, String username, Long userId, Integer loginTypeCode,
+                    String clientIp, String userAgent, String deviceType,
+                    BooleanSupplier passwordValidationFail);
 
     /**
      * 用户登出

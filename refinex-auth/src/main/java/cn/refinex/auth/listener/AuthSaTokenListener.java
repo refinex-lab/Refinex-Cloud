@@ -3,6 +3,7 @@ package cn.refinex.auth.listener;
 import cn.dev33.satoken.listener.SaTokenListenerForSimple;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import cn.hutool.core.convert.Convert;
+import cn.refinex.auth.domain.dto.request.RecordLoginLogRequest;
 import cn.refinex.auth.service.LoginAsyncService;
 import cn.refinex.common.satoken.core.util.LoginHelper;
 import cn.refinex.common.utils.servlet.ServletUtils;
@@ -63,8 +64,20 @@ public class AuthSaTokenListener extends SaTokenListenerForSimple {
             // 提取登录类型
             Integer loginTypeCode = Convert.toInt(loginParameter.getExtra(LoginHelper.LOGIN_TYPE));
 
+            // 构建登录日志记录请求
+            RecordLoginLogRequest recordRequest = RecordLoginLogRequest.builder()
+                    .userId(userId)
+                    .username(userName)
+                    .loginType(loginTypeCode)
+                    .loginIp(clientIp)
+                    .userAgent(userAgent)
+                    .deviceType(deviceType)
+                    .loginStatus(NORMAL_VALUE)
+                    .failReason(null)
+                    .build();
+
             // 记录登录日志（成功）
-            loginAsyncService.recordLoginLog(userId, userName, loginTypeCode, clientIp, userAgent, deviceType, NORMAL_VALUE, null);
+            loginAsyncService.recordLoginLog(recordRequest);
             // 更新最后登录信息
             loginAsyncService.updateLastLoginInfo(userId, LocalDateTime.now(), clientIp);
         } catch (Exception e) {

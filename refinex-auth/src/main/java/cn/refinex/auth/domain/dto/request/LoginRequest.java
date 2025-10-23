@@ -50,33 +50,13 @@ public class LoginRequest {
     @Schema(description = "验证码文本", example = "8u6h")
     private String captchaCode;
 
-    /**
-     * 客户端 ID（可选，前端传递）
-     * <p>
-     * 可选值：web_admin、mobile_app
-     * 如果不传，则默认是 web_admin
-     * </p>
-     */
-    @Schema(description = "客户端 ID", example = "web_admin", allowableValues = {"web_admin", "mobile_app"})
+    @Schema(description = "客户端 ID（可选，前端传递）", defaultValue = "web_admin", example = "web_admin", allowableValues = {"web_admin", "mobile_app"})
     private String clientId = "web_admin";
 
-    /**
-     * 设备类型（可选，前端传递）
-     * <p>
-     * 可选值：PC、APP、H5
-     * 如果不传，则通过 User-Agent 自动识别
-     * </p>
-     */
-    @Schema(description = "设备类型", example = "PC", allowableValues = {"PC", "APP", "H5"})
+    @Schema(description = "设备类型（可选，前端传递）", example = "PC", allowableValues = {"PC", "APP", "H5"})
     private String deviceType;
 
-    /**
-     * 是否记住我（默认 false）
-     * <p>
-     * true=长期有效（7天），false=短期有效（2小时）
-     * </p>
-     */
-    @Schema(description = "是否记住我", example = "false")
+    @Schema(description = "是否记住我（默认 false）", example = "false")
     private Boolean rememberMe = false;
 }
 

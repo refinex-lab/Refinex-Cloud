@@ -1,6 +1,7 @@
 package cn.refinex.auth.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import cn.refinex.auth.domain.dto.request.RecordLoginLogRequest;
 import cn.refinex.auth.domain.entity.LogLogin;
 import cn.refinex.auth.repository.LoginLogRepository;
 import cn.refinex.auth.repository.SysUserRepository;
@@ -41,47 +42,40 @@ public class LoginAsyncServiceImpl implements LoginAsyncService {
      * 3. 异常不会传播到调用方
      * </p>
      *
-     * @param userId      用户 ID（失败时可能为 null）
-     * @param username    用户名（失败时可能为 null）
-     * @param loginType   登录类型
-     * @param loginIp     登录 IP
-     * @param userAgent   User-Agent 字符串
-     * @param deviceType  设备类型（PC、APP、H5）
-     * @param loginStatus 登录状态（0 成功, 1 失败）
-     * @param failReason  失败原因（成功时为 null）
+     * @param request 记录登录日志请求 DTO
      */
     @Async
-    public void recordLoginLog(Long userId, String username, Integer loginType, String loginIp, String userAgent, String deviceType, Integer loginStatus, String failReason) {
+    public void recordLoginLog(RecordLoginLogRequest request) {
         try {
             // 1. 解析 User-Agent 获取浏览器和操作系统信息
             String browser = "Unknown";
             String os = "Unknown";
-            if (StrUtil.isNotBlank(userAgent)) {
-                browser = DeviceUtils.getBrowserName(userAgent);
-                os = DeviceUtils.getOperatingSystemName(userAgent);
+            if (StrUtil.isNotBlank(request.getUserAgent())) {
+                browser = DeviceUtils.getBrowserName(request.getUserAgent());
+                os = DeviceUtils.getOperatingSystemName(request.getUserAgent());
             }
 
             // 2. 构建登录日志对象
             LogLogin logLogin = LogLogin.builder()
-                    .userId(userId)
-                    .username(username)
+                    .userId(request.getUserId())
+                    .username(request.getUsername())
                     // 当前仅支持密码登录
-                    .loginType(LoginType.fromCode(loginType).getInfo())
-                    .loginIp(loginIp)
+                    .loginType(LoginType.fromCode(request.getLoginType()).getInfo())
+                    .loginIp(request.getLoginIp())
                     // IP 地址解析
-                    .loginLocation(Ip2RegionUtils.getRegionInfo(loginIp).getFullAddress())
+                    .loginLocation(Ip2RegionUtils.getRegionInfo(request.getLoginIp()).getFullAddress())
                     .browser(browser)
                     .os(os)
-                    .deviceType(deviceType)
-                    .loginStatus(loginStatus)
-                    .failReason(failReason)
+                    .deviceType(request.getDeviceType())
+                    .loginStatus(request.getLoginStatus())
+                    .failReason(request.getFailReason())
                     .createTime(LocalDateTime.now())
                     .build();
 
             // 3. 插入登录日志
             loginLogRepository.insert(logLogin);
         } catch (Exception e) {
-            log.error("异步记录登录日志失败，username: {}, loginStatus: {}", username, loginStatus, e);
+            log.error("异步记录登录日志失败，username: {}, loginStatus: {}", request.getUsername(), request.getLoginStatus(), e);
         }
     }
 
