@@ -1,5 +1,6 @@
 package cn.refinex.platform.controller.remote;
 
+import cn.dev33.satoken.annotation.SaIgnore;
 import cn.refinex.api.platform.client.logger.LogOperationRemoteService;
 import cn.refinex.api.platform.client.logger.dto.request.LogOperationCreateRequestDTO;
 import cn.refinex.common.domain.ApiResult;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 1.0.0
  */
 @Slf4j
+@SaIgnore
 @RestController
 @RequiredArgsConstructor
 public class LogOperationRemoteController implements LogOperationRemoteService {

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Tag(name = "操作日志服务 OpenFeign 接口契约", description = "定义操作日志服务相关的 OpenFeign 接口契约")
 public interface LogOperationRemoteService {
 
-    @PostMapping("/logger")
+    @PostMapping(value = "/logger", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "保存操作日志", description = "创建新的操作日志记录")
     @Parameter(name = "request", description = "操作日志创建请求", required = true)
     ApiResult<Boolean> saveLogOperation(@RequestBody LogOperationCreateRequestDTO request);
