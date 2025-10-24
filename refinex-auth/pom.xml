@@ -41,7 +41,7 @@
         <!-- 安全模块 -->
         <dependency>
             <groupId>cn.refinex</groupId>
-            <artifactId>refinex-common-security</artifactId>
+            <artifactId>refinex-common-satoken</artifactId>
         </dependency>
 
         <!-- 数据库模块 -->
