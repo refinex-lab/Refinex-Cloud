@@ -5,8 +5,8 @@ import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.refinex.api.platform.client.LogOperationServiceClient;
-import cn.refinex.api.platform.domain.dto.request.LogOperationCreateRequest;
+import cn.refinex.api.platform.client.logger.LogOperationRemoteService;
+import cn.refinex.api.platform.client.logger.dto.request.LogOperationCreateRequestDTO;
 import cn.refinex.common.apilog.core.annotation.LogOperation;
 import cn.refinex.common.apilog.core.enums.OperateTypeEnum;
 import cn.refinex.common.domain.ApiResult;
@@ -57,7 +57,7 @@ public class LogOperationFilter extends ApiRequestFilter {
     private static final String[] SANITIZE_KEYS = new String[]{"password", "token", "accessToken", "refreshToken"};
 
     private final String applicationName;
-    private final LogOperationServiceClient logOperationClient;
+    private final LogOperationRemoteService logOperationClient;
 
     /**
      * 构造函数
@@ -66,7 +66,7 @@ public class LogOperationFilter extends ApiRequestFilter {
      * @param applicationName    应用名称
      * @param logOperationClient 操作日志客户端
      */
-    public LogOperationFilter(WebProperties webProperties, String applicationName, LogOperationServiceClient logOperationClient) {
+    public LogOperationFilter(WebProperties webProperties, String applicationName, LogOperationRemoteService logOperationClient) {
         super(webProperties);
         this.applicationName = applicationName;
         this.logOperationClient = logOperationClient;
@@ -120,7 +120,7 @@ public class LogOperationFilter extends ApiRequestFilter {
      * @param ex           异常
      */
     private void saveLogOperation(HttpServletRequest request, LocalDateTime beginTime, Map<String, String> parameterMap, String requestBody, Exception ex) {
-        LogOperationCreateRequest logOperationRequest = new LogOperationCreateRequest();
+        LogOperationCreateRequestDTO logOperationRequest = new LogOperationCreateRequestDTO();
         try {
             boolean isSuccess = buildLogOperation(logOperationRequest, request, beginTime, parameterMap, requestBody, ex);
             if (!isSuccess) {
@@ -144,7 +144,7 @@ public class LogOperationFilter extends ApiRequestFilter {
      * @param ex                  异常
      * @return 是否构建成功
      */
-    private boolean buildLogOperation(LogOperationCreateRequest logOperationRequest, HttpServletRequest request, LocalDateTime beginTime, Map<String, String> parameterMap, String requestBody, Exception ex) {
+    private boolean buildLogOperation(LogOperationCreateRequestDTO logOperationRequest, HttpServletRequest request, LocalDateTime beginTime, Map<String, String> parameterMap, String requestBody, Exception ex) {
         HandlerMethod handlerMethod = (HandlerMethod) request.getAttribute(ATTRIBUTE_HANDLER_METHOD);
         LogOperation logOperationAnnotation = null;
         if (Objects.nonNull(handlerMethod)) {

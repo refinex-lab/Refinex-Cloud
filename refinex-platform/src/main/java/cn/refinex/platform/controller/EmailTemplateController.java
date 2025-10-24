@@ -1,8 +1,8 @@
 package cn.refinex.platform.controller;
 
 import cn.refinex.common.domain.ApiResult;
-import cn.refinex.common.mail.domain.dto.EmailTemplateDTO;
-import cn.refinex.common.mail.domain.entity.EmailTemplate;
+import cn.refinex.api.platform.client.email.dto.request.EmailTemplateDTO;
+import cn.refinex.platform.domain.entity.email.EmailTemplate;
 import cn.refinex.platform.service.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

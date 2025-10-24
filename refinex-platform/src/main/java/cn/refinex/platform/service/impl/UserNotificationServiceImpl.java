@@ -2,7 +2,6 @@ package cn.refinex.platform.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import cn.refinex.common.jdbc.service.SensitiveDataService;
-import cn.refinex.common.mail.service.EmailSendService;
 import cn.refinex.common.satoken.core.util.LoginHelper;
 import cn.refinex.common.utils.Fn;
 import cn.refinex.common.utils.regex.RegexUtils;
@@ -34,7 +33,7 @@ public class UserNotificationServiceImpl implements UserNotificationService {
 
     private final SysUserRepository sysUserRepository;
     private final SensitiveDataService sensitiveDataService;
-    private final EmailSendService emailSendService;
+    private final EmailSendServiceImpl emailSendService;
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 

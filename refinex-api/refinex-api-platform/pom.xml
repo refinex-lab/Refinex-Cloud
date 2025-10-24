@@ -14,20 +14,17 @@
     <description>Refinex Cloud API Platform</description>
 
     <dependencies>
-        <!-- 邮件服务 -->
         <dependency>
             <groupId>cn.refinex</groupId>
-            <artifactId>refinex-common-mail</artifactId>
+            <artifactId>refinex-common-core</artifactId>
         </dependency>
 
-        <!-- 参数校验 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
             <optional>true</optional>
         </dependency>
 
-        <!-- OpenFeign 模块 -->
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-openfeign</artifactId>

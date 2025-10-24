@@ -14,61 +14,51 @@
     <description>Refinex Cloud Platform</description>
 
     <dependencies>
-        <!-- Nacos 配置中心和服务发现组件 -->
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-nacos</artifactId>
         </dependency>
 
-        <!-- Spring Boot Web 模块 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- 安全模块 -->
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-security</artifactId>
         </dependency>
 
-        <!-- 数据库模块 -->
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-jdbc</artifactId>
         </dependency>
 
-        <!-- Web 模块 -->
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-web</artifactId>
         </dependency>
 
-        <!-- Common File -->
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-file</artifactId>
         </dependency>
 
-        <!-- Common Mail -->
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-mail</artifactId>
         </dependency>
 
-        <!-- Common Redis -->
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-redis</artifactId>
         </dependency>
 
-        <!-- Common JSON -->
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-json</artifactId>
         </dependency>
 
-        <!-- API Platform -->
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-api-platform</artifactId>

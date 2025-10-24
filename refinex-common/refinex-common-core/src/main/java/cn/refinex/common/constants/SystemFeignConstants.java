@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 /**
- * Feign 客户端常量类
+ * Feign 客户端常量类, 值对应注册到 Nacos 中的服务名
  *
  * @author Refinex
  * @since 1.0.0

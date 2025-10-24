@@ -226,6 +226,13 @@
                 <version>${commons-collections4.version}</version>
             </dependency>
 
+            <!-- MapStruct核心依赖 -->
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+
             <!-- Apache Commons IO -->
             <dependency>
                 <groupId>commons-io</groupId>

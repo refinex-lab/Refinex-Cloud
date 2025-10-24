@@ -57,6 +57,12 @@ public class SecurityAutoConfiguration implements WebMvcConfigurer {
                 .addInclude("/**")
                 // 排除 actuator 路径
                 .addExclude("/actuator", "/actuator/**")
+                // 排除 Swagger/Knife4j 相关路径
+                .addExclude("/doc.html", "/doc.html/**")
+                .addExclude("/swagger-ui.html", "/swagger-ui/**")
+                .addExclude("/swagger-resources", "/swagger-resources/**")
+                .addExclude("/v3/api-docs", "/v3/api-docs/**")
+                .addExclude("/webjars/**", "/favicon.ico")
                 // 自定义认证规则
                 .setAuth(obj -> {
                     // 检查是否校验 Same-Token (部分 rpc 插件有效)

@@ -105,6 +105,51 @@ spring:
         # 关闭超时
         shutdown-timeout: 200ms
 
+  cloud:
+    # OpenFeign 客户端配置
+    openfeign:
+
+      # HttpClient 5 配置
+      httpclient:
+        # 最大连接数
+        max-connections: 200
+        # 每个路由的最大连接数
+        max-connections-per-route: 50
+        # 连接存活时间(秒)
+        time-to-live: 900
+        # 连接清理定时器间隔
+        connection-timer-repeat: 3000
+        hc5:
+          # 启用 Apache HttpClient 5
+          enabled: true
+
+      # OpenFeign 客户端配置
+      client:
+        config:
+          # 全局默认配置
+          default:
+            # 连接超时时间(毫秒)
+            connectTimeout: 5000
+            # 读取超时时间(毫秒)
+            readTimeout: 10000
+            # 日志级别(可选值：NONE、BASIC、HEADERS、FULL)
+            loggerLevel: FULL
+
+      # 压缩配置
+      compression:
+        # 请求压缩配置
+        request:
+          # 启用请求压缩
+          enabled: true
+          # 支持压缩的类型
+          mime-types: text/xml，application/xml，application/json
+          # 最小压缩阈值(字节)， 超过此阈值触发压缩
+          min-request-size: 2048
+        # 响应压缩配置
+        response:
+          # 启用响应压缩
+          enabled: true
+
 # ====================================================================
 # 认证授权配置 (Sa-Token)
 # ====================================================================
@@ -112,7 +157,11 @@ sa-token:
   # Token 名称(同时作为 Cookie 和 Header 的键名)
   token-name: Authorization
   # Token 前缀(建议加上 Bearer 前缀, 符合 OAuth2 规范)
-  # token-prefix: Bearer
+  token-prefix: Bearer
+  # 是否允许动态设置 token 有效期，默认 true
+  dynamic-active-timeout: true
+  # 是否允许从请求参数读取 token，默认 true
+  is-read-body: true
   # Token 有效期, 单位：秒, 默认 30 天, -1 代表永久有效
   # Token 有效期(秒), 建议 2 小时, 通过刷新机制延长
   timeout: 7200
@@ -165,6 +214,8 @@ logging:
     io.lettuce: WARN
     # 业务包日志(根据实际包名调整)
     cn.refinex: INFO
+    # OpenFeign 日志(Feign 接口所在包)
+    cn.refinex.api.platform.client: DEBUG
   # Logback 滚动策略
   logback:
     rollingpolicy:
@@ -254,10 +305,10 @@ management:
     redis:
       enabled: true
     db:
-      enabled: true
+      enabled: false
 
 # ====================================================================
-# Open API
+# Open API 文档配置
 # ====================================================================
 # SpringDoc 核心配置
 springdoc:
@@ -265,67 +316,71 @@ springdoc:
   api-docs:
     # 是否启用 API 文档
     enabled: true
-    # API 文档 JSON 地址
+    # API 文档 JSON 路径
     path: /v3/api-docs
-
-  # 分组配置
-  group-configs:
-    # 分组名称
-    - group: default
-      # 分组显示名称
-      display-name: 默认分组
-      # 匹配路径
-      paths-to-match: /**
-      # 扫描的包
-      packages-to-scan: cn.refinex.platform.controller,cn.refinex.platform.web,cn.refinex.auth.controller
+  # Swagger UI 配置
+  swagger-ui:
+    # 是否启用 Swagger UI
+    enabled: true
+    # Swagger UI 访问路径
+    path: /swagger-ui.html
+  # 默认分组（可选，通过代码 SwaggerAutoConfiguration 配置）
+  default-flat-param-object: false
 
 # Knife4j 增强配置
 knife4j:
-  # 是否启用 Knife4j
+  # 是否启用 Knife4j（生产环境建议关闭）
   enable: true
+  # 生产环境保护（设置为 true 时需要 Basic 认证才能访问文档）
+  production: false
+  # Basic 认证配置（仅在 production=true 时生效）
+  #basic:
+  #  enable: true
+  #  username: admin
+  #  password: 123456
 
-  # 基础设置
+  # UI 增强设置
   setting:
-    # 语言:zh_cn-简体中文,en-英文
+    # 语言：zh_cn-简体中文, en-英文
     language: zh_cn
-    # 是否显示 Models
+    # 是否显示 Models（实体类列表）
     enable-swagger-models: true
     # 是否启用文档管理
     enable-document-manage: true
     # Models 显示名称
     swagger-model-name: 实体类列表
     # 是否显示版本号
-    enable-version: false
+    enable-version: true
     # 是否启用重载缓存参数
     enable-reload-cache-parameter: false
     # 是否启用调试后脚本
     enable-after-script: true
-    # 文件上传接口过滤,默认 POST
+    # 文件上传接口过滤（指定请求方法类型）
     enable-filter-multipart-api-method-type: POST
-    # 针对 RequestMapping 的接口请求类型,在不指定参数类型的情况下,如果不过滤,默认会显示7个类型的接口地址参数
+    # 针对 RequestMapping 的接口请求类型过滤
     enable-filter-multipart-apis: false
     # 是否启用请求缓存
     enable-request-cache: true
     # 是否启用 Host 设置
     enable-host: false
     # 是否启用自定义主页内容
-    #enable-home-custom: true
+    enable-home-custom: false
     # 自定义主页内容路径
     #home-custom-location: classpath:markdown/home.md
     # 是否启用搜索功能
     enable-search: true
     # 是否显示页脚
-    enable-footer: false
+    enable-footer: true
     # 是否自定义页脚
     enable-footer-custom: true
     # 页脚内容
-    footer-custom-content: Copyright © 2023 Refinex Cloud
-    # 是否启用动态参数
-    enable-dynamic-parameter: false
+    footer-custom-content: Copyright © 2025 Refinex Cloud
+    # 是否启用动态参数调试
+    enable-dynamic-parameter: true
     # 是否显示 debug 调试
     enable-debug: true
-    # 是否启用 OpenAPI
-    enable-open-api: false
+    # 是否启用 OpenAPI 规范
+    enable-open-api: true
     # 是否启用分组
     enable-group: true
 

@@ -14,70 +14,64 @@
     <description>Refinex Cloud Gateway</description>
 
     <dependencies>
-        <!-- Nacos -->
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-nacos</artifactId>
         </dependency>
 
-        <!-- Spring Cloud Gateway -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway-server-webflux</artifactId>
         </dependency>
 
-        <!-- Spring Cloud Bootstrap: 引导类, 用于加载外部配置 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-bootstrap</artifactId>
         </dependency>
 
-        <!-- Spring Cloud LoadBalancer: 负载均衡 -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
-        </dependency>
-
-        <!-- Spring Boot Actuator: 监控 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- Caffeine: 缓存 -->
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
         </dependency>
 
-        <!-- Hutool: Http 工具类库 -->
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-http</artifactId>
         </dependency>
 
-        <!-- Sa-Token 权限认证 (Gateway Reactor 响应式集成) -->
         <dependency>
             <groupId>cn.dev33</groupId>
             <artifactId>sa-token-reactor-spring-boot3-starter</artifactId>
         </dependency>
 
-        <!-- Sa-Token 集成 -->
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-satoken</artifactId>
         </dependency>
 
-        <!-- Knife4j: 网关文档 -->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-gateway-spring-boot-starter</artifactId>
         </dependency>
 
-        <!-- Refinex Redis 集成 -->
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-redis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-openfeign</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-api-platform</artifactId>
         </dependency>
 
         <!-- Netty macOS DNS 解析器 (修复 macOS 上的 DNS 解析警告) -->

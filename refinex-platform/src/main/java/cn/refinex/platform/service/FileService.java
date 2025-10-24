@@ -1,9 +1,9 @@
 package cn.refinex.platform.service;
 
-import cn.refinex.api.platform.domain.dto.request.FileConfirmUploadRequest;
-import cn.refinex.api.platform.domain.model.FileInfoDTO;
-import cn.refinex.api.platform.domain.dto.request.FileUploadUrlRequest;
-import cn.refinex.api.platform.domain.dto.response.FileUploadUrlResponse;
+import cn.refinex.api.platform.client.file.dto.request.FileConfirmUploadRequestDTO;
+import cn.refinex.api.platform.client.file.dto.request.FileInfoDTO;
+import cn.refinex.api.platform.client.file.dto.request.FileUploadUrlRequestDTO;
+import cn.refinex.api.platform.client.file.dto.response.FileUploadUrlResponseDTO;
 
 /**
  * 文件服务接口
@@ -20,7 +20,7 @@ public interface FileService {
      * @param userId  用户 ID
      * @return 上传 URL 结果
      */
-    FileUploadUrlResponse generateUploadUrl(FileUploadUrlRequest request, Long userId);
+    FileUploadUrlResponseDTO generateUploadUrl(FileUploadUrlRequestDTO request, Long userId);
 
     /**
      * 确认文件上传完成
@@ -28,7 +28,7 @@ public interface FileService {
      * @param request 确认请求
      * @return 文件信息
      */
-    FileInfoDTO confirmUpload(FileConfirmUploadRequest request);
+    FileInfoDTO confirmUpload(FileConfirmUploadRequestDTO request);
 
     /**
      * 生成文件下载 URL

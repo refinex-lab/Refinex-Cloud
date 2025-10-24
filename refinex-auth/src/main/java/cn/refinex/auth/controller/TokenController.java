@@ -1,10 +1,14 @@
 package cn.refinex.auth.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
-import cn.refinex.api.platform.client.EmailServiceClient;
-import cn.refinex.api.platform.client.UserServiceClient;
-import cn.refinex.api.platform.domain.dto.request.ResetPasswordRequest;
-import cn.refinex.api.platform.domain.dto.request.UserCreateRequest;
+import cn.refinex.api.platform.client.email.EmailRemoteService;
+import cn.refinex.api.platform.client.email.dto.request.EmailVerifyCodeRequestDTO;
+import cn.refinex.api.platform.client.email.dto.request.EmailVerifyCodeValidateRequestDTO;
+import cn.refinex.api.platform.client.email.dto.response.EmailVerifyCodeResponseDTO;
+import cn.refinex.api.platform.client.user.UserRemoteService;
+import cn.refinex.api.platform.client.user.dto.request.ResetPasswordRequestDTO;
+import cn.refinex.api.platform.client.user.dto.request.UserCreateRequestDTO;
+import cn.refinex.api.platform.enums.EmailVerifyCodeType;
 import cn.refinex.auth.domain.dto.request.LoginRequest;
 import cn.refinex.auth.domain.vo.LoginVo;
 import cn.refinex.auth.service.AuthService;
@@ -14,10 +18,6 @@ import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.domain.model.LoginUser;
 import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.exception.BusinessException;
-import cn.refinex.common.mail.domain.dto.VerifyCodeRequest;
-import cn.refinex.common.mail.domain.dto.VerifyCodeResult;
-import cn.refinex.common.mail.domain.dto.VerifyCodeValidateRequest;
-import cn.refinex.common.mail.enums.VerifyCodeType;
 import cn.refinex.common.protection.ratelimiter.core.annotation.RateLimiter;
 import cn.refinex.common.protection.ratelimiter.core.keyresolver.impl.ClientIpRateLimiterKeyResolver;
 import cn.refinex.common.utils.servlet.ServletUtils;
@@ -46,8 +46,8 @@ import java.util.concurrent.TimeUnit;
 public class TokenController {
 
     private final AuthService authService;
-    private final UserServiceClient userFeignClient;
-    private final EmailServiceClient emailFeignClient;
+    private final UserRemoteService userFeignClient;
+    private final EmailRemoteService emailFeignClient;
 
     @PostMapping("/register")
     @RateLimiter(
@@ -60,7 +60,7 @@ public class TokenController {
     @LogOperation(sensitiveParams = {"password", "confirmPassword", "email", "mobile"}, operationType = OperateTypeEnum.CREATE)
     @Operation(summary = "用户注册", description = "创建新用户账号")
     @Parameter(name = "request", description = "用户注册请求参数", required = true)
-    public ApiResult<Boolean> registerUser(@Valid @RequestBody UserCreateRequest request) {
+    public ApiResult<Boolean> registerUser(@Valid @RequestBody UserCreateRequestDTO request) {
         return userFeignClient.registerUser(request);
     }
 
@@ -90,7 +90,7 @@ public class TokenController {
     @LogOperation(sensitiveParams = {"email"}, operationType = OperateTypeEnum.OTHER)
     @Operation(summary = "发送邮箱验证码", description = "向指定邮箱发送验证码")
     @Parameter(name = "request", description = "验证码请求参数", required = true)
-    public ApiResult<VerifyCodeResult> sendEmailVerifyCode(@Valid @RequestBody VerifyCodeRequest request) {
+    public ApiResult<EmailVerifyCodeResponseDTO> sendEmailVerifyCode(@Valid @RequestBody EmailVerifyCodeRequestDTO request) {
         request.setClientIp(ServletUtils.getClientIp());
         return emailFeignClient.sendVerifyCode(request);
     }
@@ -99,7 +99,7 @@ public class TokenController {
     @LogOperation(sensitiveParams = {"email", "newPassword", "confirmPassword"}, operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "重置密码", description = "根据邮箱验证码重置用户密码")
     @Parameter(name = "request", description = "重置密码请求参数", required = true)
-    public ApiResult<Boolean> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+    public ApiResult<Boolean> resetPassword(@Valid @RequestBody ResetPasswordRequestDTO request) {
         // 验证用户存在性
         ApiResult<LoginUser> checkUserResult = userFeignClient.getLoginUserByEmail(request.getEmail());
         if (!checkUserResult.isSuccess()) {
@@ -107,10 +107,10 @@ public class TokenController {
         }
 
         // 验证验证码
-        VerifyCodeValidateRequest verifyCodeValidateRequest = VerifyCodeValidateRequest.builder()
+        EmailVerifyCodeValidateRequestDTO verifyCodeValidateRequest = EmailVerifyCodeValidateRequestDTO.builder()
                 .email(request.getEmail())
                 .verifyCode(request.getEmailCode())
-                .codeType(VerifyCodeType.RESET_PASSWORD.getCode())
+                .codeType(EmailVerifyCodeType.RESET_PASSWORD.getCode())
                 .build();
         ApiResult<Boolean> verifyCodeResult = emailFeignClient.verifyCode(verifyCodeValidateRequest);
         

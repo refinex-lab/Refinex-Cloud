@@ -1,6 +1,6 @@
 package cn.refinex.platform.controller;
 
-import cn.refinex.api.platform.domain.vo.CurrentUserVo;
+import cn.refinex.api.platform.client.user.vo.CurrentUserVo;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.exception.BusinessException;

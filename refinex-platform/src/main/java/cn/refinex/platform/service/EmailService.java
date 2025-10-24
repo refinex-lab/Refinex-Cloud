@@ -1,7 +1,12 @@
 package cn.refinex.platform.service;
 
-import cn.refinex.common.mail.domain.dto.*;
-import cn.refinex.common.mail.domain.entity.EmailTemplate;
+import cn.refinex.api.platform.client.email.dto.request.EmailSendRequestDTO;
+import cn.refinex.api.platform.client.email.dto.request.EmailTemplateDTO;
+import cn.refinex.api.platform.client.email.dto.request.EmailVerifyCodeRequestDTO;
+import cn.refinex.api.platform.client.email.dto.request.EmailVerifyCodeValidateRequestDTO;
+import cn.refinex.api.platform.client.email.dto.response.EmailSendResponseDTO;
+import cn.refinex.api.platform.client.email.dto.response.EmailVerifyCodeResponseDTO;
+import cn.refinex.platform.domain.entity.email.EmailTemplate;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +25,7 @@ public interface EmailService {
      * @param request 发送请求
      * @return 发送结果
      */
-    EmailSendResult sendSync(EmailSendRequest request);
+    EmailSendResponseDTO sendSync(EmailSendRequestDTO request);
 
     /**
      * 异步发送邮件（入队）
@@ -28,7 +33,7 @@ public interface EmailService {
      * @param request 发送请求
      * @return 发送结果
      */
-    EmailSendResult sendAsync(EmailSendRequest request);
+    EmailSendResponseDTO sendAsync(EmailSendRequestDTO request);
 
     /**
      * 批量发送邮件
@@ -36,7 +41,7 @@ public interface EmailService {
      * @param requests 发送请求列表
      * @return 发送结果列表
      */
-    List<EmailSendResult> sendBatch(List<EmailSendRequest> requests);
+    List<EmailSendResponseDTO> sendBatch(List<EmailSendRequestDTO> requests);
 
     /**
      * 使用模板发送邮件
@@ -46,7 +51,7 @@ public interface EmailService {
      * @param variables    模板变量
      * @return 发送结果
      */
-    EmailSendResult sendWithTemplate(String templateCode, String email, Map<String, Object> variables);
+    EmailSendResponseDTO sendWithTemplate(String templateCode, String email, Map<String, Object> variables);
 
     /**
      * 发送简单邮件
@@ -56,7 +61,7 @@ public interface EmailService {
      * @param content 内容
      * @return 发送结果
      */
-    EmailSendResult sendSimple(String to, String subject, String content);
+    EmailSendResponseDTO sendSimple(String to, String subject, String content);
 
     /**
      * 取消队列任务
@@ -153,7 +158,7 @@ public interface EmailService {
      * @param request 验证码请求
      * @return 验证码结果
      */
-    VerifyCodeResult sendVerifyCode(VerifyCodeRequest request);
+    EmailVerifyCodeResponseDTO sendVerifyCode(EmailVerifyCodeRequestDTO request);
 
     /**
      * 验证验证码
@@ -161,5 +166,5 @@ public interface EmailService {
      * @param request 验证请求
      * @return 是否验证成功
      */
-    boolean verifyCode(VerifyCodeValidateRequest request);
+    boolean verifyCode(EmailVerifyCodeValidateRequestDTO request);
 }

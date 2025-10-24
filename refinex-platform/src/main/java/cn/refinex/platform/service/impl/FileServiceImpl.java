@@ -16,10 +16,10 @@ import cn.refinex.common.file.service.ThumbnailService;
 import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
 import cn.refinex.common.utils.file.FileUtils;
 import cn.refinex.common.utils.object.BeanConverter;
-import cn.refinex.api.platform.domain.dto.request.FileConfirmUploadRequest;
-import cn.refinex.api.platform.domain.model.FileInfoDTO;
-import cn.refinex.api.platform.domain.dto.request.FileUploadUrlRequest;
-import cn.refinex.api.platform.domain.dto.response.FileUploadUrlResponse;
+import cn.refinex.api.platform.client.file.dto.request.FileConfirmUploadRequestDTO;
+import cn.refinex.api.platform.client.file.dto.request.FileInfoDTO;
+import cn.refinex.api.platform.client.file.dto.request.FileUploadUrlRequestDTO;
+import cn.refinex.api.platform.client.file.dto.response.FileUploadUrlResponseDTO;
 import cn.refinex.platform.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +58,7 @@ public class FileServiceImpl implements FileService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public FileUploadUrlResponse generateUploadUrl(FileUploadUrlRequest request, Long userId) {
+    public FileUploadUrlResponseDTO generateUploadUrl(FileUploadUrlRequestDTO request, Long userId) {
         try {
             // 1. 检查是否可以秒传
             if (request.getFileMd5() != null && !request.getFileMd5().isEmpty()) {
@@ -70,7 +70,7 @@ public class FileServiceImpl implements FileService {
 
                     log.info("文件秒传成功，fileGuid={}, md5={}", newFile.getFileGuid(), request.getFileMd5());
 
-                    return FileUploadUrlResponse.builder()
+                    return FileUploadUrlResponseDTO.builder()
                             .fileGuid(newFile.getFileGuid())
                             .isInstantUpload(true)
                             .fileInfo(BeanConverter.toBean(newFile, FileInfoDTO.class))
@@ -130,7 +130,7 @@ public class FileServiceImpl implements FileService {
 
             log.info("生成上传 URL 成功，fileGuid={}, uploadUrl={}", fileInfo.getFileGuid(), uploadUrl);
 
-            return FileUploadUrlResponse.builder()
+            return FileUploadUrlResponseDTO.builder()
                     .fileGuid(fileInfo.getFileGuid())
                     .uploadUrl(uploadUrl)
                     .expiresIn(3600L)
@@ -151,7 +151,7 @@ public class FileServiceImpl implements FileService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public FileInfoDTO confirmUpload(FileConfirmUploadRequest request) {
+    public FileInfoDTO confirmUpload(FileConfirmUploadRequestDTO request) {
         try {
             // 1. 查询文件元数据
             FileInfo fileInfo = fileInfoRepository.findByFileGuid(request.getFileGuid());

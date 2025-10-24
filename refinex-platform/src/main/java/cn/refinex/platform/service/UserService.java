@@ -1,9 +1,9 @@
 package cn.refinex.platform.service;
 
 import cn.refinex.common.domain.model.LoginUser;
-import cn.refinex.api.platform.domain.vo.CurrentUserVo;
-import cn.refinex.api.platform.domain.dto.request.ResetPasswordRequest;
-import cn.refinex.api.platform.domain.dto.request.UserCreateRequest;
+import cn.refinex.api.platform.client.user.vo.CurrentUserVo;
+import cn.refinex.api.platform.client.user.dto.request.ResetPasswordRequestDTO;
+import cn.refinex.api.platform.client.user.dto.request.UserCreateRequestDTO;
 import cn.refinex.platform.domain.dto.request.UserDisableRequest;
 import cn.refinex.platform.domain.dto.request.UserKickoutRequest;
 import cn.refinex.platform.domain.dto.response.UserDisableStatusResponse;
@@ -57,7 +57,7 @@ public interface UserService {
      * @param request 创建用户请求参数
      * @return 注册结果
      */
-    Boolean registerUser(UserCreateRequest request);
+    Boolean registerUser(UserCreateRequestDTO request);
 
     /**
      * 封禁账号
@@ -112,7 +112,7 @@ public interface UserService {
       * @param request 重置密码请求参数
       * @return 重置结果
       */
-    Boolean resetPassword(ResetPasswordRequest request);
+    Boolean resetPassword(ResetPasswordRequestDTO request);
 
     /**
      * 初始化超级管理员

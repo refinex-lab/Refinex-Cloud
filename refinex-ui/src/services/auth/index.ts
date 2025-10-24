@@ -5,7 +5,7 @@ import { request } from '@umijs/max';
  * GET /refinex-auth/captcha/generate
  */
 export async function generateCaptcha() {
-  return request<AUTH.ApiResult<AUTH.CaptchaResponse>>('/refinex-auth/captcha/generate', {
+  return request<AUTH.ApiResult<AUTH.CaptchaResponse>>('/refinex-auth/captcha', {
     method: 'GET',
   });
 }

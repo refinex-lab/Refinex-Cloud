@@ -24,8 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static cn.refinex.platform.constants.PlatformErrorMessageConstants.*;
-
 /**
  * 字典业务服务
  */
@@ -56,7 +54,7 @@ public class SysDictServiceImpl implements SysDictService {
     public Long createDictType(String dictCode, String dictName, String dictDesc, String remark, Integer status, Long operatorId) {
         // 校验字典类型编码唯一性
         if (dictTypeRepository.existsByCode(dictCode, null)) {
-            throw new BusinessException(DICT_TYPE_CODE_EXIST);
+            throw new BusinessException("字典类型编码已存在");
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -101,7 +99,7 @@ public class SysDictServiceImpl implements SysDictService {
         // 校验字典类型是否存在
         SysDictType exist = dictTypeRepository.selectById(id);
         if (exist == null) {
-            throw new BusinessException(DICT_TYPE_NOT_FOUND);
+            throw new BusinessException("字典类型不存在");
         }
 
         // 更新字段
@@ -137,13 +135,13 @@ public class SysDictServiceImpl implements SysDictService {
         // 校验字典类型是否存在
         SysDictType exist = dictTypeRepository.selectById(id);
         if (exist == null) {
-            throw new BusinessException(DICT_TYPE_NOT_FOUND);
+            throw new BusinessException("字典类型不存在");
         }
 
         // 检查是否有数据使用该类型, 有则不能删除
         List<SysDictData> dataList = dictDataRepository.selectListByTypeId(id);
         if (CollectionUtils.isNotEmpty(dataList)) {
-            throw new BusinessException(DICT_TYPE_IN_USE);
+            throw new BusinessException("字典类型已被使用，无法删除");
         }
 
         // 软删除字典类型
@@ -243,18 +241,18 @@ public class SysDictServiceImpl implements SysDictService {
         // 校验字典类型是否存在
         SysDictType type = dictTypeRepository.selectById(dictTypeId);
         if (type == null) {
-            throw new BusinessException(DICT_TYPE_NOT_FOUND);
+            throw new BusinessException("字典类型不存在");
         }
         // 校验字典类型是否停用
         if (type.getStatus() != null && type.getStatus() == 1) {
-            throw new BusinessException(DICT_TYPE_DISABLED);
+            throw new BusinessException("字典类型已停用");
         }
         // 校验字典标签、值的唯一性
         if (dictDataRepository.existsLabelInType(dictTypeId, dictLabel, null)) {
-            throw new BusinessException(DICT_DATA_LABEL_EXIST);
+            throw new BusinessException("字典数据标签已存在");
         }
         if (dictDataRepository.existsValueInType(dictTypeId, dictValue, null)) {
-            throw new BusinessException(DICT_DATA_VALUE_EXIST);
+            throw new BusinessException("字典数据值已存在");
         }
 
         // 创建字典数据实体
@@ -309,23 +307,23 @@ public class SysDictServiceImpl implements SysDictService {
         // 校验字典数据是否存在
         SysDictData exist = dictDataRepository.selectById(id);
         if (exist == null) {
-            throw new BusinessException(DICT_DATA_NOT_FOUND);
+            throw new BusinessException("字典数据不存在");
         }
         // 校验字典类型是否存在
         SysDictType type = dictTypeRepository.selectById(dictTypeId);
         if (type == null) {
-            throw new BusinessException(DICT_TYPE_NOT_FOUND);
+            throw new BusinessException("字典类型不存在");
         }
         // 校验字典类型是否停用
         if (type.getStatus() != null && type.getStatus() == 1) {
-            throw new BusinessException(DICT_TYPE_DISABLED);
+            throw new BusinessException("字典类型已停用");
         }
         // 校验字典标签、值的唯一性（排除当前字典数据）
         if (dictDataRepository.existsLabelInType(dictTypeId, dictLabel, id)) {
-            throw new BusinessException(DICT_DATA_LABEL_EXIST);
+            throw new BusinessException("字典数据标签已存在");
         }
         if (dictDataRepository.existsValueInType(dictTypeId, dictValue, id)) {
-            throw new BusinessException(DICT_DATA_VALUE_EXIST);
+            throw new BusinessException("字典数据值已存在");
         }
 
         // 更新字典数据实体
@@ -364,7 +362,7 @@ public class SysDictServiceImpl implements SysDictService {
         // 校验字典数据是否存在
         SysDictData exist = dictDataRepository.selectById(id);
         if (exist == null) {
-            throw new BusinessException(DICT_DATA_NOT_FOUND);
+            throw new BusinessException("字典数据不存在");
         }
 
         // 校验字典类型是否存在
@@ -443,11 +441,11 @@ public class SysDictServiceImpl implements SysDictService {
         // 校验字典类型是否存在
         SysDictType type = dictTypeRepository.selectByCode(dictCode);
         if (type == null) {
-            throw new BusinessException(DICT_TYPE_NOT_FOUND);
+            throw new BusinessException("字典类型不存在");
         }
         // 校验字典类型是否停用
         if (type.getStatus() != null && type.getStatus() == 1) {
-            throw new BusinessException(DICT_TYPE_DISABLED);
+            throw new BusinessException("字典类型已停用");
         }
 
         // 先从缓存中读取

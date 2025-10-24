@@ -1,11 +1,12 @@
 package cn.refinex.platform.service.impl;
 
-import cn.refinex.common.mail.domain.dto.*;
-import cn.refinex.common.mail.domain.entity.EmailTemplate;
-import cn.refinex.common.mail.service.EmailQueueService;
-import cn.refinex.common.mail.service.EmailSendService;
-import cn.refinex.common.mail.service.EmailTemplateService;
-import cn.refinex.common.mail.service.VerifyCodeService;
+import cn.refinex.api.platform.client.email.dto.request.EmailSendRequestDTO;
+import cn.refinex.api.platform.client.email.dto.request.EmailTemplateDTO;
+import cn.refinex.api.platform.client.email.dto.request.EmailVerifyCodeRequestDTO;
+import cn.refinex.api.platform.client.email.dto.request.EmailVerifyCodeValidateRequestDTO;
+import cn.refinex.api.platform.client.email.dto.response.EmailSendResponseDTO;
+import cn.refinex.api.platform.client.email.dto.response.EmailVerifyCodeResponseDTO;
+import cn.refinex.platform.domain.entity.email.EmailTemplate;
 import cn.refinex.platform.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,10 +26,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
-    private final EmailSendService emailSendService;
-    private final EmailQueueService emailQueueService;
-    private final EmailTemplateService emailTemplateService;
-    private final VerifyCodeService verifyCodeService;
+    private final EmailSendServiceImpl emailSendService;
+    private final EmailQueueServiceImpl emailQueueService;
+    private final EmailTemplateServiceImpl emailTemplateService;
+    private final EmailVerifyCodeServiceImpl verifyCodeService;
 
     /**
      * 同步发送邮件
@@ -37,7 +38,7 @@ public class EmailServiceImpl implements EmailService {
      * @return 发送结果
      */
     @Override
-    public EmailSendResult sendSync(EmailSendRequest request) {
+    public EmailSendResponseDTO sendSync(EmailSendRequestDTO request) {
         return emailSendService.sendSync(request);
     }
 
@@ -48,7 +49,7 @@ public class EmailServiceImpl implements EmailService {
      * @return 发送结果
      */
     @Override
-    public EmailSendResult sendAsync(EmailSendRequest request) {
+    public EmailSendResponseDTO sendAsync(EmailSendRequestDTO request) {
         return emailQueueService.enqueue(request);
     }
 
@@ -59,7 +60,7 @@ public class EmailServiceImpl implements EmailService {
      * @return 发送结果列表
      */
     @Override
-    public List<EmailSendResult> sendBatch(List<EmailSendRequest> requests) {
+    public List<EmailSendResponseDTO> sendBatch(List<EmailSendRequestDTO> requests) {
         return emailSendService.sendBatch(requests);
     }
 
@@ -72,7 +73,7 @@ public class EmailServiceImpl implements EmailService {
      * @return 发送结果
      */
     @Override
-    public EmailSendResult sendWithTemplate(String templateCode, String email, Map<String, Object> variables) {
+    public EmailSendResponseDTO sendWithTemplate(String templateCode, String email, Map<String, Object> variables) {
         return emailSendService.sendWithTemplate(templateCode, email, variables);
     }
 
@@ -85,7 +86,7 @@ public class EmailServiceImpl implements EmailService {
      * @return 发送结果
      */
     @Override
-    public EmailSendResult sendSimple(String to, String subject, String content) {
+    public EmailSendResponseDTO sendSimple(String to, String subject, String content) {
         return emailSendService.sendSimple(to, subject, content);
     }
 
@@ -218,7 +219,7 @@ public class EmailServiceImpl implements EmailService {
      * @return 验证码结果
      */
     @Override
-    public VerifyCodeResult sendVerifyCode(VerifyCodeRequest request) {
+    public EmailVerifyCodeResponseDTO sendVerifyCode(EmailVerifyCodeRequestDTO request) {
         return verifyCodeService.sendVerifyCode(request);
     }
 
@@ -229,7 +230,7 @@ public class EmailServiceImpl implements EmailService {
      * @return 是否验证成功
      */
     @Override
-    public boolean verifyCode(VerifyCodeValidateRequest request) {
+    public boolean verifyCode(EmailVerifyCodeValidateRequestDTO request) {
         return verifyCodeService.verifyCode(request);
     }
 }

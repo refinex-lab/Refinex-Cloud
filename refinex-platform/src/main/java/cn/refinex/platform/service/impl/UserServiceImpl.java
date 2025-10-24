@@ -4,10 +4,10 @@ import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
-import cn.refinex.api.platform.domain.dto.request.ResetPasswordRequest;
-import cn.refinex.api.platform.domain.dto.request.UserCreateRequest;
-import cn.refinex.api.platform.domain.vo.CurrentUserVo;
-import cn.refinex.api.platform.domain.vo.SysUserVo;
+import cn.refinex.api.platform.client.user.dto.request.ResetPasswordRequestDTO;
+import cn.refinex.api.platform.client.user.dto.request.UserCreateRequestDTO;
+import cn.refinex.api.platform.client.user.vo.CurrentUserVo;
+import cn.refinex.api.platform.client.user.vo.SysUserVo;
 import cn.refinex.api.platform.enums.RegisterSource;
 import cn.refinex.api.platform.enums.UserRegisterType;
 import cn.refinex.common.constants.SystemRoleConstants;
@@ -46,8 +46,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static cn.refinex.platform.constants.PlatformErrorMessageConstants.*;
 
 /**
  * 用户服务
@@ -174,14 +172,14 @@ public class UserServiceImpl implements UserService {
      * @return 注册结果
      */
     @Override
-    public Boolean registerUser(UserCreateRequest request) {
+    public Boolean registerUser(UserCreateRequestDTO request) {
         try {
             // 检查用户名是否重复
             String username = request.getUsername().trim();
             int count = sysUserRepository.checkUsernameExist(username);
             if (count > 0) {
                 log.warn("注册用户失败，用户名已存在，username: {}", username);
-                throw new BusinessException(USERNAME_EXIST);
+                throw new BusinessException("用户名已存在");
             }
 
             // 密码强度校验(0-弱，1-中，2-强)
@@ -189,7 +187,7 @@ public class UserServiceImpl implements UserService {
             int passwordStrength = RegexUtils.getPasswordStrength(password);
             if (passwordStrength < 2) {
                 log.warn("注册用户失败，密码强度不足，password: {}", password);
-                throw new BusinessException(PASSWORD_STRENGTH);
+                throw new BusinessException("密码强度不足，必须包含字母、数字和特殊字符");
             }
 
             // 根据注册类型判断需要加密的字段
@@ -204,7 +202,7 @@ public class UserServiceImpl implements UserService {
                     int emailCount = sysUserRepository.checkEmailExist(emailEncrypted);
                     if (emailCount > 0) {
                         log.warn("注册用户失败，邮箱已存在，email: {}", email);
-                        throw new BusinessException(USERNAME_EXIST);
+                        throw new BusinessException("用户名已存在");
                     }
                 }
                 case MOBILE -> {
@@ -213,7 +211,7 @@ public class UserServiceImpl implements UserService {
                     count = sysUserRepository.checkPhoneExist(phoneEncrypted);
                     if (count > 0) {
                         log.warn("注册用户失败，手机号已存在，phone: {}", phone);
-                        throw new BusinessException(PHONE_EXIST);
+                        throw new BusinessException("手机号已存在");
                     }
                 }
                 default -> throw new BusinessException(HttpStatusCode.BAD_REQUEST, "注册类型错误");
@@ -462,7 +460,7 @@ public class UserServiceImpl implements UserService {
      * @return 是否重置成功
      */
     @Override
-    public Boolean resetPassword(ResetPasswordRequest request) {
+    public Boolean resetPassword(ResetPasswordRequestDTO request) {
         try {
             // 获取密文邮箱
             String emailEncrypted = sensitiveDataService.encryptValue(request.getEmail());
