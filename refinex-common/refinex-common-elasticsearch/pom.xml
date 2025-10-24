@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cn.refinex</groupId>
+        <artifactId>refinex-common</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>refinex-common-elasticsearch</artifactId>
+    <packaging>jar</packaging>
+
+    <name>${project.artifactId}</name>
+    <description>
+        Refinex Cloud Common Elasticsearch：
+        基于 Easy-Es 封装的搜索模块，其他模块需要引入获得使用 Elasticsearch 相关功能的能力。
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.dromara.easy-es</groupId>
+            <artifactId>easy-es-boot-starter</artifactId>
+        </dependency>
+    </dependencies>
+</project>

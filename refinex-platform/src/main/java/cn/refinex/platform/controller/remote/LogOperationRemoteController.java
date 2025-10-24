@@ -7,6 +7,8 @@ import cn.refinex.common.domain.ApiResult;
 import cn.refinex.platform.service.LogOperationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -29,6 +31,7 @@ public class LogOperationRemoteController implements LogOperationRemoteService {
      * @param request 操作日志创建请求
      * @return 保存结果
      */
+    @PostMapping(value = "/logger", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
     public ApiResult<Boolean> saveLogOperation(LogOperationCreateRequestDTO request) {
         logOperationService.saveLogOperation(request);

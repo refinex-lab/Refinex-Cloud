@@ -60,6 +60,7 @@
         <dynamic-ds.version>4.3.1</dynamic-ds.version>
         <feign-form.version>3.8.0</feign-form.version>
         <ip2region.version>2.7.0</ip2region.version>
+        <easy-es.version>3.0.0</easy-es.version>
 
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
@@ -203,6 +204,13 @@
                 <groupId>org.apache.rocketmq</groupId>
                 <artifactId>rocketmq-spring-boot-starter</artifactId>
                 <version>${rocketmq-spring.version}</version>
+            </dependency>
+
+            <!-- Easy-Es 搜索引擎 -->
+            <dependency>
+                <groupId>org.dromara.easy-es</groupId>
+                <artifactId>easy-es-boot-starter</artifactId>
+                <version>${easy-es.version}</version>
             </dependency>
 
             <!-- hutool -->
@@ -431,6 +439,12 @@
             <dependency>
                 <groupId>cn.refinex</groupId>
                 <artifactId>refinex-common-security</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.refinex</groupId>
+                <artifactId>refinex-common-elasticsearch</artifactId>
                 <version>${revision}</version>
             </dependency>
 
