@@ -241,6 +241,35 @@ export default [
     ],
   },
   {
+    name: 'system',
+    icon: 'setting',
+    path: '/system',
+    routes: [
+      {
+        path: '/system',
+        redirect: '/system/dictionary',
+      },
+      {
+        name: 'dictionary',
+        icon: 'book',
+        path: '/system/dictionary',
+        component: './system/dictionary',
+      },
+      {
+        name: 'dictionary-data',
+        path: '/system/dictionary/data/:id',
+        component: './system/dictionary/data/[id]',
+        hideInMenu: true,
+      },
+      {
+        name: 'config',
+        icon: 'control',
+        path: '/system/config',
+        component: './system/config',
+      },
+    ],
+  },
+  {
     name: 'account',
     icon: 'user',
     path: '/account',

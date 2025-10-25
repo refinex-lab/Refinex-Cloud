@@ -102,10 +102,10 @@ public class SysDictTypeRepository {
     public int insert(SysDictType dictType) {
         String sql = """
                 INSERT INTO sys_dict_type (
-                    id, dict_code, dict_name, dict_desc, create_by, create_time, update_by, update_time,
+                    dict_code, dict_name, dict_desc, create_by, create_time, update_by, update_time,
                     deleted, version, remark, status
                 ) VALUES (
-                    :id, :dictCode, :dictName, :dictDesc, :createBy, :createTime, :updateBy, :updateTime,
+                    :dictCode, :dictName, :dictDesc, :createBy, :createTime, :updateBy, :updateTime,
                     :deleted, :version, :remark, :status
                 )
                 """;

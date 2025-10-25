@@ -64,6 +64,11 @@
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-json</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-satoken</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

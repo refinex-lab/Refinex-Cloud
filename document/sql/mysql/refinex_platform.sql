@@ -1231,7 +1231,7 @@ CREATE TABLE `sys_config`
 
 CREATE TABLE `sys_dict_type`
 (
-    `id`          BIGINT       NOT NULL COMMENT '主键ID',
+    `id`          BIGINT       AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `dict_code`   VARCHAR(50)  NOT NULL COMMENT '字典编码,如user_status',
     `dict_name`   VARCHAR(100) NOT NULL COMMENT '字典名称',
     `dict_desc`   VARCHAR(500)          DEFAULT NULL COMMENT '字典描述',
@@ -1252,7 +1252,7 @@ CREATE TABLE `sys_dict_type`
 
 CREATE TABLE `sys_dict_data`
 (
-    `id`           BIGINT       NOT NULL COMMENT '主键ID',
+    `id`           BIGINT       AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `dict_type_id` BIGINT       NOT NULL COMMENT '字典类型ID',
     `dict_label`   VARCHAR(100) NOT NULL COMMENT '字典标签,用于展示',
     `dict_value`   VARCHAR(100) NOT NULL COMMENT '字典值,用于存储',

@@ -1,16 +1,16 @@
 package cn.refinex.platform.controller.dict;
 
-import cn.dev33.satoken.stp.StpUtil;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
-import cn.refinex.platform.entity.sys.SysDictData;
-import cn.refinex.platform.entity.sys.SysDictType;
-import cn.refinex.platform.service.impl.SysDictServiceImpl;
-import cn.refinex.platform.controller.dict.dto.request.DictTypeCreateRequestDTO;
-import cn.refinex.platform.controller.dict.dto.request.DictTypeUpdateRequestDTO;
+import cn.refinex.common.satoken.core.util.LoginHelper;
 import cn.refinex.platform.controller.dict.dto.request.DictDataCreateRequestDTO;
 import cn.refinex.platform.controller.dict.dto.request.DictDataUpdateRequestDTO;
+import cn.refinex.platform.controller.dict.dto.request.DictTypeCreateRequestDTO;
+import cn.refinex.platform.controller.dict.dto.request.DictTypeUpdateRequestDTO;
+import cn.refinex.platform.entity.sys.SysDictData;
+import cn.refinex.platform.entity.sys.SysDictType;
+import cn.refinex.platform.service.SysDictService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,7 +33,7 @@ import java.util.List;
 @Tag(name = "系统字典管理", description = "字典类型和字典数据的增删改查等接口")
 public class SysDictController {
 
-    private final SysDictServiceImpl dictService;
+    private final SysDictService dictService;
 
     // ===================== 字典类型 =====================
 
@@ -41,7 +41,7 @@ public class SysDictController {
     @Operation(summary = "创建字典类型", description = "创建新的字典类型")
     @Parameter(name = "req", description = "字典类型创建请求", required = true)
     public ApiResult<Long> createDictType(@Valid @RequestBody DictTypeCreateRequestDTO req) {
-        Long operatorId = StpUtil.getLoginIdAsLong();
+        Long operatorId = LoginHelper.getUserId();
         Long id = dictService.createDictType(
                 req.getDictCode(),
                 req.getDictName(),
@@ -58,7 +58,7 @@ public class SysDictController {
     @Parameter(name = "id", description = "字典类型 ID", required = true)
     @Parameter(name = "req", description = "字典类型更新请求", required = true)
     public ApiResult<Boolean> updateDictType(@PathVariable("id") Long id, @Valid @RequestBody DictTypeUpdateRequestDTO req) {
-        Long operatorId = StpUtil.getLoginIdAsLong();
+        Long operatorId = LoginHelper.getUserId();
         boolean ok = dictService.updateDictType(
                 id,
                 req.getDictName(),
@@ -74,7 +74,7 @@ public class SysDictController {
     @Operation(summary = "删除字典类型", description = "删除指定的字典类型")
     @Parameter(name = "id", description = "字典类型 ID", required = true)
     public ApiResult<Void> deleteDictType(@PathVariable("id") Long id) {
-        Long operatorId = StpUtil.getLoginIdAsLong();
+        Long operatorId = LoginHelper.getUserId();
         dictService.deleteDictType(id, operatorId);
         return ApiResult.success(cn.refinex.common.enums.HttpStatusCode.NO_CONTENT, null);
     }
@@ -123,7 +123,7 @@ public class SysDictController {
     @Operation(summary = "创建字典数据", description = "创建新的字典数据项")
      @Parameter(name = "req", description = "字典数据创建请求", required = true)
     public ApiResult<Long> createDictData(@Valid @RequestBody DictDataCreateRequestDTO req) {
-        Long operatorId = StpUtil.getLoginIdAsLong();
+        Long operatorId = LoginHelper.getUserId();
         Long id = dictService.createDictData(
                 req.getDictTypeId(),
                 req.getDictLabel(),
@@ -144,7 +144,7 @@ public class SysDictController {
     @Parameter(name = "id", description = "字典数据 ID", required = true)
     @Parameter(name = "req", description = "字典数据更新请求", required = true)
     public ApiResult<Boolean> updateDictData(@PathVariable("id") Long id, @Valid @RequestBody DictDataUpdateRequestDTO req) {
-        Long operatorId = StpUtil.getLoginIdAsLong();
+        Long operatorId = LoginHelper.getUserId();
         boolean ok = dictService.updateDictData(
                 id,
                 req.getDictTypeId(),
@@ -165,7 +165,7 @@ public class SysDictController {
     @Operation(summary = "删除字典数据", description = "删除指定的字典数据")
     @Parameter(name = "id", description = "字典数据 ID", required = true)
     public ApiResult<Void> deleteDictData(@PathVariable("id") Long id) {
-        Long operatorId = StpUtil.getLoginIdAsLong();
+        Long operatorId = LoginHelper.getUserId();
         dictService.deleteDictData(id, operatorId);
         return ApiResult.success(cn.refinex.common.enums.HttpStatusCode.NO_CONTENT, null);
     }
@@ -174,7 +174,7 @@ public class SysDictController {
     @Operation(summary = "批量删除字典数据", description = "批量删除多个字典数据项")
     @Parameter(name = "ids", description = "ID 列表，逗号分隔", required = true)
     public ApiResult<Integer> batchDeleteDictData(@RequestParam("ids") String ids) {
-        Long operatorId = StpUtil.getLoginIdAsLong();
+        Long operatorId = LoginHelper.getUserId();
         List<Long> idList = new ArrayList<>();
         if (ids != null && !ids.isEmpty()) {
             for (String s : ids.split(",")) {

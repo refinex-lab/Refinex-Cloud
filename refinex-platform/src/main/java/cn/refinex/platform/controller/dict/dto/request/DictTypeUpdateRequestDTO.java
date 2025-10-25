@@ -1,7 +1,6 @@
 package cn.refinex.platform.controller.dict.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -15,10 +14,6 @@ import lombok.Data;
 @Data
 @Schema(description = "字典类型更新请求")
 public class DictTypeUpdateRequestDTO {
-
-    @NotNull(message = "主键ID不能为空")
-    @Schema(description = "主键ID", example = "1")
-    private Long id;
 
     @NotBlank(message = "字典名称不能为空")
     @Size(max = 128, message = "字典名称长度不能超过128个字符")

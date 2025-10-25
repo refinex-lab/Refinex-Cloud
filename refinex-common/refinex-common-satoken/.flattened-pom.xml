@@ -22,8 +22,12 @@
       <artifactId>sa-token-jwt</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.github.ben-manes.caffeine</groupId>
-      <artifactId>caffeine</artifactId>
+      <groupId>cn.dev33</groupId>
+      <artifactId>sa-token-redis-jackson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-pool2</artifactId>
     </dependency>
     <dependency>
       <groupId>cn.refinex</groupId>
@@ -32,11 +36,6 @@
     <dependency>
       <groupId>cn.refinex</groupId>
       <artifactId>refinex-common-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-configuration-processor</artifactId>
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>

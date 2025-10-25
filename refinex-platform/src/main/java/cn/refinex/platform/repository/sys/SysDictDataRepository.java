@@ -180,10 +180,10 @@ public class SysDictDataRepository {
     public int insert(SysDictData dictData) {
         String sql = """
                 INSERT INTO sys_dict_data (
-                    id, dict_type_id, dict_label, dict_value, dict_sort, css_class, list_class, is_default,
+                    dict_type_id, dict_label, dict_value, dict_sort, css_class, list_class, is_default,
                     create_by, create_time, update_by, update_time, deleted, version, remark, status
                 ) VALUES (
-                    :id, :dictTypeId, :dictLabel, :dictValue, :dictSort, :cssClass, :listClass, :isDefault,
+                    :dictTypeId, :dictLabel, :dictValue, :dictSort, :cssClass, :listClass, :isDefault,
                     :createBy, :createTime, :updateBy, :updateTime, :deleted, :version, :remark, :status
                 )
                 """;

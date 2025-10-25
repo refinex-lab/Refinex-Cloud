@@ -59,7 +59,6 @@ public class SysDictServiceImpl implements SysDictService {
 
         LocalDateTime now = LocalDateTime.now();
         SysDictType type = SysDictType.builder()
-                .id(idGenerator.nextId())
                 .dictCode(dictCode)
                 .dictName(dictName)
                 .dictDesc(dictDesc)
@@ -110,9 +109,8 @@ public class SysDictServiceImpl implements SysDictService {
         exist.setUpdateBy(operatorId);
         exist.setUpdateTime(LocalDateTime.now());
         exist.setVersion(exist.getVersion() == null ? 0 : exist.getVersion() + 1);
-        int rows = dictTypeRepository.update(exist);
 
-        // TODO 更新成功，更新缓存
+        int rows = dictTypeRepository.update(exist);
         if (rows > 0) {
             // 更新缓存
             writeTypeCache(exist);
@@ -258,7 +256,6 @@ public class SysDictServiceImpl implements SysDictService {
         // 创建字典数据实体
         LocalDateTime now = LocalDateTime.now();
         SysDictData data = SysDictData.builder()
-                .id(idGenerator.nextId())
                 .dictTypeId(dictTypeId)
                 .dictLabel(dictLabel)
                 .dictValue(dictValue)
@@ -501,6 +498,12 @@ public class SysDictServiceImpl implements SysDictService {
         }
     }
 
+    /**
+     * 写入字典数据列表缓存
+     *
+     * @param dictCode 字典编码
+     * @param list     字典数据实体列表
+     */
     private void writeDataListCache(String dictCode, List<SysDictData> list) {
         try {
             String key = SystemRedisKeyConstants.Dictionary.buildDictDataListCacheKey(dictCode);
