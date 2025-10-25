@@ -81,6 +81,8 @@ export async function resetPassword(params: AUTH.ResetPasswordRequest) {
 export async function logout() {
   return request<AUTH.ApiResult<void>>('/refinex-auth/auth/logout', {
     method: 'POST',
+    // 跳过全局错误处理，登出操作无论成功失败都应该清理本地状态
+    skipErrorHandler: true,
   });
 }
 

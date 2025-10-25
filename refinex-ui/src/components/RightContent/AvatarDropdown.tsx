@@ -49,20 +49,32 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({
    * 退出登录，并且将当前的 url 保存
    */
   const loginOut = async () => {
-    await logout();
-    const { search, pathname } = window.location;
-    const urlParams = new URL(window.location.href).searchParams;
-    const searchParams = new URLSearchParams({
-      redirect: pathname + search,
-    });
-    /** 此方法会跳转到 redirect 参数所在的位置 */
-    const redirect = urlParams.get('redirect');
-    // Note: There may be security issues, please note
-    if (window.location.pathname !== '/user/login' && !redirect) {
-      history.replace({
-        pathname: '/user/login',
-        search: searchParams.toString(),
+    try {
+      await logout();
+    } catch (error) {
+      // 即使退出登录接口调用失败，也要清理本地状态
+      console.error('退出登录失败:', error);
+    } finally {
+      // 清理本地存储的认证信息
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('clientId');
+      localStorage.removeItem('current_user');
+
+      const { search, pathname } = window.location;
+      const urlParams = new URL(window.location.href).searchParams;
+      const searchParams = new URLSearchParams({
+        redirect: pathname + search,
       });
+      /** 此方法会跳转到 redirect 参数所在的位置 */
+      const redirect = urlParams.get('redirect');
+      // Note: There may be security issues, please note
+      if (window.location.pathname !== '/user/login' && !redirect) {
+        history.replace({
+          pathname: '/user/login',
+          search: searchParams.toString(),
+        });
+      }
     }
   };
   const { styles } = useStyles();

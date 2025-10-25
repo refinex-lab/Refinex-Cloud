@@ -19,6 +19,7 @@ interface ResponseStructure {
   errorCode?: number; // 兼容旧字段
   errorMessage?: string; // 兼容旧字段
   showType?: ErrorShowType;
+  '2xxSuccess'?: boolean; // 后端返回的 2xx 成功标识
 }
 
 /**
@@ -33,7 +34,13 @@ export const errorConfig: RequestConfig = {
     errorThrower: (res) => {
       const { success, data, code, message, errorCode, errorMessage, showType } =
         res as unknown as ResponseStructure;
-      if (!success) {
+
+      // 检查是否为 2xx 成功状态码（优先判断）
+      const is2xxSuccess = code ? (code >= 200 && code < 300) : false;
+
+      // 如果是 2xx 状态码，即使 success 为 false 也不抛出错误
+      // 这是为了兼容后端返回 204 等状态码的情况
+      if (!success && !is2xxSuccess) {
         // 优先使用后端返回的 message 字段，其次使用 errorMessage
         const finalMessage = message || errorMessage || '请求失败';
         const finalCode = code || errorCode;

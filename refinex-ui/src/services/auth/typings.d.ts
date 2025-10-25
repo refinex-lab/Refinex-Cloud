@@ -5,6 +5,16 @@ declare namespace AUTH {
     message: string;
     data: T;
     success: boolean;
+    /** 是否为 2xx 成功状态码 */
+    '2xxSuccess'?: boolean;
+    /** 是否为客户端错误 */
+    clientError?: boolean;
+    /** 是否为服务器错误 */
+    serverError?: boolean;
+    /** 是否为错误 */
+    error?: boolean;
+    /** 时间戳 */
+    timestamp?: number;
   }
 
   /** 验证码生成响应 */

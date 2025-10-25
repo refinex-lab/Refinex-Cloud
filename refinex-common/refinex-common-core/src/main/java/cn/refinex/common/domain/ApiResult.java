@@ -195,7 +195,10 @@ public record ApiResult<T>(int code, String message, T data, long timestamp) imp
      * @return true 如果状态码为 200，否则 false
      */
     public boolean isSuccess() {
-        return HttpStatusCode.OK.getCode() == this.code;
+        return HttpStatusCode.OK.getCode() == this.code
+                || HttpStatusCode.CREATED.getCode() == this.code
+                || HttpStatusCode.NO_CONTENT.getCode() == this.code
+                || HttpStatusCode.ACCEPTED.getCode() == this.code;
     }
 
     /**
