@@ -26,7 +26,7 @@ public class MySQLDialect implements DatabaseDialect {
     public String getLimitSql(String sql, int offset, int limit) {
         StringBuilder sb = new StringBuilder(sql.length() + 20);
         sb.append(sql);
-        sb.append(" LIMIT ").append(offset).append(" ").append(limit);
+        sb.append(" LIMIT ").append(offset).append(", ").append(limit);
         return sb.toString();
     }
 
