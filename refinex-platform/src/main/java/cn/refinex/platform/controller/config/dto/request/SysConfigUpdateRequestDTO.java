@@ -16,10 +16,6 @@ import lombok.Data;
 @Schema(description = "系统配置更新请求")
 public class SysConfigUpdateRequestDTO {
 
-    @NotNull(message = "主键ID不能为空")
-    @Schema(description = "主键ID", example = "1")
-    private Long id;
-
     @NotBlank(message = "配置值不能为空")
     @Size(max = 2048, message = "配置值长度不能超过2048个字符")
     @Schema(description = "配置值", example = "Refinex Cloud")

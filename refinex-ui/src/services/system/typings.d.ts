@@ -113,6 +113,68 @@ export interface PageResult<T> {
   pages: number;
 }
 
+/** 系统配置 */
+export interface SysConfig {
+  id: number;
+  configKey: string;
+  configValue: string;
+  configType: string;
+  configGroup?: string;
+  configLabel?: string;
+  configDesc?: string;
+  isSensitive: number;
+  isFrontend: number;
+  sort: number;
+  remark?: string;
+  createTime?: string;
+  updateTime?: string;
+}
+
+/** 系统配置创建请求 */
+export interface SysConfigCreateRequest {
+  configKey: string;
+  configValue: string;
+  configType: string;
+  configGroup?: string;
+  configLabel?: string;
+  configDesc?: string;
+  isSensitive: number;
+  isFrontend: number;
+  sort?: number;
+  remark?: string;
+}
+
+/** 系统配置更新请求 */
+export interface SysConfigUpdateRequest {
+  configValue: string;
+  configType: string;
+  configGroup?: string;
+  configLabel?: string;
+  configDesc?: string;
+  isSensitive: number;
+  isFrontend: number;
+  sort?: number;
+  remark?: string;
+}
+
+/** 系统配置查询参数 */
+export interface SysConfigQueryRequest {
+  configKey?: string;
+  configGroup?: string;
+  configType?: string;
+  isSensitive?: number;
+  isFrontend?: number;
+}
+
+/** 系统配置分页查询参数 */
+export interface SysConfigQueryParams extends PageParams {
+  configKey?: string;
+  configGroup?: string;
+  configType?: string;
+  isSensitive?: number;
+  isFrontend?: number;
+}
+
 /** API 响应结构 */
 export interface ApiResponse<T = any> {
   code: number;

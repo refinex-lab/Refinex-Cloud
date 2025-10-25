@@ -16,10 +16,6 @@ import lombok.Data;
 @Schema(description = "字典数据更新请求")
 public class DictDataUpdateRequestDTO {
 
-    @NotNull(message = "主键ID不能为空")
-    @Schema(description = "主键ID", example = "1")
-    private Long id;
-
     @NotNull(message = "字典类型ID不能为空")
     @Schema(description = "字典类型ID", example = "1")
     private Long dictTypeId;

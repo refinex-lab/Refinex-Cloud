@@ -99,17 +99,17 @@ ON DUPLICATE KEY UPDATE menu_name = VALUES(menu_name), update_time = @now;
 -- is_sensitive=1 的值建议走密文或敏感存储方案（此处仅示例）
 -- =============================================
 INSERT INTO `sys_config`
-(`id`,`config_key`,`config_value`,`config_type`,`config_group`,`config_label`,`config_desc`,`is_sensitive`,`is_frontend`,`status`,`create_time`,`update_time`)
+(`id`,`config_key`,`config_value`,`config_type`,`config_group`,`config_label`,`config_desc`,`is_sensitive`,`is_frontend`, `create_time`,`update_time`)
 VALUES
-    (40001,'system.title','Refinex Cloud','STRING','system','系统标题','站点标题',0,1,0,@now,@now),
-    (40002,'system.subtitle','现代化微服务云平台','STRING','system','系统副标题','站点副标题',0,1,0,@now,@now),
-    (40003,'site.logo','/public/logo.svg','STRING','system','站点Logo','前端展示Logo路径',0,1,0,@now,@now),
-    (40004,'captcha.enabled','true','BOOLEAN','auth','启用验证码','登录是否启用图形验证码',0,0,0,@now,@now),
-    (40005,'file.upload.maxSize','100MB','STRING','file','最大上传大小','前端/后端统一提示',0,0,0,@now,@now),
-    (40006,'file.default.storageType','S3','STRING','file','默认存储类型','S3/OSS/COS/KODO/DATABASE',0,0,0,@now,@now)
+    (40001,'system.title','Refinex Cloud','STRING','system','系统标题','站点标题',0,0,@now,@now),
+    (40002,'system.subtitle','现代化微服务云平台','STRING','system','系统副标题','站点副标题',0,0,@now,@now),
+    (40003,'site.logo','/public/logo.svg','STRING','system','站点Logo','前端展示Logo路径',0,0,@now,@now),
+    (40004,'captcha.enabled','true','BOOLEAN','auth','启用验证码','登录是否启用图形验证码',0,0,@now,@now),
+    (40005,'file.upload.maxSize','100MB','STRING','file','最大上传大小','前端/后端统一提示',0,0,@now,@now),
+    (40006,'file.default.storageType','S3','STRING','file','默认存储类型','S3/OSS/COS/KODO/DATABASE',0,0,@now,@now)
 ON DUPLICATE KEY UPDATE
-    config_value = VALUES(config_value),
-    update_time = @now;
+     config_value = VALUES(config_value),
+     update_time = @now;
 
 -- =============================================
 -- 5. 数据字典（类型 + 数据项）
