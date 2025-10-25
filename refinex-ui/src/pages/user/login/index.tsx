@@ -560,25 +560,33 @@ const Login: React.FC = () => {
         window.location.href = urlParams.get('redirect') || '/';
         return;
       } else {
+        // 登录失败，优先使用后端返回的 message
+        const errorMessage = response.message || intl.formatMessage({
+          id: 'pages.login.failure',
+          defaultMessage: '登录失败，请重试！',
+        });
         setUserLoginState({
           status: 'error',
-          type: 'account',
-          message: response.message || '登录失败'
+          type: type,
+          message: errorMessage
         });
-        message.error(response.message || '登录失败，请重试！');
+        // 只显示一次错误消息
+        message.error(errorMessage);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('登录失败:', error);
-      const defaultLoginFailureMessage = intl.formatMessage({
+      // 处理网络错误或其他异常
+      const errorMessage = error?.message || intl.formatMessage({
         id: 'pages.login.failure',
         defaultMessage: '登录失败，请重试！',
       });
-      message.error(defaultLoginFailureMessage);
       setUserLoginState({
         status: 'error',
-        type: 'account',
-        message: '网络错误，请重试'
+        type: type,
+        message: errorMessage
       });
+      // 只显示一次错误消息
+      message.error(errorMessage);
     } finally {
       setLoading(false);
     }

@@ -21,6 +21,8 @@ export async function login(params: AUTH.LoginRequest) {
       'Content-Type': 'application/json',
     },
     data: params,
+    // 跳过全局错误处理，由页面自己处理错误
+    skipErrorHandler: true,
   });
 }
 
@@ -35,6 +37,8 @@ export async function register(params: AUTH.RegisterRequest) {
       'Content-Type': 'application/json',
     },
     data: params,
+    // 跳过全局错误处理，由页面自己处理错误
+    skipErrorHandler: true,
   });
 }
 
@@ -49,6 +53,8 @@ export async function sendEmailVerifyCode(params: AUTH.SendEmailCodeRequest) {
       'Content-Type': 'application/json',
     },
     data: params,
+    // 跳过全局错误处理，由页面自己处理错误
+    skipErrorHandler: true,
   });
 }
 
@@ -63,6 +69,8 @@ export async function resetPassword(params: AUTH.ResetPasswordRequest) {
       'Content-Type': 'application/json',
     },
     data: params,
+    // 跳过全局错误处理，由页面自己处理错误
+    skipErrorHandler: true,
   });
 }
 
@@ -78,10 +86,10 @@ export async function logout() {
 
 /**
  * 获取当前用户信息
- * GET /refinex-platform/user/current
+ * GET /refinex-platform/users/current
  */
 export async function getCurrentUser() {
-  return request<AUTH.ApiResult<AUTH.CurrentUser>>('/refinex-platform/user/current', {
+  return request<AUTH.ApiResult<AUTH.CurrentUser>>('/refinex-platform/users/current', {
     method: 'GET',
   });
 }

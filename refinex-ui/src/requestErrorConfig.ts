@@ -14,8 +14,10 @@ enum ErrorShowType {
 interface ResponseStructure {
   success: boolean;
   data: any;
-  errorCode?: number;
-  errorMessage?: string;
+  code?: number; // 后端返回的错误码
+  message?: string; // 后端返回的错误消息
+  errorCode?: number; // 兼容旧字段
+  errorMessage?: string; // 兼容旧字段
   showType?: ErrorShowType;
 }
 
@@ -29,12 +31,15 @@ export const errorConfig: RequestConfig = {
   errorConfig: {
     // 错误抛出
     errorThrower: (res) => {
-      const { success, data, errorCode, errorMessage, showType } =
+      const { success, data, code, message, errorCode, errorMessage, showType } =
         res as unknown as ResponseStructure;
       if (!success) {
-        const error: any = new Error(errorMessage);
+        // 优先使用后端返回的 message 字段，其次使用 errorMessage
+        const finalMessage = message || errorMessage || '请求失败';
+        const finalCode = code || errorCode;
+        const error: any = new Error(finalMessage);
         error.name = 'BizError';
-        error.info = { errorCode, errorMessage, showType, data };
+        error.info = { errorCode: finalCode, errorMessage: finalMessage, showType, data };
         throw error; // 抛出自制的错误
       }
     },
@@ -114,11 +119,7 @@ export const errorConfig: RequestConfig = {
   responseInterceptors: [
     (response) => {
       // 拦截响应数据，进行个性化处理
-      const { data } = response as unknown as ResponseStructure;
-
-      if (data?.success === false) {
-        message.error('请求失败！');
-      }
+      // 注意：不要在这里显示错误消息，让 errorHandler 统一处理
       return response;
     },
   ],
