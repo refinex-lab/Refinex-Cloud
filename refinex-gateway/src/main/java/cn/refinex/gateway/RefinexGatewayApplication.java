@@ -17,7 +17,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
         scanBasePackages = "cn.refinex",
         exclude = {DataSourceAutoConfiguration.class} // 网关不配置数据源, 需要排除数据源自动配置
 )
-@EnableHttpInterfaceClients(basePackages = "cn.refinex.gateway.client") // 启用自动扫描和注册 HTTP Interface 客户端
+@EnableHttpInterfaceClients(basePackages = {"cn.refinex.gateway.client", "cn.refinex.common"}) // 启用自动扫描和注册 HTTP Interface 客户端
 public class RefinexGatewayApplication {
 
     public static void main(String[] args) {

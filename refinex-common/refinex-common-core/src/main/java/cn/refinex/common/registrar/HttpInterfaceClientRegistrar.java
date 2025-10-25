@@ -4,6 +4,7 @@ import cn.refinex.common.annotation.EnableHttpInterfaceClients;
 import cn.refinex.common.annotation.HttpInterfaceClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -79,7 +80,23 @@ public class HttpInterfaceClientRegistrar implements ImportBeanDefinitionRegistr
      * @return 包扫描器实例
      */
     private ClassPathScanningCandidateComponentProvider createScanner() {
-        ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
+        // 创建扫描器，禁用默认过滤器
+        ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false) {
+            /**
+             * 判断 Bean 定义是否为候选组件
+             * 重写此方法允许接口作为候选组件（默认情况下 Spring 只接受具体类）
+             *
+             * @param beanDefinition Bean 定义
+             * @return 如果是独立的接口则返回 true
+             */
+            @Override
+            protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
+                AnnotationMetadata metadata = beanDefinition.getMetadata();
+                // 允许扫描独立的接口（HTTP Interface 客户端都是接口）
+                return metadata.isIndependent() && metadata.isInterface();
+            }
+        };
+
         // 只扫描带有 @HttpInterfaceClient 注解的接口
         scanner.addIncludeFilter(new AnnotationTypeFilter(HttpInterfaceClient.class));
         return scanner;
