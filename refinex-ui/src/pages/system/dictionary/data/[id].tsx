@@ -19,7 +19,7 @@ import {
 import { history, useIntl, useParams, useSearchParams } from '@umijs/max';
 import { Badge, Button, message, Modal, Space, Tag } from 'antd';
 import React, { useRef, useState } from 'react';
-import type { DictData } from '@/services/system';
+import type { DictData, DictDataCreateRequest, DictDataUpdateRequest } from '@/services/system';
 import {
   batchDeleteDictData,
   createDictData,
@@ -38,7 +38,7 @@ const DictionaryDataList: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [modalVisible, setModalVisible] = useState(false);
   const [currentData, setCurrentData] = useState<DictData | undefined>();
-  const actionRef = useRef<ActionType>();
+  const actionRef = useRef<ActionType>(null);
 
   // 从 URL 获取字典类型信息
   const dictTypeId = Number(params.id);
@@ -299,20 +299,20 @@ const DictionaryDataList: React.FC = () => {
         onFinish={async (values) => {
           try {
             if (currentData) {
-              await updateDictData(currentData.id, values);
+              await updateDictData(currentData.id, values as DictDataUpdateRequest);
               message.success(intl.formatMessage({ id: 'pages.system.dictionary.message.updateSuccess' }));
             } else {
-              await createDictData(values);
+              await createDictData(values as DictDataCreateRequest);
               message.success(intl.formatMessage({ id: 'pages.system.dictionary.message.createSuccess' }));
             }
             actionRef.current?.reload();
             return true;
           } catch (error) {
-            message.error(
-              currentData
-                ? intl.formatMessage({ id: 'pages.system.dictionary.message.updateFailed' })
-                : intl.formatMessage({ id: 'pages.system.dictionary.message.createFailed' }),
-            );
+            // message.error(
+            //   currentData
+            //     ? intl.formatMessage({ id: 'pages.system.dictionary.message.updateFailed' })
+            //     : intl.formatMessage({ id: 'pages.system.dictionary.message.createFailed' }),
+            // );
             return false;
           }
         }}

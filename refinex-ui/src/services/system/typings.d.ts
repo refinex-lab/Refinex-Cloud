@@ -85,6 +85,8 @@ export interface DictDataUpdateRequest {
 export interface PageParams {
   pageNum?: number;
   pageSize?: number;
+  sortField?: string;
+  sortOrder?: string;
 }
 
 /** 字典类型查询参数 */

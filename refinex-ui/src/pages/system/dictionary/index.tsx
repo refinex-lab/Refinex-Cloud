@@ -17,7 +17,7 @@ import {
 import { history, useIntl } from '@umijs/max';
 import { Badge, Button, message, Modal, Space, Tag } from 'antd';
 import React, { useRef, useState } from 'react';
-import type { DictType } from '@/services/system';
+import type { DictType, DictTypeCreateRequest, DictTypeUpdateRequest } from '@/services/system';
 import {
   createDictType,
   deleteDictType,
@@ -33,7 +33,7 @@ const DictionaryTypeList: React.FC = () => {
   const intl = useIntl();
   const [modalVisible, setModalVisible] = useState(false);
   const [currentType, setCurrentType] = useState<DictType | undefined>();
-  const actionRef = useRef<ActionType>();
+  const actionRef = useRef<ActionType>(null);
 
   // 状态枚举
   const statusEnum = {
@@ -217,20 +217,20 @@ const DictionaryTypeList: React.FC = () => {
         onFinish={async (values) => {
           try {
             if (currentType) {
-              await updateDictType(currentType.id, values);
+              await updateDictType(currentType.id, values as DictTypeUpdateRequest);
               message.success(intl.formatMessage({ id: 'pages.system.dictionary.message.updateSuccess' }));
             } else {
-              await createDictType(values);
+              await createDictType(values as DictTypeCreateRequest);
               message.success(intl.formatMessage({ id: 'pages.system.dictionary.message.createSuccess' }));
             }
             actionRef.current?.reload();
             return true;
           } catch (error) {
-            // message.error(
-            //   currentType
-            //     ? intl.formatMessage({ id: 'pages.system.dictionary.message.updateFailed' })
-            //     : intl.formatMessage({ id: 'pages.system.dictionary.message.createFailed' }),
-            // );
+            message.error(
+              currentType
+                ? intl.formatMessage({ id: 'pages.system.dictionary.message.updateFailed' })
+                : intl.formatMessage({ id: 'pages.system.dictionary.message.createFailed' }),
+            );
             return false;
           }
         }}
