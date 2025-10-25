@@ -17,7 +17,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { history, useIntl, useParams, useSearchParams } from '@umijs/max';
-import { Badge, Button, message, Modal, Space } from 'antd';
+import { Badge, Button, message, Modal, Space, Tag } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { DictData } from '@/services/system';
 import {
@@ -286,8 +286,14 @@ const DictionaryDataList: React.FC = () => {
         }
         width={800}
         open={modalVisible}
-        onOpenChange={setModalVisible}
-        initialValues={currentData || { dictTypeId, status: 0, isDefault: 0, dictSort: 0 }}
+        onOpenChange={(visible) => {
+          setModalVisible(visible);
+          if (!visible) {
+            // 弹窗关闭时清空当前编辑的数据
+            setCurrentData(undefined);
+          }
+        }}
+        initialValues={currentData ? { ...currentData } : { dictTypeId, status: 0, isDefault: 0, dictSort: 0 }}
         grid
         rowProps={{ gutter: 16 }}
         onFinish={async (values) => {

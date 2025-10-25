@@ -206,8 +206,14 @@ const DictionaryTypeList: React.FC = () => {
         }
         width={600}
         open={modalVisible}
-        onOpenChange={setModalVisible}
-        initialValues={currentType || { status: 0 }}
+        onOpenChange={(visible) => {
+          setModalVisible(visible);
+          if (!visible) {
+            // 弹窗关闭时清空当前编辑的数据
+            setCurrentType(undefined);
+          }
+        }}
+        initialValues={currentType ? { ...currentType } : { status: 0 }}
         onFinish={async (values) => {
           try {
             if (currentType) {
