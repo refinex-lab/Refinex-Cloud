@@ -12,7 +12,7 @@ const Settings: ProLayoutProps & {
   // 主色调
   colorPrimary: '#1890ff',
   // 布局模式
-  layout: 'mix',
+  layout: 'side',
   // 内容宽度
   contentWidth: 'Fluid',
   // 是否固定 Header
