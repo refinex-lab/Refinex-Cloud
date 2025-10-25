@@ -2,9 +2,9 @@ package cn.refinex.common.factory;
 
 import cn.refinex.common.config.RestClientConfig;
 import cn.refinex.common.properties.HttpInterfaceClientProperties;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
@@ -19,13 +19,23 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class HttpServiceProxyFactoryCreator {
 
     private final RestClientConfig restClientConfig;
     private final HttpInterfaceClientProperties properties;
     private final ObjectProvider<RestClient.Builder> normalBuilderProvider;
     private final ObjectProvider<RestClient.Builder> loadBalancedBuilderProvider;
+
+    public HttpServiceProxyFactoryCreator(
+            RestClientConfig restClientConfig,
+            HttpInterfaceClientProperties properties,
+            @Qualifier("restClientBuilder") ObjectProvider<RestClient.Builder> normalBuilderProvider,
+            @Qualifier("loadBalancedRestClientBuilder") ObjectProvider<RestClient.Builder> loadBalancedBuilderProvider) {
+        this.restClientConfig = restClientConfig;
+        this.properties = properties;
+        this.normalBuilderProvider = normalBuilderProvider;
+        this.loadBalancedBuilderProvider = loadBalancedBuilderProvider;
+    }
 
     /**
      * 为指定服务创建 HttpServiceProxyFactory

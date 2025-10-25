@@ -1,5 +1,6 @@
 package cn.refinex.platform;
 
+import cn.refinex.common.annotation.EnableHttpInterfaceClients;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -16,6 +17,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableDiscoveryClient
 @SpringBootApplication(scanBasePackages = "cn.refinex")
+@EnableHttpInterfaceClients(basePackages = {"cn.refinex.common"}) // 启用自动扫描和注册 HTTP Interface 客户端
 public class RefinexPlatformApplication {
 
     public static void main(String[] args) {

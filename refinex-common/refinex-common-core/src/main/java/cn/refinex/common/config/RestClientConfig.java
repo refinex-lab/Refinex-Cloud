@@ -22,23 +22,29 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 /**
  * 全局 RestClient 配置
@@ -56,7 +62,7 @@ public class RestClientConfig {
      *
      * @return RestClient.Builder
      */
-    @Bean
+    @Bean("restClientBuilder")
     @Primary // 使用 @Primary 标记为主要的 Builder，避免自动装配冲突
     @ConditionalOnMissingBean(name = "restClientBuilder")
     public RestClient.Builder restClientBuilder() {
@@ -64,22 +70,117 @@ public class RestClientConfig {
     }
 
     /**
+     * LoadBalancer 拦截器（用于处理 lb:// 协议）
+     *
+     * @param loadBalancerClient LoadBalancer 客户端
+     * @return ClientHttpRequestInterceptor
+     */
+    @Bean
+    @ConditionalOnClass(name = "org.springframework.cloud.client.loadbalancer.LoadBalancerClient")
+    // 仅在 LoadBalancerClient 存在时才创建此 Bean
+    @ConditionalOnMissingBean(name = "loadBalancerInterceptor")
+    public ClientHttpRequestInterceptor loadBalancerInterceptor(ObjectProvider<LoadBalancerClient> loadBalancerClient) {
+        return (request, body, execution) -> {
+            // 提取原始 URI 和协议
+            URI originalUri = request.getURI();
+            String scheme = originalUri.getScheme();
+
+            // 只处理 lb:// 协议
+            if ("lb".equals(scheme)) {
+                // 获取可用的 LoadBalancerClient 实例
+                LoadBalancerClient client = loadBalancerClient.getIfAvailable();
+                if (client == null) {
+                    throw new IllegalStateException("LoadBalancerClient 未找到，无法处理 lb:// 协议");
+                }
+
+                // 提取服务名称（主机名）
+                String serviceName = originalUri.getHost();
+                log.debug("使用 LoadBalancer 解析服务: {}", serviceName);
+
+                // 通过 LoadBalancer 选择服务实例
+                ServiceInstance instance = client.choose(serviceName);
+                if (instance == null) {
+                    throw new IllegalStateException("无法找到服务实例: " + serviceName);
+                }
+
+                // 构建真实的 URI
+                URI realUri = UriComponentsBuilder.fromUri(originalUri)
+                        .scheme(instance.getScheme())
+                        .host(instance.getHost())
+                        .port(instance.getPort())
+                        .build()
+                        .toUri();
+
+                log.debug("服务 {} 解析为: {}", serviceName, realUri);
+
+                // 创建新的请求对象，代理原始请求但使用新的 URI
+                HttpRequest newRequest = new HttpRequest() {
+
+                    /**
+                     * 获取 HTTP 方法（如 GET、POST 等）
+                     * @return HttpMethod
+                     */
+                    @Override
+                    public org.springframework.http.HttpMethod getMethod() {
+                        return request.getMethod();
+                    }
+
+                    /**
+                     * 获取请求的 URI
+                     * @return URI
+                     */
+                    @Override
+                    public URI getURI() {
+                        return realUri;
+                    }
+
+                    /**
+                     * 获取请求头（如 Content-Type、Authorization 等）
+                     * @return HttpHeaders
+                     */
+                    @Override
+                    public HttpHeaders getHeaders() {
+                        return request.getHeaders();
+                    }
+
+                    /**
+                     * 获取请求属性（如超时、连接池等）
+                     * @return Map<String, Object>
+                     */
+                    @Override
+                    public Map<String, Object> getAttributes() {
+                        return request.getAttributes();
+                    }
+                };
+
+                // 执行请求
+                return execution.execute(newRequest, body);
+            }
+
+            // 非 lb:// 协议，直接执行
+            return execution.execute(request, body);
+        };
+    }
+
+    /**
      * 支持负载均衡的 RestClient 构建器（用于 lb:// 协议）
      * <p>
      * 1. 仅在 LoadBalancer 类存在时才创建此 Bean
-     * 2. 使用 ObjectProvider 延迟注入，避免循环依赖
+     * 2. 使用自定义的 LoadBalancer 拦截器来处理 lb:// 协议
      *
-     * @param requestFactoryProvider 支持负载均衡的 ClientHttpRequestFactory 提供者
+     * @param loadBalancerInterceptor LoadBalancer 拦截器
      * @return RestClient.Builder
      */
-    @Bean
-    @LoadBalanced
+    @Bean("loadBalancedRestClientBuilder")
     @ConditionalOnClass(name = "org.springframework.cloud.client.loadbalancer.LoadBalancerClient")
     @ConditionalOnMissingBean(name = "loadBalancedRestClientBuilder")
-    public RestClient.Builder loadBalancedRestClientBuilder(ObjectProvider<ClientHttpRequestFactory> requestFactoryProvider) {
-        RestClient.Builder builder = RestClient.builder();
-        // 使用 ObjectProvider 延迟获取，避免循环依赖
-        requestFactoryProvider.ifAvailable(builder::requestFactory);
+    public RestClient.Builder loadBalancedRestClientBuilder(ObjectProvider<ClientHttpRequestInterceptor> loadBalancerInterceptor) {
+        RestClient.Builder builder = RestClient.builder()
+                .requestFactory(clientHttpRequestFactory());
+
+        // 添加 LoadBalancer 拦截器
+        loadBalancerInterceptor.ifAvailable(builder::requestInterceptor);
+
         return builder;
     }
 
