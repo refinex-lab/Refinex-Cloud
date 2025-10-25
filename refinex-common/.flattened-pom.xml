@@ -11,16 +11,23 @@
   <artifactId>refinex-common</artifactId>
   <version>1.0.0</version>
   <packaging>pom</packaging>
-  <name>refinex-common</name>
+  <name>${project.artifactId}</name>
   <description>Refinex Cloud Common</description>
   <modules>
     <module>refinex-common-core</module>
-    <module>refinex-common-security</module>
     <module>refinex-common-redis</module>
     <module>refinex-common-jdbc</module>
     <module>refinex-common-json</module>
     <module>refinex-common-mail</module>
     <module>refinex-common-file</module>
-    <module>refinex-common-log</module>
+    <module>refinex-common-web</module>
+    <module>refinex-common-protection</module>
+    <module>refinex-common-test</module>
+    <module>refinex-common-nacos</module>
+    <module>refinex-common-satoken</module>
+    <module>refinex-common-mq</module>
+    <module>refinex-common-job</module>
+    <module>refinex-common-elasticsearch</module>
+    <module>refinex-common-security</module>
   </modules>
 </project>

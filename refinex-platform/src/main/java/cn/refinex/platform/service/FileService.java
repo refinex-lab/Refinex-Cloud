@@ -1,9 +1,9 @@
 package cn.refinex.platform.service;
 
-import cn.refinex.api.platform.client.file.dto.request.FileConfirmUploadRequestDTO;
-import cn.refinex.api.platform.client.file.dto.request.FileInfoDTO;
-import cn.refinex.api.platform.client.file.dto.request.FileUploadUrlRequestDTO;
-import cn.refinex.api.platform.client.file.dto.response.FileUploadUrlResponseDTO;
+import cn.refinex.platform.controller.file.dto.request.FileConfirmUploadRequestDTO;
+import cn.refinex.platform.controller.file.dto.request.FileInfoDTO;
+import cn.refinex.platform.controller.file.dto.request.FileUploadUrlRequestDTO;
+import cn.refinex.platform.controller.file.dto.response.FileUploadUrlResponseDTO;
 
 /**
  * 文件服务接口

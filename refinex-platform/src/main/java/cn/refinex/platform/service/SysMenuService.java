@@ -2,10 +2,10 @@ package cn.refinex.platform.service;
 
 import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
-import cn.refinex.platform.domain.dto.request.SysMenuCreateRequest;
-import cn.refinex.platform.domain.dto.request.SysMenuQueryRequest;
-import cn.refinex.platform.domain.dto.request.SysMenuUpdateRequest;
-import cn.refinex.platform.domain.entity.sys.SysMenu;
+import cn.refinex.platform.controller.auth.dto.request.SysMenuCreateRequestDTO;
+import cn.refinex.platform.controller.auth.dto.request.SysMenuQueryRequestDTO;
+import cn.refinex.platform.controller.auth.dto.request.SysMenuUpdateRequestDTO;
+import cn.refinex.platform.entity.sys.SysMenu;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public interface SysMenuService {
      * @param operatorId 操作人ID
      * @return 菜单ID
      */
-    Long create(SysMenuCreateRequest request, Long operatorId);
+    Long create(SysMenuCreateRequestDTO request, Long operatorId);
 
     /**
      * 更新系统菜单
@@ -34,7 +34,7 @@ public interface SysMenuService {
      * @param operatorId 操作人ID
      * @return 是否更新成功
      */
-    boolean update(Long id, SysMenuUpdateRequest request, Long operatorId);
+    boolean update(Long id, SysMenuUpdateRequestDTO request, Long operatorId);
 
     /**
      * 删除系统菜单
@@ -77,7 +77,7 @@ public interface SysMenuService {
      * @param pageRequest 分页请求
      * @return 分页结果
      */
-    PageResult<SysMenu> page(SysMenuQueryRequest query, PageRequest pageRequest);
+    PageResult<SysMenu> page(SysMenuQueryRequestDTO query, PageRequest pageRequest);
 }
 
 

@@ -1,11 +1,11 @@
 package cn.refinex.common.apilog.config;
 
+import cn.refinex.common.apilog.core.client.PlatformLoggerServiceClient;
 import cn.refinex.common.apilog.core.filter.LogOperationFilter;
 import cn.refinex.common.apilog.core.interceptor.LogOperationInterceptor;
 import cn.refinex.common.constants.WebFilterOrderConstants;
 import cn.refinex.common.web.config.WebAutoConfiguration;
 import cn.refinex.common.web.config.properties.WebProperties;
-import cn.refinex.api.platform.client.logger.LogOperationRemoteService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -27,15 +27,15 @@ public class LogOperationAutoConfiguration implements WebMvcConfigurer {
     /**
      * 创建操作日志过滤器
      *
-     * @param webProperties      Web 配置属性
-     * @param applicationName    应用名称
-     * @param logOperationClient 操作日志客户端
+     * @param webProperties               Web 配置属性
+     * @param applicationName             应用名称
+     * @param platformLoggerServiceClient 平台日志服务客户端
      * @return FilterRegistrationBean
      */
     @Bean
     @ConditionalOnProperty(prefix = "refinex.log-operation", value = "enabled", matchIfMissing = true)
-    public FilterRegistrationBean<LogOperationFilter> logOperationFilter(WebProperties webProperties, @Value("${spring.application.name}") String applicationName, LogOperationRemoteService logOperationClient) {
-        LogOperationFilter logOperationFilter = new LogOperationFilter(webProperties, applicationName, logOperationClient);
+    public FilterRegistrationBean<LogOperationFilter> logOperationFilter(WebProperties webProperties, @Value("${spring.application.name}") String applicationName, PlatformLoggerServiceClient platformLoggerServiceClient) {
+        LogOperationFilter logOperationFilter = new LogOperationFilter(webProperties, applicationName, platformLoggerServiceClient);
         return WebAutoConfiguration.createFilterBean(logOperationFilter, WebFilterOrderConstants.API_ACCESS_LOG_FILTER);
     }
 

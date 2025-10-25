@@ -44,17 +44,17 @@
             <artifactId>refinex-common-core</artifactId>
         </dependency>
 
-        <!-- Refinex 公共 JSON 模块 -->
+        <!-- 配置元数据生成器 -->
         <dependency>
-            <groupId>cn.refinex</groupId>
-            <artifactId>refinex-common-json</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
 
-        <!-- OpenFeign 核心，用于提供 RequestInterceptor 接口 -->
+        <!-- 自动装配支持 -->
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
-            <optional>true</optional>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
     </dependencies>
 </project>

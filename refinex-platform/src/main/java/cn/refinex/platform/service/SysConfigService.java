@@ -2,10 +2,10 @@ package cn.refinex.platform.service;
 
 import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
-import cn.refinex.platform.domain.dto.request.SysConfigCreateRequest;
-import cn.refinex.platform.domain.dto.request.SysConfigQueryRequest;
-import cn.refinex.platform.domain.dto.request.SysConfigUpdateRequest;
-import cn.refinex.platform.domain.entity.sys.SysConfig;
+import cn.refinex.platform.controller.config.dto.request.SysConfigCreateRequestDTO;
+import cn.refinex.platform.controller.config.dto.request.SysConfigQueryRequestDTO;
+import cn.refinex.platform.controller.config.dto.request.SysConfigUpdateRequestDTO;
+import cn.refinex.platform.entity.sys.SysConfig;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public interface SysConfigService {
      * @param operatorId 操作人ID
      * @return 配置ID
      */
-    Long create(SysConfigCreateRequest request, Long operatorId);
+    Long create(SysConfigCreateRequestDTO request, Long operatorId);
 
     /**
      * 更新系统配置
@@ -33,7 +33,7 @@ public interface SysConfigService {
      * @param operatorId 操作人ID
      * @return 是否更新成功
      */
-    boolean update(Long id, SysConfigUpdateRequest request, Long operatorId);
+    boolean update(Long id, SysConfigUpdateRequestDTO request, Long operatorId);
 
     /**
      * 删除系统配置
@@ -75,7 +75,7 @@ public interface SysConfigService {
      * @param pageRequest 分页请求
      * @return 系统配置分页结果
      */
-    PageResult<SysConfig> page(SysConfigQueryRequest query, PageRequest pageRequest);
+    PageResult<SysConfig> page(SysConfigQueryRequestDTO query, PageRequest pageRequest);
 
     /**
      * 更新系统配置前端可见性

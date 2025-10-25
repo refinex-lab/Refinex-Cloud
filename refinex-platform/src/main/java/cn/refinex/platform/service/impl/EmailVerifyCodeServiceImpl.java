@@ -1,17 +1,16 @@
 package cn.refinex.platform.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
-import cn.refinex.api.platform.client.email.dto.request.EmailSendRequestDTO;
-import cn.refinex.api.platform.client.email.dto.request.EmailVerifyCodeRequestDTO;
-import cn.refinex.api.platform.client.email.dto.request.EmailVerifyCodeValidateRequestDTO;
-import cn.refinex.api.platform.client.email.dto.response.EmailSendResponseDTO;
-import cn.refinex.api.platform.client.email.dto.response.EmailVerifyCodeResponseDTO;
 import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.mail.config.properties.MailProperties;
 import cn.refinex.common.redis.RedisService;
 import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
-import cn.refinex.platform.constants.EmailErrorMessageConstants;
-import cn.refinex.platform.domain.entity.email.EmailVerifyCode;
+import cn.refinex.platform.controller.email.dto.request.EmailSendRequestDTO;
+import cn.refinex.platform.controller.email.dto.request.EmailVerifyCodeRequestDTO;
+import cn.refinex.platform.controller.email.dto.request.EmailVerifyCodeValidateRequestDTO;
+import cn.refinex.platform.controller.email.dto.response.EmailSendResponseDTO;
+import cn.refinex.platform.controller.email.dto.response.EmailVerifyCodeResponseDTO;
+import cn.refinex.platform.entity.email.EmailVerifyCode;
 import cn.refinex.platform.enums.EmailVerifyCodeStatus;
 import cn.refinex.platform.repository.email.EmailVerifyCodeRepository;
 import cn.refinex.platform.service.EmailVerifyCodeService;
@@ -144,19 +143,19 @@ public class EmailVerifyCodeServiceImpl implements EmailVerifyCodeService {
 
         if (Objects.isNull(codeEntity)) {
             log.error("验证码不存在: email={}, code={}", request.getEmail(), request.getVerifyCode());
-            throw new SystemException(EmailErrorMessageConstants.VERIFY_CODE_INVALID);
+            throw new SystemException("验证码已失效");
         }
 
         // 2. 检查验证码状态
         if (!EmailVerifyCodeStatus.UNUSED.getCode().equals(codeEntity.getStatus())) {
             log.error("验证码状态异常: email={}, status={}", request.getEmail(), codeEntity.getStatus());
-            throw new SystemException(EmailErrorMessageConstants.VERIFY_CODE_INVALID);
+            throw new SystemException("验证码已失效");
         }
 
         // 3. 检查是否已使用
         if (Objects.nonNull(codeEntity.getIsUsed()) && codeEntity.getIsUsed() == 1) {
             log.error("验证码已使用: email={}", request.getEmail());
-            throw new SystemException(EmailErrorMessageConstants.VERIFY_CODE_USED);
+            throw new SystemException("验证码已使用");
         }
 
         // 4. 检查是否过期
@@ -164,7 +163,7 @@ public class EmailVerifyCodeServiceImpl implements EmailVerifyCodeService {
             log.error("验证码已过期: email={}, expireTime={}", request.getEmail(), codeEntity.getExpireTime());
             // 更新状态为已过期
             verifyCodeRepository.markAsInvalid(codeEntity.getId());
-            throw new SystemException(EmailErrorMessageConstants.VERIFY_CODE_EXPIRED);
+            throw new SystemException("验证码已过期");
         }
 
         // 5. 标记为已使用
@@ -233,7 +232,7 @@ public class EmailVerifyCodeServiceImpl implements EmailVerifyCodeService {
         Integer emailCount = redisService.getStringService().get(emailKey, Integer.class);
         if (Objects.nonNull(emailCount) && emailCount >= mailProperties.getVerifyCode().getRateLimit().getEmailPerMinute()) {
             log.error("邮箱发送频率超限: email={}, count={}", email, emailCount);
-            throw new SystemException(EmailErrorMessageConstants.VERIFY_CODE_SEND_TOO_FREQUENT);
+            throw new SystemException("验证码发送过于频繁，请稍后重试");
         }
 
         // 2. 检查 IP 频率限制
@@ -242,7 +241,7 @@ public class EmailVerifyCodeServiceImpl implements EmailVerifyCodeService {
             Integer ipCount = redisService.getStringService().get(ipKey, Integer.class);
             if (ipCount != null && ipCount >= mailProperties.getVerifyCode().getRateLimit().getIpPerMinute()) {
                 log.error("IP 发送频率超限: ip={}, count={}", clientIp, ipCount);
-                throw new SystemException(EmailErrorMessageConstants.VERIFY_CODE_SEND_TOO_FREQUENT);
+                throw new SystemException("验证码发送过于频繁，请稍后重试");
             }
         }
     }

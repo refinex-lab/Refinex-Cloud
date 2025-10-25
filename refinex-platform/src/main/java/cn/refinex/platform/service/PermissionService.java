@@ -1,6 +1,6 @@
 package cn.refinex.platform.service;
 
-import cn.refinex.platform.domain.entity.sys.SysRole;
+import cn.refinex.platform.entity.sys.SysRole;
 
 import java.util.List;
 import java.util.Set;

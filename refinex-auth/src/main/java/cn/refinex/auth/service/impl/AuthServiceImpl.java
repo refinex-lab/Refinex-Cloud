@@ -4,7 +4,7 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import cn.hutool.core.util.StrUtil;
-import cn.refinex.api.platform.client.user.UserRemoteService;
+import cn.refinex.auth.client.PlatformUserServiceClient;
 import cn.refinex.auth.domain.dto.request.LoginRequest;
 import cn.refinex.auth.domain.dto.request.RecordLoginLogRequest;
 import cn.refinex.auth.domain.vo.LoginVo;
@@ -48,7 +48,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final CaptchaProperties captchaProperties;
     private final CaptchaService captchaService;
-    private final UserRemoteService userRemoteService;
+    private final PlatformUserServiceClient platformServiceClient;
     private final RedisService redisService;
     private final UserPasswordProperties userPasswordProperties;
     private final LoginAsyncService loginAsyncService;
@@ -82,8 +82,8 @@ public class AuthServiceImpl implements AuthService {
 
         // 根据用户名/邮箱获取登录用户信息
         ApiResult<LoginUser> userResult = Objects.equals(request.getLoginType(), loginType.getCode())
-                ? userRemoteService.getLoginUserByUserName(request.getUsername())
-                : userRemoteService.getLoginUserByEmail(request.getUsername());
+                ? platformServiceClient.getLoginUserByUserName(request.getUsername())
+                : platformServiceClient.getLoginUserByEmail(request.getUsername());
         LoginUser loginUser = userResult.data();
         if (Objects.isNull(loginUser)) {
             log.warn("根据用户名查询登录用户失败，username: {}", request.getUsername());

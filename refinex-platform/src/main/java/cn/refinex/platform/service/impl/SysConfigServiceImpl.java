@@ -7,10 +7,10 @@ import cn.refinex.common.jdbc.page.PageResult;
 import cn.refinex.common.json.utils.JsonUtils;
 import cn.refinex.common.redis.RedisService;
 import cn.refinex.common.utils.object.BeanConverter;
-import cn.refinex.platform.domain.dto.request.SysConfigCreateRequest;
-import cn.refinex.platform.domain.dto.request.SysConfigQueryRequest;
-import cn.refinex.platform.domain.dto.request.SysConfigUpdateRequest;
-import cn.refinex.platform.domain.entity.sys.SysConfig;
+import cn.refinex.platform.controller.config.dto.request.SysConfigCreateRequestDTO;
+import cn.refinex.platform.controller.config.dto.request.SysConfigQueryRequestDTO;
+import cn.refinex.platform.controller.config.dto.request.SysConfigUpdateRequestDTO;
+import cn.refinex.platform.entity.sys.SysConfig;
 import cn.refinex.platform.repository.sys.SysConfigRepository;
 import cn.refinex.platform.service.SysConfigService;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +47,7 @@ public class SysConfigServiceImpl implements SysConfigService {
      * @return 配置ID
      */
     @Override
-    public Long create(SysConfigCreateRequest request, Long operatorId) {
+    public Long create(SysConfigCreateRequestDTO request, Long operatorId) {
         // 唯一键校验
         if (sysConfigRepository.existsKey(request.getConfigKey(), null)) {
             throw new BusinessException("配置键已存在");
@@ -79,7 +79,7 @@ public class SysConfigServiceImpl implements SysConfigService {
      * @return 是否更新成功
      */
     @Override
-    public boolean update(Long id, SysConfigUpdateRequest request, Long operatorId) {
+    public boolean update(Long id, SysConfigUpdateRequestDTO request, Long operatorId) {
         // 校验配置是否存在
         SysConfig exist = sysConfigRepository.selectById(id);
         if (exist == null) {
@@ -194,7 +194,7 @@ public class SysConfigServiceImpl implements SysConfigService {
      * @return 系统配置分页结果
      */
     @Override
-    public PageResult<SysConfig> page(SysConfigQueryRequest query, PageRequest pageRequest) {
+    public PageResult<SysConfig> page(SysConfigQueryRequestDTO query, PageRequest pageRequest) {
         return sysConfigRepository.pageQuery(query, pageRequest);
     }
 

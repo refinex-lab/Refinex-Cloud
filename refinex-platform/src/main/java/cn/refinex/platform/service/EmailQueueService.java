@@ -1,7 +1,7 @@
 package cn.refinex.platform.service;
 
-import cn.refinex.api.platform.client.email.dto.request.EmailSendRequestDTO;
-import cn.refinex.api.platform.client.email.dto.response.EmailSendResponseDTO;
+import cn.refinex.platform.controller.email.dto.request.EmailSendRequestDTO;
+import cn.refinex.platform.controller.email.dto.response.EmailSendResponseDTO;
 
 /**
  * 邮件队列服务

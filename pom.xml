@@ -13,7 +13,6 @@
 
     <modules>
         <module>refinex-common</module>
-        <module>refinex-api</module>
         <module>refinex-platform</module>
         <module>refinex-gateway</module>
         <module>refinex-auth</module>
@@ -58,9 +57,9 @@
         <rocketmq-spring.version>2.3.2</rocketmq-spring.version>
         <xxl-job.version>2.4.0</xxl-job.version>
         <dynamic-ds.version>4.3.1</dynamic-ds.version>
-        <feign-form.version>3.8.0</feign-form.version>
         <ip2region.version>2.7.0</ip2region.version>
         <easy-es.version>3.0.0</easy-es.version>
+        <httpclient5.version>5.5.1</httpclient5.version>
 
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
@@ -320,23 +319,18 @@
                 <version>${thumbnailator.version}</version>
             </dependency>
 
+            <!-- Apache HttpClient 5.x -->
+            <dependency>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5</artifactId>
+                <version>${httpclient5.version}</version>
+            </dependency>
+
             <!-- 离线IP地址定位库 ip2region -->
             <dependency>
                 <groupId>org.lionsoul</groupId>
                 <artifactId>ip2region</artifactId>
                 <version>${ip2region.version}</version>
-            </dependency>
-
-            <!-- Feign 支持文件上传 -->
-            <dependency>
-                <groupId>io.github.openfeign.form</groupId>
-                <artifactId>feign-form</artifactId>
-                <version>${feign-form.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.openfeign.form</groupId>
-                <artifactId>feign-form-spring</artifactId>
-                <version>${feign-form.version}</version>
             </dependency>
 
             <!-- Yauaa（User-Agent 解析） -->
@@ -480,12 +474,6 @@
 
             <dependency>
                 <groupId>cn.refinex</groupId>
-                <artifactId>refinex-common-openfeign</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.refinex</groupId>
                 <artifactId>refinex-common-nacos</artifactId>
                 <version>${revision}</version>
             </dependency>
@@ -493,12 +481,6 @@
             <dependency>
                 <groupId>cn.refinex</groupId>
                 <artifactId>refinex-common-test</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>cn.refinex</groupId>
-                <artifactId>refinex-api-platform</artifactId>
                 <version>${revision}</version>
             </dependency>
         </dependencies>

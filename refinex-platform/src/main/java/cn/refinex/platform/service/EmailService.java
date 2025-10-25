@@ -1,12 +1,12 @@
 package cn.refinex.platform.service;
 
-import cn.refinex.api.platform.client.email.dto.request.EmailSendRequestDTO;
-import cn.refinex.api.platform.client.email.dto.request.EmailTemplateDTO;
-import cn.refinex.api.platform.client.email.dto.request.EmailVerifyCodeRequestDTO;
-import cn.refinex.api.platform.client.email.dto.request.EmailVerifyCodeValidateRequestDTO;
-import cn.refinex.api.platform.client.email.dto.response.EmailSendResponseDTO;
-import cn.refinex.api.platform.client.email.dto.response.EmailVerifyCodeResponseDTO;
-import cn.refinex.platform.domain.entity.email.EmailTemplate;
+import cn.refinex.platform.controller.email.dto.request.EmailSendRequestDTO;
+import cn.refinex.platform.controller.email.dto.request.EmailTemplateDTO;
+import cn.refinex.platform.controller.email.dto.request.EmailVerifyCodeRequestDTO;
+import cn.refinex.platform.controller.email.dto.request.EmailVerifyCodeValidateRequestDTO;
+import cn.refinex.platform.controller.email.dto.response.EmailSendResponseDTO;
+import cn.refinex.platform.controller.email.dto.response.EmailVerifyCodeResponseDTO;
+import cn.refinex.platform.entity.email.EmailTemplate;
 
 import java.util.List;
 import java.util.Map;

@@ -10,48 +10,28 @@
   <groupId>cn.refinex</groupId>
   <artifactId>refinex-platform</artifactId>
   <version>1.0.0</version>
-  <name>refinex-platform</name>
+  <name>${project.artifactId}</name>
   <description>Refinex Cloud Platform</description>
   <dependencies>
+    <dependency>
+      <groupId>cn.refinex</groupId>
+      <artifactId>refinex-common-nacos</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.alibaba.cloud</groupId>
-      <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.alibaba.cloud</groupId>
-      <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.cloud</groupId>
-      <artifactId>spring-cloud-starter-bootstrap</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.cloud</groupId>
-      <artifactId>spring-cloud-starter-loadbalancer</artifactId>
-    </dependency>
-    <dependency>
       <groupId>cn.refinex</groupId>
-      <artifactId>refinex-common-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cn.refinex</groupId>
-      <artifactId>refinex-common-security</artifactId>
+      <artifactId>refinex-common-satoken</artifactId>
     </dependency>
     <dependency>
       <groupId>cn.refinex</groupId>
       <artifactId>refinex-common-jdbc</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springdoc</groupId>
-      <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.cloud</groupId>
-      <artifactId>spring-cloud-starter-openfeign</artifactId>
+      <groupId>cn.refinex</groupId>
+      <artifactId>refinex-common-web</artifactId>
     </dependency>
     <dependency>
       <groupId>cn.refinex</groupId>
@@ -68,14 +48,6 @@
     <dependency>
       <groupId>cn.refinex</groupId>
       <artifactId>refinex-common-json</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cn.refinex</groupId>
-      <artifactId>refinex-api-auth</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cn.refinex</groupId>
-      <artifactId>refinex-api-platform</artifactId>
     </dependency>
   </dependencies>
   <build>

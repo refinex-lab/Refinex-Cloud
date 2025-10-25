@@ -3,7 +3,7 @@ package cn.refinex.platform.repository.sys;
 import cn.refinex.common.constants.SystemRoleConstants;
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
 import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
-import cn.refinex.platform.domain.entity.sys.SysRole;
+import cn.refinex.platform.entity.sys.SysRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;

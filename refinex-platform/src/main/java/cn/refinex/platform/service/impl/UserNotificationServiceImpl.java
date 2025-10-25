@@ -5,7 +5,7 @@ import cn.refinex.common.jdbc.service.SensitiveDataService;
 import cn.refinex.common.satoken.core.util.LoginHelper;
 import cn.refinex.common.utils.Fn;
 import cn.refinex.common.utils.regex.RegexUtils;
-import cn.refinex.platform.domain.entity.sys.SysUser;
+import cn.refinex.platform.entity.sys.SysUser;
 import cn.refinex.platform.repository.sys.SysUserRepository;
 import cn.refinex.platform.service.UserNotificationService;
 import lombok.RequiredArgsConstructor;

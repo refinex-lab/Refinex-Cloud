@@ -1,14 +1,13 @@
 package cn.refinex.platform.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
-import cn.refinex.api.platform.client.email.dto.request.EmailSendRequestDTO;
-import cn.refinex.api.platform.client.email.dto.response.EmailSendResponseDTO;
 import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.json.utils.JsonUtils;
 import cn.refinex.common.mail.config.properties.MailProperties;
 import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
-import cn.refinex.platform.constants.EmailErrorMessageConstants;
-import cn.refinex.platform.domain.entity.email.EmailSendQueue;
+import cn.refinex.platform.controller.email.dto.request.EmailSendRequestDTO;
+import cn.refinex.platform.controller.email.dto.response.EmailSendResponseDTO;
+import cn.refinex.platform.entity.email.EmailSendQueue;
 import cn.refinex.platform.enums.EmailSendStatus;
 import cn.refinex.platform.repository.email.EmailSendQueueRepository;
 import cn.refinex.platform.service.EmailQueueService;
@@ -207,7 +206,7 @@ public class EmailQueueServiceImpl implements EmailQueueService {
         EmailSendQueue task = queueRepository.findByQueueId(queueId);
         if (task == null) {
             log.error("任务不存在: queueId={}", queueId);
-            throw new SystemException(EmailErrorMessageConstants.QUEUE_TASK_NOT_FOUND);
+            throw new SystemException("邮件队列任务不存在");
         }
 
         // 2. 检查任务状态
@@ -245,7 +244,7 @@ public class EmailQueueServiceImpl implements EmailQueueService {
         EmailSendQueue task = queueRepository.findByQueueId(queueId);
         if (task == null) {
             log.error("任务不存在: queueId={}", queueId);
-            throw new SystemException(EmailErrorMessageConstants.QUEUE_TASK_NOT_FOUND);
+            throw new SystemException("邮件队列任务不存在");
         }
 
         // 2. 只能取消待发送的任务

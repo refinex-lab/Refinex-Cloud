@@ -15,8 +15,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>cn.refinex</groupId>
-            <artifactId>refinex-common-core</artifactId>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>

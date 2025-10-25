@@ -10,7 +10,7 @@
   <groupId>cn.refinex</groupId>
   <artifactId>refinex-common-redis</artifactId>
   <version>1.0.0</version>
-  <name>refinex-common-redis</name>
+  <name>${project.artifactId}</name>
   <description>Refinex Cloud Common Redis</description>
   <dependencies>
     <dependency>

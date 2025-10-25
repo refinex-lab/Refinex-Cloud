@@ -41,7 +41,7 @@
         <!-- 安全模块 -->
         <dependency>
             <groupId>cn.refinex</groupId>
-            <artifactId>refinex-common-satoken</artifactId>
+            <artifactId>refinex-common-security</artifactId>
         </dependency>
 
         <!-- 数据库模块 -->
@@ -67,12 +67,6 @@
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-test</artifactId>
             <scope>test</scope>
-        </dependency>
-
-        <!-- API 平台模块 -->
-        <dependency>
-            <groupId>cn.refinex</groupId>
-            <artifactId>refinex-api-platform</artifactId>
         </dependency>
 
         <!-- 验证码 -->

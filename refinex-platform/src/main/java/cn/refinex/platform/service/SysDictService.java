@@ -2,8 +2,8 @@ package cn.refinex.platform.service;
 
 import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
-import cn.refinex.platform.domain.entity.sys.SysDictData;
-import cn.refinex.platform.domain.entity.sys.SysDictType;
+import cn.refinex.platform.entity.sys.SysDictData;
+import cn.refinex.platform.entity.sys.SysDictType;
 
 import java.util.List;
 

@@ -4,7 +4,7 @@ import cn.refinex.common.jdbc.core.JdbcTemplateManager;
 import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
 import cn.refinex.common.utils.object.BeanConverter;
-import cn.refinex.platform.domain.entity.sys.SysDictType;
+import cn.refinex.platform.entity.sys.SysDictType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;

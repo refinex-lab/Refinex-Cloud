@@ -29,7 +29,7 @@ public class CaptchaController {
     private final CaptchaService captchaService;
 
     @GetMapping
-    @LogOperation(operateModule = "验证码管理", operateDesc = "生成验证码图片和唯一标识", operationType = OperateTypeEnum.OTHER)
+    @LogOperation(operateModule = "验证码管理", operateDesc = "生成验证码图片（Base64编码）和唯一标识", operationType = OperateTypeEnum.OTHER)
     @Operation(summary = "生成验证码", description = "生成验证码图片（Base64编码）和唯一标识")
     public ApiResult<CaptchaCreateResponse> generate() {
         CaptchaCreateResponse response = captchaService.generate();

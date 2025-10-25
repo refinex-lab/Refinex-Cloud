@@ -1,8 +1,8 @@
 package cn.refinex.platform.service;
 
-import cn.refinex.api.platform.client.email.dto.request.EmailVerifyCodeRequestDTO;
-import cn.refinex.api.platform.client.email.dto.request.EmailVerifyCodeValidateRequestDTO;
-import cn.refinex.api.platform.client.email.dto.response.EmailVerifyCodeResponseDTO;
+import cn.refinex.platform.controller.email.dto.request.EmailVerifyCodeRequestDTO;
+import cn.refinex.platform.controller.email.dto.request.EmailVerifyCodeValidateRequestDTO;
+import cn.refinex.platform.controller.email.dto.response.EmailVerifyCodeResponseDTO;
 
 /**
  * 邮箱验证码服务

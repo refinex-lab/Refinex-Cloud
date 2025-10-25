@@ -4,12 +4,12 @@ import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
-import cn.refinex.api.platform.client.user.dto.request.ResetPasswordRequestDTO;
-import cn.refinex.api.platform.client.user.dto.request.UserCreateRequestDTO;
-import cn.refinex.api.platform.client.user.vo.CurrentUserVo;
-import cn.refinex.api.platform.client.user.vo.SysUserVo;
-import cn.refinex.api.platform.enums.RegisterSource;
-import cn.refinex.api.platform.enums.UserRegisterType;
+import cn.refinex.platform.controller.user.dto.request.ResetPasswordRequestDTO;
+import cn.refinex.platform.controller.user.dto.request.UserCreateRequestDTO;
+import cn.refinex.platform.controller.user.vo.CurrentUserVo;
+import cn.refinex.platform.controller.user.vo.SysUserVo;
+import cn.refinex.platform.enums.RegisterSource;
+import cn.refinex.platform.enums.UserRegisterType;
 import cn.refinex.common.constants.SystemRoleConstants;
 import cn.refinex.common.constants.SystemStatusConstants;
 import cn.refinex.common.domain.model.LoginUser;
@@ -25,12 +25,12 @@ import cn.refinex.common.utils.Fn;
 import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
 import cn.refinex.common.utils.object.BeanConverter;
 import cn.refinex.common.utils.regex.RegexUtils;
-import cn.refinex.platform.domain.dto.request.UserDisableRequest;
-import cn.refinex.platform.domain.dto.request.UserKickoutRequest;
-import cn.refinex.platform.domain.dto.response.UserDisableStatusResponse;
-import cn.refinex.platform.domain.entity.sys.SysRole;
-import cn.refinex.platform.domain.entity.sys.SysUser;
-import cn.refinex.platform.domain.model.UserSessionDTO;
+import cn.refinex.platform.controller.user.dto.request.UserDisableRequestDTO;
+import cn.refinex.platform.controller.user.dto.request.UserKickoutRequestDTO;
+import cn.refinex.platform.controller.user.dto.response.UserDisableStatusResponseDTO;
+import cn.refinex.platform.entity.sys.SysRole;
+import cn.refinex.platform.entity.sys.SysUser;
+import cn.refinex.platform.controller.user.dto.response.UserSessionResponseDTO;
 import cn.refinex.platform.enums.UserStatus;
 import cn.refinex.platform.repository.sys.SysUserRepository;
 import cn.refinex.platform.service.PermissionService;
@@ -263,7 +263,7 @@ public class UserServiceImpl implements UserService {
      * @param request 封禁请求
      */
     @Override
-    public void disableUser(Long userId, UserDisableRequest request) {
+    public void disableUser(Long userId, UserDisableRequestDTO request) {
         log.info("封禁账号，userId: {}, request: {}", userId, request);
 
         // 1. 如果需要踢人下线，先踢下线
@@ -326,7 +326,7 @@ public class UserServiceImpl implements UserService {
      * @return 封禁状态
      */
     @Override
-    public UserDisableStatusResponse getUserStatus(Long userId, String service) {
+    public UserDisableStatusResponseDTO getUserStatus(Long userId, String service) {
         log.info("查询封禁状态，userId: {}, service: {}", userId, service);
 
         boolean disabled;
@@ -345,7 +345,7 @@ public class UserServiceImpl implements UserService {
             disableType = "全局";
         }
 
-        return UserDisableStatusResponse.builder()
+        return UserDisableStatusResponseDTO.builder()
                 .userId(userId)
                 .disabled(disabled)
                 .remainingTime(remainingTime)
@@ -360,10 +360,10 @@ public class UserServiceImpl implements UserService {
      * @return 会话列表
      */
     @Override
-    public List<UserSessionDTO> listUserSessions(Long userId) {
+    public List<UserSessionResponseDTO> listUserSessions(Long userId) {
         log.info("查询用户登录设备列表，userId: {}", userId);
 
-        List<UserSessionDTO> sessions = new ArrayList<>();
+        List<UserSessionResponseDTO> sessions = new ArrayList<>();
 
         // 获取用户的所有 Token
         List<String> tokenValueList = StpUtil.getTokenValueListByLoginId(userId);
@@ -387,7 +387,7 @@ public class UserServiceImpl implements UserService {
 
                 // 构建会话信息
                 // 注意：SaSession 没有 getUpdateTime() 方法，最后活跃时间使用创建时间代替
-                UserSessionDTO sessionDTO = UserSessionDTO.builder()
+                UserSessionResponseDTO sessionDTO = UserSessionResponseDTO.builder()
                         .tokenValue(tokenValue)
                         .deviceType(deviceType)
                         .loginTime(session.getCreateTime())
@@ -412,7 +412,7 @@ public class UserServiceImpl implements UserService {
      * @param request 踢人下线请求
      */
     @Override
-    public void kickoutUser(UserKickoutRequest request) {
+    public void kickoutUser(UserKickoutRequestDTO request) {
         log.info("踢人下线，request: {}", request);
 
         // 优先级：tokenValue > deviceType > userId

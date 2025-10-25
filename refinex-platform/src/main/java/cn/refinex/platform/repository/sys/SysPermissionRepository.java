@@ -4,8 +4,8 @@ import cn.refinex.common.jdbc.core.JdbcTemplateManager;
 import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
 import cn.refinex.common.utils.object.BeanConverter;
-import cn.refinex.platform.domain.dto.request.SysPermissionQueryRequest;
-import cn.refinex.platform.domain.entity.sys.SysPermission;
+import cn.refinex.platform.controller.auth.dto.request.SysPermissionQueryRequestDTO;
+import cn.refinex.platform.entity.sys.SysPermission;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -124,7 +124,7 @@ public class SysPermissionRepository {
      * @param pageRequest 分页请求
      * @return 权限分页结果
      */
-    public PageResult<SysPermission> pageQuery(SysPermissionQueryRequest query, PageRequest pageRequest) {
+    public PageResult<SysPermission> pageQuery(SysPermissionQueryRequestDTO query, PageRequest pageRequest) {
         StringBuilder sql = new StringBuilder("""
                 SELECT *
                 FROM sys_permission

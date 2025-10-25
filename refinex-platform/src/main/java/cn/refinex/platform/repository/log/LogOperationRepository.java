@@ -2,7 +2,7 @@ package cn.refinex.platform.repository.log;
 
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
 import cn.refinex.common.utils.object.BeanConverter;
-import cn.refinex.platform.domain.entity.log.LogOperation;
+import cn.refinex.platform.entity.log.LogOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

@@ -1,16 +1,12 @@
 package cn.refinex.auth.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
-import cn.refinex.api.platform.client.email.EmailRemoteService;
-import cn.refinex.api.platform.client.email.dto.request.EmailVerifyCodeRequestDTO;
-import cn.refinex.api.platform.client.email.dto.request.EmailVerifyCodeValidateRequestDTO;
-import cn.refinex.api.platform.client.email.dto.response.EmailVerifyCodeResponseDTO;
-import cn.refinex.api.platform.client.user.UserRemoteService;
-import cn.refinex.api.platform.client.user.dto.request.ResetPasswordRequestDTO;
-import cn.refinex.api.platform.client.user.dto.request.UserCreateRequestDTO;
-import cn.refinex.api.platform.enums.EmailVerifyCodeType;
-import cn.refinex.auth.domain.dto.request.LoginRequest;
+import cn.refinex.auth.client.PlatformEmailServiceClient;
+import cn.refinex.auth.client.PlatformUserServiceClient;
+import cn.refinex.auth.domain.dto.request.*;
+import cn.refinex.auth.domain.dto.response.EmailVerifyCodeResponseDTO;
 import cn.refinex.auth.domain.vo.LoginVo;
+import cn.refinex.auth.enums.EmailVerifyCodeType;
 import cn.refinex.auth.service.AuthService;
 import cn.refinex.common.apilog.core.annotation.LogOperation;
 import cn.refinex.common.apilog.core.enums.OperateTypeEnum;
@@ -46,8 +42,8 @@ import java.util.concurrent.TimeUnit;
 public class TokenController {
 
     private final AuthService authService;
-    private final UserRemoteService userFeignClient;
-    private final EmailRemoteService emailFeignClient;
+    private final PlatformUserServiceClient platformUserServiceClient;
+    private final PlatformEmailServiceClient platformEmailServiceClient;
 
     @PostMapping("/register")
     @RateLimiter(
@@ -61,7 +57,7 @@ public class TokenController {
     @Operation(summary = "用户注册", description = "创建新用户账号")
     @Parameter(name = "request", description = "用户注册请求参数", required = true)
     public ApiResult<Boolean> registerUser(@Valid @RequestBody UserCreateRequestDTO request) {
-        return userFeignClient.registerUser(request);
+        return platformUserServiceClient.registerUser(request);
     }
 
     @PostMapping("/login")
@@ -92,7 +88,7 @@ public class TokenController {
     @Parameter(name = "request", description = "验证码请求参数", required = true)
     public ApiResult<EmailVerifyCodeResponseDTO> sendEmailVerifyCode(@Valid @RequestBody EmailVerifyCodeRequestDTO request) {
         request.setClientIp(ServletUtils.getClientIp());
-        return emailFeignClient.sendVerifyCode(request);
+        return platformEmailServiceClient.sendEmailVerifyCode(request);
     }
 
     @PutMapping("/password/reset")
@@ -101,7 +97,7 @@ public class TokenController {
     @Parameter(name = "request", description = "重置密码请求参数", required = true)
     public ApiResult<Boolean> resetPassword(@Valid @RequestBody ResetPasswordRequestDTO request) {
         // 验证用户存在性
-        ApiResult<LoginUser> checkUserResult = userFeignClient.getLoginUserByEmail(request.getEmail());
+        ApiResult<LoginUser> checkUserResult = platformUserServiceClient.getLoginUserByEmail(request.getEmail());
         if (!checkUserResult.isSuccess()) {
             throw new BusinessException(HttpStatusCode.NOT_FOUND, "用户不存在");
         }
@@ -112,14 +108,14 @@ public class TokenController {
                 .verifyCode(request.getEmailCode())
                 .codeType(EmailVerifyCodeType.RESET_PASSWORD.getCode())
                 .build();
-        ApiResult<Boolean> verifyCodeResult = emailFeignClient.verifyCode(verifyCodeValidateRequest);
+        ApiResult<Boolean> verifyCodeResult = platformEmailServiceClient.verifyEmailCode(verifyCodeValidateRequest);
         
         if (!verifyCodeResult.isSuccess() || !Boolean.TRUE.equals(verifyCodeResult.data())) {
             throw new BusinessException(HttpStatusCode.BAD_REQUEST, "验证码无效或已过期");
         }
 
         // 重置密码
-        return userFeignClient.resetPassword(request);
+        return platformUserServiceClient.resetUserPassword(request);
     }
 }
 

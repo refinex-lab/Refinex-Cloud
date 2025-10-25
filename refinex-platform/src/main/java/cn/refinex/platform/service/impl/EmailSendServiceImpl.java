@@ -1,15 +1,14 @@
 package cn.refinex.platform.service.impl;
 
-import cn.refinex.api.platform.client.email.dto.request.EmailSendRequestDTO;
-import cn.refinex.api.platform.client.email.dto.response.EmailSendResponseDTO;
 import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.mail.config.properties.MailProperties;
 import cn.refinex.common.mail.config.properties.SmtpConfig;
 import cn.refinex.common.utils.Fn;
 import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
-import cn.refinex.platform.constants.EmailErrorMessageConstants;
-import cn.refinex.platform.domain.entity.email.EmailSendLog;
-import cn.refinex.platform.domain.entity.email.EmailTemplate;
+import cn.refinex.platform.controller.email.dto.request.EmailSendRequestDTO;
+import cn.refinex.platform.controller.email.dto.response.EmailSendResponseDTO;
+import cn.refinex.platform.entity.email.EmailSendLog;
+import cn.refinex.platform.entity.email.EmailTemplate;
 import cn.refinex.platform.enums.EmailSendStatus;
 import cn.refinex.platform.repository.email.EmailSendLogRepository;
 import cn.refinex.platform.service.EmailSendService;
@@ -63,7 +62,7 @@ public class EmailSendServiceImpl implements EmailSendService {
             JavaMailSender mailSender = javaMailSenderMap.get(smtpConfigId);
             if (Objects.isNull(mailSender)) {
                 log.error("SMTP 配置不存在: {}", smtpConfigId);
-                throw new SystemException(EmailErrorMessageConstants.SMTP_CONFIG_NOT_FOUND);
+                throw new SystemException("SMTP 配置不存在");
             }
 
             // 2. 准备邮件内容
@@ -200,7 +199,7 @@ public class EmailSendServiceImpl implements EmailSendService {
         return mailProperties.getSmtpConfigs().stream()
                 .filter(config -> config.getConfigId().equals(smtpConfigId))
                 .findFirst()
-                .orElseThrow(() -> new SystemException(EmailErrorMessageConstants.SMTP_CONFIG_NOT_FOUND));
+                .orElseThrow(() -> new SystemException("SMTP 配置不存在"));
     }
 
     /**

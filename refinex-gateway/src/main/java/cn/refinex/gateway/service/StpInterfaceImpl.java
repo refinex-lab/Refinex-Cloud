@@ -3,11 +3,11 @@ package cn.refinex.gateway.service;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
-import cn.refinex.api.platform.client.user.UserRemoteService;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.domain.model.LoginUser;
 import cn.refinex.common.enums.UserType;
 import cn.refinex.common.satoken.core.util.LoginHelper;
+import cn.refinex.gateway.client.PlatformUserServiceClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -28,7 +28,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class StpInterfaceImpl implements StpInterface {
 
-    private final UserRemoteService userRemoteService;
+    private final PlatformUserServiceClient platformUserServiceClient;
 
     /**
      * 获取用户权限列表
@@ -49,7 +49,7 @@ public class StpInterfaceImpl implements StpInterface {
             Long userId = Convert.toLong(loginIdList.get(1));
 
             // 调用 platform 服务获取用户权限
-            ApiResult<Set<String>> result = userRemoteService.getUserMenuPermissions(userId);
+            ApiResult<Set<String>> result = platformUserServiceClient.getUserMenuPermissions(userId);
             if (!result.isSuccess()) {
                 log.error("获取用户权限失败，userId: {}, error: {}", loginId, result.message());
                 return List.of();
@@ -89,7 +89,7 @@ public class StpInterfaceImpl implements StpInterface {
             Long userId = Convert.toLong(loginIdList.get(1));
 
             // 调用 platform 服务获取用户角色
-            ApiResult<Set<String>> result = userRemoteService.getUserRolePermissions(userId);
+            ApiResult<Set<String>> result = platformUserServiceClient.getUserRolePermissions(userId);
             if (!result.isSuccess()) {
                 log.error("获取用户角色失败，userId: {}, error: {}", loginId, result.message());
                 return List.of();

@@ -4,8 +4,8 @@ import cn.refinex.common.jdbc.core.JdbcTemplateManager;
 import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
 import cn.refinex.common.utils.object.BeanConverter;
-import cn.refinex.platform.domain.dto.request.SysMenuQueryRequest;
-import cn.refinex.platform.domain.entity.sys.SysMenu;
+import cn.refinex.platform.controller.auth.dto.request.SysMenuQueryRequestDTO;
+import cn.refinex.platform.entity.sys.SysMenu;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -163,7 +163,7 @@ public class SysMenuRepository {
      * @param pageRequest 分页请求
      * @return 分页结果
      */
-    public PageResult<SysMenu> pageQuery(SysMenuQueryRequest query, PageRequest pageRequest) {
+    public PageResult<SysMenu> pageQuery(SysMenuQueryRequestDTO query, PageRequest pageRequest) {
         StringBuilder sql = new StringBuilder("""
                 SELECT *
                 FROM sys_menu

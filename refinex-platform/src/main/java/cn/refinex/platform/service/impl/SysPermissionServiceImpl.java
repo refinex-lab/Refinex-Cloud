@@ -7,10 +7,10 @@ import cn.refinex.common.jdbc.page.PageResult;
 import cn.refinex.common.json.utils.JsonUtils;
 import cn.refinex.common.redis.RedisService;
 import cn.refinex.common.utils.object.BeanConverter;
-import cn.refinex.platform.domain.dto.request.SysPermissionCreateRequest;
-import cn.refinex.platform.domain.dto.request.SysPermissionQueryRequest;
-import cn.refinex.platform.domain.dto.request.SysPermissionUpdateRequest;
-import cn.refinex.platform.domain.entity.sys.SysPermission;
+import cn.refinex.platform.controller.auth.dto.request.SysPermissionCreateRequestDTO;
+import cn.refinex.platform.controller.auth.dto.request.SysPermissionQueryRequestDTO;
+import cn.refinex.platform.controller.auth.dto.request.SysPermissionUpdateRequestDTO;
+import cn.refinex.platform.entity.sys.SysPermission;
 import cn.refinex.platform.repository.sys.SysPermissionRepository;
 import cn.refinex.platform.service.SysPermissionService;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +47,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
      * @return 权限ID
      */
     @Override
-    public Long create(SysPermissionCreateRequest request, Long operatorId) {
+    public Long create(SysPermissionCreateRequestDTO request, Long operatorId) {
         // 校验权限编码是否存在
         if (sysPermissionRepository.existsByCode(request.getPermissionCode(), null)) {
             throw new BusinessException("权限编码已存在");
@@ -77,7 +77,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
      * @return 是否更新成功
      */
     @Override
-    public boolean update(Long id, SysPermissionUpdateRequest request, Long operatorId) {
+    public boolean update(Long id, SysPermissionUpdateRequestDTO request, Long operatorId) {
         // 校验权限是否存在
         SysPermission exist = sysPermissionRepository.selectById(id);
         if (exist == null) {
@@ -207,7 +207,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
      * @return 分页结果
      */
     @Override
-    public PageResult<SysPermission> page(SysPermissionQueryRequest query, PageRequest pageRequest) {
+    public PageResult<SysPermission> page(SysPermissionQueryRequestDTO query, PageRequest pageRequest) {
         return sysPermissionRepository.pageQuery(query, pageRequest);
     }
 

@@ -5,9 +5,9 @@ import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.refinex.api.platform.client.logger.LogOperationRemoteService;
-import cn.refinex.api.platform.client.logger.dto.request.LogOperationCreateRequestDTO;
 import cn.refinex.common.apilog.core.annotation.LogOperation;
+import cn.refinex.common.apilog.core.client.PlatformLoggerServiceClient;
+import cn.refinex.common.apilog.core.dto.request.LogOperationCreateRequestDTO;
 import cn.refinex.common.apilog.core.enums.OperateTypeEnum;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.enums.HttpStatusCode;
@@ -57,19 +57,19 @@ public class LogOperationFilter extends ApiRequestFilter {
     private static final String[] SANITIZE_KEYS = new String[]{"password", "token", "accessToken", "refreshToken"};
 
     private final String applicationName;
-    private final LogOperationRemoteService logOperationClient;
+    private final PlatformLoggerServiceClient platformLoggerServiceClient;
 
     /**
      * 构造函数
      *
-     * @param webProperties      Web 配置属性
-     * @param applicationName    应用名称
-     * @param logOperationClient 操作日志客户端
+     * @param webProperties               Web 配置属性
+     * @param applicationName             应用名称
+     * @param platformLoggerServiceClient 平台日志服务客户端
      */
-    public LogOperationFilter(WebProperties webProperties, String applicationName, LogOperationRemoteService logOperationClient) {
+    public LogOperationFilter(WebProperties webProperties, String applicationName, PlatformLoggerServiceClient platformLoggerServiceClient) {
         super(webProperties);
         this.applicationName = applicationName;
-        this.logOperationClient = logOperationClient;
+        this.platformLoggerServiceClient = platformLoggerServiceClient;
     }
 
     /**
@@ -127,7 +127,7 @@ public class LogOperationFilter extends ApiRequestFilter {
                 return;
             }
 
-            logOperationClient.saveLogOperationAsync(logOperationRequest);
+            platformLoggerServiceClient.saveLogOperationAsync(logOperationRequest);
         } catch (Exception e) {
             log.error("记录操作日志失败, url: {}, logInfo: {}", request.getRequestURI(), logOperationRequest, e);
         }
@@ -291,7 +291,7 @@ public class LogOperationFilter extends ApiRequestFilter {
     /**
      * 对请求参数中的敏感信息进行掩码处理
      *
-     * @param requestParams 请求参数
+     * @param requestParams   请求参数
      * @param sensitiveParams 敏感参数数组
      * @return 处理后的请求参数 JSON 字符串
      */
@@ -310,7 +310,7 @@ public class LogOperationFilter extends ApiRequestFilter {
     /**
      * 对 JSON 字符串中的敏感信息进行掩码处理
      *
-     * @param jsonStr JSON 字符串
+     * @param jsonStr         JSON 字符串
      * @param sensitiveParams 敏感参数数组
      * @return 处理后的 JSON 字符串
      */

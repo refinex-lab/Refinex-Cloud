@@ -183,8 +183,6 @@ sa-token:
   is-write-header: true
   # 同 Token 检查(用于微服务网关鉴权)
   check-same-token: true
-  # Same-Token 头名称（显式指定，避免环境差异）
-  same-token-name: Same-Token
   # Token 续期配置, 单位秒, 默认 -1 表示不限制
   token-session-timeout: -1
   # 自动续签(每次访问自动续期)
@@ -306,6 +304,13 @@ management:
       enabled: true
     db:
       enabled: false
+
+# ====================================================================
+# Http Interface 配置
+# ====================================================================
+http-interface-client:
+  # 基础 URL, 所有接口调用都将基于此 URL(这里走网关服务)
+  base-url: http://127.0.0.1:8082
 
 # ====================================================================
 # Open API 文档配置

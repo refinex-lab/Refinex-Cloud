@@ -10,39 +10,53 @@
   <url>https://github.com/refinex/Refinex-Cloud</url>
   <modules>
     <module>refinex-common</module>
-    <module>refinex-api</module>
     <module>refinex-platform</module>
     <module>refinex-gateway</module>
     <module>refinex-auth</module>
   </modules>
   <properties>
     <spring-boot-admin.version>3.5.3</spring-boot-admin.version>
+    <easy-es.version>3.0.0</easy-es.version>
     <tika-core.version>3.2.3</tika-core.version>
+    <dynamic-ds.version>4.3.1</dynamic-ds.version>
+    <jedis-mock.version>1.1.4</jedis-mock.version>
     <yauaa.version>7.28.1</yauaa.version>
     <hutool.version>5.8.38</hutool.version>
     <bcprov-jdk15to18.version>1.82</bcprov-jdk15to18.version>
+    <podam.version>8.0.2.RELEASE</podam.version>
     <jasypt-spring-boot-starter.version>3.0.5</jasypt-spring-boot-starter.version>
     <spring-boot.version>3.5.6</spring-boot.version>
     <flatten-maven-plugin.version>1.3.0</flatten-maven-plugin.version>
     <spring-cloud-alibaba.version>2023.0.3.3</spring-cloud-alibaba.version>
     <spring-cloud.version>2025.0.0</spring-cloud.version>
     <aws-sdk.version>2.28.22</aws-sdk.version>
-    <mapstruct-plus.version>1.5.0</mapstruct-plus.version>
-    <springdoc.version>2.2.0</springdoc.version>
+    <httpclient5.version>5.5.1</httpclient5.version>
+    <nacos.client.version>2.5.1</nacos.client.version>
+    <mapstruct.version>1.5.5.Final</mapstruct.version>
+    <springdoc.version>2.8.13</springdoc.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <commons-collections4.version>4.4</commons-collections4.version>
+    <resilience4j.version>2.3.0</resilience4j.version>
+    <lock4j.version>2.2.7</lock4j.version>
     <commons-io.version>2.20.0</commons-io.version>
     <thumbnailator.version>0.4.20</thumbnailator.version>
     <jasypt.version>1.9.3</jasypt.version>
     <java.version>17</java.version>
+    <jsoup.version>1.21.2</jsoup.version>
     <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
+    <knife4j.version>4.4.0</knife4j.version>
     <easy-captcha.version>1.6.2</easy-captcha.version>
     <revision>1.0.0</revision>
     <lombok.version>1.18.40</lombok.version>
+    <rocketmq-spring.version>2.3.2</rocketmq-spring.version>
     <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
-    <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
+    <ip2region.version>2.7.0</ip2region.version>
     <satoken.version>1.44.0</satoken.version>
+    <mockito-inline.version>5.2.0</mockito-inline.version>
     <redisson.version>3.51.0</redisson.version>
+    <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+    <transmittable-thread-local.version>2.14.5</transmittable-thread-local.version>
+    <xxl-job.version>2.4.0</xxl-job.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -68,18 +82,34 @@
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>cn.dev33</groupId>
-        <artifactId>sa-token-jwt</artifactId>
-        <version>${satoken.version}</version>
+        <groupId>com.alibaba.nacos</groupId>
+        <artifactId>nacos-client</artifactId>
+        <version>${nacos.client.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.alibaba.nacos</groupId>
+            <artifactId>nacos-log4j2-adapter</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.alibaba.nacos</groupId>
+            <artifactId>nacos-logback-adapter-12</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.alibaba.nacos</groupId>
+            <artifactId>logback-adapter</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>cn.hutool</groupId>
+        <artifactId>hutool-bom</artifactId>
+        <version>${hutool.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>cn.dev33</groupId>
         <artifactId>sa-token-core</artifactId>
-        <version>${satoken.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>cn.dev33</groupId>
-        <artifactId>sa-token-redis-template</artifactId>
         <version>${satoken.version}</version>
       </dependency>
       <dependency>
@@ -93,9 +123,45 @@
         <version>${satoken.version}</version>
       </dependency>
       <dependency>
+        <groupId>cn.dev33</groupId>
+        <artifactId>sa-token-redis-template</artifactId>
+        <version>${satoken.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.dev33</groupId>
+        <artifactId>sa-token-redis-jackson</artifactId>
+        <version>${satoken.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.dev33</groupId>
+        <artifactId>sa-token-jwt</artifactId>
+        <version>${satoken.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.redisson</groupId>
         <artifactId>redisson-spring-boot-starter</artifactId>
         <version>${redisson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
+        <version>${lock4j.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.rocketmq</groupId>
+        <artifactId>rocketmq-spring-boot-starter</artifactId>
+        <version>${rocketmq-spring.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.dromara.easy-es</groupId>
+        <artifactId>easy-es-boot-starter</artifactId>
+        <version>${easy-es.version}</version>
       </dependency>
       <dependency>
         <groupId>cn.hutool</groupId>
@@ -103,9 +169,19 @@
         <version>${hutool.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>dynamic-datasource-spring-boot3-starter</artifactId>
+        <version>${dynamic-ds.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-collections4</artifactId>
         <version>${commons-collections4.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct</artifactId>
+        <version>${mapstruct.version}</version>
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>
@@ -143,9 +219,14 @@
         <version>${jasypt.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.springdoc</groupId>
-        <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
-        <version>${springdoc.version}</version>
+        <groupId>com.github.xiaoymin</groupId>
+        <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+        <version>${knife4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.xiaoymin</groupId>
+        <artifactId>knife4j-gateway-spring-boot-starter</artifactId>
+        <version>${knife4j.version}</version>
       </dependency>
       <dependency>
         <groupId>software.amazon.awssdk</groupId>
@@ -163,9 +244,69 @@
         <version>${thumbnailator.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.httpcomponents.client5</groupId>
+        <artifactId>httpclient5</artifactId>
+        <version>${httpclient5.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.github.resilience4j</groupId>
+        <artifactId>resilience4j-spring-boot3</artifactId>
+        <version>${resilience4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.lionsoul</groupId>
+        <artifactId>ip2region</artifactId>
+        <version>${ip2region.version}</version>
+      </dependency>
+      <dependency>
         <groupId>nl.basjes.parse.useragent</groupId>
         <artifactId>yauaa</artifactId>
         <version>${yauaa.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jsoup</groupId>
+        <artifactId>jsoup</artifactId>
+        <version>${jsoup.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.xuxueli</groupId>
+        <artifactId>xxl-job-core</artifactId>
+        <version>${xxl-job.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>transmittable-thread-local</artifactId>
+        <version>${transmittable-thread-local.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <version>${spring-boot.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-inline</artifactId>
+        <version>${mockito-inline.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.fppt</groupId>
+        <artifactId>jedis-mock</artifactId>
+        <version>${jedis-mock.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.co.jemos.podam</groupId>
+        <artifactId>podam</artifactId>
+        <version>${podam.version}</version>
       </dependency>
       <dependency>
         <groupId>cn.refinex</groupId>
@@ -179,12 +320,27 @@
       </dependency>
       <dependency>
         <groupId>cn.refinex</groupId>
+        <artifactId>refinex-common-mq</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.refinex</groupId>
         <artifactId>refinex-common-jdbc</artifactId>
         <version>1.0.0</version>
       </dependency>
       <dependency>
         <groupId>cn.refinex</groupId>
+        <artifactId>refinex-common-satoken</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.refinex</groupId>
         <artifactId>refinex-common-security</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.refinex</groupId>
+        <artifactId>refinex-common-elasticsearch</artifactId>
         <version>1.0.0</version>
       </dependency>
       <dependency>
@@ -204,17 +360,22 @@
       </dependency>
       <dependency>
         <groupId>cn.refinex</groupId>
-        <artifactId>refinex-common-log</artifactId>
+        <artifactId>refinex-common-web</artifactId>
         <version>1.0.0</version>
       </dependency>
       <dependency>
         <groupId>cn.refinex</groupId>
-        <artifactId>refinex-api-auth</artifactId>
+        <artifactId>refinex-common-protection</artifactId>
         <version>1.0.0</version>
       </dependency>
       <dependency>
         <groupId>cn.refinex</groupId>
-        <artifactId>refinex-api-platform</artifactId>
+        <artifactId>refinex-common-nacos</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.refinex</groupId>
+        <artifactId>refinex-common-test</artifactId>
         <version>1.0.0</version>
       </dependency>
     </dependencies>
@@ -276,14 +437,14 @@
               <version>${lombok.version}</version>
             </path>
             <path>
-              <groupId>io.github.linpeilie</groupId>
-              <artifactId>mapstruct-plus-processor</artifactId>
-              <version>${mapstruct-plus.version}</version>
+              <groupId>org.mapstruct</groupId>
+              <artifactId>mapstruct-processor</artifactId>
+              <version>${mapstruct.version}</version>
             </path>
             <path>
               <groupId>org.projectlombok</groupId>
               <artifactId>lombok-mapstruct-binding</artifactId>
-              <version>${mapstruct-plus.lombok.version}</version>
+              <version>${lombok-mapstruct-binding.version}</version>
             </path>
           </annotationProcessorPaths>
           <compilerArgs>

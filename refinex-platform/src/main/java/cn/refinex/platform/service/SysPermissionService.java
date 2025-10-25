@@ -2,10 +2,10 @@ package cn.refinex.platform.service;
 
 import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
-import cn.refinex.platform.domain.dto.request.SysPermissionCreateRequest;
-import cn.refinex.platform.domain.dto.request.SysPermissionQueryRequest;
-import cn.refinex.platform.domain.dto.request.SysPermissionUpdateRequest;
-import cn.refinex.platform.domain.entity.sys.SysPermission;
+import cn.refinex.platform.controller.auth.dto.request.SysPermissionCreateRequestDTO;
+import cn.refinex.platform.controller.auth.dto.request.SysPermissionQueryRequestDTO;
+import cn.refinex.platform.controller.auth.dto.request.SysPermissionUpdateRequestDTO;
+import cn.refinex.platform.entity.sys.SysPermission;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public interface SysPermissionService {
      * @param operatorId 操作人ID
      * @return 权限ID
      */
-    Long create(SysPermissionCreateRequest request, Long operatorId);
+    Long create(SysPermissionCreateRequestDTO request, Long operatorId);
 
     /**
      * 更新系统权限
@@ -34,7 +34,7 @@ public interface SysPermissionService {
      * @param operatorId 操作人ID
      * @return 是否更新成功
      */
-    boolean update(Long id, SysPermissionUpdateRequest request, Long operatorId);
+    boolean update(Long id, SysPermissionUpdateRequestDTO request, Long operatorId);
 
     /**
      * 删除系统权限
@@ -86,7 +86,7 @@ public interface SysPermissionService {
      * @param pageRequest 分页请求
      * @return 权限分页结果
      */
-    PageResult<SysPermission> page(SysPermissionQueryRequest query, PageRequest pageRequest);
+    PageResult<SysPermission> page(SysPermissionQueryRequestDTO query, PageRequest pageRequest);
 }
 
 

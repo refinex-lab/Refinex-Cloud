@@ -15,7 +15,6 @@
 
     <modules>
         <module>refinex-common-core</module>
-        <module>refinex-common-security</module>
         <module>refinex-common-redis</module>
         <module>refinex-common-jdbc</module>
         <module>refinex-common-json</module>
@@ -28,8 +27,8 @@
         <module>refinex-common-satoken</module>
         <module>refinex-common-mq</module>
         <module>refinex-common-job</module>
-        <module>refinex-common-openfeign</module>
         <module>refinex-common-elasticsearch</module>
+        <module>refinex-common-security</module>
     </modules>
 
 </project>

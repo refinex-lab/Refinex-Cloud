@@ -4,8 +4,8 @@ import cn.refinex.common.jdbc.core.JdbcTemplateManager;
 import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
 import cn.refinex.common.utils.object.BeanConverter;
-import cn.refinex.platform.domain.dto.request.SysConfigQueryRequest;
-import cn.refinex.platform.domain.entity.sys.SysConfig;
+import cn.refinex.platform.controller.config.dto.request.SysConfigQueryRequestDTO;
+import cn.refinex.platform.entity.sys.SysConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -103,7 +103,7 @@ public class SysConfigRepository {
      * @param pageRequest 分页参数
      * @return 系统配置分页结果
      */
-    public PageResult<SysConfig> pageQuery(SysConfigQueryRequest query, PageRequest pageRequest) {
+    public PageResult<SysConfig> pageQuery(SysConfigQueryRequestDTO query, PageRequest pageRequest) {
         StringBuilder sql = new StringBuilder("""
                 SELECT *
                 FROM sys_config

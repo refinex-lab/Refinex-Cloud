@@ -21,11 +21,6 @@
 
         <dependency>
             <groupId>cn.refinex</groupId>
-            <artifactId>refinex-api-platform</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-json</artifactId>
         </dependency>
 

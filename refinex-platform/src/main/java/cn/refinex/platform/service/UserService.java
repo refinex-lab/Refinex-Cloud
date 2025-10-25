@@ -1,13 +1,13 @@
 package cn.refinex.platform.service;
 
 import cn.refinex.common.domain.model.LoginUser;
-import cn.refinex.api.platform.client.user.vo.CurrentUserVo;
-import cn.refinex.api.platform.client.user.dto.request.ResetPasswordRequestDTO;
-import cn.refinex.api.platform.client.user.dto.request.UserCreateRequestDTO;
-import cn.refinex.platform.domain.dto.request.UserDisableRequest;
-import cn.refinex.platform.domain.dto.request.UserKickoutRequest;
-import cn.refinex.platform.domain.dto.response.UserDisableStatusResponse;
-import cn.refinex.platform.domain.model.UserSessionDTO;
+import cn.refinex.platform.controller.user.vo.CurrentUserVo;
+import cn.refinex.platform.controller.user.dto.request.ResetPasswordRequestDTO;
+import cn.refinex.platform.controller.user.dto.request.UserCreateRequestDTO;
+import cn.refinex.platform.controller.user.dto.request.UserDisableRequestDTO;
+import cn.refinex.platform.controller.user.dto.request.UserKickoutRequestDTO;
+import cn.refinex.platform.controller.user.dto.response.UserDisableStatusResponseDTO;
+import cn.refinex.platform.controller.user.dto.response.UserSessionResponseDTO;
 
 import java.util.List;
 
@@ -65,7 +65,7 @@ public interface UserService {
      * @param userId  用户 ID
      * @param request 封禁请求
      */
-    void disableUser(Long userId, UserDisableRequest request);
+    void disableUser(Long userId, UserDisableRequestDTO request);
 
     /**
      * 解封账号
@@ -82,7 +82,7 @@ public interface UserService {
      * @param service 服务类型（可选）
      * @return 封禁状态
      */
-    UserDisableStatusResponse getUserStatus(Long userId, String service);
+    UserDisableStatusResponseDTO getUserStatus(Long userId, String service);
 
     /**
      * 查询用户登录设备列表
@@ -90,14 +90,14 @@ public interface UserService {
      * @param userId 用户 ID
      * @return 会话列表
      */
-    List<UserSessionDTO> listUserSessions(Long userId);
+    List<UserSessionResponseDTO> listUserSessions(Long userId);
 
     /**
      * 踢人下线
      *
      * @param request 踢人下线请求
      */
-    void kickoutUser(UserKickoutRequest request);
+    void kickoutUser(UserKickoutRequestDTO request);
 
     /**
      * 踢出用户所有设备

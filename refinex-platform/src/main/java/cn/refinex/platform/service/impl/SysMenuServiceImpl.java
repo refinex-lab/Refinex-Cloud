@@ -8,10 +8,10 @@ import cn.refinex.common.jdbc.page.PageResult;
 import cn.refinex.common.json.utils.JsonUtils;
 import cn.refinex.common.redis.RedisService;
 import cn.refinex.common.utils.object.BeanConverter;
-import cn.refinex.platform.domain.dto.request.SysMenuCreateRequest;
-import cn.refinex.platform.domain.dto.request.SysMenuQueryRequest;
-import cn.refinex.platform.domain.dto.request.SysMenuUpdateRequest;
-import cn.refinex.platform.domain.entity.sys.SysMenu;
+import cn.refinex.platform.controller.auth.dto.request.SysMenuCreateRequestDTO;
+import cn.refinex.platform.controller.auth.dto.request.SysMenuQueryRequestDTO;
+import cn.refinex.platform.controller.auth.dto.request.SysMenuUpdateRequestDTO;
+import cn.refinex.platform.entity.sys.SysMenu;
 import cn.refinex.platform.repository.sys.SysMenuRepository;
 import cn.refinex.platform.service.SysMenuService;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +48,7 @@ public class SysMenuServiceImpl implements SysMenuService {
      * @return 菜单ID
      */
     @Override
-    public Long create(SysMenuCreateRequest request, Long operatorId) {
+    public Long create(SysMenuCreateRequestDTO request, Long operatorId) {
         // 同一个父级下菜单名称不能重复
         if (sysMenuRepository.existsNameUnderParent(request.getMenuName(), request.getParentId(), null)) {
             throw new BusinessException("同一父级下菜单名称已存在");
@@ -86,7 +86,7 @@ public class SysMenuServiceImpl implements SysMenuService {
      * @return 是否更新成功
      */
     @Override
-    public boolean update(Long id, SysMenuUpdateRequest request, Long operatorId) {
+    public boolean update(Long id, SysMenuUpdateRequestDTO request, Long operatorId) {
         // 检查菜单是否存在
         SysMenu exist = sysMenuRepository.selectById(id);
         if (exist == null) {
@@ -204,7 +204,7 @@ public class SysMenuServiceImpl implements SysMenuService {
      * @return 分页结果
      */
     @Override
-    public PageResult<SysMenu> page(SysMenuQueryRequest query, PageRequest pageRequest) {
+    public PageResult<SysMenu> page(SysMenuQueryRequestDTO query, PageRequest pageRequest) {
         return sysMenuRepository.pageQuery(query, pageRequest);
     }
 

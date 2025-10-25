@@ -51,6 +51,11 @@
 
         <dependency>
             <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-satoken</artifactId>
         </dependency>
 
@@ -62,16 +67,6 @@
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-redis</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.refinex</groupId>
-            <artifactId>refinex-common-openfeign</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.refinex</groupId>
-            <artifactId>refinex-api-platform</artifactId>
         </dependency>
 
         <!-- Netty macOS DNS 解析器 (修复 macOS 上的 DNS 解析警告) -->

@@ -11,10 +11,7 @@
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
-    <description>
-        Refinex Cloud Common Security：
-        基于 Sa-Token 封装的认证鉴权模块，其他模块需要引入获得使用 Sa-Token 相关功能的能力。
-    </description>
+    <description>Refinex Cloud Common Security</description>
 
     <dependencies>
         <!-- Sa-Token 集成 -->
@@ -27,12 +24,6 @@
         <dependency>
             <groupId>cn.dev33</groupId>
             <artifactId>sa-token-spring-boot3-starter</artifactId>
-        </dependency>
-
-        <!-- SpringSecurity 核心集成，主要是使用 PasswordEncoder -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-crypto</artifactId>
         </dependency>
     </dependencies>
 </project>

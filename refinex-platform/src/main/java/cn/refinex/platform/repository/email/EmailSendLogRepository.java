@@ -1,7 +1,7 @@
 package cn.refinex.platform.repository.email;
 
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
-import cn.refinex.platform.domain.entity.email.EmailSendLog;
+import cn.refinex.platform.entity.email.EmailSendLog;
 import cn.refinex.common.utils.object.BeanConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

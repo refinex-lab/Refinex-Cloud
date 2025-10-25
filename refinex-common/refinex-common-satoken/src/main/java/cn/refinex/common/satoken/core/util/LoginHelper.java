@@ -1,5 +1,6 @@
 package cn.refinex.common.satoken.core.util;
 
+import cn.dev33.satoken.same.SaSameUtil;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
@@ -147,6 +148,33 @@ public class LoginHelper {
     public static UserType getUserType() {
         String loginType = StpUtil.getLoginIdAsString();
         return UserType.fromCode(loginType);
+    }
+
+    /**
+     * 获取当前 Token 值
+     *
+     * @return 当前 Token 值
+     */
+    public static String getTokenValue() {
+        return StpUtil.getTokenValue();
+    }
+
+    /**
+     * 获取当前 Token 名称
+     *
+     * @return 当前 Token 名称
+     */
+    public static String getTokenName() {
+        return StpUtil.getTokenName();
+    }
+
+    /**
+     * 获取当前 Same-Token, 如果不存在, 则立即创建并返回
+     *
+     * @return 相同 Token 值
+     */
+    public static String getSameTokenValue() {
+        return SaSameUtil.getToken();
     }
 
     /**

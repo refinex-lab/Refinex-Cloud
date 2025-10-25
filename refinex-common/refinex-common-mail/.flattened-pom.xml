@@ -10,24 +10,12 @@
   <groupId>cn.refinex</groupId>
   <artifactId>refinex-common-mail</artifactId>
   <version>1.0.0</version>
-  <name>refinex-common-mail</name>
+  <name>${project.artifactId}</name>
   <description>Refinex Cloud Common Mail</description>
   <dependencies>
     <dependency>
       <groupId>cn.refinex</groupId>
       <artifactId>refinex-common-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cn.refinex</groupId>
-      <artifactId>refinex-common-jdbc</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cn.refinex</groupId>
-      <artifactId>refinex-common-redis</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cn.refinex</groupId>
-      <artifactId>refinex-common-json</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>

@@ -2,7 +2,7 @@ package cn.refinex.platform.repository.sys;
 
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
 import cn.refinex.common.utils.object.BeanConverter;
-import cn.refinex.platform.domain.entity.sys.SysUser;
+import cn.refinex.platform.entity.sys.SysUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
