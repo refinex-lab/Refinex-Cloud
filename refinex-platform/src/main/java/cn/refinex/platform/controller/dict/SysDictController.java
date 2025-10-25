@@ -28,7 +28,7 @@ import java.util.List;
  * @since 1.0.0
  */
 @RestController
-@RequestMapping("/system/dictionaries")
+@RequestMapping("/dicts")
 @RequiredArgsConstructor
 @Tag(name = "系统字典管理", description = "字典类型和字典数据的增删改查等接口")
 public class SysDictController {
