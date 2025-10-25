@@ -178,10 +178,13 @@ const DictionaryDataList: React.FC = () => {
         rowKey="id"
         search={{
           labelWidth: 'auto',
-          span: 8,
+          span: 6,
           style: { marginBottom: 0 },
           collapsed: false,
           collapseRender: false,
+          optionRender: (_, __, dom) => [
+            ...dom.reverse(),
+          ],
         }}
         toolBarRender={() => [
           <Button
