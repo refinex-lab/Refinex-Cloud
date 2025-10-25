@@ -309,8 +309,27 @@ management:
 # Http Interface 配置
 # ====================================================================
 http-interface-client:
-  # 基础 URL, 所有接口调用都将基于此 URL(这里走网关服务)
-  base-url: http://127.0.0.1:8082
+  # 默认基础 URL (用于网关调用场景或降级场景)
+  base-url: http://127.0.0.1:8082/
+  
+  # 是否优先使用服务直连 (默认 true)
+  # true: 优先使用 services 配置的服务地址，未配置时降级到 baseUrl
+  # false: 始终使用 baseUrl (网关模式)
+  prefer-direct-call: true
+  
+  # 按服务名配置的 URL 映射 (用于服务间直连场景)
+  # 支持两种格式：
+  # 1. lb://service-name - 使用 Spring Cloud LoadBalancer 进行服务发现和负载均衡
+  # 2. http://IP:PORT - 直接指定服务地址
+  services:
+    # 认证服务 (使用负载均衡)
+    refinex-auth: lb://refinex-auth
+    # 平台服务 (使用负载均衡)
+    refinex-platform: lb://refinex-platform
+    # 知识库服务 (使用负载均衡)
+    # refinex-kb: lb://refinex-kb
+    # AI服务 (使用负载均衡)
+    # refinex-ai: lb://refinex-ai
 
 # ====================================================================
 # Open API 文档配置

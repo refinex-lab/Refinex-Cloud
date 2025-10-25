@@ -18,10 +18,14 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.io.HttpClientConnectionManager;
 import org.apache.hc.core5.util.Timeout;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -48,27 +52,62 @@ import java.nio.charset.StandardCharsets;
 public class RestClientConfig {
 
     /**
-     * 全局默认 RestClient 构建器
+     * 全局默认 RestClient 构建器（不支持负载均衡）
      *
      * @return RestClient.Builder
      */
     @Bean
+    @Primary // 使用 @Primary 标记为主要的 Builder，避免自动装配冲突
+    @ConditionalOnMissingBean(name = "restClientBuilder")
     public RestClient.Builder restClientBuilder() {
         return RestClient.builder();
     }
 
     /**
-     * 全局默认 RestClient 配置
+     * 支持负载均衡的 RestClient 构建器（用于 lb:// 协议）
+     * <p>
+     * 1. 仅在 LoadBalancer 类存在时才创建此 Bean
+     * 2. 使用 ObjectProvider 延迟注入，避免循环依赖
      *
-     * @param builder    RestClient 构建器
+     * @param requestFactoryProvider 支持负载均衡的 ClientHttpRequestFactory 提供者
+     * @return RestClient.Builder
+     */
+    @Bean
+    @LoadBalanced
+    @ConditionalOnClass(name = "org.springframework.cloud.client.loadbalancer.LoadBalancerClient")
+    @ConditionalOnMissingBean(name = "loadBalancedRestClientBuilder")
+    public RestClient.Builder loadBalancedRestClientBuilder(ObjectProvider<ClientHttpRequestFactory> requestFactoryProvider) {
+        RestClient.Builder builder = RestClient.builder();
+        // 使用 ObjectProvider 延迟获取，避免循环依赖
+        requestFactoryProvider.ifAvailable(builder::requestFactory);
+        return builder;
+    }
+
+    /**
+     * 全局默认 RestClient 配置 (使用默认 baseUrl，通常用于网关调用)
+     *
+     * @param builder    RestClient 构建器（自动注入 @Primary 的 restClientBuilder）
      * @param properties Http 接口客户端配置属性
      * @return RestClient
      */
     @Bean
+    @Primary // 使用 @Primary 标记为主要的 RestClient
+    @ConditionalOnMissingBean(name = "restClient")
     public RestClient restClient(RestClient.Builder builder, HttpInterfaceClientProperties properties) {
+        return createRestClient(builder, properties.getBaseUrl());
+    }
+
+    /**
+     * 创建 RestClient 的通用方法
+     *
+     * @param builder RestClient 构建器
+     * @param baseUrl 基础 URL
+     * @return 配置好的 RestClient 实例
+     */
+    private RestClient createRestClient(RestClient.Builder builder, String baseUrl) {
         return builder
-                // 设置基础 URL(注意，这里只配置到服务名，不包含 URL 路径前缀)
-                .baseUrl(properties.getBaseUrl())
+                // 设置基础 URL
+                .baseUrl(baseUrl)
                 // 设置默认请求头 Accept: application/json
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 // 配置 4xx 客户端错误状态处理器
@@ -104,15 +143,15 @@ public class RestClientConfig {
                 })
                 // 配置默认状态处理器(错误处理)
                 .defaultStatusHandler(statusCode -> !statusCode.is2xxSuccessful()
-                        || statusCode.is4xxClientError()
-                        || statusCode.is5xxServerError(),
+                                || statusCode.is4xxClientError()
+                                || statusCode.is5xxServerError(),
                         (request, response) -> {
-                    String responseBody = extractResponseBody(response);
-                    ApiResult<?> apiResult = parseErrorResponse(responseBody);
+                            String responseBody = extractResponseBody(response);
+                            ApiResult<?> apiResult = parseErrorResponse(responseBody);
 
-                    log.error("未知错误，状态码：{}，响应体：{}", response.getStatusCode(), responseBody);
-                    throw new SystemException(apiResult.code(), apiResult.message());
-                })
+                            log.error("未知错误，状态码：{}，响应体：{}", response.getStatusCode(), responseBody);
+                            throw new SystemException(apiResult.code(), apiResult.message());
+                        })
                 // 添加请求拦截器
                 .requestInterceptor((request, body, execution) -> {
                     // 记录请求日志
@@ -144,13 +183,61 @@ public class RestClientConfig {
     }
 
     /**
-     * 共享 RestClient 代理工厂(用于创建共享的 HTTP 服务代理)
+     * 根据服务名创建 RestClient, 自动选择合适的 Builder（支持负载均衡或普通）
      *
-     * @param restClient 全局默认 RestClient 实例
+     * @param serviceName                 服务名 (如 refinex-auth、refinex-platform)
+     * @param normalBuilderProvider       普通 RestClient 构建器提供者
+     * @param loadBalancedBuilderProvider 支持负载均衡的 RestClient 构建器提供者
+     * @param properties                  Http 接口客户端配置属性
+     * @return 针对特定服务的 RestClient 实例
+     */
+    public RestClient createRestClientForService(String serviceName,
+                                                 ObjectProvider<RestClient.Builder> normalBuilderProvider,
+                                                 ObjectProvider<RestClient.Builder> loadBalancedBuilderProvider,
+                                                 HttpInterfaceClientProperties properties) {
+
+        String serviceUrl = properties.getServiceUrl(serviceName);
+        log.info("为服务 [{}] 创建 RestClient，目标地址：{}", serviceName, serviceUrl);
+
+        // 如果使用 lb:// 协议，尝试使用支持负载均衡的 builder
+        if (serviceUrl.startsWith("lb://")) {
+            RestClient.Builder loadBalancedBuilder = loadBalancedBuilderProvider.getIfAvailable();
+            if (loadBalancedBuilder != null) {
+                log.info("检测到 lb:// 协议，使用负载均衡 RestClient");
+                return createRestClient(loadBalancedBuilder, serviceUrl);
+            } else {
+                log.warn("配置了 lb:// 协议但未找到负载均衡 Builder，降级使用普通 Builder");
+            }
+        }
+
+        // 使用普通 builder
+        RestClient.Builder normalBuilder = normalBuilderProvider.getIfAvailable(RestClient::builder);
+        return createRestClient(normalBuilder, serviceUrl);
+    }
+
+    /**
+     * 共享 RestClient 代理工厂(用于创建共享的 HTTP 服务代理)
+     * <p>
+     * 注意：此工厂使用默认 baseUrl，适用于需要通过网关调用的场景
+     *
+     * @param restClient 全局默认 RestClient 实例（自动注入 @Primary 的 restClient）
      * @return HttpServiceProxyFactory
      */
     @Bean
-    public HttpServiceProxyFactory sharedProxyFactory(@Qualifier("restClient") RestClient restClient) {
+    @Primary // 使用 @Primary 标记为主要的 HttpServiceProxyFactory，方便使用者直接注入
+    @ConditionalOnMissingBean(HttpServiceProxyFactory.class)
+    public HttpServiceProxyFactory httpServiceProxyFactory(RestClient restClient) {
+        log.info("创建默认 HttpServiceProxyFactory，使用网关地址");
+        return createProxyFactory(restClient);
+    }
+
+    /**
+     * 创建 HttpServiceProxyFactory 的通用方法
+     *
+     * @param restClient RestClient 实例
+     * @return 配置好的 HttpServiceProxyFactory
+     */
+    private HttpServiceProxyFactory createProxyFactory(RestClient restClient) {
         // 创建适配器
         RestClientAdapter adapter = RestClientAdapter.create(restClient);
 
@@ -162,6 +249,24 @@ public class RestClientConfig {
                 // 配置嵌入值解析器(用于解析 ${...} 占位符)
                 .embeddedValueResolver(new StandardEnvironment()::resolvePlaceholders)
                 .build();
+    }
+
+    /**
+     * 根据服务名创建 HttpServiceProxyFactory
+     * 自动选择合适的 Builder（支持负载均衡或普通）
+     *
+     * @param serviceName                 服务名 (如 refinex-auth、refinex-platform)
+     * @param normalBuilderProvider       普通 RestClient 构建器提供者
+     * @param loadBalancedBuilderProvider 支持负载均衡的 RestClient 构建器提供者
+     * @param properties                  Http 接口客户端配置属性
+     * @return 针对特定服务的 HttpServiceProxyFactory
+     */
+    public HttpServiceProxyFactory createProxyFactoryForService(String serviceName,
+                                                                ObjectProvider<RestClient.Builder> normalBuilderProvider,
+                                                                ObjectProvider<RestClient.Builder> loadBalancedBuilderProvider,
+                                                                HttpInterfaceClientProperties properties) {
+        RestClient restClient = createRestClientForService(serviceName, normalBuilderProvider, loadBalancedBuilderProvider, properties);
+        return createProxyFactory(restClient);
     }
 
     /**

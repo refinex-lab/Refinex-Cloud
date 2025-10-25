@@ -34,6 +34,7 @@ security:
     # 白名单列表, 网关将忽略这些路径的认证
     whites:
       - /refinex-auth/**
+      - /refinex-platform/logger/async
       - /favicon.ico
       - /actuator/**
       - /doc.html

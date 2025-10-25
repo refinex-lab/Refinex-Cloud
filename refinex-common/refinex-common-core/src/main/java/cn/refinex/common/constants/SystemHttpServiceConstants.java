@@ -13,15 +13,15 @@ import lombok.NoArgsConstructor;
 public final class SystemHttpServiceConstants {
 
     // 鉴权服务
-    public static final String AUTH_SERVICE_NAME = "/refinex-auth";
+    public static final String AUTH_SERVICE_NAME = "refinex-auth";
 
     // 平台服务
-    public static final String PLATFORM_SERVICE_NAME = "/refinex-platform";
+    public static final String PLATFORM_SERVICE_NAME = "refinex-platform";
 
     // 知识库服务
-    public static final String KB_SERVICE_NAME = "/refinex-kb";
+    public static final String KB_SERVICE_NAME = "refinex-kb";
 
     // AI服务
-    public static final String AI_SERVICE_NAME = "/refinex-ai";
+    public static final String AI_SERVICE_NAME = "refinex-ai";
 
 }

@@ -1,5 +1,6 @@
 package cn.refinex.gateway.client;
 
+import cn.refinex.common.annotation.HttpInterfaceClient;
 import cn.refinex.common.domain.ApiResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.service.annotation.GetExchange;
@@ -10,12 +11,13 @@ import java.util.Set;
 import static cn.refinex.common.constants.SystemHttpServiceConstants.PLATFORM_SERVICE_NAME;
 
 /**
- * 用户服务 HTTP Interface
+ * 平台用户服务 HTTP Interface 客户端
  *
  * @author Refinex
  * @since 1.0.0
  */
-@HttpExchange(PLATFORM_SERVICE_NAME + "/users")
+@HttpInterfaceClient(PLATFORM_SERVICE_NAME)
+@HttpExchange("/users")
 public interface PlatformUserServiceClient {
 
     @GetExchange("/{userId}/role-permissions")
