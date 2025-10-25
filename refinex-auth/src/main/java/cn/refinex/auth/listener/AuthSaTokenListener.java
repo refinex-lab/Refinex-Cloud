@@ -62,7 +62,7 @@ public class AuthSaTokenListener extends SaTokenListenerForSimple {
             // 提取用户名
             String userName = Convert.toStr(loginParameter.getExtra(USER_NAME_KEY));
             // 提取登录类型
-            Integer loginTypeCode = Convert.toInt(loginParameter.getExtra(LoginHelper.LOGIN_TYPE));
+            Integer loginTypeCode = Convert.toInt(loginParameter.getExtra(LoginHelper.LOGIN_TYPE_CODE));
 
             // 构建登录日志记录请求
             RecordLoginLogRequest recordRequest = RecordLoginLogRequest.builder()

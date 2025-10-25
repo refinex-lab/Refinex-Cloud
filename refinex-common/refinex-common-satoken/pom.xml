@@ -26,10 +26,15 @@
             <artifactId>sa-token-jwt</artifactId>
         </dependency>
 
-        <!-- Caffeine 缓存, 用于优化 SaTokenDao 在走 Redis 前先取本地缓存提高并发查询效率 -->
+        <!-- Sa-Token 集成 Redis 持久化令牌 (使用 Jackson 序列化方式) -->
+        <!--  引入依赖即可，不需要额外配置 -->
         <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-redis-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
         </dependency>
 
         <!-- Refinex 公共 Redis 模块 -->
@@ -42,13 +47,6 @@
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-core</artifactId>
-        </dependency>
-
-        <!-- 配置元数据生成器 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
         </dependency>
 
         <!-- 自动装配支持 -->

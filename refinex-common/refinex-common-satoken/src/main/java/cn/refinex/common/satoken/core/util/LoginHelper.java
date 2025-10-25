@@ -31,7 +31,12 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoginHelper {
 
-    public static final String LOGIN_TYPE = "loginType";
+    /**
+     * 踩个坑：
+     * 这里不要使用 loginType 命名，因为 loginType 是 Sa-Token 的保留字段，用于标识 Sa-Token 的登录类型（默认值为 "login"）。
+     * 否则会报错 “jwt loginType 无效：...”，感兴趣的可以 Debug 一下 SaJwtTemplate 类的 parseToken 方法。
+     */
+    public static final String LOGIN_TYPE_CODE = "loginTypeCode";
     public static final String LOGIN_USER_KEY = "loginUser";
     public static final String USER_KEY = "userId";
     public static final String USER_NAME_KEY = "userName";
@@ -72,10 +77,10 @@ public class LoginHelper {
         StpUtil.login(
                 loginUser.getLoginId(),
                 loginParameter
-                        // 额外参数：用户ID、用户名 (按需补充即可)
+                        // 额外参数：用户ID、用户名、登录类型代码 (按需补充即可)
                         .setExtra(USER_KEY, loginUser.getUserId())
                         .setExtra(USER_NAME_KEY, loginUser.getUsername())
-                        .setExtra(LOGIN_TYPE, loginType)
+                        .setExtra(LOGIN_TYPE_CODE, loginType)
         );
 
         // 将登录用户对象写入 Sa-Token 会话
