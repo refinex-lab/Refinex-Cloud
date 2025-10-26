@@ -17,7 +17,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { history, useIntl, useParams, useSearchParams } from '@umijs/max';
-import { Badge, Button, message, Popconfirm, Space, Tag, Tooltip } from 'antd';
+import { Badge, Button, message, Modal, Popconfirm, Space, Tag, Tooltip } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { DictData, DictDataCreateRequest, DictDataUpdateRequest } from '@/services/system';
 import {
@@ -101,6 +101,13 @@ const DictionaryDataList: React.FC = () => {
           text={statusEnum[record.status as 0 | 1]?.text}
         />
       ),
+    },
+    {
+      title: intl.formatMessage({ id: 'pages.system.dictionary.form.remark.label' }),
+      dataIndex: 'remark',
+      width: 200,
+      ellipsis: true,
+      hideInSearch: true,
     },
     {
       title: intl.formatMessage({ id: 'pages.system.dictionary.data.createTime' }),
@@ -280,7 +287,7 @@ const DictionaryDataList: React.FC = () => {
           showSizeChanger: true,
           showQuickJumper: true,
         }}
-        scroll={{ x: 1200, y: 'calc(100vh - 420px)' }}
+        scroll={{ x: 1400, y: 'calc(100vh - 420px)' }}
         options={{
           density: false,
           fullScreen: false,
