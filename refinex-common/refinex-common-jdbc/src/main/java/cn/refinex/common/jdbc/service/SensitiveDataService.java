@@ -4,7 +4,6 @@ import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
 import cn.refinex.common.properties.RefinexBizProperties;
-import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
 import cn.refinex.common.utils.security.CryptoUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +32,6 @@ import java.util.*;
 public class SensitiveDataService {
 
     private final JdbcTemplateManager jdbcManager;
-    private final SnowflakeIdGenerator idGenerator;
     private final RefinexBizProperties bizProperties;
 
     /**
@@ -48,39 +46,34 @@ public class SensitiveDataService {
      * @param rowGuid    被加密记录的唯一标识（业务表主键或 GUID）
      * @param fieldCode  字段代码（如 access_key、secret_key）
      * @param plainValue 明文值
-     * @return row_guid（用于关联 sys_sensitive 表）
      */
-    public String encryptAndStore(String tableName, String rowGuid, String fieldCode, String plainValue) {
+    public void encryptAndStore(String tableName, String rowGuid, String fieldCode, String plainValue) {
         Assert.hasText(tableName, "tableName 不能为空");
         Assert.hasText(rowGuid, "rowGuid 不能为空");
         Assert.hasText(fieldCode, "fieldCode 不能为空");
 
         if (!StringUtils.hasText(plainValue)) {
             log.warn("明文值为空，跳过加密存储，table={}, rowGuid={}, field={}", tableName, rowGuid, fieldCode);
-            return null;
+            return;
         }
 
         try {
             // 1. 使用 AES-256-GCM 加密
             String encryptedValue = encryptValue(plainValue);
 
-            // 2. 生成 sys_sensitive 表的 row_guid
-            String sensitiveRowGuid = UUID.randomUUID().toString().replace("-", "");
-
-            // 3. 插入到 sys_sensitive 表
+            // 2. 插入到 sys_sensitive 表
             String sql = """
                     INSERT INTO sys_sensitive (
-                        id, row_guid, table_name, field_code, encrypted_value,
+                        row_guid, table_name, field_code, encrypted_value,
                         encryption_algorithm, create_time, update_time
                     ) VALUES (
-                        :id, :rowGuid, :tableName, :fieldCode, :encryptedValue,
+                        :rowGuid, :tableName, :fieldCode, :encryptedValue,
                         :algorithm, NOW(), NOW()
                     )
                     """;
 
             Map<String, Object> params = Map.of(
-                    "id", idGenerator.nextId(),
-                    "rowGuid", sensitiveRowGuid,
+                    "rowGuid", rowGuid,
                     "tableName", tableName,
                     "fieldCode", fieldCode,
                     "encryptedValue", encryptedValue,
@@ -89,8 +82,7 @@ public class SensitiveDataService {
 
             jdbcManager.insert(sql, params);
 
-            log.debug("敏感数据已加密存储，table={}, field={}, rowGuid={}", tableName, fieldCode, sensitiveRowGuid);
-            return sensitiveRowGuid;
+            log.debug("敏感数据已加密存储，table={}, field={}, rowGuid={}", tableName, fieldCode, rowGuid);
 
         } catch (Exception e) {
             log.error("敏感数据加密存储失败，table={}, field={}", tableName, fieldCode, e);

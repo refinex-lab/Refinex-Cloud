@@ -45,14 +45,14 @@ CREATE TABLE `sys_user`
 
 CREATE TABLE `sys_sensitive`
 (
-    `id`                   BIGINT      NOT NULL COMMENT '主键ID',
-    `row_guid`             VARCHAR(64) NOT NULL COMMENT '被加密记录的唯一标识,对应业务表主键',
-    `table_name`           VARCHAR(64) NOT NULL COMMENT '来源表名,如sys_user',
-    `field_code`           VARCHAR(64) NOT NULL COMMENT '字段代码,如mobile或email',
-    `encrypted_value`      TEXT        NOT NULL COMMENT '加密后的值,AES-256加密',
-    `encryption_algorithm` VARCHAR(20) NOT NULL DEFAULT 'AES256-GCM' COMMENT '加密算法标识,默认AES256-GCM(带认证)',
-    `create_time`          DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time`          DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `id`                   BIGINT AUTO_INCREMENT NOT NULL COMMENT '主键ID',
+    `row_guid`             VARCHAR(64)           NOT NULL COMMENT '被加密记录的唯一标识,对应业务表主键',
+    `table_name`           VARCHAR(64)           NOT NULL COMMENT '来源表名,如sys_user',
+    `field_code`           VARCHAR(64)           NOT NULL COMMENT '字段代码,如mobile或email',
+    `encrypted_value`      TEXT                  NOT NULL COMMENT '加密后的值,AES-256加密',
+    `encryption_algorithm` VARCHAR(20)           NOT NULL DEFAULT 'AES256-GCM' COMMENT '加密算法标识,默认AES256-GCM(带认证)',
+    `create_time`          DATETIME              NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`          DATETIME              NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uni_unique_sensitive` (`row_guid`, `table_name`, `field_code`) COMMENT '确保同一记录同一字段只有一条加密记录',
     KEY `idx_row_guid` (`row_guid`) COMMENT '记录唯一标识索引'

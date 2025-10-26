@@ -1,4 +1,4 @@
-import { EyeOutlined, EditOutlined, DeleteOutlined, LockOutlined } from '@ant-design/icons';
+import { EyeOutlined, EditOutlined, DeleteOutlined, LockOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import { Button, message, Popconfirm, Tag, Space, Tooltip, Modal, Form, Input, Select, Avatar } from 'antd';
@@ -10,6 +10,7 @@ import {
   adminResetPassword,
   deleteUser,
   decryptSensitiveData,
+  registerUser,
   type UserListItem,
 } from '@/services/system/user';
 import { listDictDataByTypeCode } from '@/services/system';
@@ -19,9 +20,11 @@ const { Option } = Select;
 
 const UserManagement: React.FC = () => {
   const actionRef = useRef<ActionType>(undefined);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [resetPasswordModalVisible, setResetPasswordModalVisible] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserListItem | undefined>();
+  const [createForm] = Form.useForm();
   const [form] = Form.useForm();
   const [passwordForm] = Form.useForm();
 
@@ -32,6 +35,7 @@ const UserManagement: React.FC = () => {
   const [userStatusEnum, setUserStatusEnum] = useState<Record<string, { text: string; color: string }>>({});
   const [userTypeEnum, setUserTypeEnum] = useState<Record<string, { text: string; color: string }>>({});
   const [registerSourceEnum, setRegisterSourceEnum] = useState<Record<string, { text: string; color: string }>>({});
+  const [registerTypeEnum, setRegisterTypeEnum] = useState<Record<string, { text: string; color: string }>>({});
   const [sexEnum, setSexEnum] = useState<Record<string, { text: string }>>({});
   const [commonStatusEnum, setCommonStatusEnum] = useState<Record<string, { text: string; status: string }>>({});
 
@@ -68,10 +72,11 @@ const UserManagement: React.FC = () => {
   // 加载字典数据
   const loadDictionaries = async () => {
     try {
-      const [userStatusRes, userTypeRes, registerSourceRes, sexRes, commonStatusRes] = await Promise.all([
+      const [userStatusRes, userTypeRes, registerSourceRes, registerTypeRes, sexRes, commonStatusRes] = await Promise.all([
         listDictDataByTypeCode('user_status'),
         listDictDataByTypeCode('user_type'),
         listDictDataByTypeCode('register_source'),
+        listDictDataByTypeCode('register_type'),
         listDictDataByTypeCode('sex'),
         listDictDataByTypeCode('common_status'),
       ]);
@@ -110,6 +115,18 @@ const UserManagement: React.FC = () => {
           };
         });
         setRegisterSourceEnum(rsEnum);
+      }
+
+      // 注册类型字典
+      if (registerTypeRes.success && registerTypeRes.data) {
+        const rtEnum: Record<string, { text: string; color: string }> = {};
+        registerTypeRes.data.forEach((item) => {
+          rtEnum[item.dictValue] = {
+            text: item.dictLabel,
+            color: getColorForValue(item.dictValue),
+          };
+        });
+        setRegisterTypeEnum(rtEnum);
       }
 
       // 性别字典
@@ -181,6 +198,39 @@ const UserManagement: React.FC = () => {
     } catch (error) {
       // 静默处理，错误提示由全局错误处理器统一处理
       console.error('获取明文失败:', error);
+    }
+  };
+
+  // 新增用户
+  const handleCreate = () => {
+    createForm.resetFields();
+    setCreateModalVisible(true);
+  };
+
+  // 提交新增
+  const handleCreateSubmit = async () => {
+    try {
+      const values = await createForm.validateFields();
+
+      const response = await registerUser({
+        username: values.username,
+        nickname: values.nickname,
+        mobile: values.mobile,
+        email: values.email,
+        password: values.password,
+        registerSource: values.registerSource,
+        registerType: values.registerType,
+      });
+
+      if (response?.code === 200) {
+        message.success('用户创建成功');
+        setCreateModalVisible(false);
+        actionRef.current?.reload();
+      }
+      // 错误提示由全局错误处理器统一处理
+    } catch (error) {
+      // 静默处理，错误提示由全局错误处理器统一处理
+      console.error('创建用户失败:', error);
     }
   };
 
@@ -291,6 +341,7 @@ const UserManagement: React.FC = () => {
       dataIndex: 'id',
       width: 80,
       hideInSearch: true,
+      hideInTable: true,
     },
     {
       title: '头像',
@@ -510,6 +561,16 @@ const UserManagement: React.FC = () => {
         search={{
           labelWidth: 'auto',
         }}
+        toolBarRender={() => [
+          <Button
+            key="create"
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={handleCreate}
+          >
+            新增用户
+          </Button>,
+        ]}
         request={async (params) => {
           // 每次刷新或查询时，清空已解密的敏感数据缓存
           setDecryptedData({});
@@ -536,6 +597,112 @@ const UserManagement: React.FC = () => {
         columns={columns}
         scroll={{ x: 1800 }}
       />
+
+      {/* 新增用户Modal */}
+      <Modal
+        title="新增用户"
+        open={createModalVisible}
+        onOk={handleCreateSubmit}
+        onCancel={() => setCreateModalVisible(false)}
+        width={700}
+        centered
+      >
+        <Form form={createForm} layout="vertical">
+          <Form.Item
+            label="用户名"
+            name="username"
+            rules={[{ required: true, message: '请输入用户名' }]}
+          >
+            <Input placeholder="请输入用户名" />
+          </Form.Item>
+          <Form.Item label="昵称" name="nickname">
+            <Input placeholder="请输入昵称（可选，为空则后台随机生成）" />
+          </Form.Item>
+          <Form.Item
+            label="密码"
+            name="password"
+            rules={[
+              { required: true, message: '请输入密码' },
+              { min: 6, message: '密码长度不能小于6位' },
+              { max: 20, message: '密码长度不能大于20位' },
+              {
+                pattern: /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).+$/,
+                message: '密码必须包含字母、数字和特殊字符',
+              },
+            ]}
+          >
+            <Input.Password placeholder="请输入密码（6-20位，包含字母、数字和特殊字符）" />
+          </Form.Item>
+          <Form.Item
+            label="确认密码"
+            name="confirmPassword"
+            dependencies={['password']}
+            rules={[
+              { required: true, message: '请确认密码' },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue('password') === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('两次输入的密码不一致'));
+                },
+              }),
+            ]}
+          >
+            <Input.Password placeholder="请再次输入密码" />
+          </Form.Item>
+          <Form.Item
+            label="手机号"
+            name="mobile"
+            rules={[
+              {
+                pattern: /^1[3-9]\d{9}$/,
+                message: '请输入正确的手机号',
+              },
+            ]}
+          >
+            <Input placeholder="请输入手机号（可选）" />
+          </Form.Item>
+          <Form.Item
+            label="邮箱"
+            name="email"
+            rules={[
+              {
+                type: 'email',
+                message: '请输入正确的邮箱地址',
+              },
+            ]}
+          >
+            <Input placeholder="请输入邮箱（可选）" />
+          </Form.Item>
+          <Form.Item
+            label="注册来源"
+            name="registerSource"
+            rules={[{ required: true, message: '请选择注册来源' }]}
+          >
+            <Select placeholder="请选择注册来源">
+              {Object.entries(registerSourceEnum).map(([value, info]) => (
+                <Option key={value} value={value}>
+                  {info.text}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label="注册类型"
+            name="registerType"
+            rules={[{ required: true, message: '请选择注册类型' }]}
+          >
+            <Select placeholder="请选择注册类型">
+              {Object.entries(registerTypeEnum).map(([value, info]) => (
+                <Option key={value} value={value}>
+                  {info.text}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
 
       {/* 编辑用户Modal */}
       <Modal

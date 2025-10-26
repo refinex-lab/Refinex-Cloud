@@ -93,6 +93,17 @@ export interface SensitiveDecryptResponse {
   plainValue: string;
 }
 
+/** 用户注册请求 */
+export interface UserRegisterRequest {
+  username: string;
+  nickname?: string;
+  mobile?: string;
+  email?: string;
+  password: string;
+  registerSource: string;
+  registerType: string;
+}
+
 const API_PREFIX = '/refinex-platform';
 
 /**
@@ -179,6 +190,16 @@ export async function searchUsernames(keyword: string, limit?: number) {
       keyword,
       limit,
     },
+  });
+}
+
+/**
+ * 注册用户（管理员创建用户）
+ */
+export async function registerUser(data: UserRegisterRequest) {
+  return request<ApiResponse<boolean>>(`${API_PREFIX}/users/register`, {
+    method: 'POST',
+    data,
   });
 }
 
