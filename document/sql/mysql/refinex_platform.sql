@@ -474,7 +474,7 @@ CREATE TABLE `mbr_wallet_log`
 
 CREATE TABLE `content_space`
 (
-    `id`              BIGINT       NOT NULL COMMENT '主键ID',
+    `id`              BIGINT       AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `space_code`      VARCHAR(50)  NOT NULL COMMENT '空间编码,全局唯一',
     `space_name`      VARCHAR(100) NOT NULL COMMENT '空间名称',
     `space_desc`      VARCHAR(500)          DEFAULT NULL COMMENT '空间描述',
@@ -506,7 +506,7 @@ CREATE TABLE `content_space`
 
 CREATE TABLE `content_directory`
 (
-    `id`             BIGINT       NOT NULL COMMENT '主键ID',
+    `id`             BIGINT       AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `space_id`       BIGINT       NOT NULL COMMENT '所属空间ID',
     `parent_id`      BIGINT       NOT NULL DEFAULT 0 COMMENT '父目录ID,根目录为0',
     `directory_name` VARCHAR(100) NOT NULL COMMENT '目录名称',
@@ -531,7 +531,7 @@ CREATE TABLE `content_directory`
 
 CREATE TABLE `content_document`
 (
-    `id`                    BIGINT       NOT NULL COMMENT '主键ID',
+    `id`                    BIGINT       AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `doc_guid`              VARCHAR(64)  NOT NULL COMMENT '全局唯一标识,UUID格式',
     `space_id`              BIGINT       NOT NULL COMMENT '所属空间ID',
     `directory_id`          BIGINT                DEFAULT NULL COMMENT '所属目录ID',
@@ -579,7 +579,7 @@ CREATE TABLE `content_document`
 
 CREATE TABLE `content_document_version`
 (
-    `id`             BIGINT   NOT NULL COMMENT '主键ID',
+    `id`             BIGINT   AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `document_id`    BIGINT   NOT NULL COMMENT '文档ID',
     `version_number` INT      NOT NULL COMMENT '版本号,从1开始递增',
     `content_body`   LONGTEXT NOT NULL COMMENT '内容快照',
@@ -597,7 +597,7 @@ CREATE TABLE `content_document_version`
 
 CREATE TABLE `content_tag`
 (
-    `id`          BIGINT      NOT NULL COMMENT '主键ID',
+    `id`          BIGINT      AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `tag_name`    VARCHAR(50) NOT NULL COMMENT '标签名称',
     `tag_color`   VARCHAR(20)          DEFAULT NULL COMMENT '标签颜色,十六进制值',
     `tag_type`    TINYINT     NOT NULL DEFAULT 1 COMMENT '标签类型:0系统标签,1用户自定义标签',
@@ -620,7 +620,7 @@ CREATE TABLE `content_tag`
 
 CREATE TABLE `content_document_tag`
 (
-    `id`          BIGINT   NOT NULL COMMENT '主键ID',
+    `id`          BIGINT   AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `document_id` BIGINT   NOT NULL COMMENT '文档ID',
     `tag_id`      BIGINT   NOT NULL COMMENT '标签ID',
     `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -633,7 +633,7 @@ CREATE TABLE `content_document_tag`
 
 CREATE TABLE `content_category`
 (
-    `id`            BIGINT       NOT NULL COMMENT '主键ID',
+    `id`            BIGINT       AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `category_code` VARCHAR(50)  NOT NULL COMMENT '分类编码',
     `category_name` VARCHAR(100) NOT NULL COMMENT '分类名称',
     `parent_id`     BIGINT       NOT NULL DEFAULT 0 COMMENT '父分类ID,一级分类为0',
@@ -658,7 +658,7 @@ CREATE TABLE `content_category`
 
 CREATE TABLE `content_action`
 (
-    `id`           BIGINT      NOT NULL COMMENT '主键ID',
+    `id`           BIGINT      AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `user_id`      BIGINT      NOT NULL COMMENT '用户ID',
     `document_id`  BIGINT      NOT NULL COMMENT '文档ID',
     `action_type`  VARCHAR(20) NOT NULL COMMENT '行为类型:VIEW,LIKE,COLLECT,SHARE',
@@ -675,7 +675,7 @@ CREATE TABLE `content_action`
 
 CREATE TABLE `content_comment`
 (
-    `id`               BIGINT   NOT NULL COMMENT '主键ID',
+    `id`               BIGINT   AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `document_id`      BIGINT   NOT NULL COMMENT '文档ID',
     `user_id`          BIGINT   NOT NULL COMMENT '评论者ID',
     `parent_id`        BIGINT   NOT NULL DEFAULT 0 COMMENT '父评论ID,一级评论为0',
