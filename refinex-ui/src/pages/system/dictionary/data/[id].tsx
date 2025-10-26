@@ -17,7 +17,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { history, useIntl, useParams, useSearchParams } from '@umijs/max';
-import { Badge, Button, message, Modal, Space, Tag } from 'antd';
+import { Badge, Button, message, Popconfirm, Space, Tag, Tooltip } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { DictData, DictDataCreateRequest, DictDataUpdateRequest } from '@/services/system';
 import {
@@ -113,40 +113,47 @@ const DictionaryDataList: React.FC = () => {
     {
       title: intl.formatMessage({ id: 'pages.system.dictionary.data.operation' }),
       valueType: 'option',
-      width: 150,
+      width: 180,
       fixed: 'right',
       render: (_, record) => [
-        <a
-          key="edit"
-          style={{ color: '#faad14' }}
-          onClick={() => {
-            setCurrentData(record);
-            setModalVisible(true);
-          }}
-        >
-          <EditOutlined /> {intl.formatMessage({ id: 'pages.system.dictionary.button.edit' })}
-        </a>,
-        <a
+        <Tooltip title={intl.formatMessage({ id: 'pages.system.dictionary.button.edit' })} key="edit">
+          <Button
+            type="link"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => {
+              setCurrentData(record);
+              setModalVisible(true);
+            }}
+          >
+            {intl.formatMessage({ id: 'pages.system.dictionary.button.edit' })}
+          </Button>
+        </Tooltip>,
+        <Popconfirm
           key="delete"
-          style={{ color: '#ff4d4f' }}
-          onClick={() => {
-            Modal.confirm({
-              title: intl.formatMessage({ id: 'pages.system.dictionary.message.deleteConfirm' }),
-              icon: <ExclamationCircleOutlined />,
-              onOk: async () => {
-                try {
-                  await deleteDictData(record.id);
-                  message.success(intl.formatMessage({ id: 'pages.system.dictionary.message.deleteSuccess' }));
-                  actionRef.current?.reload();
-                } catch (error) {
-                  message.error(intl.formatMessage({ id: 'pages.system.dictionary.message.deleteFailed' }));
-                }
-              },
-            });
+          title={intl.formatMessage({ id: 'pages.system.dictionary.message.deleteConfirm' })}
+          icon={<ExclamationCircleOutlined style={{ color: 'red' }} />}
+          onConfirm={async () => {
+            try {
+              await deleteDictData(record.id);
+              message.success(intl.formatMessage({ id: 'pages.system.dictionary.message.deleteSuccess' }));
+              actionRef.current?.reload();
+            } catch (error) {
+              message.error(intl.formatMessage({ id: 'pages.system.dictionary.message.deleteFailed' }));
+            }
           }}
         >
-          <DeleteOutlined /> {intl.formatMessage({ id: 'pages.system.dictionary.button.delete' })}
-        </a>,
+          <Tooltip title={intl.formatMessage({ id: 'pages.system.dictionary.button.delete' })}>
+            <Button
+              type="link"
+              size="small"
+              danger
+              icon={<DeleteOutlined />}
+            >
+              {intl.formatMessage({ id: 'pages.system.dictionary.button.delete' })}
+            </Button>
+          </Tooltip>
+        </Popconfirm>,
       ],
     },
   ];
@@ -296,6 +303,7 @@ const DictionaryDataList: React.FC = () => {
             setCurrentData(undefined);
           }
         }}
+        key={currentData?.id || 'new'}
         initialValues={currentData ? { ...currentData } : { dictTypeId, status: 0, isDefault: 0, dictSort: 0 }}
         grid
         rowProps={{ gutter: 16 }}

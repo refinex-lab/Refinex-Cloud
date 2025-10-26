@@ -15,7 +15,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { history, useIntl } from '@umijs/max';
-import { Badge, Button, message, Modal, Space, Tag } from 'antd';
+import { Badge, Button, message, Popconfirm, Space, Tag, Tooltip } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { DictType, DictTypeCreateRequest, DictTypeUpdateRequest } from '@/services/system';
 import {
@@ -95,50 +95,60 @@ const DictionaryTypeList: React.FC = () => {
     {
       title: intl.formatMessage({ id: 'pages.system.dictionary.type.operation' }),
       valueType: 'option',
-      width: 200,
+      width: 220,
       fixed: 'right',
       render: (_, record) => [
-        <a
-          key="view"
-          style={{ color: '#1890ff' }}
-          onClick={() => {
-            history.push(`/system/dictionary/data/${record.id}?code=${record.dictCode}&name=${encodeURIComponent(record.dictName)}`);
-          }}
-        >
-          <UnorderedListOutlined /> {intl.formatMessage({ id: 'pages.system.dictionary.button.viewData' })}
-        </a>,
-        <a
-          key="edit"
-          style={{ color: '#faad14' }}
-          onClick={() => {
-            setCurrentType(record);
-            setModalVisible(true);
-          }}
-        >
-          <EditOutlined /> {intl.formatMessage({ id: 'pages.system.dictionary.button.edit' })}
-        </a>,
-        <a
+        <Tooltip title={intl.formatMessage({ id: 'pages.system.dictionary.button.viewData' })} key="view">
+          <Button
+            type="link"
+            size="small"
+            icon={<UnorderedListOutlined />}
+            onClick={() => {
+              history.push(`/system/dictionary/data/${record.id}?code=${record.dictCode}&name=${encodeURIComponent(record.dictName)}`);
+            }}
+          >
+            {intl.formatMessage({ id: 'pages.system.dictionary.button.viewData' })}
+          </Button>
+        </Tooltip>,
+        <Tooltip title={intl.formatMessage({ id: 'pages.system.dictionary.button.edit' })} key="edit">
+          <Button
+            type="link"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => {
+              setCurrentType(record);
+              setModalVisible(true);
+            }}
+          >
+            {intl.formatMessage({ id: 'pages.system.dictionary.button.edit' })}
+          </Button>
+        </Tooltip>,
+        <Popconfirm
           key="delete"
-          style={{ color: '#ff4d4f' }}
-          onClick={() => {
-            Modal.confirm({
-              title: intl.formatMessage({ id: 'pages.system.dictionary.message.deleteConfirmType' }),
-              icon: <ExclamationCircleOutlined />,
-              content: intl.formatMessage({ id: 'pages.system.dictionary.message.deleteTypeWarning' }),
-              onOk: async () => {
-                try {
-                  await deleteDictType(record.id);
-                  message.success(intl.formatMessage({ id: 'pages.system.dictionary.message.deleteSuccess' }));
-                  actionRef.current?.reload();
-                } catch (error) {
-                  message.error(intl.formatMessage({ id: 'pages.system.dictionary.message.deleteFailed' }));
-                }
-              },
-            });
+          title={intl.formatMessage({ id: 'pages.system.dictionary.message.deleteConfirmType' })}
+          description={intl.formatMessage({ id: 'pages.system.dictionary.message.deleteTypeWarning' })}
+          icon={<ExclamationCircleOutlined style={{ color: 'red' }} />}
+          onConfirm={async () => {
+            try {
+              await deleteDictType(record.id);
+              message.success(intl.formatMessage({ id: 'pages.system.dictionary.message.deleteSuccess' }));
+              actionRef.current?.reload();
+            } catch (error) {
+              message.error(intl.formatMessage({ id: 'pages.system.dictionary.message.deleteFailed' }));
+            }
           }}
         >
-          <DeleteOutlined /> {intl.formatMessage({ id: 'pages.system.dictionary.button.delete' })}
-        </a>,
+          <Tooltip title={intl.formatMessage({ id: 'pages.system.dictionary.button.delete' })}>
+            <Button
+              type="link"
+              size="small"
+              danger
+              icon={<DeleteOutlined />}
+            >
+              {intl.formatMessage({ id: 'pages.system.dictionary.button.delete' })}
+            </Button>
+          </Tooltip>
+        </Popconfirm>,
       ],
     },
   ];
@@ -216,6 +226,7 @@ const DictionaryTypeList: React.FC = () => {
             setCurrentType(undefined);
           }
         }}
+        key={currentType?.id || 'new'}
         initialValues={currentType ? { ...currentType } : { status: 0 }}
         onFinish={async (values) => {
           try {
