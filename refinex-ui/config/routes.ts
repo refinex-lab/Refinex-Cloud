@@ -284,6 +284,12 @@ export default [
         path: '/logs/operation',
         component: './logs/operation/index',
       },
+      {
+        name: 'login',
+        icon: 'login',
+        path: '/logs/login',
+        component: './logs/login/index',
+      },
     ],
   },
   {

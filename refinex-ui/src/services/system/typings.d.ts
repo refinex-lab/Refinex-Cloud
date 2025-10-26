@@ -2,6 +2,9 @@
  * 字典管理相关类型定义
  */
 
+// 导入通用类型
+import type { ApiResponse, PageResult, PageParams } from '@/services/typings';
+
 /** 字典类型 */
 export interface DictType {
   id: number;
@@ -84,38 +87,25 @@ export interface DictDataUpdateRequest {
   status?: number;
 }
 
-/** 分页查询参数 */
-export interface PageParams {
-  pageNum?: number;
-  pageSize?: number;
-  sortField?: string;
-  sortOrder?: string;
+/** 分页查询参数（扩展通用 PageParams） */
+export interface SystemPageParams extends PageParams {
   orderBy?: string;
   orderDirection?: string;
 }
 
 /** 字典类型查询参数 */
-export interface DictTypeQueryParams extends PageParams {
+export interface DictTypeQueryParams extends SystemPageParams {
   dictCode?: string;
   dictName?: string;
   status?: number;
 }
 
 /** 字典数据查询参数 */
-export interface DictDataQueryParams extends PageParams {
+export interface DictDataQueryParams extends SystemPageParams {
   dictTypeId?: number;
   dictLabel?: string;
   dictValue?: string;
   status?: number;
-}
-
-/** 分页结果 */
-export interface PageResult<T> {
-  records: T[];
-  total: number;
-  pageNum: number;
-  pageSize: number;
-  pages: number;
 }
 
 /** 系统配置 */
@@ -172,7 +162,7 @@ export interface SysConfigQueryRequest {
 }
 
 /** 系统配置分页查询参数 */
-export interface SysConfigQueryParams extends PageParams {
+export interface SysConfigQueryParams extends SystemPageParams {
   configKey?: string;
   configGroup?: string;
   configType?: string;
@@ -180,12 +170,6 @@ export interface SysConfigQueryParams extends PageParams {
   isFrontend?: number;
 }
 
-
-/** API 响应结构 */
-export interface ApiResponse<T = any> {
-  code: number;
-  message: string;
-  data: T;
-  success: boolean;
-}
+// 重新导出通用类型，方便其他模块使用
+export type { ApiResponse, PageResult };
 

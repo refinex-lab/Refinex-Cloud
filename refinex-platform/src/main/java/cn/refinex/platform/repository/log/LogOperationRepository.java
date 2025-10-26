@@ -182,11 +182,11 @@ public class LogOperationRepository {
         String statisticsSql = """
                 SELECT
                     COUNT(*) as total_count,
-                    SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END) as success_count,
-                    SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END) as failure_count,
-                    ROUND(AVG(execution_time), 2) as avg_execution_time,
-                    MAX(execution_time) as max_execution_time,
-                    MIN(execution_time) as min_execution_time
+                    COALESCE(SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END), 0) as success_count,
+                    COALESCE(SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END), 0) as failure_count,
+                    COALESCE(ROUND(AVG(execution_time), 2), 0) as avg_execution_time,
+                    COALESCE(MAX(execution_time), 0) as max_execution_time,
+                    COALESCE(MIN(execution_time), 0) as min_execution_time
                 FROM log_operation
                 """ + whereSql;
 
@@ -334,8 +334,8 @@ public class LogOperationRepository {
                 SELECT
                     username,
                     COUNT(*) as count,
-                    SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END) as success_count,
-                    SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END) as failure_count
+                    COALESCE(SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END), 0) as success_count,
+                    COALESCE(SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END), 0) as failure_count
                 FROM log_operation
                 """ + whereSql + """
                 GROUP BY username
@@ -381,9 +381,9 @@ public class LogOperationRepository {
                 SELECT
                     DATE(create_time) as time_point,
                     COUNT(*) as total_count,
-                    SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END) as success_count,
-                    SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END) as failure_count,
-                    ROUND(AVG(execution_time), 2) as avg_execution_time
+                    COALESCE(SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END), 0) as success_count,
+                    COALESCE(SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END), 0) as failure_count,
+                    COALESCE(ROUND(AVG(execution_time), 2), 0) as avg_execution_time
                 FROM log_operation
                 """ + whereSql + """
                 GROUP BY DATE(create_time)
@@ -428,9 +428,9 @@ public class LogOperationRepository {
                 SELECT
                     DATE_FORMAT(create_time, '%Y-%m-%d %H:00:00') as time_point,
                     COUNT(*) as total_count,
-                    SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END) as success_count,
-                    SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END) as failure_count,
-                    ROUND(AVG(execution_time), 2) as avg_execution_time
+                    COALESCE(SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END), 0) as success_count,
+                    COALESCE(SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END), 0) as failure_count,
+                    COALESCE(ROUND(AVG(execution_time), 2), 0) as avg_execution_time
                 FROM log_operation
                 """ + whereSql + """
                 GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d %H:00:00')
@@ -475,9 +475,9 @@ public class LogOperationRepository {
                 SELECT
                     DATE_FORMAT(create_time, '%Y-%u') as time_point,
                     COUNT(*) as total_count,
-                    SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END) as success_count,
-                    SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END) as failure_count,
-                    ROUND(AVG(execution_time), 2) as avg_execution_time
+                    COALESCE(SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END), 0) as success_count,
+                    COALESCE(SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END), 0) as failure_count,
+                    COALESCE(ROUND(AVG(execution_time), 2), 0) as avg_execution_time
                 FROM log_operation
                 """ + whereSql + """
                 GROUP BY DATE_FORMAT(create_time, '%Y-%u')
@@ -522,9 +522,9 @@ public class LogOperationRepository {
                 SELECT
                     DATE_FORMAT(create_time, '%Y-%m') as time_point,
                     COUNT(*) as total_count,
-                    SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END) as success_count,
-                    SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END) as failure_count,
-                    ROUND(AVG(execution_time), 2) as avg_execution_time
+                    COALESCE(SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END), 0) as success_count,
+                    COALESCE(SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END), 0) as failure_count,
+                    COALESCE(ROUND(AVG(execution_time), 2), 0) as avg_execution_time
                 FROM log_operation
                 """ + whereSql + """
                 GROUP BY DATE_FORMAT(create_time, '%Y-%m')

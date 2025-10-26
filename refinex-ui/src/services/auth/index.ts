@@ -1,11 +1,21 @@
 import { request } from '@umijs/max';
+import type { ApiResponse } from '@/services/typings';
+import type {
+  CaptchaResponse,
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  SendEmailCodeRequest,
+  ResetPasswordRequest,
+  CurrentUser,
+} from './typings';
 
 /**
  * 生成验证码
  * GET /refinex-auth/captcha/generate
  */
-export async function generateCaptcha() {
-  return request<AUTH.ApiResult<AUTH.CaptchaResponse>>('/refinex-auth/captcha', {
+export async function generateCaptcha(): Promise<ApiResponse<CaptchaResponse>> {
+  return request('/refinex-auth/captcha', {
     method: 'GET',
   });
 }
@@ -14,8 +24,8 @@ export async function generateCaptcha() {
  * 用户登录
  * POST /refinex-auth/auth/login
  */
-export async function login(params: AUTH.LoginRequest) {
-  return request<AUTH.ApiResult<AUTH.LoginResponse>>('/refinex-auth/auth/login', {
+export async function login(params: LoginRequest): Promise<ApiResponse<LoginResponse>> {
+  return request('/refinex-auth/auth/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -30,8 +40,8 @@ export async function login(params: AUTH.LoginRequest) {
  * 用户注册
  * POST /refinex-auth/auth/register
  */
-export async function register(params: AUTH.RegisterRequest) {
-  return request<AUTH.ApiResult<void>>('/refinex-auth/auth/register', {
+export async function register(params: RegisterRequest): Promise<ApiResponse<void>> {
+  return request('/refinex-auth/auth/register', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -46,8 +56,8 @@ export async function register(params: AUTH.RegisterRequest) {
  * 发送邮箱验证码
  * POST /refinex-auth/auth/sendEmailVerifyCode
  */
-export async function sendEmailVerifyCode(params: AUTH.SendEmailCodeRequest) {
-  return request<AUTH.ApiResult<void>>('/refinex-auth/auth/sendEmailVerifyCode', {
+export async function sendEmailVerifyCode(params: SendEmailCodeRequest): Promise<ApiResponse<void>> {
+  return request('/refinex-auth/auth/sendEmailVerifyCode', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -62,8 +72,8 @@ export async function sendEmailVerifyCode(params: AUTH.SendEmailCodeRequest) {
  * 重置密码
  * POST /refinex-auth/auth/resetPassword
  */
-export async function resetPassword(params: AUTH.ResetPasswordRequest) {
-  return request<AUTH.ApiResult<void>>('/refinex-auth/auth/resetPassword', {
+export async function resetPassword(params: ResetPasswordRequest): Promise<ApiResponse<void>> {
+  return request('/refinex-auth/auth/resetPassword', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -78,8 +88,8 @@ export async function resetPassword(params: AUTH.ResetPasswordRequest) {
  * 用户登出
  * POST /refinex-auth/auth/logout
  */
-export async function logout() {
-  return request<AUTH.ApiResult<void>>('/refinex-auth/auth/logout', {
+export async function logout(): Promise<ApiResponse<void>> {
+  return request('/refinex-auth/auth/logout', {
     method: 'POST',
     // 跳过全局错误处理，登出操作无论成功失败都应该清理本地状态
     skipErrorHandler: true,
@@ -90,8 +100,8 @@ export async function logout() {
  * 获取当前用户信息
  * GET /refinex-platform/users/current
  */
-export async function getCurrentUser() {
-  return request<AUTH.ApiResult<AUTH.CurrentUser>>('/refinex-platform/users/current', {
+export async function getCurrentUser(): Promise<ApiResponse<CurrentUser>> {
+  return request('/refinex-platform/users/current', {
     method: 'GET',
   });
 }
@@ -100,8 +110,8 @@ export async function getCurrentUser() {
  * 刷新令牌
  * POST /refinex-auth/auth/refresh
  */
-export async function refreshToken(refreshToken: string) {
-  return request<AUTH.ApiResult<AUTH.LoginResponse>>('/refinex-auth/auth/refresh', {
+export async function refreshToken(refreshToken: string): Promise<ApiResponse<LoginResponse>> {
+  return request('/refinex-auth/auth/refresh', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
