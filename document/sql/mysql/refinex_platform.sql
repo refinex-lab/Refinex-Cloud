@@ -62,22 +62,22 @@ CREATE TABLE `sys_sensitive`
 
 CREATE TABLE `sys_role`
 (
-    `id`          BIGINT      NOT NULL COMMENT '主键ID',
-    `role_code`   VARCHAR(50) NOT NULL COMMENT '角色编码,如SUPER_ADMIN,ROLE_USER,ROLE_VIP_MONTHLY',
-    `role_name`   VARCHAR(50) NOT NULL COMMENT '角色名称,如普通用户,月度会员',
-    `role_type`   TINYINT     NOT NULL DEFAULT 0 COMMENT '角色类型:0前台角色,1后台角色',
-    `data_scope`  INT         NOT NULL COMMENT '角色权限范围(1:所有数据权限 2:自定义数据权限 3:仅本人数据权限)',
-    `priority`    INT         NOT NULL DEFAULT 0 COMMENT '优先级,数字越大优先级越高',
-    `create_by`   BIGINT               DEFAULT NULL COMMENT '创建人ID',
-    `create_time` DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_by`   BIGINT               DEFAULT NULL COMMENT '更新人ID',
-    `update_time` DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `deleted`     TINYINT     NOT NULL DEFAULT 0 COMMENT '逻辑删除标记:0未删除,1已删除',
-    `version`     INT         NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
-    `remark`      VARCHAR(500)         DEFAULT NULL COMMENT '备注说明',
-    `sort`        INT         NOT NULL DEFAULT 0 COMMENT '排序字段',
-    `status`      TINYINT     NOT NULL DEFAULT 0 COMMENT '状态:0正常,1停用',
-    `extra_data`  JSON                 DEFAULT NULL COMMENT '扩展数据',
+    `id`          BIGINT AUTO_INCREMENT NOT NULL COMMENT '主键ID',
+    `role_code`   VARCHAR(50)           NOT NULL COMMENT '角色编码,如SUPER_ADMIN,ROLE_USER,ROLE_VIP_MONTHLY',
+    `role_name`   VARCHAR(50)           NOT NULL COMMENT '角色名称,如普通用户,月度会员',
+    `role_type`   TINYINT               NOT NULL DEFAULT 0 COMMENT '角色类型:0前台角色,1后台角色',
+    `data_scope`  INT                   NOT NULL COMMENT '角色权限范围(1:所有数据权限 2:自定义数据权限 3:仅本人数据权限)',
+    `priority`    INT                   NOT NULL DEFAULT 0 COMMENT '优先级,数字越大优先级越高',
+    `create_by`   BIGINT                         DEFAULT NULL COMMENT '创建人ID',
+    `create_time` DATETIME              NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_by`   BIGINT                         DEFAULT NULL COMMENT '更新人ID',
+    `update_time` DATETIME              NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted`     TINYINT               NOT NULL DEFAULT 0 COMMENT '逻辑删除标记:0未删除,1已删除',
+    `version`     INT                   NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
+    `remark`      VARCHAR(500)                   DEFAULT NULL COMMENT '备注说明',
+    `sort`        INT                   NOT NULL DEFAULT 0 COMMENT '排序字段',
+    `status`      TINYINT               NOT NULL DEFAULT 0 COMMENT '状态:0正常,1停用',
+    `extra_data`  JSON                           DEFAULT NULL COMMENT '扩展数据',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uni_role_code` (`role_code`) COMMENT '角色编码唯一索引',
     KEY `idx_role_type` (`role_type`) COMMENT '角色类型索引'
@@ -87,15 +87,15 @@ CREATE TABLE `sys_role`
 
 -- 补充系统内置角色标识(0: 非系统内部角色，1: 系统内部角色，禁止删除)
 ALTER TABLE `sys_role`
-    ADD COLUMN `system_flags` TINYINT NOT NULL DEFAULT 0 COMMENT '系统内置角色标识:0非系统内部角色,1系统内部角色' AFTER `id`;
+    ADD COLUMN `is_builtin` TINYINT NOT NULL DEFAULT 0 COMMENT '系统内置角色标识:0非系统内部角色,1系统内部角色' AFTER `id`;
 
 -- 初始化超级管理员角色
-INSERT INTO `sys_role` (`id`, `system_flags`, `role_code`, `role_name`, `role_type`, `data_scope`, `priority`, `remark`,
+INSERT INTO `sys_role` (`id`, `is_builtin`, `role_code`, `role_name`, `role_type`, `data_scope`, `priority`, `remark`,
                         `status`)
 VALUES (1, 1, 'SUPER_ADMIN', '超级管理员', 1, 1, 1000, '系统最高权限角色', 0);
 
 -- 初始化普通用户角色
-INSERT INTO `sys_role` (`id`, `system_flags`, `role_code`, `role_name`, `role_type`, `data_scope`, `priority`, `remark`,
+INSERT INTO `sys_role` (`id`, `is_builtin`, `role_code`, `role_name`, `role_type`, `data_scope`, `priority`, `remark`,
                         `status`)
 VALUES (2, 1, 'ROLE_USER', '普通用户', 0, 3, 100, '默认普通用户角色', 0);
 
@@ -157,13 +157,13 @@ CREATE TABLE `sys_menu`
 
 CREATE TABLE `sys_user_role`
 (
-    `id`          BIGINT   NOT NULL COMMENT '主键ID',
-    `user_id`     BIGINT   NOT NULL COMMENT '用户ID',
-    `role_id`     BIGINT   NOT NULL COMMENT '角色ID',
-    `valid_from`  DATETIME          DEFAULT NULL COMMENT '有效开始时间',
-    `valid_until` DATETIME          DEFAULT NULL COMMENT '有效结束时间,用于临时授权',
-    `create_by`   BIGINT            DEFAULT NULL COMMENT '创建人ID',
-    `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `id`          BIGINT AUTO_INCREMENT NOT NULL COMMENT '主键ID',
+    `user_id`     BIGINT                NOT NULL COMMENT '用户ID',
+    `role_id`     BIGINT                NOT NULL COMMENT '角色ID',
+    `valid_from`  DATETIME                       DEFAULT NULL COMMENT '有效开始时间',
+    `valid_until` DATETIME                       DEFAULT NULL COMMENT '有效结束时间,用于临时授权',
+    `create_by`   BIGINT                         DEFAULT NULL COMMENT '创建人ID',
+    `create_time` DATETIME              NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uni_user_role` (`user_id`, `role_id`) COMMENT '用户角色唯一索引',
     KEY `idx_user` (`user_id`) COMMENT '用户索引',

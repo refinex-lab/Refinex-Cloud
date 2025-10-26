@@ -1,5 +1,5 @@
 /**
- * 字典管理相关类型定义
+ * 系统管理相关类型定义
  */
 
 // 导入通用类型
@@ -168,6 +168,91 @@ export interface SysConfigQueryParams extends SystemPageParams {
   configType?: string;
   isSensitive?: number;
   isFrontend?: number;
+}
+
+/** 角色信息 */
+export interface RoleResponse {
+  id: number;
+  roleCode: string;
+  roleName: string;
+  roleType: number;
+  roleTypeLabel?: string;
+  dataScope: number;
+  dataScopeLabel?: string;
+  isBuiltin: number;
+  isBuiltinLabel?: string;
+  sort?: number;
+  remark?: string;
+  status: number;
+  statusLabel?: string;
+  createBy?: number;
+  createTime?: string;
+  updateBy?: number;
+  updateTime?: string;
+}
+
+/** 角色创建请求 */
+export interface RoleCreateRequest {
+  roleCode: string;
+  roleName: string;
+  roleType: number;
+  dataScope: number;
+  sort?: number;
+  remark?: string;
+  status?: number;
+}
+
+/** 角色更新请求 */
+export interface RoleUpdateRequest {
+  roleName: string;
+  roleType: number;
+  dataScope: number;
+  sort?: number;
+  remark?: string;
+  status?: number;
+}
+
+/** 角色查询参数 */
+export interface RoleQueryParams {
+  roleCode?: string;
+  roleName?: string;
+  roleType?: number;
+  status?: number;
+  orderBy?: string;
+  orderDirection?: string;
+  pageNum?: number;
+  pageSize?: number;
+}
+
+/** 用户角色绑定请求 */
+export interface UserRoleBindRequest {
+  userIds: number[];
+  validFrom?: string;
+  validUntil?: string;
+}
+
+/** 角色用户响应 */
+export interface RoleUserResponse {
+  userId: number;
+  username: string;
+  nickname?: string;
+  mobile?: string;
+  email?: string;
+  userStatus: number;
+  userStatusLabel?: string;
+  roleId: number;
+  validFrom?: string;
+  validUntil?: string;
+  isTemporary?: boolean;
+  bindTime?: string;
+}
+
+/** 角色用户查询参数 */
+export interface RoleUserQueryParams extends PageParams {
+  username?: string;
+  nickname?: string;
+  mobile?: string;
+  email?: string;
 }
 
 // 重新导出通用类型，方便其他模块使用

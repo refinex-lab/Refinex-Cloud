@@ -256,6 +256,18 @@ export default [
         component: './system/user',
       },
       {
+        name: 'role',
+        icon: 'safety',
+        path: '/system/role',
+        component: './system/role',
+      },
+      {
+        name: 'role.users',
+        path: '/system/role/:id/users',
+        component: './system/role/users',
+        hideInMenu: true,
+      },
+      {
         name: 'dictionary',
         icon: 'book',
         path: '/system/dictionary',

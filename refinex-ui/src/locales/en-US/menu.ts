@@ -42,6 +42,8 @@ export default {
   'menu.exception.trigger': 'Trigger',
   'menu.system': 'System',
   'menu.system.user': 'User Management',
+  'menu.system.role': 'Role Management',
+  'menu.system.role.users': 'Role User Management',
   'menu.system.dictionary': 'Dictionary',
   'menu.system.config': 'Configuration',
   'menu.logs': 'Logs',
