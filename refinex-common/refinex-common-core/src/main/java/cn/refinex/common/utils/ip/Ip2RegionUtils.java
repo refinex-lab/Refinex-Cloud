@@ -203,6 +203,9 @@ public final class Ip2RegionUtils {
      * @param ip IP 地址字符串（支持 IPv4 和 IPv6）
      * @return 地域信息字符串，格式：国家|区域|省份|城市|ISP, 查询失败返回：未知|0|0|0|0
      * <p>
+     * 注意：如果传入的是内网 IP（如 192.168.x.x、10.x.x.x、172.16-31.x.x 等），
+     * 将直接返回 "内网IP|内网IP"，不会查询数据库。
+     * <p>
      * 示例:
      * <pre>{@code
      * Ip2RegionUtils.getRegion("202.108.22.5");
@@ -210,12 +213,21 @@ public final class Ip2RegionUtils {
      *
      * Ip2RegionUtils.getRegion("8.8.8.8");
      * // 返回: 美国|0|0|0|谷歌
+     *
+     * Ip2RegionUtils.getRegion("192.168.1.100");
+     * // 返回: 内网IP|内网IP
      * }</pre>
      */
     public static String getRegion(String ip) {
         if (StrUtil.isBlank(ip)) {
             log.warn("IP 地址为空");
             return DEFAULT_REGION;
+        }
+
+        // 检查是否为内网 IP
+        if (NetUtils.isInnerIP(ip)) {
+            log.debug("检测到内网 IP，返回默认地域信息: {}", ip);
+            return "内网IP|内网IP";
         }
 
         // 自动识别 IP 类型
