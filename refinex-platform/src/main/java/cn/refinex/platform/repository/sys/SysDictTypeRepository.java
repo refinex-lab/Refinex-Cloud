@@ -192,7 +192,11 @@ public class SysDictTypeRepository {
             sql.append(" AND status = :status");
             params.put("status", status);
         }
-        sql.append(" ORDER BY id DESC");
+        
+        // 只有在 PageRequest 没有指定排序时才使用默认排序
+        if (pageRequest.getOrderBy() == null || pageRequest.getOrderBy().isEmpty()) {
+            sql.append(" ORDER BY dict_sort, id DESC");
+        }
 
         return jdbcManager.queryPage(sql.toString(), params, pageRequest, SysDictType.class);
     }
@@ -207,7 +211,7 @@ public class SysDictTypeRepository {
                 SELECT *
                 FROM sys_dict_type
                 WHERE deleted = 0 AND status = 0
-                ORDER BY id DESC
+                ORDER BY dict_sort, id DESC
                 """;
 
         try {
@@ -215,6 +219,27 @@ public class SysDictTypeRepository {
         } catch (Exception e) {
             log.error("查询启用的字典类型列表失败", e);
             return List.of();
+        }
+    }
+
+    /**
+     * 获取最大排序值
+     *
+     * @return 最大排序值，如果没有数据则返回 0
+     */
+    public Integer getMaxDictSort() {
+        String sql = """
+                SELECT COALESCE(MAX(dict_sort), 0) as max_sort
+                FROM sys_dict_type
+                WHERE deleted = 0
+                """;
+
+        try {
+            Integer maxSort = jdbcManager.queryInt(sql, Map.of(), false);
+            return maxSort != null ? maxSort : 0;
+        } catch (Exception e) {
+            log.error("获取最大排序值失败", e);
+            return 0;
         }
     }
 }

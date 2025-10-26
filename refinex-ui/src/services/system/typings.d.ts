@@ -8,6 +8,7 @@ export interface DictType {
   dictCode: string;
   dictName: string;
   dictDesc?: string;
+  dictSort?: number;
   createBy?: number;
   createTime?: string;
   updateBy?: number;
@@ -43,6 +44,7 @@ export interface DictTypeCreateRequest {
   dictCode: string;
   dictName: string;
   dictDesc?: string;
+  dictSort?: number;
   remark?: string;
   status?: number;
 }
@@ -51,6 +53,7 @@ export interface DictTypeCreateRequest {
 export interface DictTypeUpdateRequest {
   dictName: string;
   dictDesc?: string;
+  dictSort?: number;
   remark?: string;
   status?: number;
 }
@@ -87,6 +90,8 @@ export interface PageParams {
   pageSize?: number;
   sortField?: string;
   sortOrder?: string;
+  orderBy?: string;
+  orderDirection?: string;
 }
 
 /** 字典类型查询参数 */

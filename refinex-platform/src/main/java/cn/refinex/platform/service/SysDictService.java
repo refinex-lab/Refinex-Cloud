@@ -2,6 +2,8 @@ package cn.refinex.platform.service;
 
 import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
+import cn.refinex.platform.controller.dict.dto.request.DictDataCreateRequestDTO;
+import cn.refinex.platform.controller.dict.dto.request.DictDataUpdateRequestDTO;
 import cn.refinex.platform.entity.sys.SysDictData;
 import cn.refinex.platform.entity.sys.SysDictType;
 
@@ -48,9 +50,8 @@ public interface SysDictService {
      *
      * @param id         字典类型ID
      * @param operatorId 操作人ID
-     * @return 是否删除成功
      */
-    boolean deleteDictType(Long id, Long operatorId);
+    void deleteDictType(Long id, Long operatorId);
 
     /**
      * 根据ID查询字典类型
@@ -89,46 +90,29 @@ public interface SysDictService {
     /**
      * 创建字典数据
      *
-     * @param dictTypeId 字典类型ID
-     * @param dictLabel  字典标签
-     * @param dictValue  字典值
-     * @param dictSort   排序
-     * @param cssClass   CSS类名
-     * @param listClass  列表类名
-     * @param isDefault  是否默认
-     * @param remark     备注
-     * @param status     状态
+     * @param request    字典数据创建请求
      * @param operatorId 操作人ID
      * @return 字典数据ID
      */
-    Long createDictData(Long dictTypeId, String dictLabel, String dictValue, Integer dictSort, String cssClass, String listClass, Integer isDefault, String remark, Integer status, Long operatorId);
+    Long createDictData(DictDataCreateRequestDTO request, Long operatorId);
 
     /**
      * 更新字典数据
      *
      * @param id         字典数据ID
-     * @param dictTypeId 字典类型ID
-     * @param dictLabel  字典标签
-     * @param dictValue  字典值
-     * @param dictSort   排序
-     * @param cssClass   CSS类名
-     * @param listClass  列表类名
-     * @param isDefault  是否默认
-     * @param remark     备注
-     * @param status     状态
+     * @param request    字典数据更新请求
      * @param operatorId 操作人ID
      * @return 是否更新成功
      */
-    boolean updateDictData(Long id, Long dictTypeId, String dictLabel, String dictValue, Integer dictSort, String cssClass, String listClass, Integer isDefault, String remark, Integer status, Long operatorId);
+    boolean updateDictData(Long id, DictDataUpdateRequestDTO request, Long operatorId);
 
     /**
      * 删除字典数据（逻辑删除）
      *
      * @param id         字典数据ID
      * @param operatorId 操作人ID
-     * @return 是否删除成功
      */
-    boolean deleteDictData(Long id, Long operatorId);
+    void deleteDictData(Long id, Long operatorId);
 
     /**
      * 批量删除字典数据（逻辑删除）
@@ -166,5 +150,30 @@ public interface SysDictService {
      * @return 分页结果
      */
     PageResult<SysDictData> pageQueryDictData(Long dictTypeId, String dictLabel, String dictValue, Integer status, PageRequest pageRequest);
+
+    /**
+     * 获取字典类型的最大排序值
+     *
+     * @return 最大排序值
+     */
+    Integer getMaxDictTypeSort();
+
+    /**
+     * 获取指定字典类型下的最大排序值
+     *
+     * @param dictTypeId 字典类型ID
+     * @return 最大排序值
+     */
+    Integer getMaxDictDataSort(Long dictTypeId);
+
+    // ===================== 缓存管理 =====================
+
+    /**
+     * 预热字典缓存
+     * <p>
+     * 系统启动时或需要时，预加载常用字典数据到缓存中，提升首次访问性能
+     * </p>
+     */
+    void warmUpCache();
 
 }

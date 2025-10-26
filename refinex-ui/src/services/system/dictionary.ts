@@ -70,6 +70,13 @@ export async function listEnabledDictTypes() {
   });
 }
 
+/** 获取字典类型最大排序值 */
+export async function getMaxDictTypeSort() {
+  return request<ApiResponse<number>>(`${API_PREFIX}/types/max-sort`, {
+    method: 'GET',
+  });
+}
+
 /**
  * 字典数据管理 API
  */
@@ -124,6 +131,14 @@ export async function queryDictData(params: DictDataQueryParams) {
   return request<ApiResponse<PageResult<DictData>>>(`${API_PREFIX}/data`, {
     method: 'GET',
     params,
+  });
+}
+
+/** 获取字典数据最大排序值 */
+export async function getMaxDictDataSort(dictTypeId: number) {
+  return request<ApiResponse<number>>(`${API_PREFIX}/data/max-sort`, {
+    method: 'GET',
+    params: { dictTypeId },
   });
 }
 

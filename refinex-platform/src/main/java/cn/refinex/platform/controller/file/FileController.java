@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/files")
 @RequiredArgsConstructor
-@Tag(name = "文件服务控制器", description = "提供文件上传、确认、下载、查询、删除等功能")
+@Tag(name = "文件管理", description = "提供文件上传、确认、下载、查询、删除等功能")
 public class FileController {
 
     private final FileService fileService;

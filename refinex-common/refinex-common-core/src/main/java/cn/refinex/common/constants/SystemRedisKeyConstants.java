@@ -327,41 +327,219 @@ public final class SystemRedisKeyConstants {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Dictionary {
 
-        /**
-         * 字典类型缓存 Key 前缀
-         * KEY 格式：dict:type:{dictCode}
-         */
-        public static final String DICT_TYPE_CACHE_PREFIX = "dict:type:";
+        // ==================== 前缀定义 ====================
+
+        /** 字典模块缓存键前缀 */
+        private static final String DICT_PREFIX = "dict:";
+
+        /** 字典类型缓存 Key 前缀 */
+        private static final String DICT_TYPE_PREFIX = DICT_PREFIX + "type:";
+
+        /** 字典数据缓存 Key 前缀 */
+        private static final String DICT_DATA_PREFIX = DICT_PREFIX + "data:";
+
+        /** 字典锁 Key 前缀 */
+        private static final String DICT_LOCK_PREFIX = DICT_PREFIX + "lock:";
+
+        // ==================== 缓存过期时间 ====================
 
         /**
-         * 字典数据列表缓存 Key 前缀（按类型）
-         * KEY 格式：dict:data:{dictCode}
+         * 字典类型缓存过期时间（秒）- 1 小时
+         * <p>字典类型变更频率低，可以设置较长的过期时间</p>
          */
-        public static final String DICT_DATA_CACHE_PREFIX = "dict:data:";
+        public static final long DICT_TYPE_CACHE_TTL = 3600L;
 
         /**
-         * 默认缓存过期时间（秒）- 30 分钟
+         * 字典数据列表缓存过期时间（秒）- 30 分钟
+         * <p>字典数据是热点数据，设置适中的过期时间</p>
          */
-        public static final long DEFAULT_CACHE_TTL = 1800L;
+        public static final long DICT_DATA_LIST_CACHE_TTL = 1800L;
 
         /**
-         * 构建字典类型缓存 Key
+         * 字典详情缓存过期时间（秒）- 30 分钟
+         * <p>单个字典数据详情的缓存时间</p>
+         */
+        public static final long DICT_DATA_DETAIL_CACHE_TTL = 1800L;
+
+        /**
+         * 启用的字典类型列表缓存过期时间（秒）- 1 小时
+         * <p>启用的字典类型列表变更频率低</p>
+         */
+        public static final long DICT_ENABLED_TYPES_CACHE_TTL = 3600L;
+
+        /**
+         * 分页查询缓存过期时间（秒）- 3 分钟
+         * <p>分页查询结果缓存时间较短，避免数据不一致</p>
+         */
+        public static final long DICT_PAGE_QUERY_CACHE_TTL = 180L;
+
+        /**
+         * 空值缓存过期时间（秒）- 5 分钟
+         * <p>防止缓存穿透，对不存在的数据缓存空值，但设置较短的过期时间</p>
+         */
+        public static final long DICT_NULL_CACHE_TTL = 300L;
+
+        /**
+         * 缓存随机偏移量最大值（秒）- 300 秒（5 分钟）
+         * <p>防止缓存雪崩，在基础 TTL 上增加随机偏移量</p>
+         */
+        public static final long DICT_CACHE_TTL_OFFSET = 300L;
+
+        // ==================== 字典类型缓存键 ====================
+
+        /**
+         * 字典类型缓存键（按编码）
+         * <p>
+         * Redis数据类型：String（JSON格式的字典类型信息）
+         * 缓存内容：字典类型详细信息
+         * 失效时间：3600秒（1小时）+ 随机偏移
+         * </p>
          *
          * @param dictCode 字典编码
-         * @return 缓存 Key
+         * @return 缓存键，格式：dict:type:code:{dictCode}
          */
-        public static String buildDictTypeCacheKey(String dictCode) {
-            return DICT_TYPE_CACHE_PREFIX + dictCode;
+        public static String dictTypeByCode(String dictCode) {
+            return DICT_TYPE_PREFIX + "code:" + dictCode;
         }
 
         /**
-         * 构建字典数据列表缓存 Key（按类型）
+         * 字典类型缓存键（按ID）
+         * <p>
+         * Redis数据类型：String（JSON格式的字典类型信息）
+         * 缓存内容：字典类型详细信息
+         * 失效时间：3600秒（1小时）+ 随机偏移
+         * </p>
+         *
+         * @param dictTypeId 字典类型ID
+         * @return 缓存键，格式：dict:type:id:{dictTypeId}
+         */
+        public static String dictTypeById(Long dictTypeId) {
+            return DICT_TYPE_PREFIX + "id:" + dictTypeId;
+        }
+
+        /**
+         * 启用的字典类型列表缓存键
+         * <p>
+         * Redis数据类型：String（JSON格式的字典类型列表）
+         * 缓存内容：所有启用状态的字典类型列表
+         * 失效时间：3600秒（1小时）+ 随机偏移
+         * </p>
+         *
+         * @return 缓存键，格式：dict:type:enabled_list
+         */
+        public static String dictTypeEnabledList() {
+            return DICT_TYPE_PREFIX + "enabled_list";
+        }
+
+        /**
+         * 字典类型分页查询缓存键
+         * <p>
+         * Redis数据类型：String（JSON格式的分页结果）
+         * 缓存内容：字典类型分页查询结果
+         * 失效时间：180秒（3分钟）
+         * 注意：分页查询缓存时间较短，避免数据不一致
+         * </p>
+         *
+         * @param dictCode 字典编码（可选）
+         * @param dictName 字典名称（可选）
+         * @param status 状态（可选）
+         * @param pageNum 页码
+         * @param pageSize 每页大小
+         * @param orderBy 排序字段
+         * @param orderDirection 排序方向
+         * @return 缓存键，格式：dict:type:page_query:{hash}
+         */
+        public static String dictTypePageQuery(String dictCode, String dictName, Integer status,
+                                                int pageNum, int pageSize, String orderBy, String orderDirection) {
+            // 构建查询条件字符串
+            StringBuilder keyBuilder = new StringBuilder();
+            keyBuilder.append("code:").append(dictCode == null ? "null" : dictCode);
+            keyBuilder.append("|name:").append(dictName == null ? "null" : dictName);
+            keyBuilder.append("|status:").append(status == null ? "null" : status);
+            keyBuilder.append("|page:").append(pageNum);
+            keyBuilder.append("|size:").append(pageSize);
+            keyBuilder.append("|order:").append(orderBy == null ? "null" : orderBy);
+            keyBuilder.append("|dir:").append(orderDirection == null ? "null" : orderDirection);
+
+            // 使用 hashCode 生成简短的缓存键
+            int hash = keyBuilder.toString().hashCode();
+            return DICT_TYPE_PREFIX + "page_query:" + hash;
+        }
+
+        /**
+         * 字典类型分页查询缓存通配符
+         * <p>
+         * 用于批量删除所有分页查询缓存
+         * </p>
+         *
+         * @return 缓存键通配符，格式：dict:type:page_query:*
+         */
+        public static String dictTypePageQueryPattern() {
+            return DICT_TYPE_PREFIX + "page_query:*";
+        }
+
+        // ==================== 字典数据缓存键 ====================
+
+        /**
+         * 字典数据列表缓存键（按类型编码）
+         * <p>
+         * Redis数据类型：String（JSON格式的字典数据列表）
+         * 缓存内容：指定字典类型下的所有数据项列表
+         * 失效时间：1800秒（30分钟）+ 随机偏移
+         * </p>
          *
          * @param dictCode 字典编码
-         * @return 缓存 Key
+         * @return 缓存键，格式：dict:data:list:{dictCode}
          */
-        public static String buildDictDataListCacheKey(String dictCode) {
-            return DICT_DATA_CACHE_PREFIX + dictCode;
+        public static String dictDataListByCode(String dictCode) {
+            return DICT_DATA_PREFIX + "list:" + dictCode;
+        }
+
+        /**
+         * 字典数据详情缓存键（按ID）
+         * <p>
+         * Redis数据类型：String（JSON格式的字典数据信息）
+         * 缓存内容：单个字典数据详细信息
+         * 失效时间：1800秒（30分钟）+ 随机偏移
+         * </p>
+         *
+         * @param dictDataId 字典数据ID
+         * @return 缓存键，格式：dict:data:id:{dictDataId}
+         */
+        public static String dictDataById(Long dictDataId) {
+            return DICT_DATA_PREFIX + "id:" + dictDataId;
+        }
+
+        // ==================== 分布式锁键 ====================
+
+        /**
+         * 字典类型加载锁键
+         * <p>
+         * Redis数据类型：String
+         * 用途：防止缓存击穿，在加载字典类型时使用分布式锁
+         * 失效时间：10秒
+         * </p>
+         *
+         * @param dictCode 字典编码
+         * @return 锁键，格式：dict:lock:type:{dictCode}
+         */
+        public static String dictTypeLock(String dictCode) {
+            return DICT_LOCK_PREFIX + "type:" + dictCode;
+        }
+
+        /**
+         * 字典数据列表加载锁键
+         * <p>
+         * Redis数据类型：String
+         * 用途：防止缓存击穿，在加载字典数据列表时使用分布式锁
+         * 失效时间：10秒
+         * </p>
+         *
+         * @param dictCode 字典编码
+         * @return 锁键，格式：dict:lock:data:{dictCode}
+         */
+        public static String dictDataListLock(String dictCode) {
+            return DICT_LOCK_PREFIX + "data:" + dictCode;
         }
     }
 

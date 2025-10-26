@@ -9,6 +9,7 @@ import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import {
   ModalForm,
   PageContainer,
+  ProFormDigit,
   ProFormRadio,
   ProFormText,
   ProFormTextArea,
@@ -21,6 +22,7 @@ import type { DictType, DictTypeCreateRequest, DictTypeUpdateRequest } from '@/s
 import {
   createDictType,
   deleteDictType,
+  getMaxDictTypeSort,
   queryDictTypes,
   updateDictType,
 } from '@/services/system';
@@ -33,6 +35,7 @@ const DictionaryTypeList: React.FC = () => {
   const intl = useIntl();
   const [modalVisible, setModalVisible] = useState(false);
   const [currentType, setCurrentType] = useState<DictType | undefined>();
+  const [initialDictSort, setInitialDictSort] = useState<number>(0);
   const actionRef = useRef<ActionType>(null);
 
   // 状态枚举
@@ -83,6 +86,13 @@ const DictionaryTypeList: React.FC = () => {
           text={statusEnum[record.status as 0 | 1]?.text}
         />
       ),
+    },
+    {
+      title: intl.formatMessage({ id: 'pages.system.dictionary.type.sort' }),
+      dataIndex: 'dictSort',
+      width: 100,
+      hideInSearch: true,
+      sorter: true,
     },
     {
       title: intl.formatMessage({ id: 'pages.system.dictionary.type.createTime' }),
@@ -173,8 +183,19 @@ const DictionaryTypeList: React.FC = () => {
             key="create"
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => {
+            onClick={async () => {
               setCurrentType(undefined);
+              // 获取最大排序值并设置为 maxSort + 1
+              try {
+                const response = await getMaxDictTypeSort();
+                if (response.success && response.data !== undefined) {
+                  setInitialDictSort(response.data + 1);
+                } else {
+                  setInitialDictSort(0);
+                }
+              } catch (error) {
+                setInitialDictSort(0);
+              }
               setModalVisible(true);
             }}
           >
@@ -183,14 +204,23 @@ const DictionaryTypeList: React.FC = () => {
         ]}
         columns={columns}
         request={async (params, sort) => {
+          const sortField = Object.keys(sort || {})[0];
+          const sortOrder = Object.values(sort || {})[0] as string;
+
+          // 将前端的字段名转换为数据库字段名
+          const fieldMapping: Record<string, string> = {
+            'dictSort': 'dict_sort',
+            'createTime': 'create_time',
+          };
+
           const response = await queryDictTypes({
             dictCode: params.dictCode,
             dictName: params.dictName,
             status: params.status,
             pageNum: params.current || 1,
             pageSize: params.pageSize || 10,
-            sortField: Object.keys(sort || {})[0],
-            sortOrder: Object.values(sort || {})[0] as string,
+            orderBy: sortField ? fieldMapping[sortField] || sortField : undefined,
+            orderDirection: sortOrder === 'ascend' ? 'ASC' : sortOrder === 'descend' ? 'DESC' : undefined,
           });
           return {
             data: response.data?.records || [],
@@ -226,8 +256,8 @@ const DictionaryTypeList: React.FC = () => {
             setCurrentType(undefined);
           }
         }}
-        key={currentType?.id || 'new'}
-        initialValues={currentType ? { ...currentType } : { status: 0 }}
+        key={currentType?.id || Date.now()}
+        initialValues={currentType ? { ...currentType } : { status: 0, dictSort: initialDictSort }}
         onFinish={async (values) => {
           try {
             if (currentType) {
@@ -278,6 +308,16 @@ const DictionaryTypeList: React.FC = () => {
           label={intl.formatMessage({ id: 'pages.system.dictionary.form.desc.label' })}
           placeholder={intl.formatMessage({ id: 'pages.system.dictionary.form.desc.placeholder' })}
           fieldProps={{ rows: 3 }}
+        />
+        <ProFormDigit
+          name="dictSort"
+          label={intl.formatMessage({ id: 'pages.system.dictionary.form.sort.label' })}
+          placeholder={intl.formatMessage({ id: 'pages.system.dictionary.form.sort.placeholder' })}
+          fieldProps={{
+            min: 0,
+            precision: 0,
+            style: { width: '100%' },
+          }}
         />
         <ProFormRadio.Group
           name="status"

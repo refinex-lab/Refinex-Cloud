@@ -278,8 +278,37 @@ public class SysDictDataRepository {
             sql.append(" AND status = :status");
             params.put("status", status);
         }
-        sql.append(" ORDER BY dict_sort ASC, id ASC");
+        
+        // 只有在 PageRequest 没有指定排序时才使用默认排序
+        if (pageRequest.getOrderBy() == null || pageRequest.getOrderBy().isEmpty()) {
+            sql.append(" ORDER BY dict_sort ASC, id ASC");
+        }
 
         return jdbcManager.queryPage(sql.toString(), params, pageRequest, SysDictData.class);
+    }
+
+    /**
+     * 获取指定字典类型下的最大排序值
+     *
+     * @param dictTypeId 字典类型ID
+     * @return 最大排序值，如果没有数据则返回 0
+     */
+    public Integer getMaxDictSort(Long dictTypeId) {
+        String sql = """
+                SELECT COALESCE(MAX(dict_sort), 0) as max_sort
+                FROM sys_dict_data
+                WHERE deleted = 0 AND dict_type_id = :dictTypeId
+                """;
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("dictTypeId", dictTypeId);
+
+        try {
+            Integer maxSort = jdbcManager.queryInt(sql, params, false);
+            return maxSort != null ? maxSort : 0;
+        } catch (Exception e) {
+            log.error("获取字典类型[{}]的最大排序值失败", dictTypeId, e);
+            return 0;
+        }
     }
 }

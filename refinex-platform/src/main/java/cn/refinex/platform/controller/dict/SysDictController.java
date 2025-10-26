@@ -6,10 +6,13 @@ import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
 import cn.refinex.common.satoken.core.util.LoginHelper;
+import cn.refinex.platform.controller.dict.dto.converter.DictConverter;
 import cn.refinex.platform.controller.dict.dto.request.DictDataCreateRequestDTO;
 import cn.refinex.platform.controller.dict.dto.request.DictDataUpdateRequestDTO;
 import cn.refinex.platform.controller.dict.dto.request.DictTypeCreateRequestDTO;
 import cn.refinex.platform.controller.dict.dto.request.DictTypeUpdateRequestDTO;
+import cn.refinex.platform.controller.dict.dto.response.DictDataResponseDTO;
+import cn.refinex.platform.controller.dict.dto.response.DictTypeResponseDTO;
 import cn.refinex.platform.entity.sys.SysDictData;
 import cn.refinex.platform.entity.sys.SysDictType;
 import cn.refinex.platform.service.SysDictService;
@@ -89,15 +92,17 @@ public class SysDictController {
     @GetMapping("/types/{id}")
     @Operation(summary = "获取字典类型详情", description = "根据 ID 获取字典类型详细信息")
     @Parameter(name = "id", description = "字典类型 ID", required = true)
-    public ApiResult<SysDictType> getDictType(@PathVariable("id") Long id) {
-        return ApiResult.success(dictService.getDictTypeById(id));
+    public ApiResult<DictTypeResponseDTO> getDictType(@PathVariable("id") Long id) {
+        SysDictType dictType = dictService.getDictTypeById(id);
+        return ApiResult.success(DictConverter.toTypeResponseDTO(dictType));
     }
 
     @GetMapping("/types/by-code/{code}")
     @Operation(summary = "根据编码获取字典类型", description = "根据字典类型编码获取详细信息（带缓存）")
     @Parameter(name = "code", description = "字典类型编码", required = true)
-    public ApiResult<SysDictType> getDictTypeByCode(@PathVariable("code") String code) {
-        return ApiResult.success(dictService.getDictTypeByCode(code));
+    public ApiResult<DictTypeResponseDTO> getDictTypeByCode(@PathVariable("code") String code) {
+        SysDictType dictType = dictService.getDictTypeByCode(code);
+        return ApiResult.success(DictConverter.toTypeResponseDTO(dictType));
     }
 
     @GetMapping("/types")
@@ -105,23 +110,46 @@ public class SysDictController {
     @Parameter(name = "dictCode", description = "字典类型编码，支持模糊查询")
     @Parameter(name = "dictName", description = "字典类型名称，支持模糊查询")
     @Parameter(name = "status", description = "状态：0正常,1停用")
+    @Parameter(name = "orderBy", description = "排序字段，如：dict_sort, create_time")
+    @Parameter(name = "orderDirection", description = "排序方向：ASC 或 DESC")
     @Parameter(name = "pageNum", description = "页码，从1开始")
     @Parameter(name = "pageSize", description = "每页数量")
-    public ApiResult<PageResult<SysDictType>> searchDictTypes(
+    public ApiResult<PageResult<DictTypeResponseDTO>> searchDictTypes(
             @RequestParam(value = "dictCode", required = false) String dictCode,
             @RequestParam(value = "dictName", required = false) String dictName,
             @RequestParam(value = "status", required = false) Integer status,
+            @RequestParam(value = "orderBy", required = false) String orderBy,
+            @RequestParam(value = "orderDirection", required = false) String orderDirection,
             @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
             @RequestParam(value = "pageSize", defaultValue = "15") int pageSize
     ) {
-        PageRequest pr = new PageRequest(pageNum, pageSize);
-        return ApiResult.success(dictService.pageQueryDictTypes(dictCode, dictName, status, pr));
+        PageRequest pr = new PageRequest(pageNum, pageSize, orderBy, orderDirection);
+        PageResult<SysDictType> pageResult = dictService.pageQueryDictTypes(dictCode, dictName, status, pr);
+        
+        // 转换为响应 DTO
+        List<DictTypeResponseDTO> dtoList = DictConverter.toTypeResponseDTOList(pageResult.getRecords());
+        PageResult<DictTypeResponseDTO> dtoPageResult = new PageResult<>(
+                dtoList,
+                pageResult.getTotal(),
+                pageResult.getPageNum(),
+                pageResult.getPageSize()
+        );
+        
+        return ApiResult.success(dtoPageResult);
     }
 
     @GetMapping("/types/enabled")
     @Operation(summary = "获取所有启用的字典类型", description = "查询所有状态为启用的字典类型")
-    public ApiResult<List<SysDictType>> listEnabledDictTypes() {
-        return ApiResult.success(dictService.listEnabledTypes());
+    public ApiResult<List<DictTypeResponseDTO>> listEnabledDictTypes() {
+        List<SysDictType> dictTypes = dictService.listEnabledTypes();
+        return ApiResult.success(DictConverter.toTypeResponseDTOList(dictTypes));
+    }
+
+    @GetMapping("/types/max-sort")
+    @Operation(summary = "获取字典类型最大排序值", description = "获取当前字典类型的最大排序值，用于新增时自动计算排序")
+    public ApiResult<Integer> getMaxDictTypeSort() {
+        Integer maxSort = dictService.getMaxDictTypeSort();
+        return ApiResult.success(maxSort);
     }
 
     // ===================== 字典数据 =====================
@@ -132,18 +160,7 @@ public class SysDictController {
     @Parameter(name = "req", description = "字典数据创建请求", required = true)
     public ApiResult<Long> createDictData(@Valid @RequestBody DictDataCreateRequestDTO req) {
         Long operatorId = LoginHelper.getUserId();
-        Long id = dictService.createDictData(
-                req.getDictTypeId(),
-                req.getDictLabel(),
-                req.getDictValue(),
-                req.getDictSort(),
-                req.getCssClass(),
-                req.getListClass(),
-                req.getIsDefault(),
-                req.getRemark(),
-                req.getStatus(),
-                operatorId
-        );
+        Long id = dictService.createDictData(req, operatorId);
         return ApiResult.success(cn.refinex.common.enums.HttpStatusCode.CREATED, id);
     }
 
@@ -154,19 +171,7 @@ public class SysDictController {
     @Parameter(name = "req", description = "字典数据更新请求", required = true)
     public ApiResult<Boolean> updateDictData(@PathVariable("id") Long id, @Valid @RequestBody DictDataUpdateRequestDTO req) {
         Long operatorId = LoginHelper.getUserId();
-        boolean ok = dictService.updateDictData(
-                id,
-                req.getDictTypeId(),
-                req.getDictLabel(),
-                req.getDictValue(),
-                req.getDictSort(),
-                req.getCssClass(),
-                req.getListClass(),
-                req.getIsDefault(),
-                req.getRemark(),
-                req.getStatus(),
-                operatorId
-        );
+        boolean ok = dictService.updateDictData(id, req, operatorId);
         return ApiResult.success(ok);
     }
 
@@ -192,6 +197,7 @@ public class SysDictController {
                 try {
                     idList.add(Long.parseLong(s.trim()));
                 } catch (NumberFormatException ignored) {
+                    // ignore invalid ID
                 }
             }
         }
@@ -202,15 +208,17 @@ public class SysDictController {
     @GetMapping("/data/{id}")
     @Operation(summary = "获取字典数据详情", description = "根据 ID 获取字典数据详细信息")
     @Parameter(name = "id", description = "字典数据 ID", required = true)
-    public ApiResult<SysDictData> getDictData(@PathVariable("id") Long id) {
-        return ApiResult.success(dictService.getDictDataById(id));
+    public ApiResult<DictDataResponseDTO> getDictData(@PathVariable("id") Long id) {
+        SysDictData dictData = dictService.getDictDataById(id);
+        return ApiResult.success(DictConverter.toDataResponseDTO(dictData));
     }
 
     @GetMapping("/types/{code}/data")
     @Operation(summary = "根据类型编码获取字典数据", description = "根据字典类型编码获取所有字典数据（带缓存）")
     @Parameter(name = "code", description = "字典类型编码", required = true)
-    public ApiResult<List<SysDictData>> listDictDataByTypeCode(@PathVariable("code") String code) {
-        return ApiResult.success(dictService.listDictDataByTypeCode(code));
+    public ApiResult<List<DictDataResponseDTO>> listDictDataByTypeCode(@PathVariable("code") String code) {
+        List<SysDictData> dictDataList = dictService.listDictDataByTypeCode(code);
+        return ApiResult.success(DictConverter.toDataResponseDTOList(dictDataList));
     }
 
     @GetMapping("/data")
@@ -219,17 +227,40 @@ public class SysDictController {
     @Parameter(name = "dictLabel", description = "字典标签，支持模糊查询")
     @Parameter(name = "dictValue", description = "字典值，支持模糊查询")
     @Parameter(name = "status", description = "状态：0正常,1停用")
+    @Parameter(name = "orderBy", description = "排序字段，如：dict_sort, create_time")
+    @Parameter(name = "orderDirection", description = "排序方向：ASC 或 DESC")
     @Parameter(name = "pageNum", description = "页码，从1开始")
     @Parameter(name = "pageSize", description = "每页数量")
-    public ApiResult<PageResult<SysDictData>> searchDictData(
+    public ApiResult<PageResult<DictDataResponseDTO>> searchDictData(
             @RequestParam(value = "dictTypeId", required = false) Long dictTypeId,
             @RequestParam(value = "dictLabel", required = false) String dictLabel,
             @RequestParam(value = "dictValue", required = false) String dictValue,
             @RequestParam(value = "status", required = false) Integer status,
+            @RequestParam(value = "orderBy", required = false) String orderBy,
+            @RequestParam(value = "orderDirection", required = false) String orderDirection,
             @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
             @RequestParam(value = "pageSize", defaultValue = "15") int pageSize
     ) {
-        PageRequest pr = new PageRequest(pageNum, pageSize);
-        return ApiResult.success(dictService.pageQueryDictData(dictTypeId, dictLabel, dictValue, status, pr));
+        PageRequest pr = new PageRequest(pageNum, pageSize, orderBy, orderDirection);
+        PageResult<SysDictData> pageResult = dictService.pageQueryDictData(dictTypeId, dictLabel, dictValue, status, pr);
+        
+        // 转换为响应 DTO
+        List<DictDataResponseDTO> dtoList = DictConverter.toDataResponseDTOList(pageResult.getRecords());
+        PageResult<DictDataResponseDTO> dtoPageResult = new PageResult<>(
+                dtoList,
+                pageResult.getTotal(),
+                pageResult.getPageNum(),
+                pageResult.getPageSize()
+        );
+        
+        return ApiResult.success(dtoPageResult);
+    }
+
+    @GetMapping("/data/max-sort")
+    @Operation(summary = "获取字典数据最大排序值", description = "获取指定字典类型下的最大排序值，用于新增时自动计算排序")
+    @Parameter(name = "dictTypeId", description = "字典类型 ID", required = true)
+    public ApiResult<Integer> getMaxDictDataSort(@RequestParam("dictTypeId") Long dictTypeId) {
+        Integer maxSort = dictService.getMaxDictDataSort(dictTypeId);
+        return ApiResult.success(maxSort);
     }
 }

@@ -24,6 +24,7 @@ import {
   batchDeleteDictData,
   createDictData,
   deleteDictData,
+  getMaxDictDataSort,
   queryDictData,
   updateDictData,
 } from '@/services/system';
@@ -38,6 +39,7 @@ const DictionaryDataList: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [modalVisible, setModalVisible] = useState(false);
   const [currentData, setCurrentData] = useState<DictData | undefined>();
+  const [initialDictSort, setInitialDictSort] = useState<number>(0);
   const actionRef = useRef<ActionType>(null);
 
   // 从 URL 获取字典类型信息
@@ -212,8 +214,19 @@ const DictionaryDataList: React.FC = () => {
             key="create"
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => {
+            onClick={async () => {
               setCurrentData(undefined);
+              // 获取最大排序值并设置为 maxSort + 1
+              try {
+                const response = await getMaxDictDataSort(dictTypeId);
+                if (response.success && response.data !== undefined) {
+                  setInitialDictSort(response.data + 1);
+                } else {
+                  setInitialDictSort(0);
+                }
+              } catch (error) {
+                setInitialDictSort(0);
+              }
               setModalVisible(true);
             }}
           >
@@ -222,6 +235,15 @@ const DictionaryDataList: React.FC = () => {
         ]}
         columns={columns}
         request={async (params, sort) => {
+          const sortField = Object.keys(sort || {})[0];
+          const sortOrder = Object.values(sort || {})[0] as string;
+
+          // 将前端的字段名转换为数据库字段名
+          const fieldMapping: Record<string, string> = {
+            'dictSort': 'dict_sort',
+            'createTime': 'create_time',
+          };
+
           const response = await queryDictData({
             dictTypeId,
             dictLabel: params.dictLabel,
@@ -229,8 +251,8 @@ const DictionaryDataList: React.FC = () => {
             status: params.status,
             pageNum: params.current || 1,
             pageSize: params.pageSize || 10,
-            sortField: Object.keys(sort || {})[0],
-            sortOrder: Object.values(sort || {})[0] as string,
+            orderBy: sortField ? fieldMapping[sortField] || sortField : undefined,
+            orderDirection: sortOrder === 'ascend' ? 'ASC' : sortOrder === 'descend' ? 'DESC' : undefined,
           });
           return {
             data: response.data?.records || [],
@@ -310,8 +332,8 @@ const DictionaryDataList: React.FC = () => {
             setCurrentData(undefined);
           }
         }}
-        key={currentData?.id || 'new'}
-        initialValues={currentData ? { ...currentData } : { dictTypeId, status: 0, isDefault: 0, dictSort: 0 }}
+        key={currentData?.id || Date.now()}
+        initialValues={currentData ? { ...currentData } : { dictTypeId, status: 0, isDefault: 0, dictSort: initialDictSort }}
         grid
         rowProps={{ gutter: 16 }}
         onFinish={async (values) => {
