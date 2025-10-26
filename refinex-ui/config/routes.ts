@@ -334,6 +334,46 @@ export default [
     ],
   },
   {
+    name: 'kb',
+    icon: 'read',
+    path: '/kb',
+    routes: [
+      {
+        path: '/kb',
+        redirect: '/kb/space',
+      },
+      {
+        name: 'space',
+        icon: 'appstore',
+        path: '/kb/space',
+        component: './kb/space',
+      },
+      {
+        name: 'space-detail',
+        path: '/kb/space/:spaceCode',
+        component: './kb/space/[spaceCode]',
+        hideInMenu: true,
+      },
+    ],
+  },
+  {
+    name: 'kb-admin',
+    icon: 'book',
+    path: '/kb-admin',
+    routes: [
+      {
+        path: '/kb-admin',
+        redirect: '/kb-admin/space',
+      },
+      {
+        name: 'space',
+        icon: 'appstore',
+        path: '/kb-admin/space',
+        component: './kb-admin/space',
+      },
+    ],
+  },
+  {
     path: '/',
     redirect: '/dashboard/analysis',
   },

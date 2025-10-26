@@ -10,6 +10,7 @@ import cn.refinex.platform.controller.user.dto.response.UserSessionResponseDTO;
 import cn.refinex.platform.controller.user.vo.CurrentUserVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户服务接口
@@ -18,6 +19,22 @@ import java.util.List;
  * @since 1.0.0
  */
 public interface UserService {
+
+    /**
+     * 根据用户 ID 获取用户名
+     *
+     * @param userId 用户 ID
+     * @return 用户名
+     */
+    String getUsernameByUserId(Long userId);
+
+    /**
+     * 根据用户 ID 列表获取用户名映射
+     *
+     * @param userIds 用户 ID 列表
+     * @return 用户名映射（用户 ID -> 用户名）
+     */
+    Map<String, Object> getUsernameMap(List<Long> userIds);
 
     /**
      * 根据用户名获取用户信息

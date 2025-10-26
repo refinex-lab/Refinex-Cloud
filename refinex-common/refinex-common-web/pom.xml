@@ -56,6 +56,21 @@
             <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- Sa-Token 集成 -->
+        <dependency>
+            <groupId>cn.refinex</groupId>
+            <artifactId>refinex-common-satoken</artifactId>
+        </dependency>
+
+        <!-- Sa-Token 权限认证 (Spring Boot 3 集成) -->
+        <!-- 为什么不在 Sa-Token 模块引入这个依赖？（因为网关要引入 sa-token 模块，它使用的是 sa-token-reactor-spring-boot3-starter，要和 servlet 服务使用区分开）
+         see https://sa-token.cc/doc.html#/micro/import-intro?id=%e5%be%ae%e6%9c%8d%e5%8a%a1%e4%b8%ad%e4%bd%bf%e7%94%a8sa-token-%e4%be%9d%e8%b5%96%e5%bc%95%e5%85%a5%e8%af%b4%e6%98%8e
+         -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-spring-boot3-starter</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>

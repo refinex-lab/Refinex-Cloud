@@ -28,6 +28,14 @@ spring:
               filters:
                 - StripPrefix=1
 
+            # 知识库服务路由
+            - id: refinex-kb
+              uri: lb://refinex-kb
+              predicates:
+                - Path=/refinex-kb/**
+              filters:
+                - StripPrefix=1
+
 # 网关安全配置
 security:
   ignore:

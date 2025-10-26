@@ -70,16 +70,18 @@ public class RestClientConfig {
     }
 
     /**
-     * LoadBalancer 拦截器（用于处理 lb:// 协议）
+     * 自定义 LoadBalancer 拦截器（用于处理 lb:// 协议）
+     * <p>
+     * 注意：重命名为 customLoadBalancerInterceptor 以避免与 Spring Cloud LoadBalancer 自动配置的 Bean 冲突
      *
      * @param loadBalancerClient LoadBalancer 客户端
      * @return ClientHttpRequestInterceptor
      */
-    @Bean
+    @Bean("customLoadBalancerInterceptor")
     @ConditionalOnClass(name = "org.springframework.cloud.client.loadbalancer.LoadBalancerClient")
     // 仅在 LoadBalancerClient 存在时才创建此 Bean
-    @ConditionalOnMissingBean(name = "loadBalancerInterceptor")
-    public ClientHttpRequestInterceptor loadBalancerInterceptor(ObjectProvider<LoadBalancerClient> loadBalancerClient) {
+    @ConditionalOnMissingBean(name = "customLoadBalancerInterceptor")
+    public ClientHttpRequestInterceptor customLoadBalancerInterceptor(ObjectProvider<LoadBalancerClient> loadBalancerClient) {
         return (request, body, execution) -> {
             // 提取原始 URI 和协议
             URI originalUri = request.getURI();
@@ -168,18 +170,18 @@ public class RestClientConfig {
      * 1. 仅在 LoadBalancer 类存在时才创建此 Bean
      * 2. 使用自定义的 LoadBalancer 拦截器来处理 lb:// 协议
      *
-     * @param loadBalancerInterceptor LoadBalancer 拦截器
+     * @param customLoadBalancerInterceptor 自定义 LoadBalancer 拦截器
      * @return RestClient.Builder
      */
     @Bean("loadBalancedRestClientBuilder")
     @ConditionalOnClass(name = "org.springframework.cloud.client.loadbalancer.LoadBalancerClient")
     @ConditionalOnMissingBean(name = "loadBalancedRestClientBuilder")
-    public RestClient.Builder loadBalancedRestClientBuilder(ObjectProvider<ClientHttpRequestInterceptor> loadBalancerInterceptor) {
+    public RestClient.Builder loadBalancedRestClientBuilder(ObjectProvider<ClientHttpRequestInterceptor> customLoadBalancerInterceptor) {
         RestClient.Builder builder = RestClient.builder()
                 .requestFactory(clientHttpRequestFactory());
 
-        // 添加 LoadBalancer 拦截器
-        loadBalancerInterceptor.ifAvailable(builder::requestInterceptor);
+        // 添加自定义 LoadBalancer 拦截器
+        customLoadBalancerInterceptor.ifAvailable(builder::requestInterceptor);
 
         return builder;
     }

@@ -28,7 +28,6 @@
         <module>refinex-common-mq</module>
         <module>refinex-common-job</module>
         <module>refinex-common-elasticsearch</module>
-        <module>refinex-common-security</module>
     </modules>
 
 </project>

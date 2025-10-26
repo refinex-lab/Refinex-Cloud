@@ -35,10 +35,6 @@
     </dependency>
     <dependency>
       <groupId>cn.refinex</groupId>
-      <artifactId>refinex-common-security</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cn.refinex</groupId>
       <artifactId>refinex-common-jdbc</artifactId>
     </dependency>
     <dependency>

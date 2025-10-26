@@ -13,6 +13,7 @@
     <module>refinex-platform</module>
     <module>refinex-gateway</module>
     <module>refinex-auth</module>
+    <module>refinex-kb</module>
   </modules>
   <properties>
     <spring-boot-admin.version>3.5.3</spring-boot-admin.version>
@@ -49,7 +50,7 @@
     <lombok.version>1.18.40</lombok.version>
     <rocketmq-spring.version>2.3.2</rocketmq-spring.version>
     <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
-    <ip2region.version>2.7.0</ip2region.version>
+    <ip2region.version>3.1.1</ip2region.version>
     <satoken.version>1.44.0</satoken.version>
     <mockito-inline.version>5.2.0</mockito-inline.version>
     <redisson.version>3.51.0</redisson.version>
@@ -325,11 +326,6 @@
       <dependency>
         <groupId>cn.refinex</groupId>
         <artifactId>refinex-common-satoken</artifactId>
-        <version>1.0.0</version>
-      </dependency>
-      <dependency>
-        <groupId>cn.refinex</groupId>
-        <artifactId>refinex-common-security</artifactId>
         <version>1.0.0</version>
       </dependency>
       <dependency>

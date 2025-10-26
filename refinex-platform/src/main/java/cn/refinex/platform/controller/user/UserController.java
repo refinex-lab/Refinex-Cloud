@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -52,6 +53,20 @@ public class UserController {
     @Parameter(name = "request", description = "用户创建请求参数", required = true)
     public ApiResult<Boolean> registerUser(@RequestBody UserCreateRequestDTO request) {
         return ApiResult.success(userService.registerUser(request));
+    }
+
+    @GetMapping("/{userId}/username")
+    @Operation(summary = "根据用户ID获取用户名", description = "根据用户ID查询用户名")
+    @Parameter(name = "userId", description = "用户ID", required = true)
+    public ApiResult<String> getUsernameByUserId(@PathVariable("userId") @NotNull(message = "用户ID不能为空") Long userId) {
+        return ApiResult.success(userService.getUsernameByUserId(userId));
+    }
+
+    @GetMapping("/username-map")
+    @Operation(summary = "根据用户ID列表获取用户名映射", description = "根据用户ID列表查询用户名映射")
+    @Parameter(name = "userIds", description = "用户ID列表", required = true)
+    public ApiResult<Map<String, Object>> getUsernameMap(@RequestParam("userIds") @NotNull(message = "用户ID列表不能为空") List<Long> userIds) {
+        return ApiResult.success(userService.getUsernameMap(userIds));
     }
 
     @GetMapping("/by-username")

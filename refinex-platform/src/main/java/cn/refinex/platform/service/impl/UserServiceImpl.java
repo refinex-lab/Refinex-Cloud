@@ -4,16 +4,6 @@ import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
-import cn.refinex.common.jdbc.page.PageResult;
-import cn.refinex.common.satoken.core.util.LoginHelper;
-import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
-import cn.refinex.platform.controller.user.dto.request.*;
-import cn.refinex.platform.controller.user.dto.response.UserDetailResponseDTO;
-import cn.refinex.platform.controller.user.dto.response.UserListResponseDTO;
-import cn.refinex.platform.controller.user.vo.CurrentUserVo;
-import cn.refinex.platform.controller.user.vo.SysUserVo;
-import cn.refinex.platform.enums.RegisterSource;
-import cn.refinex.platform.enums.UserRegisterType;
 import cn.refinex.common.constants.SystemRoleConstants;
 import cn.refinex.common.constants.SystemStatusConstants;
 import cn.refinex.common.domain.model.LoginUser;
@@ -23,18 +13,25 @@ import cn.refinex.common.enums.UserSex;
 import cn.refinex.common.enums.UserType;
 import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
+import cn.refinex.common.jdbc.page.PageResult;
 import cn.refinex.common.jdbc.service.SensitiveDataService;
 import cn.refinex.common.properties.RefinexBizProperties;
-import cn.refinex.common.utils.Fn;
 import cn.refinex.common.redis.id.RedisIdGenerator;
+import cn.refinex.common.satoken.core.util.LoginHelper;
+import cn.refinex.common.utils.Fn;
 import cn.refinex.common.utils.object.BeanConverter;
 import cn.refinex.common.utils.regex.RegexUtils;
-import cn.refinex.platform.controller.user.dto.request.UserDisableRequestDTO;
-import cn.refinex.platform.controller.user.dto.request.UserKickoutRequestDTO;
+import cn.refinex.platform.controller.user.dto.request.*;
+import cn.refinex.platform.controller.user.dto.response.UserDetailResponseDTO;
 import cn.refinex.platform.controller.user.dto.response.UserDisableStatusResponseDTO;
+import cn.refinex.platform.controller.user.dto.response.UserListResponseDTO;
+import cn.refinex.platform.controller.user.dto.response.UserSessionResponseDTO;
+import cn.refinex.platform.controller.user.vo.CurrentUserVo;
+import cn.refinex.platform.controller.user.vo.SysUserVo;
 import cn.refinex.platform.entity.sys.SysRole;
 import cn.refinex.platform.entity.sys.SysUser;
-import cn.refinex.platform.controller.user.dto.response.UserSessionResponseDTO;
+import cn.refinex.platform.enums.RegisterSource;
+import cn.refinex.platform.enums.UserRegisterType;
 import cn.refinex.platform.enums.UserStatus;
 import cn.refinex.platform.repository.sys.SysUserRepository;
 import cn.refinex.platform.service.PermissionService;
@@ -49,6 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -66,12 +64,33 @@ public class UserServiceImpl implements UserService {
     private final SysUserRepository sysUserRepository;
     private final SensitiveDataService sensitiveDataService;
     private final RedisIdGenerator redisIdGenerator;
-    private final SnowflakeIdGenerator idGenerator;
     private final PasswordEncoder passwordEncoder;
     private final UserNotificationServiceImpl notificationService;
     private final PermissionService permissionService;
     private final RefinexBizProperties bizProperties;
     private final SysRoleService sysRoleService;
+
+    /**
+     * 根据用户 ID 获取用户名
+     *
+     * @param userId 用户 ID
+     * @return 用户名
+     */
+    @Override
+    public String getUsernameByUserId(Long userId) {
+        return sysUserRepository.selectUsernameById(userId);
+    }
+
+    /**
+     * 根据用户 ID 列表查询用户名映射
+     *
+     * @param userIds 用户 ID 列表
+     * @return 用户名映射，键为用户 ID，值为用户名
+     */
+    @Override
+    public Map<String, Object> getUsernameMap(List<Long> userIds) {
+        return sysUserRepository.selectUsernameMap(userIds);
+    }
 
     /**
      * 根据用户名获取用户信息

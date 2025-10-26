@@ -32,6 +32,56 @@ public class SysUserRepository {
     private final JdbcTemplateManager jdbcManager;
 
     /**
+     * 根据用户 ID 查询用户名
+     *
+     * @param userId 用户 ID
+     * @return 用户名
+     */
+    public String selectUsernameById(Long userId) {
+        String sql = """
+                SELECT username
+                FROM sys_user
+                WHERE id = :userId AND deleted = 0
+                """;
+
+        Map<String, Object> params = Map.of("userId", userId);
+
+        try {
+            return jdbcManager.queryString(sql, params, false);
+        } catch (Exception e) {
+            log.error("根据用户 ID 查询用户名失败，userId: {}", userId, e);
+            return null;
+        }
+    }
+
+    /**
+     * 根据用户 ID 列表查询用户名映射
+     *
+     * @param userIds 用户 ID 列表
+     * @return 用户名映射，键为用户 ID，值为用户名
+     */
+    public Map<String, Object> selectUsernameMap(List<Long> userIds) {
+        if (userIds.isEmpty()) {
+            return Map.of();
+        }
+
+        String sql = """
+                SELECT id, username
+                FROM sys_user
+                WHERE id IN (:userIds) AND deleted = 0
+                """;
+
+        Map<String, Object> params = Map.of("userIds", userIds);
+
+        try {
+            return jdbcManager.queryMap(sql, params);
+        } catch (Exception e) {
+            log.error("根据用户 ID 列表查询用户名映射失败，userIds: {}", userIds, e);
+            return Map.of();
+        }
+    }
+
+    /**
      * 根据用户 ID 查询用户信息
      *
      * @param userId 用户 ID

@@ -8,10 +8,11 @@
     <version>1.0.0</version>
   </parent>
   <groupId>cn.refinex</groupId>
-  <artifactId>refinex-platform</artifactId>
+  <artifactId>refinex-kb</artifactId>
   <version>1.0.0</version>
+  <packaging>pom</packaging>
   <name>${project.artifactId}</name>
-  <description>Refinex Cloud Platform</description>
+  <description>知识库服务</description>
   <dependencies>
     <dependency>
       <groupId>cn.refinex</groupId>

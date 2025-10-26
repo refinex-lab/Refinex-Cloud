@@ -3,6 +3,7 @@ package cn.refinex.common.jdbc.page;
 import lombok.Data;
 import lombok.ToString;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
 @ToString
 public class PageResult<T> implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

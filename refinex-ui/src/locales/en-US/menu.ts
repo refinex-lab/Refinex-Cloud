@@ -58,4 +58,9 @@ export default {
   'menu.editor.flow': 'Flow Editor',
   'menu.editor.mind': 'Mind Editor',
   'menu.editor.koni': 'Koni Editor',
+  'menu.kb': 'Knowledge Base',
+  'menu.kb.space': 'My Spaces',
+  'menu.kb.space-detail': 'Space Detail',
+  'menu.kb-admin': 'KB Admin',
+  'menu.kb-admin.space': 'Space Management',
 };
