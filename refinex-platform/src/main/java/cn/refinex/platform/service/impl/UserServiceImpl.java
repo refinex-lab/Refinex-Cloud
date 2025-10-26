@@ -252,8 +252,8 @@ public class UserServiceImpl implements UserService {
             SysUser sysUser = BeanConverter.toBean(request, SysUser.class);
             jdbcManager.executeInTransaction(manager -> {
                 // 使用 Redis 自增生成用户 ID（从 1000 开始）
-                // Long userId = redisIdGenerator.nextId("user", 1000L);
-                Long userId = idGenerator.nextId();
+                Long userId = redisIdGenerator.nextId("user_id", 1000L);
+                // Long userId = idGenerator.nextId();
                 sysUser.setId(userId);
 
                 // 加密存储邮箱（如果有）
@@ -278,7 +278,7 @@ public class UserServiceImpl implements UserService {
                 // 完善信息
                 sysUser.setUserStatus(UserStatus.NORMAL.getValue());
                 // 注册操作员默认为管理员
-                sysUser.setCreateBy(1L);
+                sysUser.setCreateBy(LoginHelper.getUserId() != null ? LoginHelper.getUserId() : 1L);
                 sysUser.setCreateTime(LocalDateTime.now());
                 sysUser.setUpdateTime(LocalDateTime.now());
 
