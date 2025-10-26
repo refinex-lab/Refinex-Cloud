@@ -390,7 +390,14 @@ const RoleUserManagement: React.FC = () => {
         }}
         onFinish={async (values) => {
           try {
-            await bindUsers(roleId, values);
+            // 转换日期格式为 ISO 8601 格式（后端 LocalDateTime 需要）
+            const payload: UserRoleBindRequest = {
+              userIds: values.userIds,
+              validFrom: values.validFrom ? dayjs(values.validFrom).format('YYYY-MM-DDTHH:mm:ss') : undefined,
+              validUntil: values.validUntil ? dayjs(values.validUntil).format('YYYY-MM-DDTHH:mm:ss') : undefined,
+            };
+
+            await bindUsers(roleId, payload);
             message.success('添加用户成功');
             actionRef.current?.reload();
             return true;

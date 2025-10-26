@@ -95,14 +95,18 @@ export interface CurrentUser {
   permissions?: string[];
 }
 
-// 为了向后兼容，保留 AUTH 命名空间
-declare namespace AUTH {
-  export type ApiResult<T = any> = ApiResponse<T>;
-  export type CaptchaResponse = import('./typings').CaptchaResponse;
-  export type LoginRequest = import('./typings').LoginRequest;
-  export type LoginResponse = import('./typings').LoginResponse;
-  export type RegisterRequest = import('./typings').RegisterRequest;
-  export type SendEmailCodeRequest = import('./typings').SendEmailCodeRequest;
-  export type ResetPasswordRequest = import('./typings').ResetPasswordRequest;
-  export type CurrentUser = import('./typings').CurrentUser;
+// 为了向后兼容，保留 AUTH 命名空间（全局声明）
+declare global {
+  namespace AUTH {
+    export type ApiResult<T = any> = ApiResponse<T>;
+    export type CaptchaResponse = import('@/services/auth/typings').CaptchaResponse;
+    export type LoginRequest = import('@/services/auth/typings').LoginRequest;
+    export type LoginResponse = import('@/services/auth/typings').LoginResponse;
+    export type RegisterRequest = import('@/services/auth/typings').RegisterRequest;
+    export type SendEmailCodeRequest = import('@/services/auth/typings').SendEmailCodeRequest;
+    export type ResetPasswordRequest = import('@/services/auth/typings').ResetPasswordRequest;
+    export type CurrentUser = import('@/services/auth/typings').CurrentUser;
+  }
 }
+
+export {};
