@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>refinex-kb</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
     <description>知识库服务</description>
@@ -53,16 +53,6 @@
         <dependency>
             <groupId>cn.refinex</groupId>
             <artifactId>refinex-common-redis</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.refinex</groupId>
-            <artifactId>refinex-common-json</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.refinex</groupId>
-            <artifactId>refinex-common-satoken</artifactId>
         </dependency>
     </dependencies>
 
