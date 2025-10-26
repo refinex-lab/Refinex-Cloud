@@ -1,11 +1,13 @@
 package cn.refinex.platform.controller.file;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.refinex.common.apilog.core.annotation.LogOperation;
+import cn.refinex.common.apilog.core.enums.OperateTypeEnum;
+import cn.refinex.common.domain.ApiResult;
 import cn.refinex.platform.controller.file.dto.request.FileConfirmUploadRequestDTO;
 import cn.refinex.platform.controller.file.dto.request.FileInfoDTO;
 import cn.refinex.platform.controller.file.dto.request.FileUploadUrlRequestDTO;
 import cn.refinex.platform.controller.file.dto.response.FileUploadUrlResponseDTO;
-import cn.refinex.common.domain.ApiResult;
 import cn.refinex.platform.service.FileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -67,6 +69,7 @@ public class FileController {
     }
 
     @DeleteMapping("/{fileGuid}")
+    @LogOperation(operateDesc = "删除文件", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "删除文件", description = "根据文件 GUID 删除文件")
     @Parameter(name = "fileGuid", description = "文件 GUID", required = true)
     public ApiResult<Void> deleteFile(@PathVariable("fileGuid") String fileGuid) {

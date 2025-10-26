@@ -148,7 +148,8 @@ const DictionaryDataList: React.FC = () => {
               message.success(intl.formatMessage({ id: 'pages.system.dictionary.message.deleteSuccess' }));
               actionRef.current?.reload();
             } catch (error) {
-              message.error(intl.formatMessage({ id: 'pages.system.dictionary.message.deleteFailed' }));
+              // 错误提示由全局错误处理器统一处理
+              console.error('删除字典数据失败:', error);
             }
           }}
         >
@@ -294,7 +295,8 @@ const DictionaryDataList: React.FC = () => {
                       message.success(intl.formatMessage({ id: 'pages.system.dictionary.message.deleteSuccess' }));
                       actionRef.current?.reload();
                     } catch (error) {
-                      message.error(intl.formatMessage({ id: 'pages.system.dictionary.message.deleteFailed' }));
+                      // 错误提示由全局错误处理器统一处理
+                      console.error('批量删除字典数据失败:', error);
                     }
                   },
                 });
@@ -348,11 +350,8 @@ const DictionaryDataList: React.FC = () => {
             actionRef.current?.reload();
             return true;
           } catch (error) {
-            // message.error(
-            //   currentData
-            //     ? intl.formatMessage({ id: 'pages.system.dictionary.message.updateFailed' })
-            //     : intl.formatMessage({ id: 'pages.system.dictionary.message.createFailed' }),
-            // );
+            // 错误提示由全局错误处理器统一处理
+            console.error(currentData ? '更新字典数据失败:' : '创建字典数据失败:', error);
             return false;
           }
         }}

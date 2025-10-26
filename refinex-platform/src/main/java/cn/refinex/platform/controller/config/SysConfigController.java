@@ -1,5 +1,7 @@
 package cn.refinex.platform.controller.config;
 
+import cn.refinex.common.apilog.core.annotation.LogOperation;
+import cn.refinex.common.apilog.core.enums.OperateTypeEnum;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.jdbc.page.PageRequest;
@@ -36,6 +38,7 @@ public class SysConfigController {
     private final SysConfigService sysConfigService;
 
     @PostMapping
+    @LogOperation(operateDesc = "创建配置", operationType = OperateTypeEnum.CREATE)
     @Operation(summary = "创建配置", description = "创建新的系统配置")
     @Parameter(name = "request", description = "配置创建请求", required = true)
     public ApiResult<Long> createConfig(@Valid @RequestBody SysConfigCreateRequestDTO request) {
@@ -44,6 +47,7 @@ public class SysConfigController {
     }
 
     @PutMapping("/{id}")
+    @LogOperation(operateDesc = "更新配置", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "更新配置", description = "更新指定配置的信息")
     @Parameter(name = "id", description = "配置 ID", required = true)
     @Parameter(name = "request", description = "配置更新请求", required = true)
@@ -53,6 +57,7 @@ public class SysConfigController {
     }
 
     @DeleteMapping("/{id}")
+    @LogOperation(operateDesc = "删除配置", operationType = OperateTypeEnum.DELETE)
     @Operation(summary = "删除配置", description = "删除指定的系统配置")
     @Parameter(name = "id", description = "配置 ID", required = true)
     public ApiResult<Void> deleteConfig(@PathVariable Long id) {
@@ -101,6 +106,7 @@ public class SysConfigController {
     }
 
     @PatchMapping("/{id}/frontend-visibility")
+    @LogOperation(operateDesc = "修改前端可见性", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "修改前端可见性", description = "设置配置是否对前端可见")
     @Parameter(name = "id", description = "配置 ID", required = true)
     @Parameter(name = "visible", description = "可见性（1-可见，0-不可见）", required = true)

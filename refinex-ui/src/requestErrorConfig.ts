@@ -46,6 +46,7 @@ export const errorConfig: RequestConfig = {
         const finalCode = code || errorCode;
         const error: any = new Error(finalMessage);
         error.name = 'BizError';
+        // 确保 errorMessage 字段存储的是最终的错误消息
         error.info = { errorCode: finalCode, errorMessage: finalMessage, showType, data };
         throw error; // 抛出自制的错误
       }

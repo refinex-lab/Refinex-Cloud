@@ -1,5 +1,7 @@
 package cn.refinex.platform.controller.auth;
 
+import cn.refinex.common.apilog.core.annotation.LogOperation;
+import cn.refinex.common.apilog.core.enums.OperateTypeEnum;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.satoken.core.util.LoginHelper;
 import cn.refinex.platform.controller.auth.dto.request.AssignRolePermissionsRequestDTO;
@@ -28,6 +30,7 @@ public class SysRolePermissionController {
     private final SysRolePermissionService sysRolePermissionService;
 
     @PutMapping("/{roleId}/permissions")
+    @LogOperation(operateDesc = "分配角色权限", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "分配角色权限", description = "为指定角色分配权限列表")
     @Parameter(name = "roleId", description = "角色 ID", required = true)
     @Parameter(name = "request", description = "权限 ID 列表", required = true)

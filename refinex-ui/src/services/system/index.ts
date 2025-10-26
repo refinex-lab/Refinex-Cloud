@@ -1,6 +1,7 @@
 // 导出字典和配置 API
 export * from './dictionary';
 export * from './config';
+export * from './user';
 
 // 导出系统模块特定类型
 export type {

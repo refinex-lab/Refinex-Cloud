@@ -1,13 +1,21 @@
 package cn.refinex.platform.repository.sys;
 
+import cn.hutool.core.util.StrUtil;
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
+import cn.refinex.common.jdbc.page.PageRequest;
+import cn.refinex.common.jdbc.page.PageResult;
 import cn.refinex.common.utils.object.BeanConverter;
+import cn.refinex.platform.controller.user.dto.request.UserQueryRequestDTO;
+import cn.refinex.platform.controller.user.dto.response.UserListResponseDTO;
 import cn.refinex.platform.entity.sys.SysUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -281,6 +289,169 @@ public class SysUserRepository {
         );
 
         return jdbcManager.update(sql, params, true);
+    }
+
+    /**
+     * 分页查询用户列表
+     *
+     * @param request 查询条件
+     * @return 分页结果
+     */
+    public PageResult<UserListResponseDTO> listUsers(UserQueryRequestDTO request) {
+        StringBuilder sqlBuilder = new StringBuilder("""
+                SELECT
+                    id,
+                    username,
+                    mobile,
+                    email,
+                    nickname,
+                    sex,
+                    avatar,
+                    user_status,
+                    user_type,
+                    register_source,
+                    last_login_time,
+                    last_login_ip,
+                    create_time,
+                    status,
+                    remark
+                FROM sys_user
+                WHERE deleted = 0
+                """);
+
+        Map<String, Object> params = new HashMap<>();
+        List<String> conditions = new ArrayList<>();
+
+        // 动态添加查询条件
+        if (StrUtil.isNotBlank(request.getUsername())) {
+            conditions.add("username LIKE :username");
+            params.put("username", "%" + request.getUsername() + "%");
+        }
+
+        if (StrUtil.isNotBlank(request.getMobile())) {
+            conditions.add("mobile LIKE :mobile");
+            params.put("mobile", "%" + request.getMobile() + "%");
+        }
+
+        if (StrUtil.isNotBlank(request.getEmail())) {
+            conditions.add("email LIKE :email");
+            params.put("email", "%" + request.getEmail() + "%");
+        }
+
+        if (StrUtil.isNotBlank(request.getNickname())) {
+            conditions.add("nickname LIKE :nickname");
+            params.put("nickname", "%" + request.getNickname() + "%");
+        }
+
+        if (request.getUserStatus() != null) {
+            conditions.add("user_status = :userStatus");
+            params.put("userStatus", request.getUserStatus());
+        }
+
+        if (StrUtil.isNotBlank(request.getUserType())) {
+            conditions.add("user_type = :userType");
+            params.put("userType", request.getUserType());
+        }
+
+        if (StrUtil.isNotBlank(request.getRegisterSource())) {
+            conditions.add("register_source = :registerSource");
+            params.put("registerSource", request.getRegisterSource());
+        }
+
+        if (request.getStatus() != null) {
+            conditions.add("status = :status");
+            params.put("status", request.getStatus());
+        }
+
+        if (!conditions.isEmpty()) {
+            sqlBuilder.append(" AND ").append(String.join(" AND ", conditions));
+        }
+
+        // 排序
+        sqlBuilder.append(" ORDER BY create_time DESC");
+
+        // 分页
+        int pageNum = request.getPageNum() != null && request.getPageNum() > 0 ? request.getPageNum() : 1;
+        int pageSize = request.getPageSize() != null && request.getPageSize() > 0 ? request.getPageSize() : 10;
+        PageRequest pageRequest = new PageRequest(pageNum, pageSize);
+
+        return jdbcManager.queryPage(sqlBuilder.toString(), params, pageRequest, true, UserListResponseDTO.class);
+    }
+
+    /**
+     * 更新用户信息
+     *
+     * @param sysUser 用户实体
+     * @return 影响行数
+     */
+    public int update(SysUser sysUser) {
+        String sql = """
+                UPDATE sys_user
+                SET username = :username,
+                    mobile = :mobile,
+                    email = :email,
+                    password = :password,
+                    nickname = :nickname,
+                    sex = :sex,
+                    avatar = :avatar,
+                    user_status = :userStatus,
+                    user_type = :userType,
+                    register_source = :registerSource,
+                    last_login_time = :lastLoginTime,
+                    last_login_ip = :lastLoginIp,
+                    update_by = :updateBy,
+                    update_time = :updateTime,
+                    remark = :remark,
+                    sort = :sort,
+                    status = :status,
+                    extra_data = :extraData
+                WHERE id = :id AND deleted = 0
+                """;
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", sysUser.getId());
+        params.put("username", sysUser.getUsername());
+        params.put("mobile", sysUser.getMobile());
+        params.put("email", sysUser.getEmail());
+        params.put("password", sysUser.getPassword());
+        params.put("nickname", sysUser.getNickname());
+        params.put("sex", sysUser.getSex());
+        params.put("avatar", sysUser.getAvatar());
+        params.put("userStatus", sysUser.getUserStatus());
+        params.put("userType", sysUser.getUserType());
+        params.put("registerSource", sysUser.getRegisterSource());
+        params.put("lastLoginTime", sysUser.getLastLoginTime());
+        params.put("lastLoginIp", sysUser.getLastLoginIp());
+        params.put("updateBy", sysUser.getUpdateBy());
+        params.put("updateTime", LocalDateTime.now());
+        params.put("remark", sysUser.getRemark());
+        params.put("sort", sysUser.getSort());
+        params.put("status", sysUser.getStatus());
+        params.put("extraData", sysUser.getExtraData());
+
+        return jdbcManager.update(sql, params);
+    }
+
+    /**
+     * 逻辑删除用户
+     *
+     * @param userId 用户ID
+     * @return 影响行数
+     */
+    public int delete(Long userId) {
+        String sql = """
+                UPDATE sys_user
+                SET deleted = 1,
+                    update_time = :updateTime
+                WHERE id = :userId
+                """;
+
+        Map<String, Object> params = Map.of(
+                "userId", userId,
+                "updateTime", LocalDateTime.now()
+        );
+
+        return jdbcManager.update(sql, params);
     }
 }
 

@@ -1,5 +1,7 @@
 package cn.refinex.platform.controller.email;
 
+import cn.refinex.common.apilog.core.annotation.LogOperation;
+import cn.refinex.common.apilog.core.enums.OperateTypeEnum;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.platform.controller.email.dto.request.EmailTemplateDTO;
 import cn.refinex.platform.entity.email.EmailTemplate;
@@ -31,6 +33,7 @@ public class EmailTemplateController {
     private final EmailService emailService;
 
     @PostMapping
+    @LogOperation(operateDesc = "创建邮件模板", operationType = OperateTypeEnum.CREATE)
     @Operation(summary = "创建邮件模板", description = "创建新的邮件模板")
     @Parameter(name = "templateDTO", description = "邮件模板 DTO", required = true)
     public ApiResult<Long> createTemplate(@Valid @RequestBody EmailTemplateDTO templateDTO) {
@@ -39,6 +42,7 @@ public class EmailTemplateController {
     }
 
     @PutMapping("/{id}")
+    @LogOperation(operateDesc = "更新邮件模板", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "更新邮件模板", description = "更新已有的邮件模板")
     @Parameter(name = "id", description = "模板 ID", required = true)
     @Parameter(name = "templateDTO", description = "邮件模板 DTO", required = true)
@@ -49,6 +53,7 @@ public class EmailTemplateController {
     }
 
     @DeleteMapping("/{id}")
+    @LogOperation(operateDesc = "删除邮件模板", operationType = OperateTypeEnum.DELETE)
     @Operation(summary = "删除邮件模板", description = "删除指定的邮件模板（系统模板不可删除）")
     @Parameter(name = "id", description = "模板 ID", required = true)
     public ApiResult<Boolean> deleteTemplate(@PathVariable Long id) {
@@ -97,6 +102,7 @@ public class EmailTemplateController {
     }
 
     @PutMapping("/{id}/status")
+    @LogOperation(operateDesc = "更新模板状态", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "更新模板状态", description = "启用或停用邮件模板")
     @Parameter(name = "id", description = "模板 ID", required = true)
     @Parameter(name = "status", description = "状态（1-启用，0-停用）", required = true)

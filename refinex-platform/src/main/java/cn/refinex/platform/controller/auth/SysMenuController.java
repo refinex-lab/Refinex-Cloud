@@ -1,5 +1,7 @@
 package cn.refinex.platform.controller.auth;
 
+import cn.refinex.common.apilog.core.annotation.LogOperation;
+import cn.refinex.common.apilog.core.enums.OperateTypeEnum;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.jdbc.page.PageRequest;
@@ -36,6 +38,7 @@ public class SysMenuController {
     private final SysMenuService sysMenuService;
 
     @PostMapping
+    @LogOperation(operateDesc = "创建菜单", operationType = OperateTypeEnum.CREATE)
     @Operation(summary = "创建菜单", description = "创建新的系统菜单")
     @Parameter(name = "request", description = "菜单创建请求", required = true)
     public ApiResult<Long> createMenu(@Valid @RequestBody SysMenuCreateRequestDTO request) {
@@ -44,6 +47,7 @@ public class SysMenuController {
     }
 
     @PutMapping("/{id}")
+    @LogOperation(operateDesc = "更新菜单", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "更新菜单", description = "更新指定菜单的信息")
     @Parameter(name = "id", description = "菜单 ID", required = true)
     @Parameter(name = "request", description = "菜单更新请求", required = true)
@@ -53,6 +57,7 @@ public class SysMenuController {
     }
 
     @DeleteMapping("/{id}")
+    @LogOperation(operateDesc = "删除菜单", operationType = OperateTypeEnum.DELETE)
     @Operation(summary = "删除菜单", description = "删除指定的系统菜单")
     @Parameter(name = "id", description = "菜单 ID", required = true)
     public ApiResult<Void> deleteMenu(@PathVariable Long id) {
@@ -61,6 +66,7 @@ public class SysMenuController {
     }
 
     @PatchMapping("/{id}/status")
+    @LogOperation(operateDesc = "修改菜单状态", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "修改菜单状态", description = "启用或禁用指定菜单")
     @Parameter(name = "id", description = "菜单 ID", required = true)
     @Parameter(name = "status", description = "状态值", required = true)

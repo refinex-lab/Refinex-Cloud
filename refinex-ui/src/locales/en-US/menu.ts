@@ -41,6 +41,7 @@ export default {
   'menu.exception.server-error': '500',
   'menu.exception.trigger': 'Trigger',
   'menu.system': 'System',
+  'menu.system.user': 'User Management',
   'menu.system.dictionary': 'Dictionary',
   'menu.system.config': 'Configuration',
   'menu.logs': 'Logs',

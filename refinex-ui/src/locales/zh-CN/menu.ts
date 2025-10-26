@@ -41,6 +41,7 @@ export default {
   'menu.exception.server-error': '500',
   'menu.exception.trigger': '触发错误',
   'menu.system': '系统管理',
+  'menu.system.user': '用户管理',
   'menu.system.dictionary': '字典管理',
   'menu.system.config': '系统配置',
   'menu.logs': '日志管理',

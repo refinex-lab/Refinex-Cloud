@@ -1,13 +1,13 @@
 package cn.refinex.platform.service;
 
 import cn.refinex.common.domain.model.LoginUser;
-import cn.refinex.platform.controller.user.vo.CurrentUserVo;
-import cn.refinex.platform.controller.user.dto.request.ResetPasswordRequestDTO;
-import cn.refinex.platform.controller.user.dto.request.UserCreateRequestDTO;
-import cn.refinex.platform.controller.user.dto.request.UserDisableRequestDTO;
-import cn.refinex.platform.controller.user.dto.request.UserKickoutRequestDTO;
+import cn.refinex.common.jdbc.page.PageResult;
+import cn.refinex.platform.controller.user.dto.request.*;
+import cn.refinex.platform.controller.user.dto.response.UserDetailResponseDTO;
 import cn.refinex.platform.controller.user.dto.response.UserDisableStatusResponseDTO;
+import cn.refinex.platform.controller.user.dto.response.UserListResponseDTO;
 import cn.refinex.platform.controller.user.dto.response.UserSessionResponseDTO;
+import cn.refinex.platform.controller.user.vo.CurrentUserVo;
 
 import java.util.List;
 
@@ -134,4 +134,48 @@ public interface UserService {
      * @return 用户名列表
      */
     List<String> searchUsernames(String keyword, Integer limit);
+
+    /**
+     * 分页查询用户列表
+     *
+     * @param request 查询条件
+     * @return 用户列表分页结果
+     */
+    PageResult<UserListResponseDTO> listUsers(UserQueryRequestDTO request);
+
+    /**
+     * 获取用户详情
+     *
+     * @param userId 用户ID
+     * @return 用户详情
+     */
+    UserDetailResponseDTO getUserDetail(Long userId);
+
+    /**
+     * 更新用户信息
+     *
+     * @param request 更新请求参数
+     */
+    void updateUser(UserUpdateRequestDTO request);
+
+    /**
+     * 更新用户状态
+     *
+     * @param request 状态更新请求参数
+     */
+    void updateUserStatus(UserStatusUpdateRequestDTO request);
+
+    /**
+     * 管理员重置用户密码
+     *
+     * @param request 重置密码请求参数
+     */
+    void adminResetPassword(AdminResetPasswordRequestDTO request);
+
+    /**
+     * 删除用户（逻辑删除）
+     *
+     * @param userId 用户ID
+     */
+    void deleteUser(Long userId);
 }

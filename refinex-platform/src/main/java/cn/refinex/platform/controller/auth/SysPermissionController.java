@@ -1,5 +1,7 @@
 package cn.refinex.platform.controller.auth;
 
+import cn.refinex.common.apilog.core.annotation.LogOperation;
+import cn.refinex.common.apilog.core.enums.OperateTypeEnum;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.jdbc.page.PageRequest;
@@ -34,6 +36,7 @@ public class SysPermissionController {
     private final SysPermissionService sysPermissionService;
 
     @PostMapping
+    @LogOperation(operateDesc = "创建权限", operationType = OperateTypeEnum.CREATE)
     @Operation(summary = "创建权限", description = "创建新的系统权限")
     @Parameter(name = "request", description = "权限创建请求", required = true)
     public ApiResult<Long> createPermission(@Valid @RequestBody SysPermissionCreateRequestDTO request) {
@@ -42,6 +45,7 @@ public class SysPermissionController {
     }
 
     @PutMapping("/{id}")
+    @LogOperation(operateDesc = "更新权限", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "更新权限", description = "更新指定权限的信息")
     @Parameter(name = "id", description = "权限 ID", required = true)
     @Parameter(name = "request", description = "权限更新请求", required = true)
@@ -51,6 +55,7 @@ public class SysPermissionController {
     }
 
     @DeleteMapping("/{id}")
+    @LogOperation(operateDesc = "删除权限", operationType = OperateTypeEnum.DELETE)
     @Operation(summary = "删除权限", description = "删除指定的系统权限")
     @Parameter(name = "id", description = "权限 ID", required = true)
     public ApiResult<Void> deletePermission(@PathVariable Long id) {
@@ -59,6 +64,7 @@ public class SysPermissionController {
     }
 
     @PatchMapping("/{id}/status")
+    @LogOperation(operateDesc = "更新权限状态", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "更新权限状态", description = "启用或禁用指定权限")
     @Parameter(name = "id", description = "权限 ID", required = true)
     @Parameter(name = "status", description = "状态值", required = true)

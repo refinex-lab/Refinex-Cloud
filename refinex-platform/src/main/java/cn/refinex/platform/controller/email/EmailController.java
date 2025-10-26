@@ -1,12 +1,14 @@
 package cn.refinex.platform.controller.email;
 
 import cn.dev33.satoken.annotation.SaIgnore;
+import cn.refinex.common.apilog.core.annotation.LogOperation;
+import cn.refinex.common.apilog.core.enums.OperateTypeEnum;
+import cn.refinex.common.domain.ApiResult;
 import cn.refinex.platform.controller.email.dto.request.EmailSendRequestDTO;
 import cn.refinex.platform.controller.email.dto.request.EmailVerifyCodeRequestDTO;
 import cn.refinex.platform.controller.email.dto.request.EmailVerifyCodeValidateRequestDTO;
 import cn.refinex.platform.controller.email.dto.response.EmailSendResponseDTO;
 import cn.refinex.platform.controller.email.dto.response.EmailVerifyCodeResponseDTO;
-import cn.refinex.common.domain.ApiResult;
 import cn.refinex.platform.service.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,6 +35,7 @@ public class EmailController {
     private final EmailService emailService;
 
     @PostMapping("/sent-code-simple")
+    @LogOperation(operateDesc = "发送简单邮件", operationType = OperateTypeEnum.OTHER)
     @Operation(summary = "发送简单邮件", description = "发送纯文本或 HTML 邮件")
     @Parameter(name = "request", description = "简单邮件发送请求", required = true)
     public ApiResult<EmailSendResponseDTO> sendSimple(@RequestBody EmailSendRequestDTO request) {
@@ -41,6 +44,7 @@ public class EmailController {
     }
 
     @PostMapping("/sent-code-template")
+    @LogOperation(operateDesc = "使用模板发送邮件", operationType = OperateTypeEnum.OTHER)
     @Operation(summary = "使用模板发送邮件", description = "使用预定义模板发送邮件")
     @Parameter(name = "request", description = "模板邮件发送请求", required = true)
     public ApiResult<EmailSendResponseDTO> sendWithTemplate(@RequestBody EmailSendRequestDTO request) {
@@ -49,6 +53,7 @@ public class EmailController {
     }
 
     @PostMapping("/async-sent-code")
+    @LogOperation(operateDesc = "异步发送邮件", operationType = OperateTypeEnum.OTHER)
     @Operation(summary = "异步发送邮件", description = "异步发送邮件，立即返回")
     @Parameter(name = "request", description = "异步邮件发送请求", required = true)
     public ApiResult<EmailSendResponseDTO> sendAsync(@RequestBody EmailSendRequestDTO request) {
@@ -57,6 +62,7 @@ public class EmailController {
     }
 
     @PostMapping("/sent-code")
+    @LogOperation(operateDesc = "发送验证码", operationType = OperateTypeEnum.OTHER)
     @Operation(summary = "发送验证码", description = "向指定邮箱发送验证码")
     @Parameter(name = "request", description = "验证码发送请求", required = true)
     public ApiResult<EmailVerifyCodeResponseDTO> sendVerifyCode(@RequestBody EmailVerifyCodeRequestDTO request) {
@@ -65,6 +71,7 @@ public class EmailController {
     }
 
     @PostMapping("/verify-code")
+    @LogOperation(operateDesc = "验证验证码", operationType = OperateTypeEnum.OTHER)
     @Operation(summary = "验证验证码", description = "验证指定邮箱的验证码是否正确")
     @Parameter(name = "request", description = "验证码验证请求", required = true)
     public ApiResult<Boolean> verifyCode(@RequestBody EmailVerifyCodeValidateRequestDTO request) {

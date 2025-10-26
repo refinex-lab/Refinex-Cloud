@@ -1,15 +1,17 @@
 package cn.refinex.platform.controller.user;
 
+import cn.refinex.common.apilog.core.annotation.LogOperation;
+import cn.refinex.common.apilog.core.enums.OperateTypeEnum;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.domain.model.LoginUser;
 import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.exception.BusinessException;
+import cn.refinex.common.jdbc.page.PageResult;
 import cn.refinex.common.satoken.core.util.LoginHelper;
-import cn.refinex.platform.controller.user.dto.request.ResetPasswordRequestDTO;
-import cn.refinex.platform.controller.user.dto.request.UserCreateRequestDTO;
-import cn.refinex.platform.controller.user.dto.request.UserDisableRequestDTO;
-import cn.refinex.platform.controller.user.dto.request.UserKickoutRequestDTO;
+import cn.refinex.platform.controller.user.dto.request.*;
+import cn.refinex.platform.controller.user.dto.response.UserDetailResponseDTO;
 import cn.refinex.platform.controller.user.dto.response.UserDisableStatusResponseDTO;
+import cn.refinex.platform.controller.user.dto.response.UserListResponseDTO;
 import cn.refinex.platform.controller.user.dto.response.UserSessionResponseDTO;
 import cn.refinex.platform.controller.user.vo.CurrentUserVo;
 import cn.refinex.platform.service.PermissionService;
@@ -45,6 +47,7 @@ public class UserController {
     private final PermissionService permissionService;
 
     @PostMapping("/register")
+    @LogOperation(operateDesc = "注册用户", operationType = OperateTypeEnum.CREATE)
     @Operation(summary = "注册用户", description = "创建新用户账号")
     @Parameter(name = "request", description = "用户创建请求参数", required = true)
     public ApiResult<Boolean> registerUser(@RequestBody UserCreateRequestDTO request) {
@@ -80,6 +83,7 @@ public class UserController {
     }
 
     @PutMapping("/reset-password")
+    @LogOperation(operateDesc = "重置密码", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "重置密码", description = "根据邮箱验证码重置用户密码")
     @Parameter(name = "request", description = "重置密码请求参数", required = true)
     public ApiResult<Boolean> resetPassword(@RequestBody ResetPasswordRequestDTO request) {
@@ -112,6 +116,7 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/disable")
+    @LogOperation(operateDesc = "封禁用户账号", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "封禁用户账号", description = "封禁指定用户账号，支持全局封禁和分类封禁")
     @Parameter(name = "userId", description = "用户 ID", required = true)
     @Parameter(name = "request", description = "封禁请求", required = true)
@@ -121,6 +126,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}/disable")
+    @LogOperation(operateDesc = "解封用户账号", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "解封用户账号", description = "解封指定用户账号")
     @Parameter(name = "userId", description = "用户 ID", required = true)
     @Parameter(name = "service", description = "服务类型", required = false)
@@ -153,6 +159,7 @@ public class UserController {
     }
 
     @DeleteMapping("/sessions")
+    @LogOperation(operateDesc = "踢除用户会话", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "踢除用户会话", description = "将指定用户会话踢下线，支持按设备类型或 Token 踢出")
     @Parameter(name = "request", description = "踢除请求", required = true)
     public ApiResult<Void> kickoutSession(@Valid @RequestBody UserKickoutRequestDTO request) {
@@ -161,6 +168,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}/sessions")
+    @LogOperation(operateDesc = "踢除用户所有会话", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "踢除用户所有会话", description = "将指定用户的所有设备踢下线")
     @Parameter(name = "userId", description = "用户 ID", required = true)
     public ApiResult<Void> kickoutAllSessions(@PathVariable Long userId) {
@@ -178,6 +186,75 @@ public class UserController {
     ) {
         List<String> usernames = userService.searchUsernames(keyword, limit);
         return ApiResult.success(usernames);
+    }
+
+    // ==================== 管理员功能 ====================
+
+    @GetMapping("/list")
+    @Operation(summary = "获取用户列表", description = "分页查询用户列表，支持多条件筛选")
+    @Parameter(name = "request", description = "查询条件", required = true)
+    public ApiResult<PageResult<UserListResponseDTO>> listUsers(UserQueryRequestDTO request) {
+        PageResult<UserListResponseDTO> result = userService.listUsers(request);
+        return ApiResult.success(result);
+    }
+
+    @GetMapping("/{userId}/detail")
+    @Operation(summary = "获取用户详情", description = "根据用户ID获取用户详细信息")
+    @Parameter(name = "userId", description = "用户ID", required = true)
+    public ApiResult<UserDetailResponseDTO> getUserDetail(@PathVariable("userId") @NotNull(message = "用户ID不能为空") Long userId) {
+        UserDetailResponseDTO detail = userService.getUserDetail(userId);
+        return ApiResult.success(detail);
+    }
+
+    @PutMapping("/{userId}")
+    @LogOperation(operateDesc = "更新用户信息", operationType = OperateTypeEnum.UPDATE)
+    @Operation(summary = "更新用户信息", description = "更新用户基本信息")
+    @Parameter(name = "userId", description = "用户ID", required = true)
+    @Parameter(name = "request", description = "更新请求参数", required = true)
+    public ApiResult<Void> updateUser(
+            @PathVariable("userId") Long userId,
+            @Valid @RequestBody UserUpdateRequestDTO request
+    ) {
+        request.setUserId(userId);
+        userService.updateUser(request);
+        return ApiResult.success(HttpStatusCode.NO_CONTENT, null);
+    }
+
+    @PutMapping("/{userId}/status")
+    @LogOperation(operateDesc = "变更用户状态", operationType = OperateTypeEnum.UPDATE)
+    @Operation(summary = "变更用户状态", description = "更新用户账号状态（待激活、正常、冻结、注销）")
+    @Parameter(name = "userId", description = "用户ID", required = true)
+    @Parameter(name = "request", description = "状态更新请求参数", required = true)
+    public ApiResult<Void> updateUserStatus(
+            @PathVariable("userId") Long userId,
+            @Valid @RequestBody UserStatusUpdateRequestDTO request
+    ) {
+        request.setUserId(userId);
+        userService.updateUserStatus(request);
+        return ApiResult.success(HttpStatusCode.NO_CONTENT, null);
+    }
+
+    @PutMapping("/{userId}/reset-password")
+    @LogOperation(operateDesc = "管理员重置用户密码", operationType = OperateTypeEnum.UPDATE)
+    @Operation(summary = "管理员重置用户密码", description = "管理员强制重置用户密码")
+    @Parameter(name = "userId", description = "用户ID", required = true)
+    @Parameter(name = "request", description = "重置密码请求参数", required = true)
+    public ApiResult<Void> adminResetPassword(
+            @PathVariable("userId") Long userId,
+            @Valid @RequestBody AdminResetPasswordRequestDTO request
+    ) {
+        request.setUserId(userId);
+        userService.adminResetPassword(request);
+        return ApiResult.success(HttpStatusCode.NO_CONTENT, null);
+    }
+
+    @DeleteMapping("/{userId}")
+    @LogOperation(operateDesc = "删除用户", operationType = OperateTypeEnum.UPDATE)
+    @Operation(summary = "删除用户", description = "逻辑删除用户（将deleted标记为1）")
+    @Parameter(name = "userId", description = "用户ID", required = true)
+    public ApiResult<Void> deleteUser(@PathVariable("userId") @NotNull(message = "用户ID不能为空") Long userId) {
+        userService.deleteUser(userId);
+        return ApiResult.success(HttpStatusCode.NO_CONTENT, null);
     }
 }
 

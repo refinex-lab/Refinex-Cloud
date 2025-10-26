@@ -4,8 +4,11 @@ import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
-import cn.refinex.platform.controller.user.dto.request.ResetPasswordRequestDTO;
-import cn.refinex.platform.controller.user.dto.request.UserCreateRequestDTO;
+import cn.refinex.common.jdbc.page.PageResult;
+import cn.refinex.common.satoken.core.util.LoginHelper;
+import cn.refinex.platform.controller.user.dto.request.*;
+import cn.refinex.platform.controller.user.dto.response.UserDetailResponseDTO;
+import cn.refinex.platform.controller.user.dto.response.UserListResponseDTO;
 import cn.refinex.platform.controller.user.vo.CurrentUserVo;
 import cn.refinex.platform.controller.user.vo.SysUserVo;
 import cn.refinex.platform.enums.RegisterSource;
@@ -606,10 +609,199 @@ public class UserServiceImpl implements UserService {
         if (keyword == null || keyword.trim().isEmpty()) {
             return List.of();
         }
-        
+
         // 默认返回最多 10 条
         int queryLimit = (limit != null && limit > 0 && limit <= 50) ? limit : 10;
-        
+
         return sysUserRepository.searchUsernamesByKeyword(keyword.trim(), queryLimit);
+    }
+
+    /**
+     * 分页查询用户列表
+     *
+     * @param request 查询条件
+     * @return 用户列表分页结果
+     */
+    @Override
+    public PageResult<UserListResponseDTO> listUsers(UserQueryRequestDTO request) {
+        return sysUserRepository.listUsers(request);
+    }
+
+    /**
+     * 获取用户详情
+     *
+     * @param userId 用户ID
+     * @return 用户详情
+     */
+    @Override
+    public UserDetailResponseDTO getUserDetail(Long userId) {
+        SysUser sysUser = sysUserRepository.selectById(userId);
+        if (Objects.isNull(sysUser)) {
+            throw new BusinessException(HttpStatusCode.NOT_FOUND, "用户不存在");
+        }
+        return BeanConverter.toBean(sysUser, UserDetailResponseDTO.class);
+    }
+
+    /**
+     * 更新用户信息
+     *
+     * @param request 更新请求参数
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUser(UserUpdateRequestDTO request) {
+        // 检查用户是否存在
+        SysUser sysUser = sysUserRepository.selectById(request.getUserId());
+        if (Objects.isNull(sysUser)) {
+            throw new BusinessException(HttpStatusCode.NOT_FOUND, "用户不存在");
+        }
+
+        // 超级管理员禁止更新状态
+        if (LoginHelper.isSuperAdmin(request.getUserId())) {
+            throw new BusinessException(HttpStatusCode.FORBIDDEN, "超级管理员禁止更新状态");
+        }
+
+        // 如果更新手机号，需要检查重复并加密存储
+        if (StrUtil.isNotBlank(request.getMobile()) && !request.getMobile().equals(sysUser.getMobile())) {
+            // 检查手机号是否已存在
+            SysUser existingUser = sysUserRepository.selectByMobile(request.getMobile());
+            if (existingUser != null && !existingUser.getId().equals(request.getUserId())) {
+                throw new BusinessException(HttpStatusCode.CONFLICT, "手机号已被其他用户使用");
+            }
+
+            // 加密存储手机号
+            sensitiveDataService.encryptAndStore("sys_user", String.valueOf(request.getUserId()), "mobile", request.getMobile());
+
+            // 更新脱敏手机号
+            sysUser.setMobile(RegexUtils.desensitizeMobile(request.getMobile()));
+        }
+
+        // 如果更新邮箱，需要检查重复并加密存储
+        if (StrUtil.isNotBlank(request.getEmail()) && !request.getEmail().equals(sysUser.getEmail())) {
+            // 检查邮箱是否已存在
+            SysUser existingUser = sysUserRepository.selectByEmail(request.getEmail());
+            if (existingUser != null && !existingUser.getId().equals(request.getUserId())) {
+                throw new BusinessException(HttpStatusCode.CONFLICT, "邮箱已被其他用户使用");
+            }
+
+            // 加密存储邮箱
+            sensitiveDataService.encryptAndStore("sys_user", String.valueOf(request.getUserId()), "email", request.getEmail());
+
+            // 更新脱敏邮箱
+            sysUser.setEmail(RegexUtils.desensitizeEmail(request.getEmail()));
+        }
+
+        // 更新其他字段
+        if (StrUtil.isNotBlank(request.getNickname())) {
+            sysUser.setNickname(request.getNickname());
+        }
+        if (StrUtil.isNotBlank(request.getSex())) {
+            sysUser.setSex(request.getSex());
+        }
+        if (StrUtil.isNotBlank(request.getAvatar())) {
+            sysUser.setAvatar(request.getAvatar());
+        }
+        if (StrUtil.isNotBlank(request.getRemark())) {
+            sysUser.setRemark(request.getRemark());
+        }
+
+        sysUser.setUpdateTime(LocalDateTime.now());
+        sysUserRepository.update(sysUser);
+    }
+
+    /**
+     * 更新用户状态
+     *
+     * @param request 状态更新请求参数
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUserStatus(UserStatusUpdateRequestDTO request) {
+        SysUser sysUser = sysUserRepository.selectById(request.getUserId());
+        if (Objects.isNull(sysUser)) {
+            throw new BusinessException(HttpStatusCode.NOT_FOUND, "用户不存在");
+        }
+
+        // 超级管理员禁止更新状态
+        if (LoginHelper.isSuperAdmin(request.getUserId())) {
+            throw new BusinessException(HttpStatusCode.FORBIDDEN, "超级管理员禁止更新状态");
+        }
+
+        // 验证状态值合法性
+        if (request.getUserStatus() < 0 || request.getUserStatus() > 3) {
+            throw new BusinessException(HttpStatusCode.BAD_REQUEST, "用户状态值不合法");
+        }
+
+        sysUser.setUserStatus(request.getUserStatus());
+        sysUser.setUpdateTime(LocalDateTime.now());
+        if (StrUtil.isNotBlank(request.getReason())) {
+            sysUser.setRemark(request.getReason());
+        }
+
+        sysUserRepository.update(sysUser);
+
+        // 如果设置为冻结或注销状态，踢出所有在线会话
+        if (request.getUserStatus() == 2 || request.getUserStatus() == 3) {
+            kickoutAll(request.getUserId());
+        }
+    }
+
+    /**
+     * 管理员重置用户密码
+     *
+     * @param request 重置密码请求参数
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void adminResetPassword(AdminResetPasswordRequestDTO request) {
+        SysUser sysUser = sysUserRepository.selectById(request.getUserId());
+        if (Objects.isNull(sysUser)) {
+            throw new BusinessException(HttpStatusCode.NOT_FOUND, "用户不存在");
+        }
+
+        // 超级管理员禁止重制密码
+        if (LoginHelper.isSuperAdmin(request.getUserId())) {
+            throw new BusinessException(HttpStatusCode.FORBIDDEN, "超级管理员禁止重置密码");
+        }
+
+        // 加密新密码
+        String encodedPassword = passwordEncoder.encode(request.getNewPassword());
+        sysUser.setPassword(encodedPassword);
+        sysUser.setUpdateTime(LocalDateTime.now());
+
+        sysUserRepository.update(sysUser);
+
+        // 踢出所有在线会话，强制重新登录
+        kickoutAll(request.getUserId());
+
+        // TODO: 发送通知
+        // if (StrUtil.isNotBlank(sysUser.getEmail())) {
+        //     notificationService.notifyPasswordReset(sysUser, request.getReason());
+        // }
+    }
+
+    /**
+     * 删除用户（逻辑删除）
+     *
+     * @param userId 用户ID
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteUser(Long userId) {
+        SysUser sysUser = sysUserRepository.selectById(userId);
+        if (Objects.isNull(sysUser)) {
+            throw new BusinessException(HttpStatusCode.NOT_FOUND, "用户不存在");
+        }
+
+        // 不允许删除超级管理员
+        if (LoginHelper.isSuperAdmin(userId)) {
+            throw new BusinessException(HttpStatusCode.FORBIDDEN, "不允许删除超级管理员");
+        }
+
+        // 逻辑删除
+        sysUserRepository.delete(userId);
+
+        // 踢出所有在线会话
+        kickoutAll(userId);
     }
 }

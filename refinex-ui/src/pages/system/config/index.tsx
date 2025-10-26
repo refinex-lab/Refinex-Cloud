@@ -109,7 +109,9 @@ const SystemConfig: React.FC = () => {
       message.success(checked ? '已设置为前端可见' : '已设置为后端专用');
       actionRef.current?.reload();
     } catch (error) {
-      message.error('操作失败');
+      // 错误提示由全局错误处理器统一处理
+      actionRef.current?.reload(); // 恢复之前的状态
+      console.error('切换前端可见性失败:', error);
     }
   };
 
@@ -249,7 +251,8 @@ const SystemConfig: React.FC = () => {
               message.success('删除成功');
               actionRef.current?.reload();
             } catch (error) {
-              message.error('删除失败');
+              // 错误提示由全局错误处理器统一处理
+              console.error('删除配置失败:', error);
             }
           }}
         >
@@ -381,9 +384,8 @@ const SystemConfig: React.FC = () => {
             actionRef.current?.reload();
             return true;
           } catch (error) {
-            message.error(
-              currentConfig ? '配置更新失败' : '配置创建失败',
-            );
+            // 错误提示由全局错误处理器统一处理
+            console.error(currentConfig ? '配置更新失败:' : '配置创建失败:', error);
             return false;
           }
         }}

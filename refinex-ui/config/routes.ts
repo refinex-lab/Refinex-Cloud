@@ -247,7 +247,13 @@ export default [
     routes: [
       {
         path: '/system',
-        redirect: '/system/dictionary',
+        redirect: '/system/user',
+      },
+      {
+        name: 'user',
+        icon: 'team',
+        path: '/system/user',
+        component: './system/user',
       },
       {
         name: 'dictionary',
