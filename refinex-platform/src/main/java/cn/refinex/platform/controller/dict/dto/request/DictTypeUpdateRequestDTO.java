@@ -1,6 +1,7 @@
 package cn.refinex.platform.controller.dict.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -23,6 +24,10 @@ public class DictTypeUpdateRequestDTO {
     @Size(max = 256, message = "字典描述长度不能超过256个字符")
     @Schema(description = "字典描述")
     private String dictDesc;
+
+    @Min(value = 0, message = "排序必须大于等于0")
+    @Schema(description = "排序", example = "0")
+    private Integer dictSort;
 
     @Size(max = 256, message = "备注长度不能超过256个字符")
     @Schema(description = "备注")

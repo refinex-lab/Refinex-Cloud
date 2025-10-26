@@ -39,6 +39,9 @@ public class LogOperationQueryRequestDTO {
     @Schema(description = "操作类型", example = "CREATE")
     private String operationType;
 
+    @Schema(description = "请求方法", example = "GET", allowableValues = {"GET", "POST", "PUT", "DELETE", "PATCH"})
+    private String requestMethod;
+
     @Schema(description = "操作状态(0成功,1失败)", example = "0")
     private Integer operationStatus;
 

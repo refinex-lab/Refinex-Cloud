@@ -37,6 +37,9 @@ public class SysDictType {
     @Schema(description = "字典描述", example = "用户账号状态字典")
     private String dictDesc;
 
+    @Schema(description = "字典排序", example = "100")
+    private Integer dictSort;
+
     @Schema(description = "创建人ID", example = "1")
     private Long createBy;
 

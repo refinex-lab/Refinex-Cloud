@@ -553,8 +553,8 @@ public class UserServiceImpl implements UserService {
         LoginUser loginUser = new LoginUser();
         loginUser.setUserId(userId);
         loginUser.setUserStatus(userVo.getUserStatus());
-        loginUser.setUsername(userVo.getUserName());
-        loginUser.setNickname(userVo.getNickName());
+        loginUser.setUsername(userVo.getUsername());
+        loginUser.setNickname(userVo.getNickname());
         loginUser.setPassword(userVo.getPassword());
         loginUser.setUserType(userVo.getUserType());
         loginUser.setMenuPermission(permissionService.getUserMenuPermissions(userId));
@@ -592,5 +592,24 @@ public class UserServiceImpl implements UserService {
         vo.setRoles(userRoles.stream().map(SysRole::getRoleCode).toList());
         vo.setPermissions(permissionService.getUserMenuPermissions(userId).stream().toList());
         return vo;
+    }
+
+    /**
+     * 根据用户名关键词模糊搜索用户名列表
+     *
+     * @param keyword 用户名关键词
+     * @param limit   返回数量限制
+     * @return 用户名列表
+     */
+    @Override
+    public List<String> searchUsernames(String keyword, Integer limit) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return List.of();
+        }
+        
+        // 默认返回最多 10 条
+        int queryLimit = (limit != null && limit > 0 && limit <= 50) ? limit : 10;
+        
+        return sysUserRepository.searchUsernamesByKeyword(keyword.trim(), queryLimit);
     }
 }

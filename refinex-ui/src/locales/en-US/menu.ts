@@ -43,6 +43,8 @@ export default {
   'menu.system': 'System',
   'menu.system.dictionary': 'Dictionary',
   'menu.system.config': 'Configuration',
+  'menu.logs': 'Logs',
+  'menu.logs.operation': 'Operation Logs',
   'menu.account': 'Account',
   'menu.account.center': 'Account Center',
   'menu.account.settings': 'Account Settings',

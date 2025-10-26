@@ -45,13 +45,14 @@ public class SysDictServiceImpl implements SysDictService {
      * @param dictCode   字典类型编码
      * @param dictName   字典类型名称
      * @param dictDesc   字典类型描述
+     * @param dictSort   字典类型排序
      * @param remark     备注
      * @param status     状态
      * @param operatorId 操作人ID
      * @return 字典类型ID
      */
     @Override
-    public Long createDictType(String dictCode, String dictName, String dictDesc, String remark, Integer status, Long operatorId) {
+    public Long createDictType(String dictCode, String dictName, String dictDesc, Integer dictSort, String remark, Integer status, Long operatorId) {
         // 校验字典类型编码唯一性
         if (dictTypeRepository.existsByCode(dictCode, null)) {
             throw new BusinessException("字典类型编码已存在");
@@ -62,6 +63,7 @@ public class SysDictServiceImpl implements SysDictService {
                 .dictCode(dictCode)
                 .dictName(dictName)
                 .dictDesc(dictDesc)
+                .dictSort(dictSort)
                 .createBy(operatorId)
                 .createTime(now)
                 .updateBy(operatorId)
@@ -88,13 +90,14 @@ public class SysDictServiceImpl implements SysDictService {
      * @param id         字典类型ID
      * @param dictName   字典类型名称
      * @param dictDesc   字典类型描述
+     * @param dictSort   字典类型排序
      * @param remark     备注
      * @param status     状态
      * @param operatorId 操作人ID
      * @return 是否更新成功
      */
     @Override
-    public boolean updateDictType(Long id, String dictName, String dictDesc, String remark, Integer status, Long operatorId) {
+    public boolean updateDictType(Long id, String dictName, String dictDesc, Integer dictSort, String remark, Integer status, Long operatorId) {
         // 校验字典类型是否存在
         SysDictType exist = dictTypeRepository.selectById(id);
         if (exist == null) {
@@ -104,6 +107,7 @@ public class SysDictServiceImpl implements SysDictService {
         // 更新字段
         exist.setDictName(dictName);
         exist.setDictDesc(dictDesc);
+        exist.setDictSort(dictSort);
         exist.setRemark(remark);
         exist.setStatus(status);
         exist.setUpdateBy(operatorId);

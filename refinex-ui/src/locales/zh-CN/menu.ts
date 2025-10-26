@@ -43,6 +43,8 @@ export default {
   'menu.system': '系统管理',
   'menu.system.dictionary': '字典管理',
   'menu.system.config': '系统配置',
+  'menu.logs': '日志管理',
+  'menu.logs.operation': '操作日志',
   'menu.account': '个人页',
   'menu.account.center': '个人中心',
   'menu.account.settings': '个人设置',

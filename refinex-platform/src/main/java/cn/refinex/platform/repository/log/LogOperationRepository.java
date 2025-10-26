@@ -101,6 +101,11 @@ public class LogOperationRepository {
             params.put("operationType", queryRequest.getOperationType());
         }
 
+        if (queryRequest.getRequestMethod() != null && !queryRequest.getRequestMethod().trim().isEmpty()) {
+            whereSql.append(" AND request_method = :requestMethod ");
+            params.put("requestMethod", queryRequest.getRequestMethod());
+        }
+
         if (queryRequest.getOperationStatus() != null) {
             whereSql.append(" AND operation_status = :operationStatus ");
             params.put("operationStatus", queryRequest.getOperationStatus());

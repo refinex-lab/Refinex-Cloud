@@ -167,5 +167,17 @@ public class UserController {
         userService.kickoutAll(userId);
         return ApiResult.success(HttpStatusCode.NO_CONTENT, null);
     }
+
+    @GetMapping("/search-usernames")
+    @Operation(summary = "模糊搜索用户名", description = "根据关键词模糊搜索用户名列表，用于自动完成输入")
+    @Parameter(name = "keyword", description = "用户名关键词", required = true)
+    @Parameter(name = "limit", description = "返回数量限制（默认10，最大50）")
+    public ApiResult<List<String>> searchUsernames(
+            @RequestParam("keyword") @NotBlank(message = "搜索关键词不能为空") String keyword,
+            @RequestParam(value = "limit", required = false) Integer limit
+    ) {
+        List<String> usernames = userService.searchUsernames(keyword, limit);
+        return ApiResult.success(usernames);
+    }
 }
 

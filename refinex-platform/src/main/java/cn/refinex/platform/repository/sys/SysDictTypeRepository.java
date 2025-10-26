@@ -103,10 +103,10 @@ public class SysDictTypeRepository {
         String sql = """
                 INSERT INTO sys_dict_type (
                     dict_code, dict_name, dict_desc, create_by, create_time, update_by, update_time,
-                    deleted, version, remark, status
+                    deleted, version, remark, status, dict_sort
                 ) VALUES (
                     :dictCode, :dictName, :dictDesc, :createBy, :createTime, :updateBy, :updateTime,
-                    :deleted, :version, :remark, :status
+                    :deleted, :version, :remark, :status, :dictSort
                 )
                 """;
 
@@ -126,6 +126,7 @@ public class SysDictTypeRepository {
                     dict_code = :dictCode,
                     dict_name = :dictName,
                     dict_desc = :dictDesc,
+                    dict_sort = :dictSort,
                     update_by = :updateBy,
                     update_time = :updateTime,
                     version = :version,

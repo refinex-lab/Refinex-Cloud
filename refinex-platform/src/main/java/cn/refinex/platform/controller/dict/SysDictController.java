@@ -1,5 +1,7 @@
 package cn.refinex.platform.controller.dict;
 
+import cn.refinex.common.apilog.core.annotation.LogOperation;
+import cn.refinex.common.apilog.core.enums.OperateTypeEnum;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
@@ -38,6 +40,7 @@ public class SysDictController {
     // ===================== 字典类型 =====================
 
     @PostMapping("/types")
+    @LogOperation(operateDesc = "创建字典类型", operationType = OperateTypeEnum.CREATE)
     @Operation(summary = "创建字典类型", description = "创建新的字典类型")
     @Parameter(name = "req", description = "字典类型创建请求", required = true)
     public ApiResult<Long> createDictType(@Valid @RequestBody DictTypeCreateRequestDTO req) {
@@ -46,6 +49,7 @@ public class SysDictController {
                 req.getDictCode(),
                 req.getDictName(),
                 req.getDictDesc(),
+                req.getDictSort(),
                 req.getRemark(),
                 req.getStatus(),
                 operatorId
@@ -54,6 +58,7 @@ public class SysDictController {
     }
 
     @PutMapping("/types/{id}")
+    @LogOperation(operateDesc = "更新字典类型", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "更新字典类型", description = "更新指定字典类型的信息")
     @Parameter(name = "id", description = "字典类型 ID", required = true)
     @Parameter(name = "req", description = "字典类型更新请求", required = true)
@@ -63,6 +68,7 @@ public class SysDictController {
                 id,
                 req.getDictName(),
                 req.getDictDesc(),
+                req.getDictSort(),
                 req.getRemark(),
                 req.getStatus(),
                 operatorId
@@ -71,6 +77,7 @@ public class SysDictController {
     }
 
     @DeleteMapping("/types/{id}")
+    @LogOperation(operateDesc = "删除字典类型", operationType = OperateTypeEnum.DELETE)
     @Operation(summary = "删除字典类型", description = "删除指定的字典类型")
     @Parameter(name = "id", description = "字典类型 ID", required = true)
     public ApiResult<Void> deleteDictType(@PathVariable("id") Long id) {
@@ -120,8 +127,9 @@ public class SysDictController {
     // ===================== 字典数据 =====================
 
     @PostMapping("/data")
+    @LogOperation(operateDesc = "创建字典数据", operationType = OperateTypeEnum.CREATE)
     @Operation(summary = "创建字典数据", description = "创建新的字典数据项")
-     @Parameter(name = "req", description = "字典数据创建请求", required = true)
+    @Parameter(name = "req", description = "字典数据创建请求", required = true)
     public ApiResult<Long> createDictData(@Valid @RequestBody DictDataCreateRequestDTO req) {
         Long operatorId = LoginHelper.getUserId();
         Long id = dictService.createDictData(
@@ -140,6 +148,7 @@ public class SysDictController {
     }
 
     @PutMapping("/data/{id}")
+    @LogOperation(operateDesc = "更新字典数据", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "更新字典数据", description = "更新指定字典数据的信息")
     @Parameter(name = "id", description = "字典数据 ID", required = true)
     @Parameter(name = "req", description = "字典数据更新请求", required = true)
@@ -162,6 +171,7 @@ public class SysDictController {
     }
 
     @DeleteMapping("/data/{id}")
+    @LogOperation(operateDesc = "删除字典数据", operationType = OperateTypeEnum.DELETE)
     @Operation(summary = "删除字典数据", description = "删除指定的字典数据")
     @Parameter(name = "id", description = "字典数据 ID", required = true)
     public ApiResult<Void> deleteDictData(@PathVariable("id") Long id) {
@@ -171,6 +181,7 @@ public class SysDictController {
     }
 
     @DeleteMapping("/data")
+    @LogOperation(operateDesc = "批量删除字典数据", operationType = OperateTypeEnum.DELETE)
     @Operation(summary = "批量删除字典数据", description = "批量删除多个字典数据项")
     @Parameter(name = "ids", description = "ID 列表，逗号分隔", required = true)
     public ApiResult<Integer> batchDeleteDictData(@RequestParam("ids") String ids) {

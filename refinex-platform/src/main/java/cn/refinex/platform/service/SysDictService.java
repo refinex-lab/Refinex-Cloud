@@ -21,12 +21,13 @@ public interface SysDictService {
      * @param dictCode   字典类型编码
      * @param dictName   字典类型名称
      * @param dictDesc   字典类型描述
+     * @param dictSort   字典类型排序
      * @param remark     备注
      * @param status     状态
      * @param operatorId 操作人ID
      * @return 字典类型ID
      */
-    Long createDictType(String dictCode, String dictName, String dictDesc, String remark, Integer status, Long operatorId);
+    Long createDictType(String dictCode, String dictName, String dictDesc, Integer dictSort, String remark, Integer status, Long operatorId);
 
     /**
      * 更新字典类型
@@ -34,12 +35,13 @@ public interface SysDictService {
      * @param id         字典类型ID
      * @param dictName   字典类型名称
      * @param dictDesc   字典类型描述
+     * @param dictSort   字典类型排序
      * @param remark     备注
      * @param status     状态
      * @param operatorId 操作人ID
      * @return 是否更新成功
      */
-    boolean updateDictType(Long id, String dictName, String dictDesc, String remark, Integer status, Long operatorId);
+    boolean updateDictType(Long id, String dictName, String dictDesc, Integer dictSort, String remark, Integer status, Long operatorId);
 
     /**
      * 删除字典类型（软删除）

@@ -270,6 +270,23 @@ export default [
     ],
   },
   {
+    name: 'logs',
+    icon: 'history',
+    path: '/logs',
+    routes: [
+      {
+        path: '/logs',
+        redirect: '/logs/operation',
+      },
+      {
+        name: 'operation',
+        icon: 'control',
+        path: '/logs/operation',
+        component: './logs/operation/index',
+      },
+    ],
+  },
+  {
     name: 'account',
     icon: 'user',
     path: '/account',

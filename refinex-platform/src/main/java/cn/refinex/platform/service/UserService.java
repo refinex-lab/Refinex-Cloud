@@ -125,4 +125,13 @@ public interface UserService {
      * @return 当前用户安全视图
      */
     CurrentUserVo buildCurrentUserVo(Long userId);
+
+    /**
+     * 根据用户名关键词模糊搜索用户名列表
+     *
+     * @param keyword 用户名关键词
+     * @param limit   返回数量限制
+     * @return 用户名列表
+     */
+    List<String> searchUsernames(String keyword, Integer limit);
 }
