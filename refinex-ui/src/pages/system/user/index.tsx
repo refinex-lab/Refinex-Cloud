@@ -222,7 +222,7 @@ const UserManagement: React.FC = () => {
         registerType: values.registerType,
       });
 
-      if (response?.code === 200) {
+      if (response?.success) {
         message.success('用户创建成功');
         setCreateModalVisible(false);
         actionRef.current?.reload();
@@ -256,7 +256,7 @@ const UserManagement: React.FC = () => {
         userId: currentUser.id,
       });
 
-      if (response?.code === 200) {
+      if (response?.success) {
         message.success('用户信息更新成功');
         setEditModalVisible(false);
         actionRef.current?.reload();
@@ -276,7 +276,7 @@ const UserManagement: React.FC = () => {
         userStatus: newStatus,
       });
 
-      if (response?.code === 200) {
+      if (response?.success) {
         message.success('用户状态变更成功');
         actionRef.current?.reload();
       }
@@ -308,7 +308,7 @@ const UserManagement: React.FC = () => {
         reason: values.reason,
       });
 
-      if (response?.code === 200) {
+      if (response?.success) {
         message.success('密码重置成功');
         setResetPasswordModalVisible(false);
       }
@@ -324,7 +324,7 @@ const UserManagement: React.FC = () => {
     try {
       const response = await deleteUser(userId);
 
-      if (response?.code === 200) {
+      if (response?.success) {
         message.success('用户删除成功');
         actionRef.current?.reload();
       }
@@ -590,7 +590,7 @@ const UserManagement: React.FC = () => {
 
           return {
             data: response?.data?.records || [],
-            success: response?.code === 200,
+            success: response?.success,
             total: response?.data?.total || 0,
           };
         }}
