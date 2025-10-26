@@ -25,6 +25,11 @@ public class RefinexBizProperties {
     private String dbSensitiveDataKey;
 
     /**
+     * RSA 私钥（用于解密前端使用 RSA + AES 混合加密的数据）
+     */
+    private String rsaPrivateKey;
+
+    /**
      * 超级管理员配置
      */
     private SuperAdmin superAdmin = new SuperAdmin();

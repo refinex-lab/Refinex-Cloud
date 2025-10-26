@@ -49,7 +49,7 @@ export default {
   'menu.logs': 'Logs',
   'menu.logs.operation': 'Operation Logs',
   'menu.logs.login': 'Login Logs',
-  'menu.account': 'Account',
+  'menu.account': 'Personal Center',
   'menu.account.center': 'Account Center',
   'menu.account.settings': 'Account Settings',
   'menu.account.trigger': 'Trigger Error',

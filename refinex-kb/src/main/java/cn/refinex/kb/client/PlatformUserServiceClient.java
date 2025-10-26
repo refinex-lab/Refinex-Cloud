@@ -4,7 +4,6 @@ import cn.refinex.common.annotation.HttpInterfaceClient;
 import cn.refinex.common.domain.ApiResult;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;
@@ -29,6 +28,6 @@ public interface PlatformUserServiceClient {
     @GetExchange("/{userId}/username")
     ApiResult<String> getUsernameByUserId(@PathVariable("userId") @NotNull(message = "用户ID不能为空") Long userId);
 
-    @GetMapping("/username-map")
+    @GetExchange("/username-map")
     ApiResult<Map<String, Object>> getUsernameMap(@RequestParam("userIds") @NotNull(message = "用户ID列表不能为空") List<Long> userIds);
 }

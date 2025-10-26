@@ -8,7 +8,9 @@ import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
+import cn.refinex.common.properties.RefinexBizProperties;
 import cn.refinex.common.utils.object.BeanConverter;
+import cn.refinex.common.utils.security.CryptoUtils;
 import cn.refinex.kb.client.PlatformUserServiceClient;
 import cn.refinex.kb.controller.space.dto.request.ContentSpaceCreateRequestDTO;
 import cn.refinex.kb.controller.space.dto.request.ContentSpacePublishRequestDTO;
@@ -24,17 +26,17 @@ import cn.refinex.kb.service.ContentSpaceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.security.PrivateKey;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * 内容空间服务实现
@@ -49,6 +51,7 @@ public class ContentSpaceServiceImpl implements ContentSpaceService {
 
     private final ContentSpaceRepository spaceRepository;
     private final PlatformUserServiceClient platformUserServiceClient;
+    private final RefinexBizProperties bizProperties;
 
     /**
      * 创建内容空间
@@ -283,12 +286,12 @@ public class ContentSpaceServiceImpl implements ContentSpaceService {
         // 提取拥有者ID列表
         List<Long> ownerIds = spaces.stream()
                 .map(ContentSpace::getOwnerId)
-                .collect(Collectors.toList());
+                .toList();
 
         Map<String, Object> usernameMap = buildUsernameMap(ownerIds);
         return spaces.stream()
                 .map(space -> buildResponse(space, usernameMap))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -308,12 +311,12 @@ public class ContentSpaceServiceImpl implements ContentSpaceService {
         // 提取拥有者ID列表
         List<Long> ownerIds = pageResult.getRecords().stream()
                 .map(ContentSpace::getOwnerId)
-                .collect(Collectors.toList());
+                .toList();
 
         Map<String, Object> usernameMap = buildUsernameMap(ownerIds);
         List<ContentSpaceResponseDTO> dtoList = pageResult.getRecords().stream()
                 .map(space -> buildResponse(space, usernameMap))
-                .collect(Collectors.toList());
+                .toList();
 
         return new PageResult<>(dtoList, pageResult.getTotal(), pageResult.getPageNum(), pageResult.getPageSize());
     }
@@ -362,10 +365,17 @@ public class ContentSpaceServiceImpl implements ContentSpaceService {
 
     /**
      * 校验空间访问权限
+     * <p>
+     * 注意：此方法用于检查用户是否有权限访问空间，会根据访问类型进行判断。
+     * 对于密码保护类型的空间：
+     * - 必须提供正确的密码才能访问（即使是拥有者也必须输入密码）
+     * - 密码必须使用 RSA + AES 混合加密后传输
+     * - 这样的设计可以防止密码泄露后无法撤销访问权限
+     * </p>
      *
      * @param spaceId  空间ID
      * @param userId   用户ID
-     * @param password 访问密码（如果需要）
+     * @param password 访问密码（RSA + AES 混合加密，格式：encryptedKey|encryptedData）
      * @return 是否有权限访问
      */
     @Override
@@ -375,39 +385,112 @@ public class ContentSpaceServiceImpl implements ContentSpaceService {
             return false;
         }
 
+        // 获取访问类型
+        Integer accessType = space.getAccessType();
+
+        // 【优先】密码访问：必须先验证密码（即使是拥有者也要验证）
+        if (AccessType.PASSWORD_PROTECTED.getCode().equals(accessType)) {
+            // 验证空间是否配置了密码
+            if (space.getAccessPassword() == null || space.getAccessPassword().isBlank()) {
+                log.warn("空间 [{}] 设置了密码访问，但数据库中未存储密码哈希值", spaceId);
+                return false;
+            }
+            
+            // 必须提供密码才能访问（包括拥有者）
+            if (password == null || password.isBlank()) {
+                log.debug("空间 [{}] 需要密码访问，但未提供密码", spaceId);
+                return false;
+            }
+            
+            // 解密密码（使用 RSA + AES 混合解密）
+            String plainPassword = decryptPassword(password);
+            
+            // 验证密码是否正确
+            boolean passwordValid = BCrypt.checkpw(plainPassword, space.getAccessPassword());
+            if (!passwordValid) {
+                log.debug("空间 [{}] 密码验证失败", spaceId);
+            }
+            return passwordValid;
+        }
+
         // 未发布的空间只有拥有者可以访问
         if (space.getIsPublished() == 0) {
             return space.getOwnerId().equals(userId);
         }
 
-        // 根据访问类型判断
-        Integer accessType = space.getAccessType();
-
-        // 公开空间
-        if (accessType.equals(AccessType.PUBLIC.getCode())) {
+        // 公开空间：所有人都可以访问
+        if (AccessType.PUBLIC.getCode().equals(accessType)) {
             return true;
         }
 
-        // 私有空间
-        if (accessType.equals(AccessType.PRIVATE.getCode())) {
+        // 私有空间：只有拥有者可以访问
+        if (AccessType.PRIVATE.getCode().equals(accessType)) {
             return space.getOwnerId().equals(userId);
         }
 
-        // 密码访问
-        if (accessType.equals(AccessType.PASSWORD_PROTECTED.getCode())) {
-            if (space.getOwnerId().equals(userId)) {
-                return true;
-            }
-            if (password == null || password.isBlank()) {
-                return false;
-            }
-            return BCrypt.checkpw(password, space.getAccessPassword());
-        }
-
+        // 未知的访问类型，拒绝访问
+        log.warn("空间 [{}] 包含未知的访问类型: {}", spaceId, accessType);
         return false;
     }
 
     // ==================== 私有方法 ====================
+
+    /**
+     * 解密密码（使用 RSA + AES 混合解密）
+     * <p>
+     * 密码格式：encryptedKey|encryptedData
+     * - encryptedKey: RSA 加密的 AES 密钥（Base64）
+     * - encryptedData: AES-GCM 加密的密码数据（Base64）
+     * </p>
+     *
+     * @param encryptedPassword RSA + AES 混合加密的密码
+     * @return 解密后的明文密码
+     * @throws BusinessException 如果密码格式错误或解密失败
+     */
+    private String decryptPassword(String encryptedPassword) {
+        if (!StringUtils.hasText(encryptedPassword)) {
+            throw new BusinessException("密码不能为空");
+        }
+
+        try {
+            // 获取 RSA 私钥
+            String base64PrivateKey = bizProperties.getRsaPrivateKey();
+            if (!StringUtils.hasText(base64PrivateKey)) {
+                log.error("RSA 私钥未配置（refinex.security.rsa.private-key），密码解密功能不可用");
+                throw new BusinessException("系统配置错误，密码解密功能不可用");
+            }
+
+            PrivateKey privateKey = CryptoUtils.loadRsaPrivateKeyFromBase64(base64PrivateKey);
+            if (privateKey == null) {
+                log.error("RSA 私钥加载失败，无法解密密码");
+                throw new BusinessException("系统配置错误，密码解密功能不可用");
+            }
+
+            // 解析加密数据（格式：encryptedKey|encryptedData）
+            String[] parts = encryptedPassword.split("\\|");
+            if (parts.length != 2) {
+                log.warn("密码格式错误，期望格式：encryptedKey|encryptedData，实际：{}", encryptedPassword);
+                throw new BusinessException("密码格式错误");
+            }
+
+            String encryptedKey = parts[0];
+            String encryptedData = parts[1];
+
+            // 使用混合解密
+            String plainPassword = CryptoUtils.hybridDecrypt(encryptedKey, encryptedData, privateKey);
+            if (!StringUtils.hasText(plainPassword)) {
+                throw new BusinessException("解密后的密码为空");
+            }
+            
+            return plainPassword;
+            
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("密码解密失败：{}", e.getMessage(), e);
+            throw new BusinessException("密码解密失败，请检查密码格式");
+        }
+    }
 
     /**
      * 生成空间编码

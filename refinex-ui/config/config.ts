@@ -180,5 +180,8 @@ export default defineConfig({
   exportStatic: {},
   define: {
     'process.env.CI': process.env.CI,
+    // RSA 公钥配置：优先使用环境变量，否则使用默认值
+    'process.env.RSA_PUBLIC_KEY': process.env.RSA_PUBLIC_KEY ||
+      'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmtb9mwjm3Nehv3ZUvJRNfF5xPG/J9Oi/CJb7RbNnMxf1BCvLL4sC/wL/Nnkaz3BeUNjxQ3tMTU2c2sjamqUqzll3k27ALPuxNGU4aukoavoZrdOlYZMAje6Hh6hsaz62PUYL9czPUuS/aOa9Hu9/QD3CjLtKsl/tDjizcU5LzfwdwRLOmO7UQ6BgM+1oeRwgX+yxhqJBLJk5RAE64xoFuA1cnBBFJq9vDV/Tir8RGo6Jfeb5lUPtRGlTc9jWt0hxy8LN+StgdbNaqZ2QWbCaI5glH0Y+kO3veiZlmMv36sukwaS3cB8o8BZhqcxHlj/yhmH2WRYFe6XUbCmmTxm3XwIDAQAB',
   },
 });

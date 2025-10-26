@@ -47,7 +47,9 @@ import {
   Tag,
   Tooltip,
   Typography,
+  Upload,
 } from 'antd';
+import type { UploadFile, UploadProps } from 'antd';
 import React, { useEffect, useState } from 'react';
 import type {
   ContentSpace,
@@ -62,7 +64,9 @@ import {
   publishContentSpace,
   updateContentSpace,
 } from '@/services/kb/space';
-import { AccessType, PublishStatus, SpaceStatus, SpaceType } from '@/services/kb/typings';
+import { AccessType, PublishStatus, SpaceStatus, SpaceType } from '@/services/kb/typings.d';
+import { listDictDataByTypeCode } from '@/services/system/dictionary';
+import { encryptPassword, getRsaPublicKey } from '@/utils/crypto';
 
 const { Search } = Input;
 const { Title, Text, Paragraph } = Typography;
@@ -82,6 +86,13 @@ const MyContentSpace: React.FC = () => {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [filterType, setFilterType] = useState<SpaceType | 'all'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+  // 字典数据
+  const [spaceTypeDict, setSpaceTypeDict] = useState<Array<{ label: string; value: number }>>([]);
+  const [accessTypeDict, setAccessTypeDict] = useState<Array<{ label: string; value: number }>>([]);
+  const [spaceTypeDictMap, setSpaceTypeDictMap] = useState<Record<number, string>>({});
+  const [accessTypeDictMap, setAccessTypeDictMap] = useState<Record<number, string>>({});
 
   // 加载我的空间列表
   const loadMySpaces = async () => {
@@ -100,7 +111,51 @@ const MyContentSpace: React.FC = () => {
     }
   };
 
+  // 加载字典数据
+  const loadDictionaries = async () => {
+    try {
+      const [spaceTypeRes, accessTypeRes] = await Promise.all([
+        listDictDataByTypeCode('kb_space_type'),
+        listDictDataByTypeCode('kb_access_type'),
+      ]);
+
+      if (spaceTypeRes.success && spaceTypeRes.data) {
+        const spaceTypes = spaceTypeRes.data.map((item) => ({
+          label: item.dictLabel,
+          value: Number(item.dictValue),
+        }));
+        setSpaceTypeDict(spaceTypes);
+
+        // 同时创建映射表，用于显示
+        const typeMap: Record<number, string> = {};
+        spaceTypeRes.data.forEach((item) => {
+          typeMap[Number(item.dictValue)] = item.dictLabel;
+        });
+        setSpaceTypeDictMap(typeMap);
+      }
+
+      if (accessTypeRes.success && accessTypeRes.data) {
+        const accessTypes = accessTypeRes.data.map((item) => ({
+          label: item.dictLabel,
+          value: Number(item.dictValue),
+        }));
+        setAccessTypeDict(accessTypes);
+
+        // 同时创建映射表，用于显示
+        const accessMap: Record<number, string> = {};
+        accessTypeRes.data.forEach((item) => {
+          accessMap[Number(item.dictValue)] = item.dictLabel;
+        });
+        setAccessTypeDictMap(accessMap);
+      }
+    } catch (error) {
+      console.error('加载字典数据失败:', error);
+      message.error('加载字典数据失败');
+    }
+  };
+
   useEffect(() => {
+    loadDictionaries();
     loadMySpaces();
   }, []);
 
@@ -129,26 +184,94 @@ const MyContentSpace: React.FC = () => {
   // 处理新增/编辑
   const handleSubmit = async (values: ContentSpaceCreateRequest | ContentSpaceUpdateRequest) => {
     try {
+      // 如果有上传的文件，将 URL 添加到表单数据中
+      const submitData = {
+        ...values,
+        coverImage: fileList.length > 0 && fileList[0].url ? fileList[0].url : values.coverImage,
+      };
+
+      // 如果是密码保护类型且设置了密码，使用 RSA + AES 混合加密
+      if (
+        submitData.accessType === AccessType.PASSWORD_PROTECTED &&
+        submitData.accessPassword &&
+        submitData.accessPassword.trim() !== ''
+      ) {
+        try {
+          const publicKey = getRsaPublicKey();
+          const result = await encryptPassword(submitData.accessPassword, publicKey);
+          // 格式化为后端期望的格式：encryptedKey|encryptedData
+          submitData.accessPassword = `${result.encryptedKey}|${result.encryptedData}`;
+        } catch (error) {
+          console.error('密码加密失败:', error);
+          message.error('密码加密失败，请检查系统配置');
+          return false;
+        }
+      }
+
       if (currentSpace) {
         // 编辑
         await updateContentSpace(currentSpace.id, {
-          ...values,
+          ...submitData,
           version: currentSpace.version,
         } as ContentSpaceUpdateRequest);
         message.success('更新空间成功');
       } else {
         // 新增
-        await createContentSpace(values as ContentSpaceCreateRequest);
+        await createContentSpace(submitData as ContentSpaceCreateRequest);
         message.success('创建空间成功');
       }
       setModalVisible(false);
       setCurrentSpace(undefined);
+      setFileList([]);
       loadMySpaces();
       return true;
     } catch (error) {
       console.error('提交空间信息失败:', error);
       return false;
     }
+  };
+
+  // 处理文件上传（暂时模拟，后期接入真实接口）
+  const handleUploadChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
+  };
+
+  // 自定义上传请求（暂时返回预览 URL）
+  const customUploadRequest: UploadProps['customRequest'] = (options) => {
+    const { file, onSuccess, onError } = options;
+
+    // 模拟上传过程
+    setTimeout(() => {
+      // 创建本地预览 URL
+      if (file instanceof File) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          // 模拟成功，使用本地预览 URL
+          onSuccess?.({
+            url: e.target?.result as string,
+          });
+        };
+        reader.onerror = () => {
+          onError?.(new Error('文件读取失败'));
+        };
+        reader.readAsDataURL(file);
+      }
+    }, 500);
+  };
+
+  // 验证文件
+  const beforeUpload = (file: File) => {
+    const isImage = file.type.startsWith('image/');
+    if (!isImage) {
+      message.error('只能上传图片文件！');
+      return false;
+    }
+    const isLt5M = file.size / 1024 / 1024 < 5;
+    if (!isLt5M) {
+      message.error('图片大小不能超过 5MB！');
+      return false;
+    }
+    return true;
   };
 
   // 处理删除
@@ -256,13 +379,14 @@ const MyContentSpace: React.FC = () => {
                 ) : (
                   <SendOutlined />
                 ),
-              onClick: () =>
+              onClick: () => {
                 handlePublish(
                   space,
                   space.isPublished === PublishStatus.PUBLISHED
                     ? PublishStatus.UNPUBLISHED
                     : PublishStatus.PUBLISHED,
-                ),
+                );
+              },
             },
             {
               key: 'delete',
@@ -342,7 +466,7 @@ const MyContentSpace: React.FC = () => {
                 }
                 icon={getAccessTypeIcon(space.accessType)}
               >
-                {space.accessTypeDesc}
+                {accessTypeDictMap[space.accessType] || space.accessTypeDesc}
               </Tag>
             </div>
             <div
@@ -352,7 +476,9 @@ const MyContentSpace: React.FC = () => {
                 left: 12,
               }}
             >
-              <Tag color={getSpaceTypeColor(space.spaceType)}>{space.spaceTypeDesc}</Tag>
+              <Tag color={getSpaceTypeColor(space.spaceType)}>
+                {spaceTypeDictMap[space.spaceType] || space.spaceTypeDesc}
+              </Tag>
             </div>
           </div>
         }
@@ -430,7 +556,9 @@ const MyContentSpace: React.FC = () => {
                 <Title level={5} style={{ margin: 0 }}>
                   {space.spaceName}
                 </Title>
-                <Tag color={getSpaceTypeColor(space.spaceType)}>{space.spaceTypeDesc}</Tag>
+                <Tag color={getSpaceTypeColor(space.spaceType)}>
+                  {spaceTypeDictMap[space.spaceType] || space.spaceTypeDesc}
+                </Tag>
                 <Tag
                   color={space.isPublished === PublishStatus.PUBLISHED ? 'success' : 'default'}
                   icon={
@@ -449,7 +577,7 @@ const MyContentSpace: React.FC = () => {
               </Text>
               <Space size="large">
                 <Text type="secondary">
-                  {getAccessTypeIcon(space.accessType)} {space.accessTypeDesc}
+                  {getAccessTypeIcon(space.accessType)} {accessTypeDictMap[space.accessType] || space.accessTypeDesc}
                 </Text>
                 <Text type="secondary">
                   <EyeOutlined /> {space.viewCount} 次浏览
@@ -495,20 +623,23 @@ const MyContentSpace: React.FC = () => {
                         ) : (
                           <SendOutlined />
                         ),
-                      onClick: () =>
+                      onClick: (info) => {
+                        info.domEvent.stopPropagation();
                         handlePublish(
                           space,
                           space.isPublished === PublishStatus.PUBLISHED
                             ? PublishStatus.UNPUBLISHED
                             : PublishStatus.PUBLISHED,
-                        ),
+                        );
+                      },
                     },
                     {
                       key: 'delete',
                       label: '删除',
                       icon: <DeleteOutlined />,
                       danger: true,
-                      onClick: () => {
+                      onClick: (info) => {
+                        info.domEvent.stopPropagation();
                         Modal.confirm({
                           title: '确认删除',
                           content: '删除后将无法恢复，且空间下不能有文档，确认删除？',
@@ -521,7 +652,6 @@ const MyContentSpace: React.FC = () => {
                     },
                   ],
                 }}
-                onClick={(e) => e.stopPropagation()}
               >
                 <Button icon={<EllipsisOutlined />} onClick={(e) => e.stopPropagation()} />
               </Dropdown>
@@ -535,21 +665,8 @@ const MyContentSpace: React.FC = () => {
   return (
     <PageContainer
       header={{
-        title: '我的空间',
-        subTitle: '管理和浏览您创建的所有知识空间',
-        extra: [
-          <Button
-            key="create"
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              setCurrentSpace(undefined);
-              setModalVisible(true);
-            }}
-          >
-            创建空间
-          </Button>,
-        ],
+        title: false,
+        subTitle: false,
       }}
     >
       {/* 搜索和过滤工具栏 */}
@@ -573,15 +690,11 @@ const MyContentSpace: React.FC = () => {
                 size="large"
               >
                 <Select.Option value="all">全部类型</Select.Option>
-                <Select.Option value={SpaceType.PERSONAL}>
-                  <BookOutlined /> 个人知识库
-                </Select.Option>
-                <Select.Option value={SpaceType.COURSE}>
-                  <FileTextOutlined /> 课程专栏
-                </Select.Option>
-                <Select.Option value={SpaceType.VIDEO}>
-                  <VideoCameraOutlined /> 视频专栏
-                </Select.Option>
+                {spaceTypeDict.map((type) => (
+                  <Select.Option key={type.value} value={type.value}>
+                    {type.label}
+                  </Select.Option>
+                ))}
               </Select>
               <Button.Group size="large">
                 <Button
@@ -641,17 +754,48 @@ const MyContentSpace: React.FC = () => {
 
       {/* 新建/编辑模态框 */}
       <ModalForm<ContentSpaceCreateRequest | ContentSpaceUpdateRequest>
-        title={currentSpace ? '编辑空间' : '创建空间'}
+        title={
+          <Space>
+            <BookOutlined />
+            {currentSpace ? '编辑空间' : '创建空间'}
+          </Space>
+        }
         open={modalVisible}
-        width={600}
+        width={720}
+        layout="horizontal"
+        labelCol={{ span: 5 }}
+        wrapperCol={{ span: 19 }}
         modalProps={{
           onCancel: () => {
             setModalVisible(false);
             setCurrentSpace(undefined);
+            setFileList([]);
           },
           destroyOnClose: true,
+          centered: true,
+          styles: {
+            body: {
+              maxHeight: 'calc(100vh - 200px)',
+              overflowY: 'auto',
+            },
+          },
         }}
         onFinish={handleSubmit}
+        onOpenChange={(visible) => {
+          if (visible && currentSpace?.coverImage) {
+            // 编辑时，如果有封面图，初始化文件列表
+            setFileList([
+              {
+                uid: '-1',
+                name: '封面图片',
+                status: 'done',
+                url: currentSpace.coverImage,
+              },
+            ]);
+          } else if (!visible) {
+            setFileList([]);
+          }
+        }}
         initialValues={
           currentSpace
             ? {
@@ -660,6 +804,7 @@ const MyContentSpace: React.FC = () => {
                 coverImage: currentSpace.coverImage,
                 spaceType: currentSpace.spaceType,
                 accessType: currentSpace.accessType,
+                accessPassword: undefined,
                 sort: currentSpace.sort,
                 remark: currentSpace.remark,
               }
@@ -683,7 +828,7 @@ const MyContentSpace: React.FC = () => {
         <ProFormTextArea
           name="spaceDesc"
           label="空间描述"
-          placeholder="请输入空间描述"
+          placeholder="输入空间描述，让访客更好地了解这个空间"
           fieldProps={{
             rows: 3,
             maxLength: 1024,
@@ -691,34 +836,60 @@ const MyContentSpace: React.FC = () => {
           }}
         />
 
-        <ProFormText
-          name="coverImage"
-          label="封面图URL"
-          placeholder="请输入封面图URL（留空将使用默认封面）"
-          rules={[{ max: 512, message: 'URL不能超过512个字符' }]}
-        />
+        {/* 封面图上传 */}
+        <ProFormText name="coverImage" hidden />
+        <Row>
+          <Col span={5} style={{ textAlign: 'right', paddingRight: 8, paddingTop: 8 }}>
+            <label>封面图片</label>
+          </Col>
+          <Col span={19} style={{ marginBottom: 24 }}>
+            <Upload
+              listType="picture-card"
+              fileList={fileList}
+              onChange={handleUploadChange}
+              beforeUpload={beforeUpload}
+              customRequest={customUploadRequest}
+              maxCount={1}
+              accept="image/*"
+            >
+              {fileList.length === 0 && (
+                <div>
+                  <PlusOutlined />
+                  <div style={{ marginTop: 8 }}>上传封面</div>
+                </div>
+              )}
+            </Upload>
+            <div>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                支持 JPG、PNG、GIF 格式，大小不超过 5MB，建议尺寸 16:9
+              </Text>
+            </div>
+          </Col>
+        </Row>
 
         <ProFormSelect
           name="spaceType"
           label="空间类型"
-          placeholder="请选择空间类型"
-          options={[
-            { label: '📚 个人知识库', value: SpaceType.PERSONAL },
-            { label: '📖 课程专栏', value: SpaceType.COURSE },
-            { label: '🎬 视频专栏', value: SpaceType.VIDEO },
-          ]}
+          placeholder="选择类型"
+          options={spaceTypeDict}
           rules={[{ required: true, message: '请选择空间类型' }]}
+        />
+
+        <ProFormDigit
+          name="sort"
+          label="排序"
+          placeholder="数字越小越靠前"
+          fieldProps={{
+            precision: 0,
+          }}
+          min={0}
         />
 
         <ProFormSelect
           name="accessType"
           label="访问类型"
           placeholder="请选择访问类型"
-          options={[
-            { label: '🔒 私有（仅自己可见）', value: AccessType.PRIVATE },
-            { label: '🌍 公开（所有人可见）', value: AccessType.PUBLIC },
-            { label: '🔑 密码访问（知道密码可见）', value: AccessType.PASSWORD_PROTECTED },
-          ]}
+          options={accessTypeDict}
           rules={[{ required: true, message: '请选择访问类型' }]}
         />
 
@@ -736,20 +907,10 @@ const MyContentSpace: React.FC = () => {
           ]}
         />
 
-        <ProFormDigit
-          name="sort"
-          label="排序"
-          placeholder="请输入排序值（数字越小越靠前）"
-          fieldProps={{
-            precision: 0,
-          }}
-          min={0}
-        />
-
         <ProFormTextArea
           name="remark"
           label="备注"
-          placeholder="请输入备注信息（仅自己可见）"
+          placeholder="输入备注信息（仅自己可见）"
           fieldProps={{
             rows: 2,
             maxLength: 500,

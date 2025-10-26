@@ -8,12 +8,14 @@ import {
   LockOutlined,
   SafetyOutlined,
   UserOutlined,
+  ArrowLeftOutlined,
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { history, useParams } from '@umijs/max';
 import {
   Avatar,
   Badge,
+  Button,
   Card,
   Col,
   Descriptions,
@@ -25,16 +27,17 @@ import {
   Statistic,
   Tag,
   Typography,
-  Modal,
   Input,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
-import type { ContentSpaceDetail } from '@/services/kb/typings';
+import type { ContentSpaceDetail as ContentSpaceDetailType } from '@/services/kb/typings';
 import {
   getContentSpaceDetailByCode,
   validateContentSpaceAccess,
 } from '@/services/kb/space';
-import { AccessType, PublishStatus, SpaceType } from '@/services/kb/typings';
+import { AccessType, PublishStatus, SpaceType } from '@/services/kb/typings.d';
+import { listDictDataByTypeCode } from '@/services/system/dictionary';
+import { encryptPassword, getRsaPublicKey } from '@/utils/crypto';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -45,10 +48,14 @@ const { Title, Text, Paragraph } = Typography;
 const ContentSpaceDetail: React.FC = () => {
   const { spaceCode } = useParams<{ spaceCode: string }>();
   const [loading, setLoading] = useState(false);
-  const [space, setSpace] = useState<ContentSpaceDetail | null>(null);
-  const [passwordModalVisible, setPasswordModalVisible] = useState(false);
+  const [space, setSpace] = useState<ContentSpaceDetailType | null>(null);
+  const [isLocked, setIsLocked] = useState(false); // 是否处于锁定状态
   const [password, setPassword] = useState('');
   const [validating, setValidating] = useState(false);
+
+  // 字典数据映射
+  const [spaceTypeDictMap, setSpaceTypeDictMap] = useState<Record<number, string>>({});
+  const [accessTypeDictMap, setAccessTypeDictMap] = useState<Record<number, string>>({});
 
   // 加载空间详情
   const loadSpaceDetail = async () => {
@@ -66,8 +73,8 @@ const ContentSpaceDetail: React.FC = () => {
 
         // 检查访问权限
         if (response.data.accessType === AccessType.PASSWORD_PROTECTED) {
-          // 密码保护的空间，需要验证密码
-          setPasswordModalVisible(true);
+          // 密码保护的空间，显示锁定页面
+          setIsLocked(true);
         }
       }
     } catch (error: any) {
@@ -83,7 +90,36 @@ const ContentSpaceDetail: React.FC = () => {
     }
   };
 
+  // 加载字典数据
+  const loadDictionaries = async () => {
+    try {
+      const [spaceTypeRes, accessTypeRes] = await Promise.all([
+        listDictDataByTypeCode('kb_space_type'),
+        listDictDataByTypeCode('kb_access_type'),
+      ]);
+
+      if (spaceTypeRes.success && spaceTypeRes.data) {
+        const typeMap: Record<number, string> = {};
+        spaceTypeRes.data.forEach((item) => {
+          typeMap[Number(item.dictValue)] = item.dictLabel;
+        });
+        setSpaceTypeDictMap(typeMap);
+      }
+
+      if (accessTypeRes.success && accessTypeRes.data) {
+        const accessMap: Record<number, string> = {};
+        accessTypeRes.data.forEach((item) => {
+          accessMap[Number(item.dictValue)] = item.dictLabel;
+        });
+        setAccessTypeDictMap(accessMap);
+      }
+    } catch (error) {
+      console.error('加载字典数据失败:', error);
+    }
+  };
+
   useEffect(() => {
+    loadDictionaries();
     loadSpaceDetail();
   }, [spaceCode]);
 
@@ -94,17 +130,38 @@ const ContentSpaceDetail: React.FC = () => {
       return;
     }
 
+    if (!space?.id) {
+      message.error('空间信息异常');
+      return;
+    }
+
     setValidating(true);
     try {
-      const response = await validateContentSpaceAccess(space!.id, password);
+      // 使用 RSA + AES 混合加密密码
+      let encryptedData: string;
+      try {
+        const publicKey = getRsaPublicKey();
+        const result = await encryptPassword(password, publicKey);
+        // 格式化为后端期望的格式：encryptedKey|encryptedData
+        encryptedData = `${result.encryptedKey}|${result.encryptedData}`;
+      } catch (error) {
+        console.error('密码加密失败:', error);
+        message.error('密码加密失败，请检查系统配置');
+        setValidating(false);
+        return;
+      }
+
+      const response = await validateContentSpaceAccess(space.id, encryptedData);
       if (response.success && response.data) {
         message.success('密码正确，欢迎访问');
-        setPasswordModalVisible(false);
+        setIsLocked(false); // 解锁页面
+        setPassword(''); // 清空密码
       } else {
-        message.error('密码错误');
+        message.error('密码错误，请重试');
       }
     } catch (error) {
       console.error('验证密码失败:', error);
+      message.error('验证失败，请稍后重试');
     } finally {
       setValidating(false);
     }
@@ -112,29 +169,31 @@ const ContentSpaceDetail: React.FC = () => {
 
   // 空间类型配置
   const getSpaceTypeConfig = (type: SpaceType) => {
+    const text = spaceTypeDictMap[type] || '未知类型';
     switch (type) {
       case SpaceType.PERSONAL:
-        return { icon: <BookOutlined />, color: '#1890ff', text: '个人知识库' };
+        return { icon: <BookOutlined />, color: '#1890ff', text };
       case SpaceType.COURSE:
-        return { icon: <FileTextOutlined />, color: '#52c41a', text: '课程专栏' };
+        return { icon: <FileTextOutlined />, color: '#52c41a', text };
       case SpaceType.VIDEO:
-        return { icon: <FileTextOutlined />, color: '#fa8c16', text: '视频专栏' };
+        return { icon: <FileTextOutlined />, color: '#fa8c16', text };
       default:
-        return { icon: <BookOutlined />, color: '#1890ff', text: '未知类型' };
+        return { icon: <BookOutlined />, color: '#1890ff', text };
     }
   };
 
   // 访问类型配置
   const getAccessTypeConfig = (type: AccessType) => {
+    const text = accessTypeDictMap[type] || '未知';
     switch (type) {
       case AccessType.PRIVATE:
-        return { icon: <LockOutlined />, color: 'default', text: '私有' };
+        return { icon: <LockOutlined />, color: 'default', text };
       case AccessType.PUBLIC:
-        return { icon: <GlobalOutlined />, color: 'success', text: '公开' };
+        return { icon: <GlobalOutlined />, color: 'success', text };
       case AccessType.PASSWORD_PROTECTED:
-        return { icon: <SafetyOutlined />, color: 'warning', text: '密码访问' };
+        return { icon: <SafetyOutlined />, color: 'warning', text };
       default:
-        return { icon: <LockOutlined />, color: 'default', text: '未知' };
+        return { icon: <LockOutlined />, color: 'default', text };
     }
   };
 
@@ -161,12 +220,105 @@ const ContentSpaceDetail: React.FC = () => {
   const spaceTypeConfig = getSpaceTypeConfig(space.spaceType);
   const accessTypeConfig = getAccessTypeConfig(space.accessType);
 
+  // 如果空间被锁定，显示密码验证页面
+  if (isLocked) {
+    return (
+      <PageContainer>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: 'calc(100vh - 200px)',
+          }}
+        >
+          <Card
+            style={{
+              maxWidth: 480,
+              width: '100%',
+              textAlign: 'center',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+            }}
+            bordered={false}
+          >
+            <Space direction="vertical" size={24} style={{ width: '100%' }}>
+              {/* 锁定图标 */}
+              <div
+                style={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: '50%',
+                  backgroundColor: '#fff7e6',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  margin: '0 auto',
+                }}
+              >
+                <LockOutlined style={{ fontSize: 40, color: '#faad14' }} />
+              </div>
+
+              {/* 标题和描述 */}
+              <div>
+                <Title level={3} style={{ marginBottom: 8 }}>
+                  {space.spaceName}
+                </Title>
+                <Text type="secondary" style={{ fontSize: 16 }}>
+                  此空间需要密码才能访问
+                </Text>
+              </div>
+
+              {/* 密码输入框 */}
+              <div style={{ width: '100%' }}>
+                <Input.Password
+                  placeholder="请输入访问密码"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onPressEnter={handleValidatePassword}
+                  size="large"
+                  prefix={<SafetyOutlined />}
+                  style={{ fontSize: 16 }}
+                />
+              </div>
+
+              {/* 操作按钮 */}
+              <Space size={12} style={{ width: '100%', justifyContent: 'center' }}>
+                <Button
+                  size="large"
+                  icon={<ArrowLeftOutlined />}
+                  onClick={() => history.push('/kb/space')}
+                >
+                  返回
+                </Button>
+                <Button
+                  type="primary"
+                  size="large"
+                  loading={validating}
+                  onClick={handleValidatePassword}
+                  icon={<LockOutlined />}
+                  style={{ minWidth: 120 }}
+                >
+                  {validating ? '验证中' : '确定'}
+                </Button>
+              </Space>
+
+              {/* 提示信息 */}
+              <Text type="secondary" style={{ fontSize: 14 }}>
+                <SafetyOutlined /> 您的密码使用 RSA + AES 混合加密传输，请放心输入
+              </Text>
+            </Space>
+          </Card>
+        </div>
+      </PageContainer>
+    );
+  }
+
   return (
     <PageContainer
       title={space.spaceName}
       tags={[
         <Tag key="type" color={spaceTypeConfig.color} icon={spaceTypeConfig.icon}>
-          {space.spaceTypeDesc}
+          {spaceTypeDictMap[space.spaceType] || space.spaceTypeDesc}
         </Tag>,
         <Badge
           key="status"
@@ -176,7 +328,7 @@ const ContentSpaceDetail: React.FC = () => {
       ]}
       extra={[
         <Tag key="access" color={accessTypeConfig.color} icon={accessTypeConfig.icon}>
-          {space.accessTypeDesc}
+          {accessTypeDictMap[space.accessType] || space.accessTypeDesc}
         </Tag>,
       ]}
       content={
@@ -275,31 +427,6 @@ const ContentSpaceDetail: React.FC = () => {
           </Card>
         </Col>
       </Row>
-
-      {/* 密码验证模态框 */}
-      <Modal
-        title="请输入访问密码"
-        open={passwordModalVisible}
-        onOk={handleValidatePassword}
-        onCancel={() => {
-          setPasswordModalVisible(false);
-          history.push('/kb/space');
-        }}
-        confirmLoading={validating}
-        closable={false}
-        maskClosable={false}
-      >
-        <Space direction="vertical" style={{ width: '100%' }}>
-          <Text type="secondary">此空间需要密码才能访问</Text>
-          <Input.Password
-            placeholder="请输入访问密码"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onPressEnter={handleValidatePassword}
-            size="large"
-          />
-        </Space>
-      </Modal>
     </PageContainer>
   );
 };

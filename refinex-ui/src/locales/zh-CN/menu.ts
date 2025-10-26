@@ -49,7 +49,7 @@ export default {
   'menu.logs': '日志管理',
   'menu.logs.operation': '操作日志',
   'menu.logs.login': '登录日志',
-  'menu.account': '个人页',
+  'menu.account': '个人中心',
   'menu.account.center': '个人中心',
   'menu.account.settings': '个人设置',
   'menu.account.trigger': '触发报错',

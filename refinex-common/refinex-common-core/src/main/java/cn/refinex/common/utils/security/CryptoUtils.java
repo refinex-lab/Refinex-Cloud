@@ -320,17 +320,145 @@ public final class CryptoUtils {
         return Hex.toHexString(digest);
     }
 
+    // ========================= RSA ========================= //
+
+    /**
+     * 生成 RSA 密钥对（2048 位）
+     *
+     * @return KeyPair（公钥/私钥）
+     * @throws GeneralSecurityException 若生成失败
+     */
+    public static KeyPair generateRsaKeyPair() throws GeneralSecurityException {
+        return generateRsaKeyPair(2048);
+    }
+
+    /**
+     * 生成 RSA 密钥对
+     *
+     * @param keySize 密钥长度（位），建议 2048 或 4096
+     * @return KeyPair（公钥/私钥）
+     * @throws GeneralSecurityException 若生成失败
+     */
+    public static KeyPair generateRsaKeyPair(int keySize) throws GeneralSecurityException {
+        final KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+        kpg.initialize(keySize, SECURE_RANDOM);
+        return kpg.generateKeyPair();
+    }
+
+    /**
+     * RSA 加密（使用公钥，返回 Base64）
+     * <p>使用 RSA-OAEP with SHA-256 and MGF1-SHA-256 padding</p>
+     *
+     * @param plainBytes 明文字节
+     * @param publicKey  RSA 公钥
+     * @return Base64 编码的密文
+     * @throws GeneralSecurityException 若加密失败
+     */
+    public static String rsaEncryptToBase64(final byte[] plainBytes, final PublicKey publicKey) throws GeneralSecurityException {
+        Assert.notNull(plainBytes, "plainBytes 不能为空");
+        Assert.notNull(publicKey, "publicKey 不能为空");
+
+        final Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
+        final java.security.spec.MGF1ParameterSpec mgf1Spec = new java.security.spec.MGF1ParameterSpec("SHA-256");
+        final javax.crypto.spec.OAEPParameterSpec oaepSpec = new javax.crypto.spec.OAEPParameterSpec(
+            "SHA-256", "MGF1", mgf1Spec, javax.crypto.spec.PSource.PSpecified.DEFAULT
+        );
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey, oaepSpec, SECURE_RANDOM);
+        final byte[] encrypted = cipher.doFinal(plainBytes);
+        return Base64.getEncoder().encodeToString(encrypted);
+    }
+
+    /**
+     * RSA 解密（使用私钥，输入 Base64）
+     * <p>使用 RSA-OAEP with SHA-256 and MGF1-SHA-256 padding</p>
+     *
+     * @param base64Ciphertext Base64 编码的密文
+     * @param privateKey       RSA 私钥
+     * @return 明文字节数组
+     * @throws GeneralSecurityException 若解密失败
+     */
+    public static byte[] rsaDecryptFromBase64(final String base64Ciphertext, final PrivateKey privateKey) throws GeneralSecurityException {
+        Assert.hasText(base64Ciphertext, "base64Ciphertext 不能为空");
+        Assert.notNull(privateKey, "privateKey 不能为空");
+
+        final byte[] cipherBytes = Base64.getDecoder().decode(base64Ciphertext);
+        final Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPPadding");
+        final java.security.spec.MGF1ParameterSpec mgf1Spec = new java.security.spec.MGF1ParameterSpec("SHA-256");
+        final javax.crypto.spec.OAEPParameterSpec oaepSpec = new javax.crypto.spec.OAEPParameterSpec(
+            "SHA-256", "MGF1", mgf1Spec, javax.crypto.spec.PSource.PSpecified.DEFAULT
+        );
+        cipher.init(Cipher.DECRYPT_MODE, privateKey, oaepSpec);
+        return cipher.doFinal(cipherBytes);
+    }
+
+    /**
+     * 从 Base64 编码的字符串加载 RSA 公钥
+     *
+     * @param base64PublicKey Base64 编码的公钥
+     * @return PublicKey 对象
+     * @throws GeneralSecurityException 若密钥格式不正确
+     */
+    public static PublicKey loadRsaPublicKeyFromBase64(final String base64PublicKey) throws GeneralSecurityException {
+        Assert.hasText(base64PublicKey, "公钥不能为空");
+        final byte[] keyBytes = Base64.getDecoder().decode(base64PublicKey);
+        final java.security.spec.X509EncodedKeySpec keySpec = new java.security.spec.X509EncodedKeySpec(keyBytes);
+        final KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        return keyFactory.generatePublic(keySpec);
+    }
+
+    /**
+     * 从 Base64 编码的字符串加载 RSA 私钥
+     *
+     * @param base64PrivateKey Base64 编码的私钥
+     * @return PrivateKey 对象
+     * @throws GeneralSecurityException 若密钥格式不正确
+     */
+    public static PrivateKey loadRsaPrivateKeyFromBase64(final String base64PrivateKey) throws GeneralSecurityException {
+        Assert.hasText(base64PrivateKey, "私钥不能为空");
+        final byte[] keyBytes = Base64.getDecoder().decode(base64PrivateKey);
+        final java.security.spec.PKCS8EncodedKeySpec keySpec = new java.security.spec.PKCS8EncodedKeySpec(keyBytes);
+        final KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        return keyFactory.generatePrivate(keySpec);
+    }
+
+    /**
+     * 混合加密解密：RSA 解密 AES 密钥 + AES-GCM 解密数据
+     * <p>
+     * 适用场景：前端使用 RSA 公钥加密随机生成的 AES 密钥，使用 AES-GCM 加密实际数据
+     * </p>
+     *
+     * @param encryptedAesKeyBase64 RSA 加密的 AES 密钥（Base64）
+     * @param encryptedDataBase64   AES-GCM 加密的数据（Base64，包含 IV）
+     * @param rsaPrivateKey         RSA 私钥
+     * @return 解密后的明文字符串
+     * @throws GeneralSecurityException 若解密失败
+     */
+    public static String hybridDecrypt(final String encryptedAesKeyBase64, final String encryptedDataBase64, 
+                                      final PrivateKey rsaPrivateKey) throws GeneralSecurityException {
+        // 1. 使用 RSA 私钥解密 AES 密钥
+        final byte[] aesKey = rsaDecryptFromBase64(encryptedAesKeyBase64, rsaPrivateKey);
+        
+        // 2. 使用 AES 密钥解密数据
+        final byte[] plainBytes = aesGcmDecryptFromBase64(encryptedDataBase64, aesKey, null);
+        
+        return new String(plainBytes, StandardCharsets.UTF_8);
+    }
+
     // ========================= SM2 (BouncyCastle) ========================= //
 
     /**
      * 生成 SM2 密钥对（BouncyCastle）
+     * <p>
+     * 注意：SM2 使用的是 sm2p256v1 曲线，在 BouncyCastle 中也被称为 "1.2.156.10197.1.301"
+     * </p>
      *
      * @return KeyPair（公钥/私钥均为 java.security.interfaces 下的实现）
      * @throws GeneralSecurityException 若生成失败
      */
     public static KeyPair generateSm2KeyPair() throws GeneralSecurityException {
         final KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC", BC_PROVIDER);
-        final ECGenParameterSpec ecSpec = new ECGenParameterSpec("SM2");
+        // SM2 曲线标准名称为 sm2p256v1，OID 为 1.2.156.10197.1.301
+        final ECGenParameterSpec ecSpec = new ECGenParameterSpec("sm2p256v1");
         kpg.initialize(ecSpec, SECURE_RANDOM);
         return kpg.generateKeyPair();
     }
@@ -373,6 +501,36 @@ public final class CryptoUtils {
         engine.init(false, privParams);
         final byte[] input = Hex.decode(hexCipher);
         return engine.processBlock(input, 0, input.length);
+    }
+
+    /**
+     * 从 Base64 编码的字符串加载 SM2 公钥
+     *
+     * @param base64PublicKey Base64 编码的公钥
+     * @return PublicKey 对象
+     * @throws GeneralSecurityException 若密钥格式不正确
+     */
+    public static PublicKey loadSm2PublicKeyFromBase64(final String base64PublicKey) throws GeneralSecurityException {
+        Assert.hasText(base64PublicKey, "公钥不能为空");
+        final byte[] keyBytes = Base64.getDecoder().decode(base64PublicKey);
+        final java.security.spec.X509EncodedKeySpec keySpec = new java.security.spec.X509EncodedKeySpec(keyBytes);
+        final KeyFactory keyFactory = KeyFactory.getInstance("EC", BC_PROVIDER);
+        return keyFactory.generatePublic(keySpec);
+    }
+
+    /**
+     * 从 Base64 编码的字符串加载 SM2 私钥
+     *
+     * @param base64PrivateKey Base64 编码的私钥
+     * @return PrivateKey 对象
+     * @throws GeneralSecurityException 若密钥格式不正确
+     */
+    public static PrivateKey loadSm2PrivateKeyFromBase64(final String base64PrivateKey) throws GeneralSecurityException {
+        Assert.hasText(base64PrivateKey, "私钥不能为空");
+        final byte[] keyBytes = Base64.getDecoder().decode(base64PrivateKey);
+        final java.security.spec.PKCS8EncodedKeySpec keySpec = new java.security.spec.PKCS8EncodedKeySpec(keyBytes);
+        final KeyFactory keyFactory = KeyFactory.getInstance("EC", BC_PROVIDER);
+        return keyFactory.generatePrivate(keySpec);
     }
 
     // ========================= 辅助方法 ========================= //

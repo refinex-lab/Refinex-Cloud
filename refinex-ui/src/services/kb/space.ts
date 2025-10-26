@@ -12,7 +12,7 @@ import type {
   ContentSpaceQueryParams,
   ContentSpaceUpdateRequest,
   PageResult,
-} from './typings';
+} from './typings.d';
 
 const API_PREFIX = '/refinex-kb/spaces';
 

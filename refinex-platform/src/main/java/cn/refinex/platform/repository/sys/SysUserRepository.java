@@ -58,7 +58,7 @@ public class SysUserRepository {
      * 根据用户 ID 列表查询用户名映射
      *
      * @param userIds 用户 ID 列表
-     * @return 用户名映射，键为用户 ID，值为用户名
+     * @return 用户名映射，键为用户 ID（字符串），值为用户名
      */
     public Map<String, Object> selectUsernameMap(List<Long> userIds) {
         if (userIds.isEmpty()) {
@@ -74,7 +74,17 @@ public class SysUserRepository {
         Map<String, Object> params = Map.of("userIds", userIds);
 
         try {
-            return jdbcManager.queryMap(sql, params);
+            List<Map<String, Object>> resultList = jdbcManager.queryList(sql, params);
+            Map<String, Object> usernameMap = new java.util.HashMap<>();
+            for (Map<String, Object> row : resultList) {
+                Object id = row.get("id");
+                Object username = row.get("username");
+                if (id != null && username != null) {
+                    usernameMap.put(String.valueOf(id), username);
+                }
+            }
+            
+            return usernameMap;
         } catch (Exception e) {
             log.error("根据用户 ID 列表查询用户名映射失败，userIds: {}", userIds, e);
             return Map.of();
