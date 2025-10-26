@@ -165,7 +165,8 @@ public class LogOperationFilter extends ApiRequestFilter {
             if (Objects.nonNull(loginId)) {
                 Long userId = Convert.toLong(StringUtils.split(Convert.toStr(loginId), ":")[1]);
                 logOperationRequest.setUserId(userId);
-                Object usernameObj = StpUtil.getExtra("username");
+                // TODO 这里的 Key 和 LoginHelper 中设置的 USER_NAME_KEY 保持一致, 后续看下能否用到同一个常量
+                Object usernameObj = StpUtil.getExtra("userName");
                 if (Objects.nonNull(usernameObj)) {
                     logOperationRequest.setUsername(usernameObj.toString());
                 }
