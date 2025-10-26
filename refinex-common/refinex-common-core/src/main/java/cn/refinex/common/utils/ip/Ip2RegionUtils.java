@@ -2,20 +2,26 @@ package cn.refinex.common.utils.ip;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.utils.net.NetUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.lionsoul.ip2region.xdb.LongByteArray;
 import org.lionsoul.ip2region.xdb.Searcher;
+import org.lionsoul.ip2region.xdb.Version;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * IP 地址离线定位工具类(基于 ip2region 2.x (xdb) 实现)
+ * IP 地址离线定位工具类(基于 ip2region 3.1.1 (xdb) 实现)
+ *
+ * <p>支持 IPv4 和 IPv6 地址查询</p>
+ * <p>使用线程安全的全文件缓存模式</p>
  *
  * @author Refinex
  * @since 1.0.0
@@ -79,8 +85,14 @@ public final class Ip2RegionUtils {
 
                     InputStream inputStream = Ip2RegionUtils.class.getResourceAsStream(IPV4_DB_PATH);
                     if (inputStream == null) {
-                        log.error("无法找到 IPv4 数据库文件: {}", IPV4_DB_PATH);
-                        throw new RuntimeException("IPv4 数据库文件不存在: " + IPV4_DB_PATH);
+                        log.error("无法找到 IPv4 数据库文件: {}, 尝试从类路径加载", IPV4_DB_PATH);
+                        // 尝试使用不同的加载方式
+                        inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("ip2region/ip2region.xdb");
+                    }
+                    
+                    if (inputStream == null) {
+                        log.error("IPv4 数据库文件不存在: {}", IPV4_DB_PATH);
+                        throw new SystemException("IPv4 数据库文件不存在: " + IPV4_DB_PATH);
                     }
 
                     try {
@@ -88,16 +100,30 @@ public final class Ip2RegionUtils {
                         byte[] dbBuffer = IoUtil.readBytes(inputStream);
                         log.info("IPv4 数据库文件大小: {} KB", dbBuffer.length / 1024);
 
+                        // 转换为 LongByteArray（ip2region 3.1.1 API 要求）
+                        LongByteArray contentBuffer = new LongByteArray();
+                        contentBuffer.append(dbBuffer);
+
                         // 创建基于内存的查询器（无磁盘 IO，性能最优）
-                        ipv4Searcher = Searcher.newWithBuffer(dbBuffer);
+                        // ip2region 3.1.1 使用 newWithBuffer(Version, LongByteArray) 方法
+                        ipv4Searcher = Searcher.newWithBuffer(Version.IPv4, contentBuffer);
 
                         ipv4Initialized = true;
                         long costTime = System.currentTimeMillis() - startTime;
                         log.info("ip2region IPv4 数据库初始化完成，耗时: {} ms", costTime);
+                        
+                        // 测试查询以验证数据库是否正常工作
+                        try {
+                            String testIp = "8.8.8.8";
+                            String testResult = ipv4Searcher.search(testIp);
+                            log.info("IPv4 数据库测试查询成功，IP: {}, 结果: {}", testIp, testResult);
+                        } catch (Exception e) {
+                            log.warn("IPv4 数据库测试查询失败", e);
+                        }
 
                     } catch (IOException e) {
                         log.error("加载 IPv4 数据库文件失败", e);
-                        throw new RuntimeException("加载 IPv4 数据库文件失败", e);
+                        throw new SystemException("加载 IPv4 数据库文件失败", e);
                     } finally {
                         IoUtil.close(inputStream);
                     }
@@ -123,6 +149,12 @@ public final class Ip2RegionUtils {
 
                     InputStream inputStream = Ip2RegionUtils.class.getResourceAsStream(IPV6_DB_PATH);
                     if (inputStream == null) {
+                        log.warn("无法找到 IPv6 数据库文件: {}, 尝试从类路径加载", IPV6_DB_PATH);
+                        // 尝试使用不同的加载方式
+                        inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("ip2region/ip2region_v6.xdb");
+                    }
+                    
+                    if (inputStream == null) {
                         log.warn("未找到 IPv6 数据库文件: {}, IPv6 查询功能将不可用", IPV6_DB_PATH);
                         // 标记为已初始化，避免重复尝试
                         ipv6Initialized = true;
@@ -133,11 +165,25 @@ public final class Ip2RegionUtils {
                         byte[] dbBuffer = IoUtil.readBytes(inputStream);
                         log.info("IPv6 数据库文件大小: {} KB", dbBuffer.length / 1024);
 
-                        ipv6Searcher = Searcher.newWithBuffer(dbBuffer);
+                        // 转换为 LongByteArray（ip2region 3.1.1 API 要求）
+                        LongByteArray contentBuffer = new LongByteArray();
+                        contentBuffer.append(dbBuffer);
+
+                        // ip2region 3.1.1 使用 newWithBuffer(Version, LongByteArray) 方法
+                        ipv6Searcher = Searcher.newWithBuffer(Version.IPv6, contentBuffer);
 
                         ipv6Initialized = true;
                         long costTime = System.currentTimeMillis() - startTime;
                         log.info("ip2region IPv6 数据库初始化完成，耗时: {} ms", costTime);
+                        
+                        // 测试查询以验证数据库是否正常工作
+                        try {
+                            String testIp = "2001:4860:4860::8888";
+                            String testResult = ipv6Searcher.search(testIp);
+                            log.info("IPv6 数据库测试查询成功，IP: {}, 结果: {}", testIp, testResult);
+                        } catch (Exception e) {
+                            log.warn("IPv6 数据库测试查询失败", e);
+                        }
 
                     } catch (IOException e) {
                         log.error("加载 IPv6 数据库文件失败", e);
@@ -201,7 +247,10 @@ public final class Ip2RegionUtils {
         try {
             if (ipv4Searcher != null) {
                 String region = ipv4Searcher.search(ip);
+                log.debug("IPv4 查询成功: IP={}, Region={}", ip, region);
                 return StrUtil.isBlank(region) ? DEFAULT_REGION : region;
+            } else {
+                log.error("IPv4 查询器未初始化，无法查询 IP: {}", ip);
             }
         } catch (Exception e) {
             log.error("查询 IPv4 地址失败: {}", ip, e);
@@ -230,6 +279,7 @@ public final class Ip2RegionUtils {
         try {
             if (ipv6Searcher != null) {
                 String region = ipv6Searcher.search(ip);
+                log.debug("IPv6 查询成功: IP={}, Region={}", ip, region);
                 return StrUtil.isBlank(region) ? DEFAULT_REGION : region;
             } else {
                 log.warn("IPv6 查询器未初始化，请确保已添加 IPv6 数据库文件");

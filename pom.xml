@@ -57,7 +57,7 @@
         <rocketmq-spring.version>2.3.2</rocketmq-spring.version>
         <xxl-job.version>2.4.0</xxl-job.version>
         <dynamic-ds.version>4.3.1</dynamic-ds.version>
-        <ip2region.version>2.7.0</ip2region.version>
+        <ip2region.version>3.1.1</ip2region.version>
         <easy-es.version>3.0.0</easy-es.version>
         <httpclient5.version>5.5.1</httpclient5.version>
 
