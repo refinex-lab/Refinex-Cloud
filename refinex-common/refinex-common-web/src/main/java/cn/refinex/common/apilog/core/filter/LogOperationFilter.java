@@ -1,6 +1,7 @@
 package cn.refinex.common.apilog.core.filter;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.BooleanUtil;
@@ -162,9 +163,9 @@ public class LogOperationFilter extends ApiRequestFilter {
         try {
             Object loginId = StpUtil.getLoginIdDefaultNull();
             if (Objects.nonNull(loginId)) {
-                Long userId = Long.valueOf(loginId.toString());
+                Long userId = Convert.toLong(StringUtils.split(Convert.toStr(loginId), ":")[1]);
                 logOperationRequest.setUserId(userId);
-                Object usernameObj = StpUtil.getSession().get("username");
+                Object usernameObj = StpUtil.getExtra("username");
                 if (Objects.nonNull(usernameObj)) {
                     logOperationRequest.setUsername(usernameObj.toString());
                 }

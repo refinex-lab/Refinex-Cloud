@@ -29,13 +29,13 @@ public class SysUserVo implements Serializable {
     private Integer userStatus;
 
     @Schema(description = "用户名")
-    private String userName;
+    private String username;
 
     @Schema(description = "密码")
     private String password;
 
     @Schema(description = "昵称")
-    private String nickName;
+    private String nickname;
 
     @Schema(description = "用户类型(sys_user:后台用户, app_user:移动端用户)")
     private String userType;

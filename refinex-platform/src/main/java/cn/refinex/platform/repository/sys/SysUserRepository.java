@@ -200,13 +200,42 @@ public class SysUserRepository {
                     register_source, create_by, create_time, update_time
                 )
                 VALUES (
-                    :id, :userName, :mobile, :email, :password, :nickName, :userStatus,
+                    :id, :username, :mobile, :email, :password, :nickname, :userStatus,
                     :registerSource, :createBy, :createTime, :updateTime
                 )
                 """;
 
         Map<String, Object> params = BeanConverter.beanToMap(sysUser, false, false);
         jdbcManager.insert(sql, params, true);
+    }
+
+    /**
+     * 根据用户名模糊查询用户名列表
+     *
+     * @param username 用户名关键词
+     * @param limit    查询数量限制
+     * @return 用户名列表
+     */
+    public java.util.List<String> searchUsernamesByKeyword(String username, int limit) {
+        String sql = """
+                SELECT DISTINCT username
+                FROM sys_user
+                WHERE username LIKE CONCAT('%', :username, '%') AND deleted = 0
+                ORDER BY username
+                LIMIT :limit
+                """;
+
+        Map<String, Object> params = Map.of(
+                "username", username,
+                "limit", limit
+        );
+
+        try {
+            return jdbcManager.queryColumn(sql, params, String.class);
+        } catch (Exception e) {
+            log.error("模糊查询用户名失败，username: {}", username, e);
+            return java.util.Collections.emptyList();
+        }
     }
 
     /**
