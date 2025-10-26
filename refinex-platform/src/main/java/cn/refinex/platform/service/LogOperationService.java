@@ -4,8 +4,11 @@ import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
 import cn.refinex.platform.controller.logger.dto.request.LogOperationCreateRequestDTO;
 import cn.refinex.platform.controller.logger.dto.request.LogOperationQueryRequestDTO;
+import cn.refinex.platform.controller.logger.dto.request.LogOperationStatisticsRequestDTO;
+import cn.refinex.platform.controller.logger.dto.request.LogOperationTrendRequestDTO;
 import cn.refinex.platform.controller.logger.dto.response.LogOperationResponseDTO;
-import cn.refinex.platform.controller.logger.dto.response.LogOperationStatisticsDTO;
+import cn.refinex.platform.controller.logger.dto.response.LogOperationStatisticsResponseDTO;
+import cn.refinex.platform.controller.logger.dto.response.LogOperationTrendResponseDTO;
 
 /**
  * 日志操作服务
@@ -48,27 +51,21 @@ public interface LogOperationService {
 
     /**
      * 获取操作日志统计信息
+     * <p>
+     * 支持灵活的时间维度和分组统计
      *
-     * @param queryRequest 查询条件
+     * @param request 统计请求
      * @return 统计信息
      */
-    LogOperationStatisticsDTO getStatistics(LogOperationQueryRequestDTO queryRequest);
+    LogOperationStatisticsResponseDTO getStatistics(LogOperationStatisticsRequestDTO request);
 
     /**
-     * 根据用户ID获取操作日志
+     * 获取操作日志趋势分析
+     * <p>
+     * 支持按小时、天、周、月等维度分析
      *
-     * @param userId 用户ID
-     * @param pageRequest 分页请求
-     * @return 分页结果
+     * @param request 趋势分析请求
+     * @return 趋势分析结果
      */
-    PageResult<LogOperationResponseDTO> getByUserId(Long userId, PageRequest pageRequest);
-
-    /**
-     * 根据操作模块获取操作日志
-     *
-     * @param operationModule 操作模块
-     * @param pageRequest 分页请求
-     * @return 分页结果
-     */
-    PageResult<LogOperationResponseDTO> getByOperationModule(String operationModule, PageRequest pageRequest);
+    LogOperationTrendResponseDTO getTrend(LogOperationTrendRequestDTO request);
 }

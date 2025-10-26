@@ -5,11 +5,13 @@ import cn.refinex.common.jdbc.page.PageResult;
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
 import cn.refinex.common.utils.object.BeanConverter;
 import cn.refinex.platform.controller.logger.dto.request.LogOperationQueryRequestDTO;
-import cn.refinex.platform.controller.logger.dto.response.LogOperationStatisticsDTO;
 import cn.refinex.platform.entity.log.LogOperation;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -79,11 +81,6 @@ public class LogOperationRepository {
         StringBuilder whereSql = new StringBuilder(" WHERE 1=1 ");
         Map<String, Object> params = new java.util.HashMap<>();
 
-        if (queryRequest.getUserId() != null) {
-            whereSql.append(" AND user_id = :userId ");
-            params.put("userId", queryRequest.getUserId());
-        }
-
         if (queryRequest.getUsername() != null && !queryRequest.getUsername().trim().isEmpty()) {
             whereSql.append(" AND username LIKE :username ");
             params.put("username", "%" + queryRequest.getUsername().trim() + "%");
@@ -104,43 +101,14 @@ public class LogOperationRepository {
             params.put("operationType", queryRequest.getOperationType());
         }
 
-        if (queryRequest.getOperationDesc() != null && !queryRequest.getOperationDesc().trim().isEmpty()) {
-            whereSql.append(" AND operation_desc LIKE :operationDesc ");
-            params.put("operationDesc", "%" + queryRequest.getOperationDesc().trim() + "%");
-        }
-
-        if (queryRequest.getRequestMethod() != null && !queryRequest.getRequestMethod().trim().isEmpty()) {
-            whereSql.append(" AND request_method = :requestMethod ");
-            params.put("requestMethod", queryRequest.getRequestMethod());
-        }
-
-        if (queryRequest.getRequestUrl() != null && !queryRequest.getRequestUrl().trim().isEmpty()) {
-            whereSql.append(" AND request_url LIKE :requestUrl ");
-            params.put("requestUrl", "%" + queryRequest.getRequestUrl().trim() + "%");
-        }
-
-        if (queryRequest.getOperationIp() != null && !queryRequest.getOperationIp().trim().isEmpty()) {
-            whereSql.append(" AND operation_ip = :operationIp ");
-            params.put("operationIp", queryRequest.getOperationIp());
-        }
-
         if (queryRequest.getOperationStatus() != null) {
             whereSql.append(" AND operation_status = :operationStatus ");
             params.put("operationStatus", queryRequest.getOperationStatus());
         }
 
-        if (Boolean.TRUE.equals(queryRequest.getHasError())) {
-            whereSql.append(" AND error_message IS NOT NULL AND error_message != '' ");
-        }
-
-        if (queryRequest.getMinExecutionTime() != null) {
-            whereSql.append(" AND execution_time >= :minExecutionTime ");
-            params.put("minExecutionTime", queryRequest.getMinExecutionTime());
-        }
-
-        if (queryRequest.getMaxExecutionTime() != null) {
-            whereSql.append(" AND execution_time <= :maxExecutionTime ");
-            params.put("maxExecutionTime", queryRequest.getMaxExecutionTime());
+        if (queryRequest.getOperationIp() != null && !queryRequest.getOperationIp().trim().isEmpty()) {
+            whereSql.append(" AND operation_ip = :operationIp ");
+            params.put("operationIp", queryRequest.getOperationIp());
         }
 
         if (queryRequest.getStartTime() != null) {
@@ -167,115 +135,398 @@ public class LogOperationRepository {
     }
 
     /**
-     * 获取操作日志统计信息
+     * 获取基础统计信息（一条 SQL 完成）
      *
-     * @param queryRequest 查询条件
-     * @return 统计信息
+     * @param startTime       开始时间
+     * @param endTime         结束时间
+     * @param applicationName 应用名称（可选）
+     * @param operationModule 操作模块（可选）
+     * @param username        用户名（可选）
+     * @return 基础统计信息
      */
-    public LogOperationStatisticsDTO getStatistics(LogOperationQueryRequestDTO queryRequest) {
-        // 构建查询条件
+    public Map<String, Object> getBasicStatistics(LocalDateTime startTime, LocalDateTime endTime, String applicationName, String operationModule, String username) {
         StringBuilder whereSql = new StringBuilder(" WHERE 1=1 ");
         Map<String, Object> params = new java.util.HashMap<>();
 
-        if (queryRequest.getUserId() != null) {
-            whereSql.append(" AND user_id = :userId ");
-            params.put("userId", queryRequest.getUserId());
-        }
-
-        if (queryRequest.getOperationModule() != null && !queryRequest.getOperationModule().trim().isEmpty()) {
-            whereSql.append(" AND operation_module = :operationModule ");
-            params.put("operationModule", queryRequest.getOperationModule());
-        }
-
-        if (queryRequest.getStartTime() != null) {
+        if (startTime != null) {
             whereSql.append(" AND create_time >= :startTime ");
-            params.put("startTime", queryRequest.getStartTime());
+            params.put("startTime", startTime);
         }
 
-        if (queryRequest.getEndTime() != null) {
+        if (endTime != null) {
             whereSql.append(" AND create_time <= :endTime ");
-            params.put("endTime", queryRequest.getEndTime());
+            params.put("endTime", endTime);
         }
 
-        // 统计SQL
+        if (applicationName != null && !applicationName.trim().isEmpty()) {
+            whereSql.append(" AND application_name = :applicationName ");
+            params.put("applicationName", applicationName);
+        }
+
+        if (operationModule != null && !operationModule.trim().isEmpty()) {
+            whereSql.append(" AND operation_module = :operationModule ");
+            params.put("operationModule", operationModule);
+        }
+
+        if (username != null && !username.trim().isEmpty()) {
+            whereSql.append(" AND username = :username ");
+            params.put("username", username);
+        }
+
+        // 一条 SQL 完成所有基础统计
         String statisticsSql = """
                 SELECT
-                    COUNT(*) as totalCount,
-                    SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END) as successCount,
-                    SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END) as failureCount,
-                    AVG(execution_time) as avgExecutionTime,
-                    MAX(execution_time) as maxExecutionTime,
-                    MIN(execution_time) as minExecutionTime
+                    COUNT(*) as total_count,
+                    SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END) as success_count,
+                    SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END) as failure_count,
+                    ROUND(AVG(execution_time), 2) as avg_execution_time,
+                    MAX(execution_time) as max_execution_time,
+                    MIN(execution_time) as min_execution_time
                 FROM log_operation
                 """ + whereSql;
 
         Map<String, Object> result = jdbcManager.queryMap(statisticsSql, params);
-
-        long totalCount = ((Number) result.get("totalCount")).longValue();
-        Long successCount = ((Number) result.get("successCount")).longValue();
-        Long failureCount = ((Number) result.get("failureCount")).longValue();
-
-        Double successRate = totalCount > 0 ? (double) successCount / totalCount * 100 : 0.0;
-        Double avgExecutionTime = result.get("avgExecutionTime") != null ? ((Number) result.get("avgExecutionTime")).doubleValue() : 0.0;
-        Integer maxExecutionTime = result.get("maxExecutionTime") != null ? ((Number) result.get("maxExecutionTime")).intValue() : 0;
-        Integer minExecutionTime = result.get("minExecutionTime") != null ? ((Number) result.get("minExecutionTime")).intValue() : 0;
-
-        return LogOperationStatisticsDTO.builder()
-                .totalCount(totalCount)
-                .successCount(successCount)
-                .failureCount(failureCount)
-                .successRate(successRate)
-                .avgExecutionTime(avgExecutionTime)
-                .maxExecutionTime(maxExecutionTime)
-                .minExecutionTime(minExecutionTime)
-                .todayCount(0L) // 将在Service层计算
-                .weekCount(0L)  // 将在Service层计算
-                .monthCount(0L) // 将在Service层计算
-                .build();
+        return new CaseInsensitiveMap<>(result);
     }
 
     /**
-     * 根据条件统计数量
+     * 按操作类型分组统计
      *
-     * @param queryRequest 查询条件
-     * @return 统计数量
+     * @param startTime       开始时间
+     * @param endTime         结束时间
+     * @param applicationName 应用名称（可选）
+     * @param operationModule 操作模块（可选）
+     * @param username        用户名（可选）
+     * @return 分组统计结果
      */
-    public Long countByCondition(LogOperationQueryRequestDTO queryRequest) {
-        // 构建查询条件
+    public List<Map<String, Object>> getStatisticsByType(LocalDateTime startTime, LocalDateTime endTime, String applicationName, String operationModule, String username) {
         StringBuilder whereSql = new StringBuilder(" WHERE 1=1 ");
         Map<String, Object> params = new java.util.HashMap<>();
 
-        if (queryRequest.getUserId() != null) {
-            whereSql.append(" AND user_id = :userId ");
-            params.put("userId", queryRequest.getUserId());
-        }
-
-        if (queryRequest.getUsername() != null && !queryRequest.getUsername().trim().isEmpty()) {
-            whereSql.append(" AND username LIKE :username ");
-            params.put("username", "%" + queryRequest.getUsername().trim() + "%");
-        }
-
-        if (queryRequest.getOperationModule() != null && !queryRequest.getOperationModule().trim().isEmpty()) {
-            whereSql.append(" AND operation_module = :operationModule ");
-            params.put("operationModule", queryRequest.getOperationModule());
-        }
-
-        if (queryRequest.getOperationStatus() != null) {
-            whereSql.append(" AND operation_status = :operationStatus ");
-            params.put("operationStatus", queryRequest.getOperationStatus());
-        }
-
-        if (queryRequest.getStartTime() != null) {
+        if (startTime != null) {
             whereSql.append(" AND create_time >= :startTime ");
-            params.put("startTime", queryRequest.getStartTime());
+            params.put("startTime", startTime);
         }
 
-        if (queryRequest.getEndTime() != null) {
+        if (endTime != null) {
             whereSql.append(" AND create_time <= :endTime ");
-            params.put("endTime", queryRequest.getEndTime());
+            params.put("endTime", endTime);
         }
 
-        String countSql = "SELECT COUNT(*) FROM log_operation" + whereSql;
-        return jdbcManager.queryLong(countSql, params);
+        if (applicationName != null && !applicationName.trim().isEmpty()) {
+            whereSql.append(" AND application_name = :applicationName ");
+            params.put("applicationName", applicationName);
+        }
+
+        if (operationModule != null && !operationModule.trim().isEmpty()) {
+            whereSql.append(" AND operation_module = :operationModule ");
+            params.put("operationModule", operationModule);
+        }
+
+        if (username != null && !username.trim().isEmpty()) {
+            whereSql.append(" AND username = :username ");
+            params.put("username", username);
+        }
+
+        String sql = """
+                SELECT
+                    operation_type as group_name,
+                    COUNT(*) as count
+                FROM log_operation
+                """ + whereSql + """
+                GROUP BY operation_type
+                ORDER BY count DESC
+                """;
+
+        return jdbcManager.queryList(sql, params);
     }
+
+    /**
+     * 按操作模块分组统计
+     *
+     * @param startTime       开始时间
+     * @param endTime         结束时间
+     * @param applicationName 应用名称（可选）
+     * @param username        用户名（可选）
+     * @return 分组统计结果
+     */
+    public List<Map<String, Object>> getStatisticsByModule(LocalDateTime startTime, LocalDateTime endTime, String applicationName, String username) {
+
+        StringBuilder whereSql = new StringBuilder(" WHERE 1=1 ");
+        Map<String, Object> params = new java.util.HashMap<>();
+
+        if (startTime != null) {
+            whereSql.append(" AND create_time >= :startTime ");
+            params.put("startTime", startTime);
+        }
+
+        if (endTime != null) {
+            whereSql.append(" AND create_time <= :endTime ");
+            params.put("endTime", endTime);
+        }
+
+        if (applicationName != null && !applicationName.trim().isEmpty()) {
+            whereSql.append(" AND application_name = :applicationName ");
+            params.put("applicationName", applicationName);
+        }
+
+        if (username != null && !username.trim().isEmpty()) {
+            whereSql.append(" AND username = :username ");
+            params.put("username", username);
+        }
+
+        String sql = """
+                SELECT
+                    operation_module as group_name,
+                    COUNT(*) as count
+                FROM log_operation
+                """ + whereSql + """
+                GROUP BY operation_module
+                ORDER BY count DESC
+                """;
+
+        return jdbcManager.queryList(sql, params);
+    }
+
+    /**
+     * 获取 Top 操作用户
+     *
+     * @param startTime       开始时间
+     * @param endTime         结束时间
+     * @param applicationName 应用名称（可选）
+     * @param operationModule 操作模块（可选）
+     * @param limit           返回数量
+     * @return Top 用户列表
+     */
+    public List<Map<String, Object>> getTopUsers(LocalDateTime startTime, LocalDateTime endTime, String applicationName, String operationModule, Integer limit) {
+
+        StringBuilder whereSql = new StringBuilder(" WHERE 1=1 ");
+        Map<String, Object> params = new java.util.HashMap<>();
+
+        if (startTime != null) {
+            whereSql.append(" AND create_time >= :startTime ");
+            params.put("startTime", startTime);
+        }
+
+        if (endTime != null) {
+            whereSql.append(" AND create_time <= :endTime ");
+            params.put("endTime", endTime);
+        }
+
+        if (applicationName != null && !applicationName.trim().isEmpty()) {
+            whereSql.append(" AND application_name = :applicationName ");
+            params.put("applicationName", applicationName);
+        }
+
+        if (operationModule != null && !operationModule.trim().isEmpty()) {
+            whereSql.append(" AND operation_module = :operationModule ");
+            params.put("operationModule", operationModule);
+        }
+
+        params.put("limit", limit);
+
+        String sql = """
+                SELECT
+                    username,
+                    COUNT(*) as count,
+                    SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END) as success_count,
+                    SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END) as failure_count
+                FROM log_operation
+                """ + whereSql + """
+                GROUP BY username
+                ORDER BY count DESC
+                LIMIT :limit
+                """;
+
+        return jdbcManager.queryList(sql, params);
+    }
+
+    /**
+     * 获取趋势数据（按天）
+     *
+     * @param startTime       开始时间
+     * @param endTime         结束时间
+     * @param applicationName 应用名称（可选）
+     * @param operationModule 操作模块（可选）
+     * @param username        用户名（可选）
+     * @return 趋势数据点列表
+     */
+    public List<Map<String, Object>> getTrendDataByDay(LocalDateTime startTime, LocalDateTime endTime, String applicationName, String operationModule, String username) {
+        StringBuilder whereSql = new StringBuilder(" WHERE create_time >= :startTime AND create_time <= :endTime ");
+        Map<String, Object> params = new java.util.HashMap<>();
+        params.put("startTime", startTime);
+        params.put("endTime", endTime);
+
+        if (applicationName != null && !applicationName.trim().isEmpty()) {
+            whereSql.append(" AND application_name = :applicationName ");
+            params.put("applicationName", applicationName);
+        }
+
+        if (operationModule != null && !operationModule.trim().isEmpty()) {
+            whereSql.append(" AND operation_module = :operationModule ");
+            params.put("operationModule", operationModule);
+        }
+
+        if (username != null && !username.trim().isEmpty()) {
+            whereSql.append(" AND username = :username ");
+            params.put("username", username);
+        }
+
+        String sql = """
+                SELECT
+                    DATE(create_time) as time_point,
+                    COUNT(*) as total_count,
+                    SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END) as success_count,
+                    SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END) as failure_count,
+                    ROUND(AVG(execution_time), 2) as avg_execution_time
+                FROM log_operation
+                """ + whereSql + """
+                GROUP BY DATE(create_time)
+                ORDER BY time_point ASC
+                """;
+
+        return jdbcManager.queryList(sql, params);
+    }
+
+    /**
+     * 获取趋势数据（按小时）
+     *
+     * @param startTime       开始时间
+     * @param endTime         结束时间
+     * @param applicationName 应用名称（可选）
+     * @param operationModule 操作模块（可选）
+     * @param username        用户名（可选）
+     * @return 趋势数据点列表
+     */
+    public List<Map<String, Object>> getTrendDataByHour(LocalDateTime startTime, LocalDateTime endTime, String applicationName, String operationModule, String username) {
+        StringBuilder whereSql = new StringBuilder(" WHERE create_time >= :startTime AND create_time <= :endTime ");
+        Map<String, Object> params = new java.util.HashMap<>();
+        params.put("startTime", startTime);
+        params.put("endTime", endTime);
+
+        if (applicationName != null && !applicationName.trim().isEmpty()) {
+            whereSql.append(" AND application_name = :applicationName ");
+            params.put("applicationName", applicationName);
+        }
+
+        if (operationModule != null && !operationModule.trim().isEmpty()) {
+            whereSql.append(" AND operation_module = :operationModule ");
+            params.put("operationModule", operationModule);
+        }
+
+        if (username != null && !username.trim().isEmpty()) {
+            whereSql.append(" AND username = :username ");
+            params.put("username", username);
+        }
+
+        String sql = """
+                SELECT
+                    DATE_FORMAT(create_time, '%Y-%m-%d %H:00:00') as time_point,
+                    COUNT(*) as total_count,
+                    SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END) as success_count,
+                    SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END) as failure_count,
+                    ROUND(AVG(execution_time), 2) as avg_execution_time
+                FROM log_operation
+                """ + whereSql + """
+                GROUP BY DATE_FORMAT(create_time, '%Y-%m-%d %H:00:00')
+                ORDER BY time_point ASC
+                """;
+
+        return jdbcManager.queryList(sql, params);
+    }
+
+    /**
+     * 获取趋势数据（按周）
+     *
+     * @param startTime       开始时间
+     * @param endTime         结束时间
+     * @param applicationName 应用名称（可选）
+     * @param operationModule 操作模块（可选）
+     * @param username        用户名（可选）
+     * @return 趋势数据点列表
+     */
+    public List<Map<String, Object>> getTrendDataByWeek(LocalDateTime startTime, LocalDateTime endTime, String applicationName, String operationModule, String username) {
+        StringBuilder whereSql = new StringBuilder(" WHERE create_time >= :startTime AND create_time <= :endTime ");
+        Map<String, Object> params = new java.util.HashMap<>();
+        params.put("startTime", startTime);
+        params.put("endTime", endTime);
+
+        if (applicationName != null && !applicationName.trim().isEmpty()) {
+            whereSql.append(" AND application_name = :applicationName ");
+            params.put("applicationName", applicationName);
+        }
+
+        if (operationModule != null && !operationModule.trim().isEmpty()) {
+            whereSql.append(" AND operation_module = :operationModule ");
+            params.put("operationModule", operationModule);
+        }
+
+        if (username != null && !username.trim().isEmpty()) {
+            whereSql.append(" AND username = :username ");
+            params.put("username", username);
+        }
+
+        String sql = """
+                SELECT
+                    DATE_FORMAT(create_time, '%Y-%u') as time_point,
+                    COUNT(*) as total_count,
+                    SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END) as success_count,
+                    SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END) as failure_count,
+                    ROUND(AVG(execution_time), 2) as avg_execution_time
+                FROM log_operation
+                """ + whereSql + """
+                GROUP BY DATE_FORMAT(create_time, '%Y-%u')
+                ORDER BY time_point ASC
+                """;
+
+        return jdbcManager.queryList(sql, params);
+    }
+
+    /**
+     * 获取趋势数据（按月）
+     *
+     * @param startTime       开始时间
+     * @param endTime         结束时间
+     * @param applicationName 应用名称（可选）
+     * @param operationModule 操作模块（可选）
+     * @param username        用户名（可选）
+     * @return 趋势数据点列表
+     */
+    public List<Map<String, Object>> getTrendDataByMonth(LocalDateTime startTime, LocalDateTime endTime, String applicationName, String operationModule, String username) {
+        StringBuilder whereSql = new StringBuilder(" WHERE create_time >= :startTime AND create_time <= :endTime ");
+        Map<String, Object> params = new java.util.HashMap<>();
+        params.put("startTime", startTime);
+        params.put("endTime", endTime);
+
+        if (applicationName != null && !applicationName.trim().isEmpty()) {
+            whereSql.append(" AND application_name = :applicationName ");
+            params.put("applicationName", applicationName);
+        }
+
+        if (operationModule != null && !operationModule.trim().isEmpty()) {
+            whereSql.append(" AND operation_module = :operationModule ");
+            params.put("operationModule", operationModule);
+        }
+
+        if (username != null && !username.trim().isEmpty()) {
+            whereSql.append(" AND username = :username ");
+            params.put("username", username);
+        }
+
+        String sql = """
+                SELECT
+                    DATE_FORMAT(create_time, '%Y-%m') as time_point,
+                    COUNT(*) as total_count,
+                    SUM(CASE WHEN operation_status = 0 THEN 1 ELSE 0 END) as success_count,
+                    SUM(CASE WHEN operation_status = 1 THEN 1 ELSE 0 END) as failure_count,
+                    ROUND(AVG(execution_time), 2) as avg_execution_time
+                FROM log_operation
+                """ + whereSql + """
+                GROUP BY DATE_FORMAT(create_time, '%Y-%m')
+                ORDER BY time_point ASC
+                """;
+
+        return jdbcManager.queryList(sql, params);
+    }
+
 }

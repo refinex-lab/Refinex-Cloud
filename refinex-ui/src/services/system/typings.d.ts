@@ -175,6 +175,7 @@ export interface SysConfigQueryParams extends PageParams {
   isFrontend?: number;
 }
 
+
 /** API 响应结构 */
 export interface ApiResponse<T = any> {
   code: number;
