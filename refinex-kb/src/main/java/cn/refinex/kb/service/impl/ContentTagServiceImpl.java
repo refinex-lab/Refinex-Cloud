@@ -32,6 +32,7 @@ public class ContentTagServiceImpl implements ContentTagService {
 
     private final JdbcTemplateManager jdbcManager;
     private final ContentTagRepository contentTagRepository;
+    private final cn.refinex.kb.repository.ContentDocumentTagRepository documentTagRepository;
 
     /**
      * 创建标签
@@ -130,8 +131,11 @@ public class ContentTagServiceImpl implements ContentTagService {
             throw new BusinessException("无权删除他人的标签");
         }
 
-        // TODO: 检查标签是否被文档使用，如果被使用则提示用户
-        // 这里可以查询 content_document_tag 表，看是否有文档关联了该标签
+        // 检查标签是否被文档使用，如果被使用则提示用户
+        long documentCount = documentTagRepository.countByTagId(id);
+        if (documentCount > 0) {
+            throw new BusinessException("该标签已被 " + documentCount + " 个文档使用，无法删除。请先移除文档中的标签关联");
+        }
 
         int rows = jdbcManager.executeInTransaction(tx -> contentTagRepository.softDeleteById(tx, id, operatorId));
         return rows > 0;
@@ -158,8 +162,23 @@ public class ContentTagServiceImpl implements ContentTagService {
             }
         }
 
-        int rows = jdbcManager.executeInTransaction(tx -> 
-            contentTagRepository.batchSoftDelete(tx, ids, operatorId)
+        // 检查标签是否被文档使用
+        List<String> usedTags = new java.util.ArrayList<>();
+        for (Long id : ids) {
+            long documentCount = documentTagRepository.countByTagId(id);
+            if (documentCount > 0) {
+                ContentTag tag = contentTagRepository.selectById(id);
+                String tagName = tag != null ? tag.getTagName() : "ID:" + id;
+                usedTags.add(tagName + "(" + documentCount + "个文档)");
+            }
+        }
+
+        if (!usedTags.isEmpty()) {
+            throw new BusinessException("以下标签已被文档使用，无法删除：" + String.join("、", usedTags) + "。请先移除文档中的标签关联");
+        }
+
+        int rows = jdbcManager.executeInTransaction(tx ->
+                contentTagRepository.batchSoftDelete(tx, ids, operatorId)
         );
 
         return rows > 0;
@@ -271,16 +290,16 @@ public class ContentTagServiceImpl implements ContentTagService {
      */
     private String generateRandomColor() {
         String[] colors = {
-            "#1890ff", // 拂晓蓝（默认）
-            "#52c41a", // 极光绿
-            "#fa8c16", // 日暮黄
-            "#f5222d", // 薄暮红
-            "#722ed1", // 酱紫
-            "#13c2c2", // 明青
-            "#eb2f96", // 法式洋红
-            "#faad14", // 金盏花
-            "#a0d911", // 青柠
-            "#2f54eb"  // 极客蓝
+                "#1890ff", // 拂晓蓝（默认）
+                "#52c41a", // 极光绿
+                "#fa8c16", // 日暮黄
+                "#f5222d", // 薄暮红
+                "#722ed1", // 酱紫
+                "#13c2c2", // 明青
+                "#eb2f96", // 法式洋红
+                "#faad14", // 金盏花
+                "#a0d911", // 青柠
+                "#2f54eb"  // 极客蓝
         };
         int index = ThreadLocalRandom.current().nextInt(colors.length);
         return colors[index];

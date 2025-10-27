@@ -656,7 +656,7 @@ CREATE TABLE `content_category`
     KEY `idx_parent` (`parent_id`) COMMENT '父分类索引'
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='内容分类表-文档分类体系';
+  COLLATE = utf8mb4_unicode_ci COMMENT ='内容分类表-文档分类体系（计划废弃）';
 
 CREATE TABLE `content_action`
 (
