@@ -63,4 +63,5 @@ export default {
   'menu.kb.space-detail': 'Space Detail',
   'menu.kb-admin': 'KB Admin',
   'menu.kb-admin.space': 'Space Management',
+  'menu.kb-admin.space-detail': 'Space Detail',
 };

@@ -1,0 +1,550 @@
+// 目录树容器
+.directory-tree-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03),
+              0 2px 6px rgba(0, 0, 0, 0.02),
+              0 4px 12px rgba(0, 0, 0, 0.01);
+  overflow: hidden;
+
+  // 顶部工具栏
+  .tree-toolbar {
+    padding: 12px;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    flex-shrink: 0;
+
+    // 返回按钮和空间名称
+    .toolbar-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f0f0f0;
+
+      .tree-back-btn {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        border: none;
+        background: transparent;
+        border-radius: 4px;
+        cursor: pointer;
+        color: rgba(0, 0, 0, 0.65);
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.04);
+          color: #1890ff;
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+
+      .space-name {
+        flex: 1;
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 0.85);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .toolbar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tree-search-input {
+      flex: 1;
+      border-radius: 8px;
+      border-color: #e8e8e8;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: #40a9ff;
+      }
+
+      &:focus,
+      &:focus-within {
+        border-color: #40a9ff;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.08);
+      }
+
+      :global {
+        .ant-input {
+          font-size: 14px;
+        }
+
+        .anticon-search {
+          color: rgba(0, 0, 0, 0.25);
+        }
+      }
+    }
+
+    .tree-create-btn {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      border: none;
+      background: #1890ff;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #fff;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      &:hover {
+        background: #40a9ff;
+        box-shadow: 0 2px 8px rgba(24, 144, 255, 0.35);
+      }
+
+      &:active {
+        transform: scale(0.95);
+        background: #096dd9;
+      }
+    }
+  }
+
+  // 树内容区域
+  .tree-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden; // 严格禁止水平滚动
+    padding: 12px 8px;
+    background: #fff;
+
+    // 自定义滚动条
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #d9d9d9;
+      border-radius: 3px;
+
+      &:hover {
+        background: #bfbfbf;
+      }
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  }
+
+  // 空状态按钮
+  .empty-create-btn {
+    height: 32px;
+    padding: 0 16px;
+    border: 1px solid #d9d9d9;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+
+    &:hover {
+      border-color: #40a9ff;
+      color: #40a9ff;
+    }
+  }
+}
+
+// 自定义目录树样式（简化设计，最小化覆盖，紧凑缩进）
+.custom-directory-tree {
+  background: transparent;
+  font-size: 14px;
+
+  :global {
+    // 减小缩进距离（默认是 24px，改为 16px）
+    .ant-tree-indent-unit {
+      width: 16px !important;
+    }
+
+    // 树节点容器
+    .ant-tree-treenode {
+      padding: 0 6px;
+      margin-bottom: 2px;
+
+      &.ant-tree-treenode-selected {
+        background: #e6f7ff !important;
+        border-left: 3px solid #1890ff;
+        padding-left: 5px;
+
+        .ant-tree-node-content-wrapper {
+          background: transparent;
+        }
+
+        .tree-node-label {
+          color: #1890ff;
+          font-weight: 500;
+        }
+      }
+    }
+
+    // 节点内容包装器（blockNode 模式下占据整行）
+    .ant-tree-node-content-wrapper {
+      width: 100%;
+      padding: 0;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.02);
+      }
+
+      &.ant-tree-node-selected {
+        background: transparent;
+      }
+    }
+
+    // 展开/收起按钮（完全隐藏，点击节点内容来展开/收起）
+    .ant-tree-switcher {
+      width: 0 !important;
+      min-width: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      display: none !important;
+      pointer-events: none !important;
+    }
+
+    // 拖拽图标（完全隐藏，但保留拖拽功能）
+    .ant-tree-draggable-icon {
+      width: 0 !important;
+      min-width: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      display: none !important;
+      pointer-events: none !important;
+    }
+
+    // 拖拽指示器
+    .ant-tree-drop-indicator {
+      height: 2px;
+      background: #1890ff;
+      border-radius: 1px;
+    }
+
+    // 正在被拖拽的节点（增加透明度，改善视觉体验）
+    .ant-tree-treenode-dragging {
+      opacity: 0.4 !important;
+      background: rgba(161, 208, 252, 0.1) !important;
+      border-radius: 6px;
+    }
+
+    .drag-over {
+      background: #e6f7ff;
+      border: 1px dashed #1890ff;
+    }
+
+    .drag-over-gap-top,
+    .drag-over-gap-bottom {
+      border: 1px dashed #1890ff;
+    }
+  }
+}
+
+// 树节点内容（完全自定义：图标 + 文字 + 操作按钮，紧凑设计）
+.tree-node-content {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 4px 6px;
+  min-height: 28px;
+  // 移除 width: 100%，避免产生水平滚动条
+  max-width: 100%;
+
+  // 节点主体区域（图标 + 文字，可点击展开/收起）
+  .tree-node-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+
+  // 文件夹图标（紧凑设计）
+  .tree-node-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+    transition: color 0.2s ease;
+  }
+
+  // 文字标签
+  .tree-node-label {
+    flex: 1;
+    min-width: 0; // 允许收缩
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    user-select: none;
+    line-height: 1.5;
+    font-size: 13px;
+  }
+
+  // 操作按钮区域（始终渲染，通过 opacity 控制显示）
+  .tree-node-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    flex-shrink: 0;
+    // 确保按钮不会被隐藏或换行
+    margin-left: auto;
+
+    .tree-node-more-btn {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      color: rgba(0, 0, 0, 0.45);
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+      font-size: 14px;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.06);
+        color: rgba(0, 0, 0, 0.85);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+  }
+
+  // hover 时显示操作按钮
+  &.tree-node-hover .tree-node-actions {
+    opacity: 1;
+  }
+}
+
+// 树节点下拉菜单
+.tree-node-dropdown {
+  :global {
+    .ant-dropdown-menu {
+      min-width: 160px;
+      border-radius: 10px;
+      box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08),
+        0 3px 6px -4px rgba(0, 0, 0, 0.12),
+        0 9px 28px 8px rgba(0, 0, 0, 0.05);
+      padding: 6px;
+      border: 1px solid rgba(5, 5, 5, 0.06);
+
+      .ant-dropdown-menu-item {
+        border-radius: 6px;
+        padding: 10px 14px;
+        font-size: 14px;
+        line-height: 22px;
+        margin-bottom: 2px;
+        transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.04);
+        }
+
+        &:active {
+          background: rgba(0, 0, 0, 0.06);
+        }
+
+        .anticon {
+          font-size: 14px;
+          margin-right: 10px;
+          transition: transform 0.2s ease;
+        }
+
+        &:hover .anticon {
+          transform: scale(1.1);
+        }
+      }
+
+      .ant-dropdown-menu-item-divider {
+        margin: 6px 0;
+        background: #f0f0f0;
+      }
+
+      .ant-dropdown-menu-item-danger {
+        color: #ff4d4f;
+
+        &:hover {
+          background: #fff1f0;
+          color: #ff4d4f;
+        }
+
+        &:active {
+          background: #ffccc7;
+        }
+      }
+    }
+  }
+}
+
+// 响应式优化
+@media (max-width: 768px) {
+  .directory-tree-container {
+    .tree-toolbar {
+      padding: 12px;
+
+      .tree-search-input {
+        margin-bottom: 8px;
+      }
+    }
+
+    .tree-content {
+      padding: 4px 0;
+    }
+  }
+
+  .custom-directory-tree {
+    font-size: 13px;
+  }
+
+  .tree-node-content {
+    padding: 4px 6px;
+    min-height: 28px;
+    gap: 6px;
+
+    .tree-node-icon {
+      font-size: 14px;
+    }
+  }
+}
+
+// 暗色主题支持
+@media (prefers-color-scheme: dark) {
+  .directory-tree-container {
+    background: #1f1f1f;
+    border-right-color: #303030;
+
+    .tree-toolbar {
+      background: #141414;
+      border-bottom-color: #303030;
+
+      .tree-create-btn {
+        background: #1f1f1f;
+        color: rgba(255, 255, 255, 0.65);
+        border-color: #434343;
+
+        &:hover {
+          background: #111b26;
+          border-color: #177ddc;
+          color: #177ddc;
+        }
+      }
+    }
+
+    .tree-content {
+      background: #1f1f1f;
+
+      &::-webkit-scrollbar-thumb {
+        background: #434343;
+
+        &:hover {
+          background: #595959;
+        }
+      }
+    }
+  }
+
+  .custom-directory-tree {
+    :global {
+      .ant-tree-treenode {
+        &.ant-tree-treenode-selected {
+          background: #111b26 !important;
+
+          .tree-node-label {
+            color: #177ddc;
+          }
+        }
+      }
+
+      .ant-tree-node-content-wrapper:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      // 暗黑模式下也要隐藏展开/收起图标
+      .ant-tree-switcher {
+        width: 0 !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        display: none !important;
+        pointer-events: none !important;
+      }
+    }
+  }
+
+  .tree-node-content {
+    .tree-node-icon {
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    .tree-node-actions .tree-node-more-btn {
+      color: rgba(255, 255, 255, 0.45);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.85);
+      }
+    }
+  }
+}
+
+// 全局最高优先级：强制隐藏所有 DirectoryTree 中的展开/收起图标和拖拽手柄
+.directory-tree-container {
+  .ant-tree-switcher,
+  .ant-tree-draggable-icon {
+    width: 0 !important;
+    min-width: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    display: none !important;
+    pointer-events: none !important;
+  }
+}
+

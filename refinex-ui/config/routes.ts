@@ -371,6 +371,13 @@ export default [
         path: '/kb-admin/space',
         component: './kb-admin/space',
       },
+      {
+        name: 'space-detail',
+        icon: 'folder',
+        path: '/kb-admin/space/detail/:spaceId',
+        component: './kb/space/detail/[spaceId]',
+        hideInMenu: true,
+      },
     ],
   },
   {

@@ -63,4 +63,5 @@ export default {
   'menu.kb.space-detail': '空间详情',
   'menu.kb-admin': '知识库管理',
   'menu.kb-admin.space': '空间管理',
+  'menu.kb-admin.space-detail': '空间详情',
 };

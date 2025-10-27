@@ -3,6 +3,7 @@ import {
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
+  FolderOutlined,
   GlobalOutlined,
   LockOutlined,
   PlusOutlined,
@@ -21,7 +22,7 @@ import {
   ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
-import { useIntl } from '@umijs/max';
+import { history, useIntl } from '@umijs/max';
 import { Badge, Button, Col, Image, message, Popconfirm, Row, Space, Tag, Tooltip, Typography, Upload } from 'antd';
 import type { UploadFile, UploadProps } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
@@ -263,8 +264,9 @@ const AdminContentSpace: React.FC = () => {
             alt={record.spaceName}
             width={50}
             height={50}
-            style={{ borderRadius: 4, objectFit: 'cover' }}
+            style={{ borderRadius: 4, objectFit: 'cover', cursor: 'pointer' }}
             placeholder
+            onClick={() => history.push(`/kb-admin/space/detail/${record.id}`)}
           />
         ) : (
           <div
@@ -277,7 +279,9 @@ const AdminContentSpace: React.FC = () => {
               alignItems: 'center',
               justifyContent: 'center',
               color: '#999',
+              cursor: 'pointer',
             }}
+            onClick={() => history.push(`/kb-admin/space/detail/${record.id}`)}
           >
             无
           </div>
@@ -289,7 +293,11 @@ const AdminContentSpace: React.FC = () => {
       width: 200,
       ellipsis: true,
       fixed: 'left',
-      render: (text) => <strong>{text}</strong>,
+      render: (text, record) => (
+        <a onClick={() => history.push(`/kb-admin/space/detail/${record.id}`)} style={{ fontWeight: 500 }}>
+          {text}
+        </a>
+      ),
     },
     {
       title: '空间描述',
@@ -420,6 +428,16 @@ const AdminContentSpace: React.FC = () => {
             </Popconfirm>
           </Tooltip>
         ),
+        <Tooltip key="manage" title="管理知识库">
+          <Button
+            type="link"
+            size="small"
+            icon={<FolderOutlined />}
+            onClick={() => {
+              history.push(`/kb-admin/space/detail/${record.id}`);
+            }}
+          />
+        </Tooltip>,
         <Tooltip key="view" title="查看详情">
           <Button
             type="link"

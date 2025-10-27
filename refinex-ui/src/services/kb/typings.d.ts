@@ -121,6 +121,82 @@ export interface ContentSpaceAccessValidateRequest {
   password?: string;
 }
 
+/** ============ 目录管理 ============ */
+
+/** 内容目录响应 */
+export interface ContentDirectory {
+  id: number;
+  spaceId: number;
+  parentId: number;
+  directoryName: string;
+  directoryPath: string;
+  depthLevel: number;
+  sort: number;
+  status: number;
+  remark?: string;
+  createBy?: number;
+  createTime: string;
+  updateTime: string;
+  hasChildren?: boolean;
+  children?: ContentDirectory[];
+}
+
+/** 内容目录树节点（用于前端树形展示） */
+export interface ContentDirectoryTreeNode {
+  key: string;
+  title: string;
+  id: number;
+  parentId: number;
+  directoryName: string;
+  directoryPath?: string;
+  depthLevel: number;
+  sort: number;
+  remark?: string;
+  status?: number;
+  spaceId?: number;
+  createBy?: number;
+  createTime?: string;
+  updateTime?: string;
+  hasChildren?: boolean;
+  isLeaf: boolean;
+  children?: ContentDirectoryTreeNode[];
+}
+
+/** 创建目录请求 */
+export interface ContentDirectoryCreateRequest {
+  spaceId: number;
+  parentId: number;
+  directoryName: string;
+  sort?: number;
+  remark?: string;
+}
+
+/** 更新目录请求 */
+export interface ContentDirectoryUpdateRequest {
+  id: number;
+  directoryName: string;
+  sort?: number;
+  remark?: string;
+}
+
+/** 移动目录请求 */
+export interface ContentDirectoryMoveRequest {
+  directoryId: number;
+  targetParentId: number;
+  targetSort?: number;
+}
+
+/** 批量排序项 */
+export interface DirectorySortItem {
+  id: number;
+  sort: number;
+}
+
+/** 批量更新目录排序请求 */
+export interface ContentDirectoryBatchSortRequest {
+  sortItems: DirectorySortItem[];
+}
+
 // 重新导出通用类型
 export type { ApiResponse, PageResult };
 

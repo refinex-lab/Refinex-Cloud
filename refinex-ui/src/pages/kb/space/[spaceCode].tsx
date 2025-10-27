@@ -1,61 +1,39 @@
 import {
-  BookOutlined,
-  ClockCircleOutlined,
-  EyeOutlined,
-  FileTextOutlined,
-  FolderOutlined,
-  GlobalOutlined,
-  LockOutlined,
-  SafetyOutlined,
-  UserOutlined,
   ArrowLeftOutlined,
+  FileTextOutlined,
+  LockOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  SafetyOutlined,
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { history, useParams } from '@umijs/max';
-import {
-  Avatar,
-  Badge,
-  Button,
-  Card,
-  Col,
-  Descriptions,
-  Empty,
-  message,
-  Row,
-  Space,
-  Spin,
-  Statistic,
-  Tag,
-  Typography,
-  Input,
-} from 'antd';
+import { Button, Card, Empty, Input, Layout, message, Space, Spin, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
-import type { ContentSpaceDetail as ContentSpaceDetailType } from '@/services/kb/typings';
-import {
-  getContentSpaceDetailByCode,
-  validateContentSpaceAccess,
-} from '@/services/kb/space';
-import { AccessType, PublishStatus, SpaceType } from '@/services/kb/typings.d';
-import { listDictDataByTypeCode } from '@/services/system/dictionary';
+import DirectoryTree from './components/DirectoryTree';
+import type { ContentDirectory, ContentSpaceDetail } from '@/services/kb/typings.d';
+import { getContentSpaceDetailByCode, validateContentSpaceAccess } from '@/services/kb/space';
+import { AccessType } from '@/services/kb/typings.d';
 import { encryptPassword, getRsaPublicKey } from '@/utils/crypto';
+import './detail/detail.less';
 
+const { Sider, Content } = Layout;
 const { Title, Text, Paragraph } = Typography;
 
 /**
- * 空间详情页面
- * 展示空间的详细信息、统计数据，以及空间下的内容
+ * 空间详情页面 - 用户端
+ * 展示知识库目录树和内容
  */
 const ContentSpaceDetail: React.FC = () => {
   const { spaceCode } = useParams<{ spaceCode: string }>();
   const [loading, setLoading] = useState(false);
-  const [space, setSpace] = useState<ContentSpaceDetailType | null>(null);
+  const [space, setSpace] = useState<ContentSpaceDetail | null>(null);
   const [isLocked, setIsLocked] = useState(false); // 是否处于锁定状态
   const [password, setPassword] = useState('');
   const [validating, setValidating] = useState(false);
-
-  // 字典数据映射
-  const [spaceTypeDictMap, setSpaceTypeDictMap] = useState<Record<number, string>>({});
-  const [accessTypeDictMap, setAccessTypeDictMap] = useState<Record<number, string>>({});
+  const [selectedDirectory, setSelectedDirectory] = useState<ContentDirectory | null>(null);
+  const [collapsed, setCollapsed] = useState(false);
+  const [siderWidth] = useState(280);
 
   // 加载空间详情
   const loadSpaceDetail = async () => {
@@ -90,38 +68,20 @@ const ContentSpaceDetail: React.FC = () => {
     }
   };
 
-  // 加载字典数据
-  const loadDictionaries = async () => {
-    try {
-      const [spaceTypeRes, accessTypeRes] = await Promise.all([
-        listDictDataByTypeCode('kb_space_type'),
-        listDictDataByTypeCode('kb_access_type'),
-      ]);
-
-      if (spaceTypeRes.success && spaceTypeRes.data) {
-        const typeMap: Record<number, string> = {};
-        spaceTypeRes.data.forEach((item) => {
-          typeMap[Number(item.dictValue)] = item.dictLabel;
-        });
-        setSpaceTypeDictMap(typeMap);
-      }
-
-      if (accessTypeRes.success && accessTypeRes.data) {
-        const accessMap: Record<number, string> = {};
-        accessTypeRes.data.forEach((item) => {
-          accessMap[Number(item.dictValue)] = item.dictLabel;
-        });
-        setAccessTypeDictMap(accessMap);
-      }
-    } catch (error) {
-      console.error('加载字典数据失败:', error);
-    }
-  };
-
   useEffect(() => {
-    loadDictionaries();
     loadSpaceDetail();
   }, [spaceCode]);
+
+  // 目录选中回调
+  const handleDirectorySelect = (directoryId: number | null, directory: ContentDirectory | null) => {
+    setSelectedDirectory(directory);
+    // TODO: 加载目录下的文档列表
+  };
+
+  // 返回空间列表
+  const handleBack = () => {
+    history.push('/kb/space');
+  };
 
   // 验证访问密码
   const handleValidatePassword = async () => {
@@ -167,58 +127,6 @@ const ContentSpaceDetail: React.FC = () => {
     }
   };
 
-  // 空间类型配置
-  const getSpaceTypeConfig = (type: SpaceType) => {
-    const text = spaceTypeDictMap[type] || '未知类型';
-    switch (type) {
-      case SpaceType.PERSONAL:
-        return { icon: <BookOutlined />, color: '#1890ff', text };
-      case SpaceType.COURSE:
-        return { icon: <FileTextOutlined />, color: '#52c41a', text };
-      case SpaceType.VIDEO:
-        return { icon: <FileTextOutlined />, color: '#fa8c16', text };
-      default:
-        return { icon: <BookOutlined />, color: '#1890ff', text };
-    }
-  };
-
-  // 访问类型配置
-  const getAccessTypeConfig = (type: AccessType) => {
-    const text = accessTypeDictMap[type] || '未知';
-    switch (type) {
-      case AccessType.PRIVATE:
-        return { icon: <LockOutlined />, color: 'default', text };
-      case AccessType.PUBLIC:
-        return { icon: <GlobalOutlined />, color: 'success', text };
-      case AccessType.PASSWORD_PROTECTED:
-        return { icon: <SafetyOutlined />, color: 'warning', text };
-      default:
-        return { icon: <LockOutlined />, color: 'default', text };
-    }
-  };
-
-  if (loading) {
-    return (
-      <PageContainer>
-        <Card>
-          <Spin tip="加载中..." style={{ display: 'block', textAlign: 'center', padding: 60 }} />
-        </Card>
-      </PageContainer>
-    );
-  }
-
-  if (!space) {
-    return (
-      <PageContainer>
-        <Card>
-          <Empty description="空间不存在" />
-        </Card>
-      </PageContainer>
-    );
-  }
-
-  const spaceTypeConfig = getSpaceTypeConfig(space.spaceType);
-  const accessTypeConfig = getAccessTypeConfig(space.accessType);
 
   // 如果空间被锁定，显示密码验证页面
   if (isLocked) {
@@ -261,7 +169,7 @@ const ContentSpaceDetail: React.FC = () => {
               {/* 标题和描述 */}
               <div>
                 <Title level={3} style={{ marginBottom: 8 }}>
-                  {space.spaceName}
+                  {space?.spaceName || '知识库空间'}
                 </Title>
                 <Text type="secondary" style={{ fontSize: 16 }}>
                   此空间需要密码才能访问
@@ -315,118 +223,111 @@ const ContentSpaceDetail: React.FC = () => {
 
   return (
     <PageContainer
-      title={space.spaceName}
-      tags={[
-        <Tag key="type" color={spaceTypeConfig.color} icon={spaceTypeConfig.icon}>
-          {spaceTypeDictMap[space.spaceType] || space.spaceTypeDesc}
-        </Tag>,
-        <Badge
-          key="status"
-          status={space.isPublished === PublishStatus.PUBLISHED ? 'success' : 'default'}
-          text={space.isPublished === PublishStatus.PUBLISHED ? '已发布' : '未发布'}
-        />,
-      ]}
-      extra={[
-        <Tag key="access" color={accessTypeConfig.color} icon={accessTypeConfig.icon}>
-          {accessTypeDictMap[space.accessType] || space.accessTypeDesc}
-        </Tag>,
-      ]}
-      content={
-        <Space direction="vertical" size={16} style={{ width: '100%' }}>
-          {space.coverImage && (
-            <img
-              src={space.coverImage}
-              alt={space.spaceName}
-              style={{
-                width: '100%',
-                maxHeight: 300,
-                objectFit: 'cover',
-                borderRadius: 8,
-              }}
+      title={false}
+      loading={loading}
+      className="space-detail-container"
+    >
+      <Layout className="space-detail-layout">
+        {/* 左侧目录树 */}
+        <Sider
+          className="space-detail-sider"
+          width={siderWidth}
+          collapsedWidth={0}
+          collapsed={collapsed}
+          trigger={null}
+          theme="light"
+          style={{
+            overflow: 'hidden',
+            height: 'calc(100vh - 112px)',
+            position: 'sticky',
+            top: 0,
+            left: 0,
+          }}
+        >
+          {space?.id && (
+            <DirectoryTree
+              spaceId={space.id}
+              onSelect={handleDirectorySelect}
+              showBackButton
+              onBack={handleBack}
+              spaceName={space.spaceName}
             />
           )}
-          <Paragraph style={{ fontSize: 16, color: '#666' }}>
-            {space.spaceDesc || '暂无描述'}
-          </Paragraph>
-        </Space>
-      }
-    >
-      <Row gutter={[16, 16]}>
-        {/* 统计信息 */}
-        <Col xs={24} sm={24} md={6}>
-          <Card>
-            <Statistic
-              title="浏览次数"
-              value={space.viewCount}
-              prefix={<EyeOutlined />}
-              valueStyle={{ color: '#3f8600' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="文档数量"
-              value={space.documentCount}
-              prefix={<FileTextOutlined />}
-              valueStyle={{ color: '#1890ff' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="目录数量"
-              value={space.directoryCount}
-              prefix={<FolderOutlined />}
-              valueStyle={{ color: '#fa8c16' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={24} md={6}>
-          <Card>
-            <Statistic
-              title="发布时间"
-              value={space.publishTime || '未发布'}
-              prefix={<ClockCircleOutlined />}
-              valueStyle={{ fontSize: 14 }}
-            />
-          </Card>
-        </Col>
+        </Sider>
 
-        {/* 空间详情 */}
-        <Col span={24}>
-          <Card title="空间信息" bordered={false}>
-            <Descriptions column={{ xs: 1, sm: 2, md: 3 }}>
-              <Descriptions.Item label="空间编码">{space.spaceCode}</Descriptions.Item>
-              <Descriptions.Item label="拥有者">
-                <Space>
-                  <Avatar size="small" icon={<UserOutlined />} />
-                  {space.ownerName || `ID:${space.ownerId}`}
-                </Space>
-              </Descriptions.Item>
-              <Descriptions.Item label="排序">{space.sort}</Descriptions.Item>
-              <Descriptions.Item label="创建时间">{space.createTime}</Descriptions.Item>
-              <Descriptions.Item label="更新时间">{space.updateTime}</Descriptions.Item>
-              <Descriptions.Item label="状态">
-                <Badge status={space.status === 0 ? 'success' : 'error'} text={space.status === 0 ? '正常' : '停用'} />
-              </Descriptions.Item>
-              {space.remark && (
-                <Descriptions.Item label="备注" span={3}>
-                  {space.remark}
-                </Descriptions.Item>
+        {/* 折叠/展开按钮 */}
+        <div className="sider-trigger">
+          <Button
+            type="text"
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            className="trigger-button"
+          />
+        </div>
+
+        {/* 右侧内容区域 */}
+        <Content className="space-detail-content">
+          {selectedDirectory ? (
+            <div className="directory-content">
+              <div className="directory-header">
+                <FileTextOutlined className="directory-icon" />
+                <Title level={3} style={{ margin: 0 }}>
+                  {selectedDirectory.directoryName}
+                </Title>
+              </div>
+
+              {selectedDirectory.remark && (
+                <Paragraph
+                  type="secondary"
+                  style={{ marginTop: 8, marginBottom: 24, fontSize: 14 }}
+                >
+                  {selectedDirectory.remark}
+                </Paragraph>
               )}
-            </Descriptions>
-          </Card>
-        </Col>
 
-        {/* 内容区域 - 待开发：文档列表、目录树等 */}
-        <Col span={24}>
-          <Card title="空间内容" bordered={false}>
-            <Empty description="暂无内容，敬请期待" />
-          </Card>
-        </Col>
-      </Row>
+              <div className="document-list">
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description="文档管理功能即将上线"
+                  style={{ marginTop: 60 }}
+                >
+                  <Paragraph type="secondary" style={{ fontSize: 14 }}>
+                    敬请期待...
+                  </Paragraph>
+                </Empty>
+              </div>
+            </div>
+          ) : (
+            <div className="welcome-content">
+              <Empty
+                image="/images/welcome-kb.svg"
+                imageStyle={{ height: 200 }}
+                description={
+                  <div>
+                    <Title level={4} style={{ marginBottom: 8 }}>
+                      欢迎访问 {space?.spaceName || '知识库'}
+                    </Title>
+                    <Paragraph type="secondary" style={{ fontSize: 14 }}>
+                      请从左侧选择一个目录开始浏览知识库内容
+                    </Paragraph>
+                    {collapsed && (
+                      <Paragraph type="secondary" style={{ fontSize: 13, marginTop: 12 }}>
+                        <Button
+                          type="link"
+                          icon={<MenuUnfoldOutlined />}
+                          onClick={() => setCollapsed(false)}
+                        >
+                          展开目录树
+                        </Button>
+                      </Paragraph>
+                    )}
+                  </div>
+                }
+              />
+            </div>
+          )}
+        </Content>
+      </Layout>
     </PageContainer>
   );
 };
