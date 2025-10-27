@@ -279,7 +279,7 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
       if (!info.dropToGap) {
         // 层级迁移：拖到目标节点上，成为其子节点
         await moveDirectory({
-          directoryId: dragKey as number,
+          id: dragKey as number,
           targetParentId: dropKey as number,
           targetSort: 0, // 移到最前面
         });
@@ -290,7 +290,7 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
         const dropNode = findNodeById(treeData, dropKey as number);
         if (dropNode) {
           await moveDirectory({
-            directoryId: dragKey as number,
+            id: dragKey as number,
             targetParentId: dropNode.parentId,
             targetSort: dropPosition < 0 ? dropNode.sort - 1 : dropNode.sort + 1,
           });

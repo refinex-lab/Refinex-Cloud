@@ -144,8 +144,7 @@ const ContentSpaceDetail: React.FC = () => {
             style={{
               maxWidth: 480,
               width: '100%',
-              textAlign: 'center',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+              textAlign: 'center'
             }}
             bordered={false}
           >
@@ -212,7 +211,7 @@ const ContentSpaceDetail: React.FC = () => {
 
               {/* 提示信息 */}
               <Text type="secondary" style={{ fontSize: 14 }}>
-                <SafetyOutlined /> 您的密码使用 RSA + AES 混合加密传输，请放心输入
+                <SafetyOutlined /> 您的密码已加密传输，请放心输入
               </Text>
             </Space>
           </Card>

@@ -245,18 +245,42 @@
       pointer-events: none !important;
     }
 
-    // 拖拽指示器
+    // 拖拽指示器（更明显的视觉反馈）
     .ant-tree-drop-indicator {
       height: 2px;
-      background: #1890ff;
+      background: linear-gradient(90deg, #1890ff 0%, #40a9ff 100%);
       border-radius: 1px;
+      box-shadow: 0 0 4px rgba(24, 144, 255, 0.4);
+      position: relative;
+
+      // 添加端点小圆点，更清晰地标识插入位置
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: #1890ff;
+      }
+
+      &::before {
+        left: -2px;
+      }
+
+      &::after {
+        right: -2px;
+      }
     }
 
-    // 正在被拖拽的节点（增加透明度，改善视觉体验）
+    // 正在被拖拽的节点（高透明度，几乎不遮挡视线）
     .ant-tree-treenode-dragging {
-      opacity: 0.4 !important;
-      background: rgba(161, 208, 252, 0.1) !important;
+      opacity: 0.15 !important;
+      background: rgba(161, 208, 252, 0.05) !important;
       border-radius: 6px;
+      transition: opacity 0.2s ease;
     }
 
     .drag-over {

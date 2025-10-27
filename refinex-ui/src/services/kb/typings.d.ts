@@ -181,7 +181,7 @@ export interface ContentDirectoryUpdateRequest {
 
 /** 移动目录请求 */
 export interface ContentDirectoryMoveRequest {
-  directoryId: number;
+  id: number;
   targetParentId: number;
   targetSort?: number;
 }
