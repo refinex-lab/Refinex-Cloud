@@ -61,7 +61,9 @@ export default {
   'menu.kb': '知识库',
   'menu.kb.space': '我的空间',
   'menu.kb.space-detail': '空间详情',
+  'menu.kb.tag': '标签管理',
   'menu.kb-admin': '知识库管理',
   'menu.kb-admin.space': '空间管理',
   'menu.kb-admin.space-detail': '空间详情',
+  'menu.kb-admin.tag': '标签管理',
 };

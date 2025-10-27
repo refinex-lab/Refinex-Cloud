@@ -354,6 +354,12 @@ export default [
         component: './kb/space/[spaceCode]',
         hideInMenu: true,
       },
+      {
+        name: 'tag',
+        icon: 'tags',
+        path: '/kb/tag',
+        component: './kb/tag',
+      },
     ],
   },
   {
@@ -377,6 +383,12 @@ export default [
         path: '/kb-admin/space/detail/:spaceId',
         component: './kb/space/detail/[spaceId]',
         hideInMenu: true,
+      },
+      {
+        name: 'tag',
+        icon: 'tags',
+        path: '/kb-admin/tag',
+        component: './kb-admin/tag',
       },
     ],
   },

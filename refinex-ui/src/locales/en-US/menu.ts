@@ -61,7 +61,9 @@ export default {
   'menu.kb': 'Knowledge Base',
   'menu.kb.space': 'My Spaces',
   'menu.kb.space-detail': 'Space Detail',
+  'menu.kb.tag': 'Tag Management',
   'menu.kb-admin': 'KB Admin',
   'menu.kb-admin.space': 'Space Management',
   'menu.kb-admin.space-detail': 'Space Detail',
+  'menu.kb-admin.tag': 'Tag Management',
 };

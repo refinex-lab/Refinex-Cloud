@@ -602,7 +602,7 @@ CREATE TABLE `content_tag`
     `tag_color`   VARCHAR(20)          DEFAULT NULL COMMENT '标签颜色,十六进制值',
     `tag_type`    TINYINT     NOT NULL DEFAULT 1 COMMENT '标签类型:0系统标签,1用户自定义标签',
     `usage_count` BIGINT      NOT NULL DEFAULT 0 COMMENT '使用次数',
-    `creator_id`  BIGINT               DEFAULT NULL COMMENT '创建者ID',
+    `creator_id`  BIGINT      NOT NULL COMMENT '创建者ID(系统标签为0)',
     `create_by`   BIGINT               DEFAULT NULL COMMENT '创建人ID',
     `create_time` DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_by`   BIGINT               DEFAULT NULL COMMENT '更新人ID',
@@ -612,11 +612,13 @@ CREATE TABLE `content_tag`
     `remark`      VARCHAR(500)         DEFAULT NULL COMMENT '备注说明',
     `status`      TINYINT     NOT NULL DEFAULT 0 COMMENT '状态:0正常,1停用',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uni_tag_name` (`tag_name`) COMMENT '标签名称唯一索引',
-    KEY `idx_usage` (`usage_count`) COMMENT '使用次数索引'
+    UNIQUE KEY `uni_creator_tag_name` (`creator_id`, `tag_name`) COMMENT '创建者标签名称联合唯一索引',
+    KEY `idx_creator` (`creator_id`) COMMENT '创建者索引',
+    KEY `idx_usage` (`usage_count`) COMMENT '使用次数索引',
+    KEY `idx_type` (`tag_type`) COMMENT '标签类型索引'
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='内容标签表-统一的标签词库';
+  COLLATE = utf8mb4_unicode_ci COMMENT ='内容标签表-支持多用户独立标签体系';
 
 CREATE TABLE `content_document_tag`
 (

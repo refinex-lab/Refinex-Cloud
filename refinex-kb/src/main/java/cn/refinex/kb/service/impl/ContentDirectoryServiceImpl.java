@@ -103,11 +103,7 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
                 .updateTime(LocalDateTime.now())
                 .build();
 
-        Long directoryId = directoryRepository.insert(directory);
-        log.info("创建目录成功，directoryId: {}, directoryName: {}, spaceId: {}",
-                directoryId, requestDTO.getDirectoryName(), requestDTO.getSpaceId());
-
-        return directoryId;
+        return directoryRepository.insert(directory);
     }
 
     @Override
@@ -151,8 +147,6 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
         if (rows == 0) {
             throw new BusinessException("更新目录失败，请重试");
         }
-
-        log.info("更新目录成功，directoryId: {}, directoryName: {}", requestDTO.getId(), requestDTO.getDirectoryName());
     }
 
     @Override
@@ -223,8 +217,6 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
         if (requestDTO.getTargetSort() != null) {
             directoryRepository.updateSort(requestDTO.getId(), requestDTO.getTargetSort(), updateBy);
         }
-
-        log.info("移动目录成功，directoryId: {}, targetParentId: {}", requestDTO.getId(), requestDTO.getTargetParentId());
     }
 
     @Override
@@ -233,7 +225,6 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
         for (ContentDirectoryBatchSortRequestDTO.DirectorySortItem item : requestDTO.getSortItems()) {
             directoryRepository.updateSort(item.getId(), item.getSort(), updateBy);
         }
-        log.info("批量更新目录排序成功，count: {}", requestDTO.getSortItems().size());
     }
 
     @Override
@@ -258,8 +249,6 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
         if (rows == 0) {
             throw new BusinessException("删除目录失败");
         }
-
-        log.info("删除目录成功，directoryId: {}, 级联删除子目录数量: {}", directoryId, descendantIds.size());
     }
 
     @Override
