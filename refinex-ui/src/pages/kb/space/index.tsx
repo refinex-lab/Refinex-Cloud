@@ -708,6 +708,17 @@ const MyContentSpace: React.FC = () => {
                   onClick={() => setViewMode('list')}
                 />
               </Button.Group>
+              <Button
+                type="primary"
+                size="large"
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  setCurrentSpace(undefined);
+                  setModalVisible(true);
+                }}
+              >
+                创建空间
+              </Button>
             </Space>
           </Col>
         </Row>
