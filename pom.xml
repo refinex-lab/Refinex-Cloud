@@ -61,6 +61,7 @@
         <ip2region.version>3.1.1</ip2region.version>
         <easy-es.version>3.0.0</easy-es.version>
         <httpclient5.version>5.5.1</httpclient5.version>
+        <java-diff-utils.version>4.16</java-diff-utils.version>
 
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
@@ -398,6 +399,13 @@
                 <groupId>uk.co.jemos.podam</groupId>
                 <artifactId>podam</artifactId>
                 <version>${podam.version}</version>
+            </dependency>
+
+            <!-- 文本 diff 工具 -->
+            <dependency>
+                <groupId>io.github.java-diff-utils</groupId>
+                <artifactId>java-diff-utils</artifactId>
+                <version>${java-diff-utils.version}</version>
             </dependency>
 
             <!-- =================== 内部模块 =================== -->
