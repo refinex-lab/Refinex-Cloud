@@ -1,0 +1,276 @@
+/**
+ * 文档编辑器样式
+ */
+.document-editor-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  .editor-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    :global {
+      .ant-card-head {
+        border-bottom: 1px solid #f0f0f0;
+        padding: 12px 24px;
+        min-height: 56px;
+      }
+
+      .ant-card-body {
+        flex: 1;
+        padding: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  }
+
+  .editor-header {
+    width: 100%;
+
+    .document-title-input {
+      font-size: 18px;
+      font-weight: 600;
+
+      &:hover,
+      &:focus {
+        background-color: rgba(0, 0, 0, 0.02);
+        border-radius: 4px;
+      }
+    }
+  }
+
+  .editor-content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    :global {
+      .mdx-editor {
+        height: 100%;
+        border: none;
+
+        // MDXEditor 内部样式覆盖
+        ._rootContentEditableWrapper_uazmh_306 {
+          height: 100%;
+          overflow-y: auto;
+        }
+
+        ._editorRoot_uazmh_1 {
+          height: 100%;
+        }
+
+        ._toolbarRoot_15xlo_5 {
+          border-bottom: 1px solid #f0f0f0;
+          padding: 8px 16px;
+          background-color: #fafafa;
+        }
+
+        ._contentEditable_uazmh_384 {
+          padding: 24px;
+          min-height: calc(100% - 50px);
+          font-size: 15px;
+          line-height: 1.8;
+
+          // Markdown 内容样式优化
+          h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-top: 24px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 8px;
+          }
+
+          h2 {
+            font-size: 26px;
+            font-weight: 600;
+            margin-top: 20px;
+            margin-bottom: 14px;
+          }
+
+          h3 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-top: 18px;
+            margin-bottom: 12px;
+          }
+
+          h4 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 16px;
+            margin-bottom: 10px;
+          }
+
+          p {
+            margin-bottom: 16px;
+            color: rgba(0, 0, 0, 0.85);
+          }
+
+          code {
+            background-color: rgba(150, 150, 150, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+          }
+
+          pre {
+            background-color: #f6f8fa;
+            border-radius: 6px;
+            padding: 16px;
+            overflow-x: auto;
+            margin: 16px 0;
+
+            code {
+              background-color: transparent;
+              padding: 0;
+            }
+          }
+
+          blockquote {
+            border-left: 4px solid #1890ff;
+            padding-left: 16px;
+            margin: 16px 0;
+            color: rgba(0, 0, 0, 0.65);
+            font-style: italic;
+          }
+
+          ul,
+          ol {
+            padding-left: 28px;
+            margin-bottom: 16px;
+
+            li {
+              margin-bottom: 8px;
+            }
+          }
+
+          table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 16px 0;
+
+            th,
+            td {
+              border: 1px solid #e8e8e8;
+              padding: 8px 12px;
+              text-align: left;
+            }
+
+            th {
+              background-color: #fafafa;
+              font-weight: 600;
+            }
+
+            tr:hover {
+              background-color: #f5f5f5;
+            }
+          }
+
+          hr {
+            border: none;
+            border-top: 1px solid #e8e8e8;
+            margin: 24px 0;
+          }
+
+          img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin: 16px 0;
+          }
+
+          a {
+            color: #1890ff;
+            text-decoration: none;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// 暗色模式适配
+@media (prefers-color-scheme: dark) {
+  .document-editor-container {
+    .editor-card {
+      background-color: #1f1f1f;
+      border-color: #303030;
+
+      :global {
+        .ant-card-head {
+          background-color: #1f1f1f;
+          border-bottom-color: #303030;
+        }
+      }
+    }
+
+    .editor-content {
+      :global {
+        .mdx-editor {
+          ._toolbarRoot_15xlo_5 {
+            background-color: #262626;
+            border-bottom-color: #303030;
+          }
+
+          ._contentEditable_uazmh_384 {
+            color: rgba(255, 255, 255, 0.85);
+
+            h1 {
+              border-bottom-color: #303030;
+            }
+
+            p {
+              color: rgba(255, 255, 255, 0.85);
+            }
+
+            code {
+              background-color: rgba(255, 255, 255, 0.1);
+            }
+
+            pre {
+              background-color: #262626;
+            }
+
+            blockquote {
+              color: rgba(255, 255, 255, 0.65);
+            }
+
+            table {
+              th,
+              td {
+                border-color: #303030;
+              }
+
+              th {
+                background-color: #262626;
+              }
+
+              tr:hover {
+                background-color: #2a2a2a;
+              }
+            }
+
+            hr {
+              border-top-color: #303030;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

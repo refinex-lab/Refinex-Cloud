@@ -11,6 +11,7 @@ import { history, useParams } from '@umijs/max';
 import { Button, Card, Empty, Input, Layout, message, Space, Spin, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import DirectoryTree from './components/DirectoryTree';
+import DocumentEditor from './components/DocumentEditor';
 import type { ContentDirectory, ContentSpaceDetail } from '@/services/kb/typings.d';
 import { getContentSpaceDetailByCode, validateContentSpaceAccess } from '@/services/kb/space';
 import { AccessType } from '@/services/kb/typings.d';
@@ -264,66 +265,13 @@ const ContentSpaceDetail: React.FC = () => {
           />
         </div>
 
-        {/* 右侧内容区域 */}
+        {/* 右侧内容区域 - 集成 MDXEditor */}
         <Content className="space-detail-content">
-          {selectedDirectory ? (
-            <div className="directory-content">
-              <div className="directory-header">
-                <FileTextOutlined className="directory-icon" />
-                <Title level={3} style={{ margin: 0 }}>
-                  {selectedDirectory.directoryName}
-                </Title>
-              </div>
-
-              {selectedDirectory.remark && (
-                <Paragraph
-                  type="secondary"
-                  style={{ marginTop: 8, marginBottom: 24, fontSize: 14 }}
-                >
-                  {selectedDirectory.remark}
-                </Paragraph>
-              )}
-
-              <div className="document-list">
-                <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description="文档管理功能即将上线"
-                  style={{ marginTop: 60 }}
-                >
-                  <Paragraph type="secondary" style={{ fontSize: 14 }}>
-                    敬请期待...
-                  </Paragraph>
-                </Empty>
-              </div>
-            </div>
-          ) : (
-            <div className="welcome-content">
-              <Empty
-                image="/images/welcome-kb.svg"
-                imageStyle={{ height: 200 }}
-                description={
-                  <div>
-                    <Title level={4} style={{ marginBottom: 8 }}>
-                      欢迎访问 {space?.spaceName || '知识库'}
-                    </Title>
-                    <Paragraph type="secondary" style={{ fontSize: 14 }}>
-                      请从左侧选择一个目录开始浏览知识库内容
-                    </Paragraph>
-                    {collapsed && (
-                      <Paragraph type="secondary" style={{ fontSize: 13, marginTop: 12 }}>
-                        <Button
-                          type="link"
-                          icon={<MenuUnfoldOutlined />}
-                          onClick={() => setCollapsed(false)}
-                        >
-                          展开目录树
-                        </Button>
-                      </Paragraph>
-                    )}
-                  </div>
-                }
-              />
-            </div>
+          {space?.id && (
+            <DocumentEditor
+              directory={selectedDirectory}
+              spaceId={space.id}
+            />
           )}
         </Content>
       </Layout>
