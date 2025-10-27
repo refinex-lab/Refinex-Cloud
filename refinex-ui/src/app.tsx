@@ -174,6 +174,12 @@ export const layout: RunTimeLayoutConfig = ({
       );
     },
     ...initialState?.settings,
+    // 根据主题模式动态设置 token
+    token: {
+      ...defaultSettings.token,
+      // 暗色模式使用深色背景，亮色模式使用白色背景
+      bgLayout: initialState?.settings?.navTheme === 'realDark' ? '#141414' : '#ffffff',
+    },
   };
 };
 
