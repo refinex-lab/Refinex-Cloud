@@ -45,6 +45,7 @@ export default {
   'menu.system.role': 'Role Management',
   'menu.system.role.users': 'Role User Management',
   'menu.system.dictionary': 'Dictionary',
+  'menu.system.dictionary-data': 'Dictionary Data',
   'menu.system.config': 'Configuration',
   'menu.logs': 'Logs',
   'menu.logs.operation': 'Operation Logs',

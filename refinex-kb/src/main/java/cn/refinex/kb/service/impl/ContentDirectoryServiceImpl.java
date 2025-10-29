@@ -1,16 +1,22 @@
 package cn.refinex.kb.service.impl;
 
+import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.utils.object.BeanConverter;
+import cn.refinex.kb.client.PlatformUserServiceClient;
 import cn.refinex.kb.controller.directory.dto.request.ContentDirectoryBatchSortRequestDTO;
 import cn.refinex.kb.controller.directory.dto.request.ContentDirectoryCreateRequestDTO;
 import cn.refinex.kb.controller.directory.dto.request.ContentDirectoryMoveRequestDTO;
 import cn.refinex.kb.controller.directory.dto.request.ContentDirectoryUpdateRequestDTO;
 import cn.refinex.kb.controller.directory.dto.response.ContentDirectoryResponseDTO;
 import cn.refinex.kb.controller.directory.dto.response.ContentDirectoryTreeResponseDTO;
+import cn.refinex.kb.controller.directory.dto.response.ContentTreeNodeResponseDTO;
 import cn.refinex.kb.entity.ContentDirectory;
+import cn.refinex.kb.entity.ContentDocument;
 import cn.refinex.kb.entity.ContentSpace;
+import cn.refinex.kb.enums.DocumentStatus;
 import cn.refinex.kb.repository.ContentDirectoryRepository;
+import cn.refinex.kb.repository.ContentDocumentRepository;
 import cn.refinex.kb.repository.ContentSpaceRepository;
 import cn.refinex.kb.service.ContentDirectoryService;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +43,16 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
 
     private final ContentDirectoryRepository directoryRepository;
     private final ContentSpaceRepository spaceRepository;
+    private final ContentDocumentRepository documentRepository;
+    private final PlatformUserServiceClient platformUserServiceClient;
 
+    /**
+     * 创建目录
+     *
+     * @param requestDTO 创建请求
+     * @param createBy    创建人ID
+     * @return 目录ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createDirectory(ContentDirectoryCreateRequestDTO requestDTO, Long createBy) {
@@ -106,6 +121,12 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
         return directoryRepository.insert(directory);
     }
 
+    /**
+     * 更新目录
+     *
+     * @param requestDTO 更新请求
+     * @param updateBy   更新人ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateDirectory(ContentDirectoryUpdateRequestDTO requestDTO, Long updateBy) {
@@ -149,6 +170,12 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
         }
     }
 
+    /**
+     * 移动目录
+     *
+     * @param requestDTO 移动请求
+     * @param updateBy   更新人ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void moveDirectory(ContentDirectoryMoveRequestDTO requestDTO, Long updateBy) {
@@ -219,6 +246,12 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
         }
     }
 
+    /**
+     * 批量更新目录排序
+     *
+     * @param requestDTO 批量排序请求
+     * @param updateBy   更新人ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchUpdateSort(ContentDirectoryBatchSortRequestDTO requestDTO, Long updateBy) {
@@ -227,6 +260,12 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
         }
     }
 
+    /**
+     * 删除目录（级联删除所有子目录）
+     *
+     * @param directoryId 目录ID
+     * @param deleteBy    删除人ID
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteDirectory(Long directoryId, Long deleteBy) {
@@ -251,6 +290,12 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
         }
     }
 
+    /**
+     * 根据ID查询目录详情
+     *
+     * @param directoryId 目录ID
+     * @return 目录详情
+     */
     @Override
     public ContentDirectoryResponseDTO getDirectoryById(Long directoryId) {
         ContentDirectory directory = directoryRepository.selectById(directoryId);
@@ -267,6 +312,12 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
         return responseDTO;
     }
 
+    /**
+     * 查询空间下目录树结构
+     *
+     * @param spaceId 空间ID
+     * @return 目录树结构
+     */
     @Override
     public List<ContentDirectoryTreeResponseDTO> getDirectoryTree(Long spaceId) {
         // 1. 查询空间下所有目录
@@ -284,6 +335,12 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
         return buildTree(allNodes, 0L);
     }
 
+    /**
+     * 查询空间下所有目录（不包含子目录）
+     *
+     * @param spaceId 空间ID
+     * @return 目录列表
+     */
     @Override
     public List<ContentDirectoryResponseDTO> getDirectoryList(Long spaceId) {
         List<ContentDirectory> directories = directoryRepository.selectBySpaceId(spaceId);
@@ -298,6 +355,13 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
                 .toList();
     }
 
+    /**
+     * 查询指定目录下的所有子目录（不包含子目录的子目录）
+     *
+     * @param spaceId 空间ID
+     * @param parentId 父目录ID
+     * @return 子目录列表
+     */
     @Override
     public List<ContentDirectoryResponseDTO> getChildDirectories(Long spaceId, Long parentId) {
         List<ContentDirectory> children = directoryRepository.selectByParentId(spaceId, parentId);
@@ -313,7 +377,12 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
     }
 
     /**
-     * 递归更新子目录路径
+     * 递归更新子目录路径（不包含子目录的子目录）
+     *
+     * @param directoryId 目录ID
+     * @param newParentPath 新父路径
+     * @param oldNamePart 旧目录名部分
+     * @param newNamePart 新目录名部分
      */
     private void updateChildrenPath(Long directoryId, String newParentPath, String oldNamePart, String newNamePart) {
         List<ContentDirectory> children = directoryRepository.selectByParentId(null, directoryId);
@@ -327,7 +396,13 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
     }
 
     /**
-     * 递归更新子目录路径和层级
+     * 递归更新子目录路径和层级（不包含子目录的子目录）
+     *
+     * @param directoryId 目录ID
+     * @param oldParentPath 旧父路径
+     * @param newParentPath 新父路径
+     * @param depthChange 层级变化量
+     * @param updateBy 更新人ID
      */
     private void updateChildrenPathAndDepth(Long directoryId, String oldParentPath, String newParentPath, Integer depthChange, Long updateBy) {
         // 查询所有子孙目录
@@ -348,7 +423,10 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
     }
 
     /**
-     * 转换为树节点
+     * 转换为树节点（不包含子目录的子目录）
+     *
+     * @param directory 目录实体
+     * @return 目录树节点DTO
      */
     private ContentDirectoryTreeResponseDTO convertToTreeNode(ContentDirectory directory) {
         return ContentDirectoryTreeResponseDTO.builder()
@@ -366,7 +444,11 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
     }
 
     /**
-     * 构建树形结构（递归）
+     * 构建树形结构（递归）（不包含子目录的子目录）
+     *
+     * @param allNodes 所有目录节点
+     * @param parentId 父目录ID
+     * @return 子目录树节点列表
      */
     private List<ContentDirectoryTreeResponseDTO> buildTree(List<ContentDirectoryTreeResponseDTO> allNodes, Long parentId) {
         List<ContentDirectoryTreeResponseDTO> result = new ArrayList<>();
@@ -383,6 +465,156 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
 
         // 按排序字段排序
         result.sort(Comparator.comparing(ContentDirectoryTreeResponseDTO::getSort));
+
+        return result;
+    }
+
+    /**
+     * 查询空间下的统一树结构（包含目录和文档节点）
+     *
+     * @param spaceId 空间ID
+     * @param userId  用户ID（用于权限过滤，可为null）
+     * @return 统一树节点列表
+     */
+    @Override
+    public List<ContentTreeNodeResponseDTO> getTreeWithDocuments(Long spaceId, Long userId) {
+        // 1. 查询所有目录
+        List<ContentDirectory> directories = directoryRepository.selectBySpaceId(spaceId);
+        if (directories.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 2. 转换目录为统一树节点
+        List<ContentTreeNodeResponseDTO> allNodes = new ArrayList<>();
+        for (ContentDirectory directory : directories) {
+            ContentTreeNodeResponseDTO node = convertDirectoryToTreeNode(directory);
+            allNodes.add(node);
+        }
+
+        // 3. 查询所有文档
+        List<ContentDocument> documents = documentRepository.selectBySpaceId(spaceId);
+
+        // 4. 转换文档为统一树节点并加入列表
+        for (ContentDocument document : documents) {
+            // 权限过滤：草稿状态只有创建者可见
+            if (DocumentStatus.DRAFT.getCode().equals(document.getDocStatus()) && !document.getCreateBy().equals(userId)) {
+                continue; // 跳过草稿文档
+            }
+
+            ContentTreeNodeResponseDTO node = convertDocumentToTreeNode(document);
+            allNodes.add(node);
+        }
+
+        // 5. 构建树形结构
+        return buildUnifiedTree(allNodes, 0L);
+    }
+
+    /**
+     * 转换目录为统一树节点
+     *
+     * @param directory 目录实体
+     * @return 统一树节点
+     */
+    private ContentTreeNodeResponseDTO convertDirectoryToTreeNode(ContentDirectory directory) {
+        return ContentTreeNodeResponseDTO.builder()
+                .nodeType("directory")
+                .key("dir_" + directory.getId())
+                .title(directory.getDirectoryName())
+                .directoryId(directory.getId())
+                .directoryName(directory.getDirectoryName())
+                .directoryPath(directory.getDirectoryPath())
+                .parentId(directory.getParentId())
+                .depthLevel(directory.getDepthLevel())
+                .sort(directory.getSort())
+                .isLeaf(false) // 稍后根据是否有子节点计算
+                .children(new ArrayList<>())
+                .build();
+    }
+
+    /**
+     * 转换文档为统一树节点
+     *
+     * @param document 文档实体
+     * @return 统一树节点
+     */
+    private ContentTreeNodeResponseDTO convertDocumentToTreeNode(ContentDocument document) {
+        // 获取创建人昵称
+        String createByName = null;
+        if (document.getCreateBy() != null) {
+            try {
+                ApiResult<String> apiResult = platformUserServiceClient.getUsernameByUserId(document.getCreateBy());
+                createByName = apiResult.data() != null ? apiResult.data() : "未知用户";
+            } catch (Exception e) {
+                createByName = "用户" + document.getCreateBy();
+            }
+        }
+
+        return ContentTreeNodeResponseDTO.builder()
+                .nodeType("document")
+                .key("doc_" + document.getDocGuid())
+                .title(document.getDocTitle())
+                .documentId(document.getId())
+                .docGuid(document.getDocGuid())
+                .docTitle(document.getDocTitle())
+                .docStatus(document.getDocStatus())
+                .docStatusDesc(DocumentStatus.getDescription(document.getDocStatus()))
+                .accessType(document.getAccessType())
+                // 新增文档元信息字段
+                .docSummary(document.getDocSummary())
+                .coverImage(document.getCoverImage())
+                .wordCount(document.getWordCount())
+                .readDuration(document.getReadDuration())
+                .viewCount(document.getViewCount())
+                .likeCount(document.getLikeCount())
+                .collectCount(document.getCollectCount())
+                .commentCount(document.getCommentCount())
+                .createBy(document.getCreateBy())
+                .createByName(createByName)
+                .createTime(document.getCreateTime() != null ? document.getCreateTime().toString() : null)
+                .updateTime(document.getUpdateTime() != null ? document.getUpdateTime().toString() : null)
+                // 树结构字段
+                .parentId(document.getDirectoryId())
+                .depthLevel(null) // 文档不需要深度
+                .sort(document.getSort() != null ? document.getSort() : 999) // 文档默认排在目录后面
+                .isLeaf(true) // 文档一定是叶子节点
+                .children(null) // 文档没有子节点
+                .build();
+    }
+
+    /**
+     * 构建统一树形结构（递归）
+     * 同时包含目录和文档节点
+     *
+     * @param allNodes 所有节点列表（包含目录和文档）
+     * @param parentId 父节点ID（0表示根目录）
+     * @return 统一树节点列表
+     */
+    private List<ContentTreeNodeResponseDTO> buildUnifiedTree(List<ContentTreeNodeResponseDTO> allNodes, Long parentId) {
+        List<ContentTreeNodeResponseDTO> result = new ArrayList<>();
+
+        for (ContentTreeNodeResponseDTO node : allNodes) {
+            // 安全的 parentId 比较 - 处理 null 情况
+            Long nodeParentId = node.getParentId();
+            if (nodeParentId == null) {
+                // 如果节点的 parentId 为 null，跳过（理论上不应该出现）
+                log.warn("节点 {} 的 parentId 为 null，已跳过", node.getKey());
+                continue;
+            }
+            
+            if (nodeParentId.equals(parentId)) {
+                // 如果是目录节点，递归查找子节点（包括子目录和文档）
+                if ("directory".equals(node.getNodeType())) {
+                    List<ContentTreeNodeResponseDTO> children = buildUnifiedTree(allNodes, node.getDirectoryId());
+                    node.setChildren(children);
+                    node.setIsLeaf(children.isEmpty());
+                }
+
+                result.add(node);
+            }
+        }
+
+        // 按排序字段排序（目录和文档混合排序）
+        result.sort(Comparator.comparing(ContentTreeNodeResponseDTO::getSort));
 
         return result;
     }

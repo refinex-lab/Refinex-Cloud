@@ -4,36 +4,41 @@ import {
   CaretRightOutlined,
   DeleteOutlined,
   EditOutlined,
+  FileAddOutlined,
+  FileTextOutlined,
+  FolderAddOutlined,
   FolderFilled,
   FolderOpenFilled,
   MoreOutlined,
   PlusOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-import { Dropdown, Empty, Input, message, Modal, Spin, Tree } from 'antd';
+import { Dropdown, Empty, Input, message, Modal, Spin, Tag, Tree } from 'antd';
 import type { MenuProps } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import React, { useEffect, useMemo, useState } from 'react';
-import type {
-  ContentDirectory,
-  ContentDirectoryTreeNode,
-} from '@/services/kb/typings.d';
+import type { ContentTreeNode } from '@/services/kb/typings.d';
+import { DocumentStatus, TreeNodeType } from '@/services/kb/typings.d';
 import {
   deleteDirectory,
-  getDirectoryTree,
+  getDirectoryTreeWithDocs,
   moveDirectory,
 } from '@/services/kb/directory';
+import { deleteDocument } from '@/services/kb/document';
 import DirectoryFormModal from './DirectoryFormModal';
+import DocumentFormModal from './DocumentFormModal';
 import './DirectoryTree.less';
 
 // 扩展 DataNode 类型以包含自定义数据
 interface ExtendedDataNode extends DataNode {
-  data?: ContentDirectoryTreeNode;
+  data?: ContentTreeNode;
 }
 
 interface DirectoryTreeProps {
   spaceId: number;
-  onSelect?: (directoryId: number | null, directory: ContentDirectory | null) => void;
+  onSelect?: (node: ContentTreeNode | null) => void;
+  onDocumentOpen?: (docGuid: string, document: ContentTreeNode) => void;
+  selectedKey?: string;
   showBackButton?: boolean;
   onBack?: () => void;
   spaceName?: string;
@@ -42,11 +47,13 @@ interface DirectoryTreeProps {
 const DirectoryTree: React.FC<DirectoryTreeProps> = ({
   spaceId,
   onSelect,
+  onDocumentOpen,
+  selectedKey,
   showBackButton = false,
   onBack,
   spaceName,
 }) => {
-  const [treeData, setTreeData] = useState<ContentDirectoryTreeNode[]>([]);
+  const [treeData, setTreeData] = useState<ContentTreeNode[]>([]);
   const [loading, setLoading] = useState(false);
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
@@ -55,22 +62,26 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
   const [hoverKey, setHoverKey] = useState<React.Key | null>(null);
   const [dropdownOpenKey, setDropdownOpenKey] = useState<React.Key | null>(null);
 
-  // 弹窗状态
+  // 目录弹窗状态
   const [formModalVisible, setFormModalVisible] = useState(false);
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
-  const [currentDirectory, setCurrentDirectory] = useState<ContentDirectoryTreeNode | null>(null);
-  const [parentDirectory, setParentDirectory] = useState<ContentDirectoryTreeNode | null>(null);
+  const [currentDirectory, setCurrentDirectory] = useState<ContentTreeNode | null>(null);
+  const [parentDirectory, setParentDirectory] = useState<ContentTreeNode | null>(null);
 
-  // 加载目录树
+  // 文档弹窗状态
+  const [docFormVisible, setDocFormVisible] = useState(false);
+  const [docFormDirectory, setDocFormDirectory] = useState<ContentTreeNode | null>(null);
+
+  // 加载目录树（包含文档）
   const loadTree = async () => {
     setLoading(true);
     try {
-      const response = await getDirectoryTree(spaceId);
+      const response = await getDirectoryTreeWithDocs(spaceId);
       const data = response.data || [];
       setTreeData(data);
 
       // 默认展开第一层
-      const firstLevelKeys = data.map((item: ContentDirectoryTreeNode) => item.id);
+      const firstLevelKeys = data.map((item: ContentTreeNode) => item.key);
       setExpandedKeys(firstLevelKeys);
     } catch (error) {
       console.error('加载目录树失败:', error);
@@ -84,24 +95,30 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
     loadTree();
   }, [spaceId]);
 
+  // 同步外部选中状态
+  useEffect(() => {
+    if (selectedKey) {
+      setSelectedKeys([selectedKey]);
+    }
+  }, [selectedKey]);
+
   // 转换为 Ant Design Tree 数据格式
-  const convertToTreeData = (nodes: ContentDirectoryTreeNode[]): ExtendedDataNode[] => {
+  const convertToTreeData = (nodes: ContentTreeNode[]): ExtendedDataNode[] => {
     return nodes.map((node) => ({
-      key: node.id,
-      title: node.directoryName,
-      // 不再使用 Tree 的 icon 属性，在 titleRender 里统一渲染
+      key: node.key,
+      title: node.title,
       children: node.children ? convertToTreeData(node.children) : undefined,
-      isLeaf: !(node.children && node.children.length > 0) && !node.hasChildren,
+      isLeaf: node.isLeaf,
       data: node, // 保存原始数据
     }));
   };
 
   // 递归获取所有节点的 key
-  const getAllKeys = (nodes: ContentDirectoryTreeNode[]): React.Key[] => {
+  const getAllKeys = (nodes: ContentTreeNode[]): React.Key[] => {
     const keys: React.Key[] = [];
-    const traverse = (items: ContentDirectoryTreeNode[]) => {
+    const traverse = (items: ContentTreeNode[]) => {
       items.forEach((item) => {
-        keys.push(item.id);
+        keys.push(item.key);
         if (item.children && item.children.length > 0) {
           traverse(item.children);
         }
@@ -117,20 +134,19 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
       return convertToTreeData(treeData);
     }
 
-    const filterTree = (nodes: ContentDirectoryTreeNode[]): ExtendedDataNode[] => {
+    const filterTree = (nodes: ContentTreeNode[]): ExtendedDataNode[] => {
       const result: ExtendedDataNode[] = [];
 
       nodes.forEach((node) => {
-        const match = node.directoryName.toLowerCase().includes(searchValue.toLowerCase());
+        const match = node.title.toLowerCase().includes(searchValue.toLowerCase());
         const children = node.children ? filterTree(node.children) : [];
 
         if (match || children.length > 0) {
           result.push({
-            key: node.id,
-            title: highlightText(node.directoryName, searchValue),
-            // 不再使用 Tree 的 icon 属性，在 titleRender 里统一渲染
+            key: node.key,
+            title: highlightText(node.title, searchValue),
             children: children.length > 0 ? children : undefined,
-            isLeaf: !(node.children && node.children.length > 0) && !node.hasChildren,
+            isLeaf: node.isLeaf,
             data: node,
           });
         }
@@ -140,7 +156,7 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
     };
 
     return filterTree(treeData);
-  }, [treeData, searchValue, expandedKeys]);
+  }, [treeData, searchValue]);
 
   // 高亮搜索文本
   const highlightText = (text: string, search: string) => {
@@ -170,7 +186,7 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
       setAutoExpandParent(true);
     } else {
       // 恢复默认展开第一层
-      const firstLevelKeys = treeData.map((item) => item.id);
+      const firstLevelKeys = treeData.map((item) => item.key);
       setExpandedKeys(firstLevelKeys);
     }
   }, [searchValue, treeData]);
@@ -185,24 +201,40 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
   const onTreeSelect = (selectedKeysValue: React.Key[], info: any) => {
     setSelectedKeys(selectedKeysValue);
     if (selectedKeysValue.length > 0) {
-      const selectedNode = info.node.data as ContentDirectoryTreeNode;
-      onSelect?.(selectedNode.id, selectedNode as unknown as ContentDirectory);
+      const selectedNode = info.node.data as ContentTreeNode;
+      handleNodeClick(selectedNode);
+    }
+  };
+
+  // 节点点击处理
+  const handleNodeClick = (nodeData: ContentTreeNode) => {
+    if (nodeData.nodeType === TreeNodeType.DOCUMENT) {
+      // 点击文档 -> 打开编辑器
+      onDocumentOpen?.(nodeData.docGuid!, nodeData);
     } else {
-      onSelect?.(null, null);
+      // 点击目录 -> 触发选中回调（右侧显示目录内容）
+      onSelect?.(nodeData);
     }
   };
 
   // 查找节点
   const findNodeById = (
-    nodes: ContentDirectoryTreeNode[],
+    nodes: ContentTreeNode[],
     id: number,
-  ): ContentDirectoryTreeNode | null => {
+    isDocument: boolean = false,
+  ): ContentTreeNode | null => {
     for (const node of nodes) {
-      if (node.id === id) {
-        return node;
+      if (isDocument) {
+        if (node.nodeType === TreeNodeType.DOCUMENT && node.documentId === id) {
+          return node;
+        }
+      } else {
+        if (node.nodeType === TreeNodeType.DIRECTORY && node.directoryId === id) {
+          return node;
+        }
       }
       if (node.children) {
-        const found = findNodeById(node.children, id);
+        const found = findNodeById(node.children, id, isDocument);
         if (found) return found;
       }
     }
@@ -218,7 +250,7 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
   };
 
   // 创建子目录
-  const handleCreateChild = (directory: ContentDirectoryTreeNode) => {
+  const handleCreateDirectory = (directory: ContentTreeNode) => {
     setFormMode('create');
     setCurrentDirectory(null);
     setParentDirectory(directory);
@@ -226,13 +258,13 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
   };
 
   // 编辑目录
-  const handleEdit = (directory: ContentDirectoryTreeNode) => {
+  const handleEditDirectory = (directory: ContentTreeNode) => {
     setFormMode('edit');
     setCurrentDirectory(directory);
 
     // 查找父目录
     if (directory.parentId !== 0) {
-      const parent = findNodeById(treeData, directory.parentId);
+      const parent = findNodeById(treeData, directory.parentId, false);
       setParentDirectory(parent || null);
     } else {
       setParentDirectory(null);
@@ -242,16 +274,16 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
   };
 
   // 删除目录
-  const handleDelete = (directory: ContentDirectoryTreeNode) => {
+  const handleDeleteDirectory = (directory: ContentTreeNode) => {
     Modal.confirm({
       title: '确认删除',
-      content: `确定要删除目录"${directory.directoryName}"吗？删除后将级联删除所有子目录，且无法恢复！`,
+      content: `确定要删除目录"${directory.directoryName}"吗？删除后将级联删除所有子目录和文档，且无法恢复！`,
       okText: '确认',
       okType: 'danger',
       cancelText: '取消',
       onOk: async () => {
         try {
-          await deleteDirectory(directory.id);
+          await deleteDirectory(directory.directoryId!);
           message.success('删除成功');
           loadTree();
         } catch (error) {
@@ -261,12 +293,51 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
     });
   };
 
-  // 拖拽放置
+  // 创建文档
+  const handleCreateDocument = (directory: ContentTreeNode) => {
+    setDocFormDirectory(directory);
+    setDocFormVisible(true);
+  };
+
+  // 删除文档
+  const handleDeleteDocument = (node: ContentTreeNode) => {
+    Modal.confirm({
+      title: '确认删除',
+      content: `确定要删除文档"${node.docTitle}"吗？删除后无法恢复！`,
+      okText: '确认',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          await deleteDocument(node.documentId!);
+          message.success('删除成功');
+          loadTree();
+        } catch (error) {
+          console.error('删除文档失败:', error);
+          message.error('删除文档失败');
+        }
+      },
+    });
+  };
+
+  // 拖拽放置（仅支持目录）
   const onDrop = async (info: any) => {
-    const dropKey = info.node.key;
-    const dragKey = info.dragNode.key;
-    const dropPos = info.node.pos.split('-');
-    const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]);
+    const dropNode = info.node.data as ContentTreeNode;
+    const dragNode = info.dragNode.data as ContentTreeNode;
+
+    // 只支持目录拖拽
+    if (dragNode.nodeType !== TreeNodeType.DIRECTORY) {
+      message.warning('文档节点不支持拖拽');
+      return;
+    }
+
+    if (dropNode.nodeType !== TreeNodeType.DIRECTORY) {
+      message.warning('不能拖拽到文档节点上');
+      return;
+    }
+
+    const dropKey = dropNode.key;
+    const dragKey = dragNode.key;
 
     // 不能拖到自己上
     if (dragKey === dropKey) {
@@ -275,28 +346,28 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
     }
 
     try {
-      // 判断是否是层级迁移（dropToGap=false 表示拖到节点上，作为子节点）
+      const dropPos = info.node.pos.split('-');
+      const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]);
+
+      // 判断是否是层级迁移
       if (!info.dropToGap) {
         // 层级迁移：拖到目标节点上，成为其子节点
         await moveDirectory({
-          id: dragKey as number,
-          targetParentId: dropKey as number,
-          targetSort: 0, // 移到最前面
+          id: dragNode.directoryId!,
+          targetParentId: dropNode.directoryId!,
+          targetSort: 0,
         });
         message.success('移动成功');
         loadTree();
       } else {
         // 同级排序：拖到目标节点的上方或下方
-        const dropNode = findNodeById(treeData, dropKey as number);
-        if (dropNode) {
-          await moveDirectory({
-            id: dragKey as number,
-            targetParentId: dropNode.parentId,
-            targetSort: dropPosition < 0 ? dropNode.sort - 1 : dropNode.sort + 1,
-          });
-          message.success('移动成功');
-          loadTree();
-        }
+        await moveDirectory({
+          id: dragNode.directoryId!,
+          targetParentId: dropNode.parentId,
+          targetSort: dropPosition < 0 ? dropNode.sort - 1 : dropNode.sort + 1,
+        });
+        message.success('移动成功');
+        loadTree();
       }
     } catch (error) {
       console.error('移动失败:', error);
@@ -309,60 +380,130 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
     loadTree();
   };
 
+  // 文档创建成功回调
+  const handleDocumentSuccess = (docGuid: string) => {
+    setDocFormVisible(false);
+    loadTree();
+    // 自动打开新建的文档
+    if (docFormDirectory) {
+      onDocumentOpen?.(docGuid, { ...docFormDirectory, docGuid } as ContentTreeNode);
+    }
+  };
+
   // 右键菜单
-  const getContextMenu = (node: ContentDirectoryTreeNode): MenuProps['items'] => {
-    return [
-      {
-        key: 'create',
-        label: '新建子目录',
-        icon: <PlusOutlined />,
-        onClick: () => {
-          setDropdownOpenKey(null);
-          handleCreateChild(node);
+  const getContextMenu = (node: ContentTreeNode): MenuProps['items'] => {
+    if (node.nodeType === TreeNodeType.DIRECTORY) {
+      return [
+        {
+          key: 'create-doc',
+          label: '新建文档',
+          icon: <FileAddOutlined />,
+          onClick: () => {
+            setDropdownOpenKey(null);
+            handleCreateDocument(node);
+          },
         },
-      },
-      {
-        key: 'edit',
-        label: '编辑',
-        icon: <EditOutlined />,
-        onClick: () => {
-          setDropdownOpenKey(null);
-          handleEdit(node);
+        {
+          key: 'create-dir',
+          label: '新建子目录',
+          icon: <FolderAddOutlined />,
+          onClick: () => {
+            setDropdownOpenKey(null);
+            handleCreateDirectory(node);
+          },
         },
-      },
-      {
-        type: 'divider',
-      },
-      {
-        key: 'delete',
-        label: '删除',
-        icon: <DeleteOutlined />,
-        danger: true,
-        onClick: () => {
-          setDropdownOpenKey(null);
-          handleDelete(node);
+        {
+          type: 'divider',
         },
-      },
-    ];
+        {
+          key: 'edit',
+          label: '编辑目录',
+          icon: <EditOutlined />,
+          onClick: () => {
+            setDropdownOpenKey(null);
+            handleEditDirectory(node);
+          },
+        },
+        {
+          key: 'delete',
+          label: '删除目录',
+          icon: <DeleteOutlined />,
+          danger: true,
+          onClick: () => {
+            setDropdownOpenKey(null);
+            handleDeleteDirectory(node);
+          },
+        },
+      ];
+    } else {
+      // 文档节点菜单
+      return [
+        {
+          key: 'open',
+          label: '打开',
+          icon: <FileTextOutlined />,
+          onClick: () => {
+            console.log('打开文档:', node);
+            console.log('docGuid:', node.docGuid);
+            setDropdownOpenKey(null);
+            if (node.docGuid) {
+              onDocumentOpen?.(node.docGuid, node);
+            } else {
+              message.error('文档 GUID 不存在，无法打开');
+            }
+          },
+        },
+        {
+          type: 'divider',
+        },
+        {
+          key: 'delete',
+          label: '删除',
+          icon: <DeleteOutlined />,
+          danger: true,
+          onClick: () => {
+            setDropdownOpenKey(null);
+            handleDeleteDocument(node);
+          },
+        },
+      ];
+    }
   };
 
   // 自定义树节点标题（完全自控：图标 + 文字 + 操作按钮）
   const renderTreeTitle = (node: any) => {
-    const nodeData = node.data as ContentDirectoryTreeNode;
+    const nodeData = node.data as ContentTreeNode;
     const isHover = hoverKey === node.key;
     const isDropdownOpen = dropdownOpenKey === node.key;
     const isExpanded = expandedKeys.includes(node.key);
     const isSearching = !!searchValue;
 
-    // 选择图标
-    const FolderIcon = isExpanded ? FolderOpenFilled : FolderFilled;
-    const iconColor = isSearching && node.title !== node.data?.directoryName ? '#faad14' : '#1890ff';
+    const isDirectory = nodeData.nodeType === TreeNodeType.DIRECTORY;
+    const isDocument = nodeData.nodeType === TreeNodeType.DOCUMENT;
 
-    // 点击节点内容区域展开/收起
-    const handleNodeClick = (e: React.MouseEvent) => {
-      // 不阻止事件冒泡，让 Tree 组件处理选中逻辑
-      // 切换展开状态
-      if (node.children && node.children.length > 0) {
+    // 选择图标
+    let IconComponent: React.ComponentType<any> = FolderFilled;
+    let iconColor = '#1890ff';
+
+    if (isDirectory) {
+      IconComponent = isExpanded ? FolderOpenFilled : FolderFilled;
+      iconColor = isSearching && node.title !== nodeData.directoryName ? '#faad14' : '#1890ff';
+    } else if (isDocument) {
+      IconComponent = FileTextOutlined;
+      // 根据文档状态显示不同颜色
+      if (nodeData.docStatus === DocumentStatus.DRAFT) {
+        iconColor = '#8c8c8c'; // 草稿：灰色
+      } else if (nodeData.docStatus === DocumentStatus.OFFLINE) {
+        iconColor = '#ff4d4f'; // 下架：红色
+      } else {
+        iconColor = '#52c41a'; // 已发布：绿色
+      }
+    }
+
+    // 点击节点内容区域
+    const handleNodeContentClick = (e: React.MouseEvent) => {
+      // 对于目录，切换展开状态
+      if (isDirectory && node.children && node.children.length > 0) {
         if (isExpanded) {
           setExpandedKeys(expandedKeys.filter((k) => k !== node.key));
         } else {
@@ -384,14 +525,26 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
         {/* 可点击的节点主体区域（图标 + 文字）*/}
         <div
           className="tree-node-main"
-          onClick={handleNodeClick}
+          onClick={handleNodeContentClick}
           style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1, cursor: 'pointer' }}
         >
-          {/* 文件夹图标 */}
-          <FolderIcon className="tree-node-icon" style={{ color: iconColor }} />
+          {/* 文件夹/文档图标 */}
+          <IconComponent className="tree-node-icon" style={{ color: iconColor }} />
 
           {/* 文字标签 */}
           <span className="tree-node-label">{node.title}</span>
+
+          {/* 文档状态标签 */}
+          {isDocument && nodeData.docStatus === DocumentStatus.DRAFT && (
+            <Tag color="default" style={{ marginLeft: 4, fontSize: 12 }}>
+              草稿
+            </Tag>
+          )}
+          {isDocument && nodeData.docStatus === DocumentStatus.OFFLINE && (
+            <Tag color="error" style={{ marginLeft: 4, fontSize: 12 }}>
+              已下架
+            </Tag>
+          )}
         </div>
 
         {/* 操作按钮（始终渲染，通过 opacity 控制显示） */}
@@ -442,7 +595,7 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
 
         <div className="toolbar-row">
           <Input
-            placeholder="搜索目录..."
+            placeholder="搜索目录或文档..."
             prefix={<SearchOutlined />}
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
@@ -467,7 +620,11 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
               autoExpandParent={autoExpandParent}
               onExpand={onExpand}
               onSelect={onTreeSelect}
-              draggable
+              draggable={(node: any) => {
+                // 只有目录节点可拖拽
+                const nodeData = node.data as ContentTreeNode;
+                return nodeData.nodeType === TreeNodeType.DIRECTORY;
+              }}
               onDrop={onDrop}
               blockNode
               showLine={false}
@@ -480,7 +637,7 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
           ) : (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={searchValue ? '未找到匹配的目录' : '暂无目录'}
+              description={searchValue ? '未找到匹配的目录或文档' : '暂无目录'}
             >
               {!searchValue && (
                 <button
@@ -501,10 +658,41 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
         visible={formModalVisible}
         mode={formMode}
         spaceId={spaceId}
-        directory={currentDirectory}
-        parentDirectory={parentDirectory}
+        directory={currentDirectory ? {
+          id: currentDirectory.directoryId!,
+          directoryName: currentDirectory.directoryName!,
+          directoryPath: currentDirectory.directoryPath!,
+          parentId: currentDirectory.parentId,
+          spaceId: spaceId,
+          sort: currentDirectory.sort || 0,
+          depthLevel: currentDirectory.depthLevel || 0,
+          key: currentDirectory.key,
+          title: currentDirectory.title,
+          isLeaf: currentDirectory.isLeaf || false,
+        } : null}
+        parentDirectory={parentDirectory ? {
+          id: parentDirectory.directoryId!,
+          directoryName: parentDirectory.directoryName!,
+          directoryPath: parentDirectory.directoryPath!,
+          parentId: parentDirectory.parentId,
+          spaceId: spaceId,
+          sort: parentDirectory.sort || 0,
+          depthLevel: parentDirectory.depthLevel || 0,
+          key: parentDirectory.key,
+          title: parentDirectory.title,
+          isLeaf: parentDirectory.isLeaf || false,
+        } : null}
         onSuccess={handleFormSuccess}
         onCancel={() => setFormModalVisible(false)}
+      />
+
+      {/* 文档表单弹窗 */}
+      <DocumentFormModal
+        visible={docFormVisible}
+        spaceId={spaceId}
+        directoryId={docFormDirectory?.directoryId}
+        onSuccess={handleDocumentSuccess}
+        onCancel={() => setDocFormVisible(false)}
       />
     </div>
   );

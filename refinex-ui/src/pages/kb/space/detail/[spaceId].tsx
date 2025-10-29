@@ -5,11 +5,13 @@ import {
   MenuUnfoldOutlined,
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { history, useParams } from '@umijs/max';
+import { history, useParams, useLocation } from '@umijs/max';
 import { Button, Card, Empty, Layout, Spin, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import DirectoryTree from '../components/DirectoryTree';
-import type { ContentDirectory, ContentSpaceDetail } from '@/services/kb/typings.d';
+import DocumentEditor from '../components/DocumentEditor';
+import DirectoryView from '../components/DirectoryView';
+import type { ContentDirectory, ContentSpaceDetail, ContentTreeNode } from '@/services/kb/typings.d';
 import { getContentSpaceDetail } from '@/services/kb/space';
 import './detail.less';
 
@@ -18,9 +20,12 @@ const { Title, Paragraph } = Typography;
 
 const SpaceDetail: React.FC = () => {
   const { spaceId } = useParams<{ spaceId: string }>();
+  const location = useLocation();
   const [space, setSpace] = useState<ContentSpaceDetail | null>(null);
   const [loading, setLoading] = useState(false);
-  const [selectedDirectory, setSelectedDirectory] = useState<ContentDirectory | null>(null);
+  const [selectedNode, setSelectedNode] = useState<ContentTreeNode | null>(null);
+  const [currentDocGuid, setCurrentDocGuid] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'directory' | 'document'>('directory');
   const [collapsed, setCollapsed] = useState(false);
   const [siderWidth, setSiderWidth] = useState(280);
 
@@ -45,10 +50,45 @@ const SpaceDetail: React.FC = () => {
     loadSpace();
   }, [spaceId]);
 
+  // 从 URL 读取文档 GUID
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const urlDocGuid = searchParams.get('doc');
+    if (urlDocGuid && urlDocGuid !== currentDocGuid) {
+      setCurrentDocGuid(urlDocGuid);
+      setViewMode('document');
+    }
+  }, [location.search]);
+
   // 目录选中回调
-  const handleDirectorySelect = (directoryId: number | null, directory: ContentDirectory | null) => {
-    setSelectedDirectory(directory);
-    // TODO: 加载目录下的文档列表
+  const handleDirectorySelect = (node: ContentTreeNode | null) => {
+    setSelectedNode(node);
+    setViewMode('directory');
+    setCurrentDocGuid(null);
+  };
+
+  // 文档打开回调
+  const handleDocumentOpen = (docGuid: string, node: ContentTreeNode) => {
+    console.log('handleDocumentOpen 被调用');
+    console.log('docGuid:', docGuid);
+    console.log('node:', node);
+
+    setCurrentDocGuid(docGuid);
+    setViewMode('document');
+    setSelectedNode(node);
+
+    // 更新 URL
+    history.replace(`/kb/space/detail/${spaceId}?doc=${docGuid}`);
+
+    console.log('URL已更新，currentDocGuid:', docGuid);
+    console.log('viewMode:', 'document');
+  };
+
+  // 关闭文档编辑器
+  const handleCloseEditor = () => {
+    setCurrentDocGuid(null);
+    setViewMode('directory');
+    history.replace(`/kb/space/detail/${spaceId}`);
   };
 
   // 返回空间列表
@@ -83,6 +123,8 @@ const SpaceDetail: React.FC = () => {
             <DirectoryTree
               spaceId={Number(spaceId)}
               onSelect={handleDirectorySelect}
+              onDocumentOpen={handleDocumentOpen}
+              selectedKey={currentDocGuid || selectedNode?.key}
               showBackButton
               onBack={handleBack}
               spaceName={space?.spaceName}
@@ -102,36 +144,22 @@ const SpaceDetail: React.FC = () => {
 
         {/* 右侧内容区域 */}
         <Content className="space-detail-content">
-          {selectedDirectory ? (
-            <div className="directory-content">
-              <div className="directory-header">
-                <FileTextOutlined className="directory-icon" />
-                <Title level={3} style={{ margin: 0 }}>
-                  {selectedDirectory.directoryName}
-                </Title>
-              </div>
-
-              {selectedDirectory.remark && (
-                <Paragraph
-                  type="secondary"
-                  style={{ marginTop: 8, marginBottom: 24, fontSize: 14 }}
-                >
-                  {selectedDirectory.remark}
-                </Paragraph>
-              )}
-
-              <div className="document-list">
-                <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description="文档管理功能即将上线"
-                  style={{ marginTop: 60 }}
-                >
-                  <Paragraph type="secondary" style={{ fontSize: 14 }}>
-                    敬请期待...
-                  </Paragraph>
-                </Empty>
-              </div>
-            </div>
+          {viewMode === 'document' && currentDocGuid ? (
+            <DocumentEditor
+              docGuid={currentDocGuid}
+              spaceId={Number(spaceId)}
+              onClose={handleCloseEditor}
+            />
+          ) : selectedNode && selectedNode.nodeType === 'directory' ? (
+            <DirectoryView
+              directory={selectedNode}
+              spaceId={Number(spaceId)}
+              onDocumentOpen={(docGuid, doc) => handleDocumentOpen(docGuid, doc)}
+              onCreateDocument={(directoryId) => {
+                // TODO: 打开新建文档弹窗
+                console.log('创建文档在目录:', directoryId);
+              }}
+            />
           ) : (
             <div className="welcome-content">
               <Empty
@@ -143,7 +171,7 @@ const SpaceDetail: React.FC = () => {
                       欢迎使用知识库管理系统
                     </Title>
                     <Paragraph type="secondary" style={{ fontSize: 14 }}>
-                      请从左侧选择一个目录开始管理您的知识库内容
+                      请从左侧选择一个目录或文档开始管理您的知识库内容
                     </Paragraph>
                     {collapsed && (
                       <Paragraph type="secondary" style={{ fontSize: 13, marginTop: 12 }}>

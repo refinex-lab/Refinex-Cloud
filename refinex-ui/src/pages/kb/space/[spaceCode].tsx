@@ -7,34 +7,45 @@ import {
   SafetyOutlined,
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { history, useParams } from '@umijs/max';
+import { history, useParams, useLocation } from '@umijs/max';
 import { Button, Card, Empty, Input, Layout, message, Space, Spin, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import DirectoryTree from './components/DirectoryTree';
 import DocumentEditor from './components/DocumentEditor';
-import type { ContentDirectory, ContentSpaceDetail } from '@/services/kb/typings.d';
+import DirectoryView from './components/DirectoryView';
+import DocumentFormModal from './components/DocumentFormModal';
+import type { ContentSpaceDetail, ContentTreeNode } from '@/services/kb/typings.d';
+import { AccessType, TreeNodeType } from '@/services/kb/typings.d';
 import { getContentSpaceDetailByCode, validateContentSpaceAccess } from '@/services/kb/space';
-import { AccessType } from '@/services/kb/typings.d';
 import { encryptPassword, getRsaPublicKey } from '@/utils/crypto';
 import './detail/detail.less';
 
 const { Sider, Content } = Layout;
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
 /**
  * 空间详情页面 - 用户端
- * 展示知识库目录树和内容
+ * 展示知识库目录树和内容（支持目录视图和文档编辑）
  */
 const ContentSpaceDetail: React.FC = () => {
   const { spaceCode } = useParams<{ spaceCode: string }>();
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [space, setSpace] = useState<ContentSpaceDetail | null>(null);
   const [isLocked, setIsLocked] = useState(false); // 是否处于锁定状态
   const [password, setPassword] = useState('');
   const [validating, setValidating] = useState(false);
-  const [selectedDirectory, setSelectedDirectory] = useState<ContentDirectory | null>(null);
   const [collapsed, setCollapsed] = useState(false);
   const [siderWidth] = useState(280);
+
+  // 状态管理
+  const [selectedNode, setSelectedNode] = useState<ContentTreeNode | null>(null);
+  const [currentDocGuid, setCurrentDocGuid] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'directory' | 'document' | 'empty'>('empty');
+
+  // 文档弹窗状态
+  const [docFormVisible, setDocFormVisible] = useState(false);
+  const [docFormDirectory, setDocFormDirectory] = useState<ContentTreeNode | null>(null);
 
   // 加载空间详情
   const loadSpaceDetail = async () => {
@@ -73,10 +84,63 @@ const ContentSpaceDetail: React.FC = () => {
     loadSpaceDetail();
   }, [spaceCode]);
 
+  // URL 同步：从 URL 读取文档 GUID
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const urlDocGuid = searchParams.get('doc');
+
+    if (urlDocGuid && urlDocGuid !== currentDocGuid) {
+      setCurrentDocGuid(urlDocGuid);
+      setViewMode('document');
+    } else if (!urlDocGuid && currentDocGuid) {
+      // URL 中没有文档参数，但当前有打开的文档，清空状态
+      setCurrentDocGuid(null);
+      if (selectedNode && selectedNode.nodeType === TreeNodeType.DIRECTORY) {
+        setViewMode('directory');
+      } else {
+        setViewMode('empty');
+      }
+    }
+  }, [location.search]);
+
   // 目录选中回调
-  const handleDirectorySelect = (directoryId: number | null, directory: ContentDirectory | null) => {
-    setSelectedDirectory(directory);
-    // TODO: 加载目录下的文档列表
+  const handleDirectorySelect = (node: ContentTreeNode | null) => {
+    setSelectedNode(node);
+    setViewMode('directory');
+    setCurrentDocGuid(null);
+    // 清除 URL 中的文档参数
+    if (location.search.includes('doc=')) {
+      history.replace(`/kb/space/${spaceCode}`);
+    }
+  };
+
+  // 文档打开回调
+  const handleDocumentOpen = (docGuid: string, node: ContentTreeNode) => {
+    console.log('handleDocumentOpen 被调用');
+    console.log('docGuid:', docGuid);
+    console.log('node:', node);
+    console.log('spaceCode:', spaceCode);
+
+    setCurrentDocGuid(docGuid);
+    setViewMode('document');
+    setSelectedNode(node);
+
+    // 更新 URL（使用 history.replace 避免历史记录堆积）
+    history.replace(`/kb/space/${spaceCode}?doc=${docGuid}`);
+
+    console.log('URL已更新，currentDocGuid:', docGuid);
+    console.log('viewMode:', 'document');
+  };
+
+  // 关闭文档编辑器
+  const handleCloseEditor = () => {
+    setCurrentDocGuid(null);
+    if (selectedNode && selectedNode.nodeType === TreeNodeType.DIRECTORY) {
+      setViewMode('directory');
+    } else {
+      setViewMode('empty');
+    }
+    history.replace(`/kb/space/${spaceCode}`);
   };
 
   // 返回空间列表
@@ -128,7 +192,6 @@ const ContentSpaceDetail: React.FC = () => {
     }
   };
 
-
   // 如果空间被锁定，显示密码验证页面
   if (isLocked) {
     return (
@@ -145,7 +208,7 @@ const ContentSpaceDetail: React.FC = () => {
             style={{
               maxWidth: 480,
               width: '100%',
-              textAlign: 'center'
+              textAlign: 'center',
             }}
             bordered={false}
           >
@@ -222,11 +285,7 @@ const ContentSpaceDetail: React.FC = () => {
   }
 
   return (
-    <PageContainer
-      title={false}
-      loading={loading}
-      className="space-detail-container"
-    >
+    <PageContainer title={false} loading={loading} className="space-detail-container">
       <Layout className="space-detail-layout">
         {/* 左侧目录树 */}
         <Sider
@@ -248,6 +307,8 @@ const ContentSpaceDetail: React.FC = () => {
             <DirectoryTree
               spaceId={space.id}
               onSelect={handleDirectorySelect}
+              onDocumentOpen={handleDocumentOpen}
+              selectedKey={currentDocGuid || selectedNode?.key}
               showBackButton
               onBack={handleBack}
               spaceName={space.spaceName}
@@ -265,19 +326,64 @@ const ContentSpaceDetail: React.FC = () => {
           />
         </div>
 
-        {/* 右侧内容区域 - 集成 MDXEditor */}
+        {/* 右侧内容区域 */}
         <Content className="space-detail-content">
-          {space?.id && (
+          {viewMode === 'document' && currentDocGuid && space ? (
             <DocumentEditor
-              directory={selectedDirectory}
+              docGuid={currentDocGuid}
               spaceId={space.id}
+              onClose={handleCloseEditor}
+              onTitleChange={(newTitle) => {
+                // TODO: 刷新树节点标题（需要 DirectoryTree 暴露刷新方法）
+                console.log('文档标题已更新:', newTitle);
+              }}
             />
+          ) : viewMode === 'directory' && selectedNode && space ? (
+            <DirectoryView
+              directory={selectedNode}
+              spaceId={space.id}
+              onDocumentOpen={handleDocumentOpen}
+              onCreateDocument={(directoryId) => {
+                // 打开新建文档弹窗
+                setDocFormDirectory(selectedNode);
+                setDocFormVisible(true);
+              }}
+            />
+          ) : (
+            <Card className="editor-card" bordered={false} style={{ boxShadow: "none"}}>
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={
+                  <div>
+                    <p style={{ fontSize: 16, color: '#8c8c8c' }}>请从左侧选择目录或文档</p>
+                    <p style={{ fontSize: 14, color: '#bfbfbf' }}>
+                      选择目录可查看文档列表，选择文档可查看和编辑内容
+                    </p>
+                  </div>
+                }
+              />
+            </Card>
           )}
         </Content>
       </Layout>
+
+      {/* 文档创建弹窗 */}
+      <DocumentFormModal
+        visible={docFormVisible}
+        spaceId={space?.id || 0}
+        directoryId={docFormDirectory?.directoryId}
+        onSuccess={(docGuid) => {
+          setDocFormVisible(false);
+          loadSpaceDetail();
+          // 自动打开新建的文档
+          if (docGuid) {
+            handleDocumentOpen(docGuid, docFormDirectory!);
+          }
+        }}
+        onCancel={() => setDocFormVisible(false)}
+      />
     </PageContainer>
   );
 };
 
 export default ContentSpaceDetail;
-

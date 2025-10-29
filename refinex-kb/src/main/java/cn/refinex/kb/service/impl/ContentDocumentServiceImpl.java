@@ -18,6 +18,7 @@ import cn.refinex.kb.entity.ContentDocument;
 import cn.refinex.kb.entity.ContentDocumentVersion;
 import cn.refinex.kb.entity.ContentSpace;
 import cn.refinex.kb.entity.ContentTag;
+import cn.refinex.kb.enums.DocumentAccessType;
 import cn.refinex.kb.enums.DocumentStatus;
 import cn.refinex.kb.repository.ContentDocumentRepository;
 import cn.refinex.kb.repository.ContentDocumentTagRepository;
@@ -78,6 +79,7 @@ public class ContentDocumentServiceImpl implements ContentDocumentService {
         // 4. 构建实体
         ContentDocument document = BeanConverter.toBean(request, ContentDocument.class);
         document.setDocGuid(docGuid);
+        // 默认文档状态为草稿
         document.setDocStatus(DocumentStatus.DRAFT.getCode());
         document.setVersionNumber(1);
         document.setViewCount(0L);
@@ -108,9 +110,14 @@ public class ContentDocumentServiceImpl implements ContentDocumentService {
 
             // 如果启用自动摘要且没有提供摘要
             if ((request.getDocSummary() == null || request.getDocSummary().isEmpty())) {
+                // 提取移除 Markdown 语法的前 200 个字符作为摘要（末尾补充 ...）
                 String summary = MarkdownUtils.extractSummary(request.getContentBody(), 200);
                 document.setDocSummary(summary);
             }
+        } else {
+            // 没有内容时，设置默认值
+            document.setWordCount(0);
+            document.setReadDuration(0);
         }
 
         // 6. 插入数据库
@@ -218,24 +225,26 @@ public class ContentDocumentServiceImpl implements ContentDocumentService {
                 exist.getVersion()
         );
 
-        // 7. 如果需要，更新标题和摘要
-        if (request.getDocTitle() != null ||
-                (request.getAutoGenerateSummary() != null && request.getAutoGenerateSummary())) {
+        // 7. 如果需要，更新标题和摘要（需要重新查询以获取最新数据）
+        if (request.getDocTitle() != null || (request.getAutoGenerateSummary() != null && request.getAutoGenerateSummary())) {
+            // 重新查询文档以获取最新数据（包含刚才更新的版本号）
+            ContentDocument latestDoc = documentRepository.selectById(documentId);
+            if (latestDoc == null) {
+                throw new BusinessException("文档不存在");
+            }
 
-            ContentDocument updateDoc = new ContentDocument();
-            updateDoc.setId(documentId);
             if (request.getDocTitle() != null) {
-                updateDoc.setDocTitle(request.getDocTitle());
+                latestDoc.setDocTitle(request.getDocTitle());
             }
             if (request.getAutoGenerateSummary() != null && request.getAutoGenerateSummary()
-                    && (exist.getDocSummary() == null || exist.getDocSummary().isEmpty())) {
+                    && (latestDoc.getDocSummary() == null || latestDoc.getDocSummary().isEmpty())) {
                 String summary = MarkdownUtils.extractSummary(request.getContentBody(), 200);
-                updateDoc.setDocSummary(summary);
+                latestDoc.setDocSummary(summary);
             }
-            updateDoc.setUpdateBy(operatorId);
-            updateDoc.setUpdateTime(LocalDateTime.now());
-            updateDoc.setVersion(exist.getVersion() + 1); // 版本号已在 updateContentAndVersion 中递增了
-            documentRepository.update(updateDoc);
+
+            latestDoc.setUpdateBy(operatorId);
+            latestDoc.setUpdateTime(LocalDateTime.now());
+            documentRepository.update(latestDoc);
         }
 
         return newVersionNumber;
@@ -766,8 +775,11 @@ public class ContentDocumentServiceImpl implements ContentDocumentService {
 
     /**
      * 验证空间存在且用户有访问权限
+     *
+     * @param spaceId 空间ID
+     * @param userId  用户ID
      */
-    private ContentSpace validateSpaceAccess(Long spaceId, Long userId) {
+    private void validateSpaceAccess(Long spaceId, Long userId) {
         ContentSpace space = spaceRepository.selectById(spaceId);
         if (space == null) {
             throw new BusinessException("空间不存在");
@@ -775,21 +787,14 @@ public class ContentDocumentServiceImpl implements ContentDocumentService {
 
         // 空间访问权限验证
         // 1. 私有空间：只有拥有者可以访问
-        if (space.getAccessType() != null && space.getAccessType() == 0 && !space.getOwnerId().equals(userId)) {
+        if (space.getAccessType() != null
+                && space.getAccessType().equals(DocumentAccessType.CUSTOM_PRIVATE.getCode())
+                && !space.getOwnerId().equals(userId)) {
             throw new BusinessException("该空间为私有空间，您没有访问权限");
         }
 
-        // 2. 密码访问空间：需要验证密码（暂时简化为只检查是否是拥有者）
-        if (space.getAccessType() != null && space.getAccessType() == 2 && !space.getOwnerId().equals(userId)) {
-            // TODO: 实现密码验证逻辑（需要前端提供密码）
-            throw new BusinessException("该空间需要密码访问");
-        }
-
-
         // 3. 公开空间：所有人都可以访问
         // accessType == 1 或 null，不做限制
-
-        return space;
     }
 
     /**
@@ -807,8 +812,6 @@ public class ContentDocumentServiceImpl implements ContentDocumentService {
         if (!directory.getSpaceId().equals(spaceId)) {
             throw new BusinessException("目录不属于指定空间");
         }
-
-        log.debug("验证目录 {} 属于空间 {} 通过", directoryId, spaceId);
     }
 
     /**

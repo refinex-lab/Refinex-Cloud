@@ -36,7 +36,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/spaces")
 @RequiredArgsConstructor
-@Tag(name = "知识库-内容空间", description = "内容空间管理相关接口")
+@Tag(name = "知识库空间管理", description = "内容空间管理相关接口")
 public class ContentSpaceController {
 
     private final ContentSpaceService contentSpaceService;

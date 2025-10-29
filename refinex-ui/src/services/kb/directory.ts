@@ -11,6 +11,7 @@ import type {
   ContentDirectoryMoveRequest,
   ContentDirectoryTreeNode,
   ContentDirectoryUpdateRequest,
+  ContentTreeNode,
 } from './typings.d';
 
 const API_PREFIX = '/refinex-kb/directory';
@@ -101,5 +102,14 @@ export async function getChildDirectories(spaceId: number, parentId: number) {
       method: 'GET',
     },
   );
+}
+
+/**
+ * 查询目录树（包含文档节点）
+ */
+export async function getDirectoryTreeWithDocs(spaceId: number) {
+  return request<ApiResponse<ContentTreeNode[]>>(`${API_PREFIX}/tree-with-docs/${spaceId}`, {
+    method: 'GET',
+  });
 }
 

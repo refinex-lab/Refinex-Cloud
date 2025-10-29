@@ -34,7 +34,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/documents")
 @RequiredArgsConstructor
-@Tag(name = "知识库 - 文档管理", description = "文档的增删改查、发布、标签管理等")
+@Tag(name = "知识库文档管理", description = "文档的增删改查、发布、标签管理等")
 public class ContentDocumentController {
 
     private final ContentDocumentService documentService;
@@ -70,7 +70,7 @@ public class ContentDocumentController {
         Long operatorId = LoginHelper.getUserId();
         Integer newVersionNumber = documentService.saveContent(id, request, operatorId);
         
-        // 返回版本号和保存时间信息
+        // 返回版本号
         return ApiResult.success(Map.of(
             "versionNumber", newVersionNumber,
             "message", "保存成功"

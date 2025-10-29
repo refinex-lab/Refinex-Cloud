@@ -32,7 +32,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/tags")
-@Tag(name = "内容标签管理（管理端）", description = "管理员管理所有用户的标签")
+@Tag(name = "知识库标签管理（管理端）", description = "管理员管理所有用户的标签")
 public class ContentTagAdminController {
 
     private final ContentTagService contentTagService;

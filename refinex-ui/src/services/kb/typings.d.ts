@@ -197,6 +197,147 @@ export interface ContentDirectoryBatchSortRequest {
   sortItems: DirectorySortItem[];
 }
 
+/** ============ 统一树节点（目录+文档） ============ */
+
+/** 节点类型枚举 */
+export enum TreeNodeType {
+  DIRECTORY = 'directory',
+  DOCUMENT = 'document',
+}
+
+/** 统一树节点（目录+文档） */
+export interface ContentTreeNode {
+  nodeType: TreeNodeType;
+  key: string;
+  title: string;
+
+  // 目录字段
+  directoryId?: number;
+  directoryName?: string;
+  directoryPath?: string;
+
+  // 文档字段
+  documentId?: number;
+  docGuid?: string;
+  docTitle?: string;
+  docStatus?: number;
+  docStatusDesc?: string;
+  accessType?: number;
+
+  // 文档元信息字段
+  docSummary?: string;
+  coverImage?: string;
+  wordCount?: number;
+  readDuration?: number;
+  viewCount?: number;
+  likeCount?: number;
+  collectCount?: number;
+  commentCount?: number;
+  createBy?: number;
+  createByName?: string;
+  createTime?: string;
+  updateTime?: string;
+
+  // 共用字段
+  parentId: number;
+  depthLevel?: number;
+  sort: number;
+  isLeaf: boolean;
+  children?: ContentTreeNode[];
+}
+
+/** ============ 文档管理 ============ */
+
+/** 文档状态枚举 */
+export enum DocumentStatus {
+  /** 草稿 */
+  DRAFT = 0,
+  /** 已发布 */
+  PUBLISHED = 1,
+  /** 已下架 */
+  OFFLINE = 2,
+}
+
+/** 文档访问类型 */
+export enum DocumentAccessType {
+  /** 继承空间 */
+  INHERIT_SPACE = 0,
+  /** 自定义私有 */
+  PRIVATE = 1,
+  /** 自定义公开 */
+  PUBLIC = 2,
+}
+
+/** 文档详情响应 */
+export interface ContentDocumentDetail {
+  id: number;
+  docGuid: string;
+  spaceId: number;
+  directoryId: number;
+  docTitle: string;
+  docSummary?: string;
+  contentBody?: string; // Markdown 内容
+  contentType: string;
+  coverImage?: string;
+  accessType: number;
+  isPaid: number;
+  docStatus: number;
+  docStatusDesc: string;
+  publishTime?: string;
+  wordCount: number;
+  readDuration: number;
+  viewCount: number;
+  likeCount: number;
+  collectCount: number;
+  commentCount: number;
+  versionNumber: number;
+  tags?: Array<{
+    id: number;
+    tagName: string;
+    tagColor: string;
+    tagType: number;
+  }>;
+  directoryName?: string;
+  directoryPath?: string;
+  isLiked?: boolean;
+  isCollected?: boolean;
+  canEdit?: boolean;
+  canDelete?: boolean;
+  createBy: number;
+  createByName?: string;
+  createTime: string;
+  updateTime: string;
+  version: number;
+}
+
+/** 创建文档请求 */
+export interface ContentDocumentCreateRequest {
+  spaceId: number;
+  directoryId: number;
+  docTitle: string;
+  docSummary?: string;
+  contentType?: string;
+  accessType?: number;
+  tagIds?: number[];
+}
+
+/** 保存文档内容请求 */
+export interface ContentDocumentSaveContentRequest {
+  contentBody: string;
+  changeRemark?: string;
+}
+
+/** 更新文档请求 */
+export interface ContentDocumentUpdateRequest {
+  docTitle?: string;
+  docSummary?: string;
+  coverImage?: string;
+  accessType?: number;
+  directoryId?: number;
+  tagIds?: number[];
+  version: number;
+}
+
 // 重新导出通用类型
 export type { ApiResponse, PageResult };
 

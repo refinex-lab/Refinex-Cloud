@@ -28,7 +28,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/documents/{documentId}/versions")
 @RequiredArgsConstructor
-@Tag(name = "知识库 - 文档版本管理", description = "文档版本历史查询、对比、恢复等")
+@Tag(name = "知识库文档版本管理", description = "文档版本历史查询、对比、恢复等")
 public class ContentDocumentVersionController {
 
     private final ContentDocumentVersionService versionService;

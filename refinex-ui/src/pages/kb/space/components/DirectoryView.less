@@ -1,0 +1,536 @@
+.directory-view-container {
+  height: 100%;
+
+  .directory-view-card {
+    height: 100%;
+
+    .ant-card-head {
+      border-bottom: 1px solid #f0f0f0;
+      padding: 16px 24px;
+    }
+
+    .ant-card-body {
+      padding: 20px 24px;
+      height: calc(100% - 73px);
+      overflow-y: auto;
+    }
+  }
+
+  // 搜索框样式 - 精心设计的搜索体验
+  .directory-view-search {
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+
+    // 修复多层嵌套问题
+    :global {
+      .ant-input-search {
+        width: 100%;
+        max-width: 500px;
+
+        .ant-input-wrapper {
+          display: flex;
+          align-items: center;
+        }
+
+        .ant-input-group {
+          display: flex;
+          align-items: stretch;
+        }
+
+        .ant-input {
+          height: 40px;
+          border-radius: 24px 0 0 24px;
+          border: 1px solid #e8e8e8;
+          background: #fafafa;
+          font-size: 14px;
+          padding: 0 20px;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+          &::placeholder {
+            color: #bfbfbf;
+          }
+
+          &:hover {
+            border-color: #d9d9d9;
+            background: #fff;
+          }
+
+          &:focus {
+            border-color: #1890ff;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.08);
+          }
+        }
+
+        .ant-input-group-addon {
+          background: transparent;
+          border: none;
+          padding: 0;
+        }
+
+        .ant-input-search-button {
+          height: 40px;
+          min-width: 40px;
+          border-radius: 0 24px 24px 0;
+          border: 1px solid #e8e8e8;
+          border-left: none;
+          background: #fafafa;
+          color: #8c8c8c;
+          transition: all 0.3s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &:hover {
+            background: #1890ff;
+            border-color: #1890ff;
+            color: #fff;
+          }
+        }
+      }
+    }
+  }
+}
+
+// ==================== 卡片视图样式 ====================
+.document-card {
+  height: 100%;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #f0f0f0;
+  background: #fff;
+  overflow: hidden;
+
+  &:hover {
+    border-color: #1890ff;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.12);
+  }
+
+  .document-card-cover {
+    height: 160px;
+    background: linear-gradient(135deg, #e6f7ff 0%, #f0f9ff 50%, #ffffff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1890ff;
+    font-size: 64px;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(24, 144, 255, 0.05) 0%, transparent 70%);
+      animation: rotate 30s linear infinite;
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .anticon {
+      position: relative;
+      z-index: 1;
+      opacity: 0.6;
+    }
+  }
+
+  .document-card-cover-image {
+    height: 160px;
+    overflow: hidden;
+    background: #f5f5f5;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    &:hover img {
+      transform: scale(1.05);
+    }
+  }
+
+  .ant-card-body {
+    padding: 16px;
+  }
+
+  .ant-card-meta-title {
+    margin-bottom: 8px !important;
+    line-height: 1.4;
+  }
+
+  .document-card-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 22px;
+  }
+
+  .document-card-title {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 600;
+    color: #262626;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.4;
+  }
+
+  .document-card-description {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .document-summary {
+    margin-bottom: 0 !important;
+    color: #8c8c8c;
+    font-size: 13px;
+    line-height: 1.6;
+    min-height: 42px;
+    max-height: 42px;
+    overflow: hidden;
+  }
+
+  .document-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+    min-height: 36px;
+  }
+
+  .document-author {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+
+    .ant-avatar {
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+    }
+
+    .ant-typography {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .document-stats {
+    display: flex;
+    gap: 12px;
+    color: #8c8c8c;
+    font-size: 12px;
+    padding-top: 2px;
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.3s;
+      white-space: nowrap;
+
+      &:hover {
+        color: #1890ff;
+      }
+
+      .anticon {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+// ==================== 列表视图样式 ====================
+.document-list-view {
+  .ant-list-item {
+    padding: 0 !important;
+    margin-bottom: 12px !important;
+    border: none !important;
+
+    &:last-child {
+      margin-bottom: 0 !important;
+    }
+  }
+
+  .document-list-item {
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #f0f0f0 !important;
+    border-radius: 8px;
+    background: #fff;
+    overflow: hidden;
+
+    // 内部容器增加 padding
+    .ant-list-item-meta,
+    .ant-list-item-extra {
+      padding: 20px 20px 0;
+    }
+
+    &:hover {
+      border: 1px solid #1890ff !important;
+      background: #f0f9ff;
+      box-shadow: 0 2px 8px rgba(24, 144, 255, 0.08);
+    }
+
+    .ant-list-item-meta {
+      align-items: flex-start;
+    }
+
+    .ant-list-item-extra {
+      margin-left: 24px;
+
+      .document-list-cover {
+        border-radius: 6px;
+        object-fit: cover;
+        height: 120px;
+        border: 1px solid #f0f0f0;
+      }
+    }
+  }
+
+  .document-list-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1890ff;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .document-list-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #262626;
+    transition: color 0.3s;
+
+    .document-list-item:hover & {
+      color: #1890ff;
+    }
+  }
+
+  .document-list-description {
+    margin-top: 8px;
+  }
+
+  .document-list-meta {
+    margin-bottom: 10px;
+
+    .ant-col {
+      display: flex;
+      align-items: center;
+    }
+
+    .ant-avatar {
+      background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+    }
+  }
+
+  .document-list-stats {
+    color: #8c8c8c;
+    font-size: 13px;
+
+    .ant-space-item {
+      display: flex;
+      align-items: center;
+    }
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.3s;
+
+      &:hover {
+        color: #1890ff;
+      }
+
+      .anticon {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+// ==================== 空状态样式 ====================
+.document-empty-state {
+  padding: 80px 0;
+
+  .ant-empty-image {
+    height: 120px;
+    margin-bottom: 16px;
+  }
+
+  .ant-empty-description {
+    font-size: 14px;
+    color: #8c8c8c;
+    margin-bottom: 16px;
+  }
+
+  .ant-btn-primary {
+    height: 40px;
+    padding: 0 24px;
+    font-size: 14px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(24, 144, 255, 0.2);
+
+    &:hover {
+      box-shadow: 0 4px 8px rgba(24, 144, 255, 0.3);
+    }
+  }
+}
+
+// ==================== 响应式适配 ====================
+@media (max-width: 1200px) {
+  .document-card {
+    .document-stats {
+      gap: 8px;
+      font-size: 11px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .directory-view-container {
+    .directory-view-card {
+      .ant-card-head {
+        padding: 12px 16px;
+      }
+
+      .ant-card-body {
+        padding: 16px;
+      }
+    }
+
+    .directory-view-search {
+      .ant-input-search {
+        max-width: 100%;
+      }
+    }
+  }
+
+  .document-card {
+    .document-card-cover,
+    .document-card-cover-image {
+      height: 120px;
+    }
+
+    .document-card-cover {
+      font-size: 48px;
+    }
+
+    .ant-card-body {
+      padding: 12px;
+    }
+
+    .document-stats {
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+  }
+
+  .document-list-view {
+    .document-list-item {
+      padding: 16px 12px;
+
+      .ant-list-item-extra {
+        display: none;
+      }
+    }
+
+    .document-list-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .directory-view-container {
+    .ant-card-head-wrapper {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+
+      .ant-card-extra {
+        width: 100%;
+
+        .ant-space {
+          width: 100%;
+
+          .ant-space-item:first-child {
+            flex: 1;
+
+            .ant-segmented {
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .document-card {
+    .document-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+  }
+
+  .document-list-view {
+    .document-list-meta {
+      .ant-col {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 8px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+// ==================== 滚动条美化 ====================
+.directory-view-card .ant-card-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.directory-view-card .ant-card-body::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 3px;
+}
+
+.directory-view-card .ant-card-body::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+  border-radius: 3px;
+
+  &:hover {
+    background: #bfbfbf;
+  }
+}

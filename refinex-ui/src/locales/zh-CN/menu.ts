@@ -45,6 +45,7 @@ export default {
   'menu.system.role': '角色管理',
   'menu.system.role.users': '角色用户管理',
   'menu.system.dictionary': '字典管理',
+  'menu.system.dictionary-data': '字典数据',
   'menu.system.config': '系统配置',
   'menu.logs': '日志管理',
   'menu.logs.operation': '操作日志',

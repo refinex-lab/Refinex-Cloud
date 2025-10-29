@@ -6,6 +6,7 @@ import cn.refinex.kb.controller.directory.dto.request.ContentDirectoryMoveReques
 import cn.refinex.kb.controller.directory.dto.request.ContentDirectoryUpdateRequestDTO;
 import cn.refinex.kb.controller.directory.dto.response.ContentDirectoryResponseDTO;
 import cn.refinex.kb.controller.directory.dto.response.ContentDirectoryTreeResponseDTO;
+import cn.refinex.kb.controller.directory.dto.response.ContentTreeNodeResponseDTO;
 
 import java.util.List;
 
@@ -90,5 +91,15 @@ public interface ContentDirectoryService {
      * @return 子目录列表
      */
     List<ContentDirectoryResponseDTO> getChildDirectories(Long spaceId, Long parentId);
+
+    /**
+     * 查询空间下的统一树结构（包含目录和文档节点）
+     * 用于前端树形展示，合并目录和文档为统一的树节点
+     *
+     * @param spaceId 空间ID
+     * @param userId  用户ID（用于权限过滤，可为null）
+     * @return 统一树节点列表
+     */
+    List<ContentTreeNodeResponseDTO> getTreeWithDocuments(Long spaceId, Long userId);
 }
 

@@ -10,6 +10,7 @@ import cn.refinex.kb.controller.directory.dto.request.ContentDirectoryMoveReques
 import cn.refinex.kb.controller.directory.dto.request.ContentDirectoryUpdateRequestDTO;
 import cn.refinex.kb.controller.directory.dto.response.ContentDirectoryResponseDTO;
 import cn.refinex.kb.controller.directory.dto.response.ContentDirectoryTreeResponseDTO;
+import cn.refinex.kb.controller.directory.dto.response.ContentTreeNodeResponseDTO;
 import cn.refinex.kb.service.ContentDirectoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -119,6 +120,17 @@ public class ContentDirectoryController {
             @PathVariable Long parentId) {
         List<ContentDirectoryResponseDTO> children = directoryService.getChildDirectories(spaceId, parentId);
         return ApiResult.success(children);
+    }
+
+    @GetMapping("/tree-with-docs/{spaceId}")
+    @Operation(summary = "查询目录树（包含文档节点）", description = "返回统一的树结构，包含目录和文档节点，用于前端树形展示")
+    public ApiResult<List<ContentTreeNodeResponseDTO>> getTreeWithDocuments(
+            @Parameter(description = "空间ID", required = true, example = "100")
+            @PathVariable Long spaceId) {
+
+        Long userId = LoginHelper.getUserId();
+        List<ContentTreeNodeResponseDTO> tree = directoryService.getTreeWithDocuments(spaceId, userId);
+        return ApiResult.success(tree);
     }
 }
 
