@@ -4,7 +4,7 @@
  * 深度集成后端 API，支持真实的文档加载、编辑、保存
  */
 import React, { useRef, useState, useEffect } from 'react';
-import { Card, Button, Space, message, Input, Spin, Empty, Tooltip, Tag } from 'antd';
+import { Card, Button, Space, message, Input, Spin, Empty, Tooltip, Tag, Divider } from 'antd';
 import {
   SaveOutlined,
   CloseOutlined,
@@ -12,6 +12,7 @@ import {
   ClockCircleOutlined,
   CheckOutlined,
   StopOutlined,
+  TagsOutlined,
 } from '@ant-design/icons';
 import type { MDXEditorMethods } from '@mdxeditor/editor';
 import MDXEditorWrapper from '@/components/MDXEditor';
@@ -23,7 +24,9 @@ import {
   updateDocument,
   publishDocument,
   offlineDocument,
+  bindDocumentTags,
 } from '@/services/kb/document';
+import TagSelector from './TagSelector';
 import './DocumentEditor.less';
 
 interface DocumentEditorProps {
@@ -52,6 +55,7 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
   const [lastSaveTime, setLastSaveTime] = useState<Date | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [autoSaveTimer, setAutoSaveTimer] = useState<NodeJS.Timeout | null>(null);
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 
   // 加载文档
   const loadDocument = async () => {
@@ -65,6 +69,9 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
         setDocumentTitle(response.data.docTitle);
         setMarkdown(response.data.contentBody || '');
         setHasUnsavedChanges(false);
+        // 加载文档标签
+        const tagIds = response.data.tags?.map((tag) => tag.id) || [];
+        setSelectedTagIds(tagIds);
       }
     } catch (error) {
       console.error('加载文档失败:', error);
@@ -212,6 +219,24 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
     }
   };
 
+  // 绑定标签
+  const handleTagsChange = async (tagIds: number[]) => {
+    if (!document?.id) {
+      // 如果文档还未创建,只更新本地状态
+      setSelectedTagIds(tagIds);
+      return;
+    }
+
+    try {
+      await bindDocumentTags(document.id, tagIds);
+      setSelectedTagIds(tagIds);
+      message.success('标签已更新');
+    } catch (error) {
+      console.error('绑定标签失败:', error);
+      message.error('绑定标签失败');
+    }
+  };
+
   // 如果没有选择文档
   if (!docGuid) {
     return (
@@ -240,7 +265,8 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
         className="editor-card"
         title={
           <div className="editor-header">
-            <Space size="middle">
+            <Space size="middle" split={<Divider type="vertical" />}>
+              {/* 文档标题 */}
               <Input
                 value={documentTitle}
                 onChange={(e) => setDocumentTitle(e.target.value)}
@@ -252,18 +278,17 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
                 style={{ fontSize: 18, fontWeight: 600, width: 300 }}
                 disabled={loading}
               />
-              {/*{document?.docStatus === DocumentStatus.DRAFT && (*/}
-              {/*  <Tag color="default">草稿</Tag>*/}
-              {/*)}*/}
-              {/*{document?.docStatus === DocumentStatus.PUBLISHED && (*/}
-              {/*  <Tag color="success">已发布</Tag>*/}
-              {/*)}*/}
-              {/*{document?.docStatus === DocumentStatus.OFFLINE && (*/}
-              {/*  <Tag color="error">已下架</Tag>*/}
-              {/*)}*/}
-              {/*{hasUnsavedChanges && (*/}
-              {/*  <Tag color="warning">未保存</Tag>*/}
-              {/*)}*/}
+              
+              {/* 标签选择器 */}
+              <div className="editor-tags">
+                <TagsOutlined style={{ color: '#8c8c8c', marginRight: 8 }} />
+                <TagSelector
+                  value={selectedTagIds}
+                  onChange={handleTagsChange}
+                  spaceId={spaceId}
+                  maxCount={5}
+                />
+              </div>
             </Space>
           </div>
         }

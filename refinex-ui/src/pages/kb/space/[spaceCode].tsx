@@ -116,20 +116,12 @@ const ContentSpaceDetail: React.FC = () => {
 
   // 文档打开回调
   const handleDocumentOpen = (docGuid: string, node: ContentTreeNode) => {
-    console.log('handleDocumentOpen 被调用');
-    console.log('docGuid:', docGuid);
-    console.log('node:', node);
-    console.log('spaceCode:', spaceCode);
-
     setCurrentDocGuid(docGuid);
     setViewMode('document');
     setSelectedNode(node);
 
     // 更新 URL（使用 history.replace 避免历史记录堆积）
     history.replace(`/kb/space/${spaceCode}?doc=${docGuid}`);
-
-    console.log('URL已更新，currentDocGuid:', docGuid);
-    console.log('viewMode:', 'document');
   };
 
   // 关闭文档编辑器
@@ -334,8 +326,6 @@ const ContentSpaceDetail: React.FC = () => {
               spaceId={space.id}
               onClose={handleCloseEditor}
               onTitleChange={(newTitle) => {
-                // TODO: 刷新树节点标题（需要 DirectoryTree 暴露刷新方法）
-                console.log('文档标题已更新:', newTitle);
               }}
             />
           ) : viewMode === 'directory' && selectedNode && space ? (

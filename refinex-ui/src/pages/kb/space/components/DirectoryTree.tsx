@@ -443,8 +443,6 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
           label: '打开',
           icon: <FileTextOutlined />,
           onClick: () => {
-            console.log('打开文档:', node);
-            console.log('docGuid:', node.docGuid);
             setDropdownOpenKey(null);
             if (node.docGuid) {
               onDocumentOpen?.(node.docGuid, node);

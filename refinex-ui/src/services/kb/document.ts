@@ -109,3 +109,68 @@ export async function offlineDocument(documentId: number) {
   });
 }
 
+/**
+ * 点赞文档
+ */
+export async function likeDocument(documentId: number) {
+  return request<ApiResponse<boolean>>(`${API_PREFIX}/${documentId}/like`, {
+    method: 'POST',
+  });
+}
+
+/**
+ * 取消点赞
+ */
+export async function unlikeDocument(documentId: number) {
+  return request<ApiResponse<boolean>>(`${API_PREFIX}/${documentId}/like`, {
+    method: 'DELETE',
+  });
+}
+
+/**
+ * 收藏文档
+ */
+export async function collectDocument(documentId: number) {
+  return request<ApiResponse<boolean>>(`${API_PREFIX}/${documentId}/collect`, {
+    method: 'POST',
+  });
+}
+
+/**
+ * 取消收藏
+ */
+export async function uncollectDocument(documentId: number) {
+  return request<ApiResponse<boolean>>(`${API_PREFIX}/${documentId}/collect`, {
+    method: 'DELETE',
+  });
+}
+
+/**
+ * 记录浏览文档
+ */
+export async function recordView(documentId: number, duration?: number) {
+  return request<ApiResponse<boolean>>(`${API_PREFIX}/${documentId}/view`, {
+    method: 'POST',
+    params: { duration },
+  });
+}
+
+/**
+ * 绑定标签
+ */
+export async function bindDocumentTags(documentId: number, tagIds: number[]) {
+  return request<ApiResponse<boolean>>(`${API_PREFIX}/${documentId}/tags`, {
+    method: 'POST',
+    data: tagIds,
+  });
+}
+
+/**
+ * 解绑标签
+ */
+export async function unbindDocumentTag(documentId: number, tagId: number) {
+  return request<ApiResponse<boolean>>(`${API_PREFIX}/${documentId}/tags/${tagId}`, {
+    method: 'DELETE',
+  });
+}
+

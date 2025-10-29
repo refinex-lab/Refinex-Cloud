@@ -1,0 +1,333 @@
+// 标签选择器样式
+.tag-selector-container {
+  display: inline-block;
+
+  .ant-space {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+}
+
+// 全部标签 Popover 样式
+.tag-selector-all-overlay {
+  .ant-popover-inner {
+    border-radius: 8px;
+  }
+
+  .ant-popover-inner-content {
+    padding: 12px;
+  }
+
+  .tag-selector-all-tags {
+    .all-tags-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #262626;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+  }
+}
+
+// Popover 样式覆盖
+.tag-selector-overlay {
+  .ant-popover-inner {
+    border-radius: 8px;
+  }
+
+  .ant-popover-title {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 12px 16px;
+    font-weight: 600;
+  }
+
+  .ant-popover-inner-content {
+    padding: 12px;
+    width: 320px;
+  }
+}
+
+// Popover 内容区域
+.tag-selector-popover {
+  .tag-list-container {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+
+    // 美化滚动条
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f0f0f0;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #d9d9d9;
+      border-radius: 3px;
+
+      &:hover {
+        background: #bfbfbf;
+      }
+    }
+  }
+
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-content: flex-start;
+  }
+
+  .tag-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    background: transparent;
+    position: relative;
+
+    // Tag 本身的样式
+    .ant-tag {
+      margin: 0;
+      font-size: 13px;
+      padding: 4px 12px;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      line-height: 1.5;
+      transition: all 0.25s;
+      cursor: pointer;
+
+      // 默认状态 - 浅色背景
+      &[color="blue"] {
+        background: #e6f7ff;
+        color: #1890ff;
+        border-color: transparent;
+      }
+
+      &[color="green"] {
+        background: #f6ffed;
+        color: #52c41a;
+        border-color: transparent;
+      }
+
+      &[color="orange"] {
+        background: #fff7e6;
+        color: #fa8c16;
+        border-color: transparent;
+      }
+
+      &[color="red"] {
+        background: #fff1f0;
+        color: #f5222d;
+        border-color: transparent;
+      }
+
+      &[color="purple"] {
+        background: #f9f0ff;
+        color: #722ed1;
+        border-color: transparent;
+      }
+
+      &[color="cyan"] {
+        background: #e6fffb;
+        color: #13c2c2;
+        border-color: transparent;
+      }
+
+      &[color="geekblue"] {
+        background: #f0f5ff;
+        color: #2f54eb;
+        border-color: transparent;
+      }
+
+      &[color="magenta"] {
+        background: #fff0f6;
+        color: #eb2f96;
+        border-color: transparent;
+      }
+
+      &[color="volcano"] {
+        background: #fff2e8;
+        color: #fa541c;
+        border-color: transparent;
+      }
+
+      &[color="gold"] {
+        background: #fffbe6;
+        color: #faad14;
+        border-color: transparent;
+      }
+
+      &[color="lime"] {
+        background: #fcffe6;
+        color: #a0d911;
+        border-color: transparent;
+      }
+    }
+
+    // Hover 效果 - 加深背景色
+    &:hover {
+      .ant-tag {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+        &[color="blue"] {
+          background: #bae7ff;
+          border-color: #91d5ff;
+        }
+
+        &[color="green"] {
+          background: #d9f7be;
+          border-color: #b7eb8f;
+        }
+
+        &[color="orange"] {
+          background: #ffd591;
+          border-color: #ffc069;
+        }
+
+        &[color="red"] {
+          background: #ffccc7;
+          border-color: #ffa39e;
+        }
+
+        &[color="purple"] {
+          background: #d3adf7;
+          border-color: #b37feb;
+        }
+
+        &[color="cyan"] {
+          background: #87e8de;
+          border-color: #5cdbd3;
+        }
+
+        &[color="geekblue"] {
+          background: #adc6ff;
+          border-color: #85a5ff;
+        }
+
+        &[color="magenta"] {
+          background: #ffadd2;
+          border-color: #ff85c0;
+        }
+
+        &[color="volcano"] {
+          background: #ffbb96;
+          border-color: #ff9c6e;
+        }
+
+        &[color="gold"] {
+          background: #ffe58f;
+          border-color: #ffd666;
+        }
+
+        &[color="lime"] {
+          background: #eaff8f;
+          border-color: #d3f261;
+        }
+      }
+    }
+
+    // 选中状态 - 边框加粗
+    &.selected {
+      .ant-tag {
+        font-weight: 600;
+
+        &[color="blue"] {
+          background: #1890ff;
+          color: #fff;
+          border-color: #1890ff;
+        }
+
+        &[color="green"] {
+          background: #52c41a;
+          color: #fff;
+          border-color: #52c41a;
+        }
+
+        &[color="orange"] {
+          background: #fa8c16;
+          color: #fff;
+          border-color: #fa8c16;
+        }
+
+        &[color="red"] {
+          background: #f5222d;
+          color: #fff;
+          border-color: #f5222d;
+        }
+
+        &[color="purple"] {
+          background: #722ed1;
+          color: #fff;
+          border-color: #722ed1;
+        }
+
+        &[color="cyan"] {
+          background: #13c2c2;
+          color: #fff;
+          border-color: #13c2c2;
+        }
+
+        &[color="geekblue"] {
+          background: #2f54eb;
+          color: #fff;
+          border-color: #2f54eb;
+        }
+
+        &[color="magenta"] {
+          background: #eb2f96;
+          color: #fff;
+          border-color: #eb2f96;
+        }
+
+        &[color="volcano"] {
+          background: #fa541c;
+          color: #fff;
+          border-color: #fa541c;
+        }
+
+        &[color="gold"] {
+          background: #faad14;
+          color: #fff;
+          border-color: #faad14;
+        }
+
+        &[color="lime"] {
+          background: #a0d911;
+          color: #fff;
+          border-color: #a0d911;
+        }
+      }
+    }
+
+    // 勾选图标
+    .anticon-check {
+      font-size: 14px;
+      font-weight: bold;
+      color: #fff;
+    }
+  }
+
+  .tag-selector-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f0;
+
+    .tag-count {
+      font-size: 12px;
+      color: #8c8c8c;
+    }
+  }
+}
+

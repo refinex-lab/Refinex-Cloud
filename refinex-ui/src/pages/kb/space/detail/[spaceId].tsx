@@ -69,19 +69,12 @@ const SpaceDetail: React.FC = () => {
 
   // 文档打开回调
   const handleDocumentOpen = (docGuid: string, node: ContentTreeNode) => {
-    console.log('handleDocumentOpen 被调用');
-    console.log('docGuid:', docGuid);
-    console.log('node:', node);
-
     setCurrentDocGuid(docGuid);
     setViewMode('document');
     setSelectedNode(node);
 
     // 更新 URL
     history.replace(`/kb/space/detail/${spaceId}?doc=${docGuid}`);
-
-    console.log('URL已更新，currentDocGuid:', docGuid);
-    console.log('viewMode:', 'document');
   };
 
   // 关闭文档编辑器
@@ -156,8 +149,6 @@ const SpaceDetail: React.FC = () => {
               spaceId={Number(spaceId)}
               onDocumentOpen={(docGuid, doc) => handleDocumentOpen(docGuid, doc)}
               onCreateDocument={(directoryId) => {
-                // TODO: 打开新建文档弹窗
-                console.log('创建文档在目录:', directoryId);
               }}
             />
           ) : (
