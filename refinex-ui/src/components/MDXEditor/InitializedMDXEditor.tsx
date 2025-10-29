@@ -21,9 +21,13 @@ import {
   diffSourcePlugin,
   frontmatterPlugin,
   searchPlugin,
+  directivesPlugin,
+  AdmonitionDirectiveDescriptor,
+  sandpackPlugin,
   toolbarPlugin,
   UndoRedo,
   BoldItalicUnderlineToggles,
+  CodeToggle,
   ListsToggle,
   BlockTypeSelect,
   CreateLink,
@@ -31,6 +35,13 @@ import {
   InsertTable,
   InsertThematicBreak,
   InsertCodeBlock,
+  InsertAdmonition,
+  InsertSandpack,
+  ShowSandpackInfo,
+  ConditionalContents,
+  ChangeCodeMirrorLanguage,
+  ChangeAdmonitionType,
+  InsertFrontmatter,
   DiffSourceToggleWrapper,
   Separator,
   type MDXEditorMethods,
@@ -140,6 +151,86 @@ export default function InitializedMDXEditor({
             },
           }),
 
+          // Directives 插件（支持 Admonitions 等）
+          directivesPlugin({
+            directiveDescriptors: [AdmonitionDirectiveDescriptor]
+          }),
+
+          // Sandpack 实时代码编辑器插件
+          sandpackPlugin({
+            sandpackConfig: {
+              defaultPreset: 'react',
+              presets: [
+                {
+                  label: 'React',
+                  name: 'react',
+                  meta: 'live react',
+                  sandpackTemplate: 'react',
+                  sandpackTheme: 'light',
+                  snippetFileName: '/App.js',
+                  snippetLanguage: 'jsx',
+                  initialSnippetContent: `export default function App() {
+  return (
+    <div>
+      <h1>Hello World</h1>
+      <p>Start editing to see some magic happen!</p>
+    </div>
+  );
+}`,
+                },
+                {
+                  label: 'React TypeScript',
+                  name: 'react-ts',
+                  meta: 'live',
+                  sandpackTemplate: 'react-ts',
+                  sandpackTheme: 'light',
+                  snippetFileName: '/App.tsx',
+                  snippetLanguage: 'tsx',
+                  initialSnippetContent: `export default function App() {
+  return (
+    <div>
+      <h1>Hello TypeScript</h1>
+      <p>Fully typed React component!</p>
+    </div>
+  );
+}`,
+                },
+                {
+                  label: 'Vanilla JavaScript',
+                  name: 'vanilla',
+                  meta: 'live',
+                  sandpackTemplate: 'vanilla',
+                  sandpackTheme: 'light',
+                  snippetFileName: '/index.js',
+                  snippetLanguage: 'javascript',
+                  initialSnippetContent: `document.getElementById('app').innerHTML = \`
+<h1>Hello Vanilla JS</h1>
+<p>You can use vanilla JavaScript here!</p>
+\`;`,
+                },
+                {
+                  label: 'Vue 3',
+                  name: 'vue',
+                  meta: 'live',
+                  sandpackTemplate: 'vue',
+                  sandpackTheme: 'light',
+                  snippetFileName: '/src/App.vue',
+                  snippetLanguage: 'vue',
+                  initialSnippetContent: `<script setup>
+import { ref } from 'vue'
+
+const count = ref(0)
+</script>
+
+<template>
+  <h1>Hello Vue 3!</h1>
+  <button @click="count++">Count: {{ count }}</button>
+</template>`,
+                },
+              ],
+            },
+          }),
+
           // Diff/Source 模式切换
           diffSourcePlugin({ viewMode: 'rich-text' }),
 
@@ -153,23 +244,72 @@ export default function InitializedMDXEditor({
           toolbarPlugin({
             toolbarContents: () => (
               <>
+                {/* 撤销/重做 */}
                 <UndoRedo />
                 <Separator />
+
+                {/* 文本格式 */}
                 <BoldItalicUnderlineToggles />
+                <CodeToggle />
                 <Separator />
+
+                {/* 块类型选择 */}
                 <BlockTypeSelect />
                 <Separator />
+
+                {/* 列表 */}
                 <ListsToggle />
                 <Separator />
+
+                {/* 链接和图片 */}
                 <CreateLink />
                 <InsertImage />
                 <Separator />
+
+                {/* 表格、分隔线、代码块 */}
                 <InsertTable />
                 <InsertThematicBreak />
                 <InsertCodeBlock />
                 <Separator />
+
+                {/* Admonitions 提示框 */}
+                <InsertAdmonition />
+                <Separator />
+
+                {/* Sandpack 实时代码编辑器 */}
+                <InsertSandpack />
+                <Separator />
+
+                {/* Front-matter */}
+                <InsertFrontmatter />
+                <Separator />
+
+                {/* 搜索 */}
                 <SearchButton />
                 <Separator />
+
+                {/* 条件工具栏：根据编辑器焦点动态显示 */}
+                <ConditionalContents
+                  options={[
+                    {
+                      // 代码块聚焦时显示语言切换
+                      when: (editor) => editor?.editorType === 'codeblock',
+                      contents: () => <ChangeCodeMirrorLanguage />,
+                    },
+                    {
+                      // Admonition 聚焦时显示类型切换
+                      when: (editor) => editor?.editorType === 'directive',
+                      contents: () => <ChangeAdmonitionType />,
+                    },
+                    {
+                      // Sandpack 聚焦时显示信息
+                      when: (editor) => editor?.editorType === 'sandpack',
+                      contents: () => <ShowSandpackInfo />,
+                    },
+                  ]}
+                />
+
+                {/* 源码模式切换 */}
                 <DiffSourceToggleWrapper>
                   <></>
                 </DiffSourceToggleWrapper>

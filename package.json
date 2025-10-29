@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "@mdxeditor/editor": "^3.48.0"
+    "@codesandbox/sandpack-react": "^2.20.0",
+    "@mdxeditor/editor": "^3.48.0",
+    "remark-sandpack": "^0.0.5"
   }
 }
