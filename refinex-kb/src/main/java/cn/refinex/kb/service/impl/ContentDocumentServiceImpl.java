@@ -160,15 +160,48 @@ public class ContentDocumentServiceImpl implements ContentDocumentService {
         // 2. 权限验证：只有创建者可以更新
         validateDocumentEditPermission(exist, operatorId);
 
-        // 3. 构建更新实体
-        ContentDocument document = BeanConverter.toBean(request, ContentDocument.class);
-        document.setId(id);
-        document.setUpdateBy(operatorId);
-        document.setUpdateTime(LocalDateTime.now());
-        document.setVersion(exist.getVersion());
+        // 3. 采用部分更新策略：只更新非 null 字段
+        // 先复制现有文档的所有字段，然后用请求中的非 null 字段覆盖
+        if (request.getDocTitle() != null) {
+            exist.setDocTitle(request.getDocTitle());
+        }
+        if (request.getDocSummary() != null) {
+            exist.setDocSummary(request.getDocSummary());
+        }
+        if (request.getCoverImage() != null) {
+            exist.setCoverImage(request.getCoverImage());
+        }
+        if (request.getAccessType() != null) {
+            exist.setAccessType(request.getAccessType());
+        }
+        if (request.getIsPaid() != null) {
+            exist.setIsPaid(request.getIsPaid());
+        }
+        if (request.getPaidAmount() != null) {
+            exist.setPaidAmount(request.getPaidAmount());
+        }
+        if (request.getSeoKeywords() != null) {
+            exist.setSeoKeywords(request.getSeoKeywords());
+        }
+        if (request.getSeoDescription() != null) {
+            exist.setSeoDescription(request.getSeoDescription());
+        }
+        if (request.getSort() != null) {
+            exist.setSort(request.getSort());
+        }
+        if (request.getStatus() != null) {
+            exist.setStatus(request.getStatus());
+        }
+        if (request.getRemark() != null) {
+            exist.setRemark(request.getRemark());
+        }
 
-        // 4. 更新数据库
-        return documentRepository.update(document) > 0;
+        // 4. 设置更新人和更新时间
+        exist.setUpdateBy(operatorId);
+        exist.setUpdateTime(LocalDateTime.now());
+
+        // 5. 更新数据库
+        return documentRepository.update(exist) > 0;
     }
 
     /**
