@@ -98,6 +98,9 @@ public class ContentTreeNodeResponseDTO {
     @Schema(description = "更新时间", example = "2025-01-20 15:45:00")
     private String updateTime;
 
+    @Schema(description = "文档标签列表")
+    private List<DocumentTagDTO> tags;
+
     // ==================== 共用字段 ====================
 
     @Schema(description = "父节点ID（0表示根节点）", example = "0")
@@ -114,5 +117,30 @@ public class ContentTreeNodeResponseDTO {
 
     @Schema(description = "子节点列表")
     private List<ContentTreeNodeResponseDTO> children;
+
+    /**
+     * 文档标签DTO
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(description = "文档标签")
+    public static class DocumentTagDTO {
+        @Schema(description = "标签ID", example = "1")
+        private Long id;
+
+        @Schema(description = "标签名称", example = "Java")
+        private String tagName;
+
+        @Schema(description = "标签颜色", example = "blue")
+        private String tagColor;
+
+        @Schema(description = "标签类型：0=系统标签,1=用户自定义", example = "1")
+        private Integer tagType;
+
+        @Schema(description = "使用次数", example = "25")
+        private Long usageCount;
+    }
 }
 

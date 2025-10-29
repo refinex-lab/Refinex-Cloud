@@ -238,6 +238,15 @@ export interface ContentTreeNode {
   createTime?: string;
   updateTime?: string;
 
+  // 文档标签
+  tags?: Array<{
+    id: number;
+    tagName: string;
+    tagColor: string;
+    tagType: number;
+    usageCount?: number;
+  }>;
+
   // 共用字段
   parentId: number;
   depthLevel?: number;

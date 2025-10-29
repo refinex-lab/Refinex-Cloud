@@ -100,11 +100,26 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid #f0f0f0;
   background: #fff;
-  overflow: hidden;
+  overflow: visible; // 允许悬浮层溢出
 
   &:hover {
     border-color: #1890ff;
     box-shadow: 0 2px 8px rgba(24, 144, 255, 0.12);
+  }
+  
+  // 卡片的封面区域需要保持裁剪
+  :global {
+    .ant-card-cover {
+      overflow: hidden; // 封面区域裁剪图片
+      border-radius: 8px 8px 0 0;
+    }
+  }
+
+  // 封面包装器（统一高度）
+  .document-card-cover-wrapper {
+    position: relative;
+    height: 160px;
+    overflow: visible; // 改为 visible，允许悬浮层溢出
   }
 
   .document-card-cover {
@@ -116,7 +131,8 @@
     color: #1890ff;
     font-size: 64px;
     position: relative;
-    overflow: hidden;
+    overflow: hidden; // 封面本身裁剪内容
+    border-radius: 8px 8px 0 0;
 
     &::before {
       content: '';
@@ -147,8 +163,9 @@
 
   .document-card-cover-image {
     height: 160px;
-    overflow: hidden;
+    overflow: hidden; // 裁剪图片
     background: #f5f5f5;
+    border-radius: 8px 8px 0 0;
 
     img {
       width: 100%;
@@ -159,6 +176,93 @@
 
     &:hover img {
       transform: scale(1.05);
+    }
+  }
+
+  // ==================== 标签悬浮层样式 ====================
+  .document-card-tags-overlay {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 100; // 提高层级，确保在卡片之上
+    
+    // 标签云图标指示器
+    .tags-cloud-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: rgba(24, 144, 255, 0.85); // 默认蓝色，更醒目
+      backdrop-filter: blur(8px);
+      border-radius: 16px;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+      
+      .tags-count {
+        font-size: 12px;
+        font-weight: 600;
+        min-width: 16px;
+        text-align: center;
+      }
+      
+      &:hover {
+        background: rgba(24, 144, 255, 1); // Hover 时更深蓝色
+        transform: scale(1.08);
+        box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
+      }
+    }
+    
+    // 悬浮显示的标签列表（默认隐藏）
+    .tags-popover-content {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 8px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      min-width: 200px; // 最小宽度
+      max-width: 300px; // 最大宽度，支持多个标签自动换行
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      z-index: 1000; // 极高层级，确保不被遮挡
+      
+      // 小三角箭头
+      &::before {
+        content: '';
+        position: absolute;
+        top: -6px;
+        right: 12px;
+        width: 12px;
+        height: 12px;
+        background: rgba(255, 255, 255, 0.98);
+        transform: rotate(45deg);
+        border-top-left-radius: 2px;
+        box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.05);
+      }
+      
+      // 标签自动换行布局
+      :global {
+        .ant-space {
+          width: 100%;
+        }
+      }
+    }
+    
+    // Hover 状态：显示标签列表
+    &:hover .tags-popover-content {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
     }
   }
 
@@ -203,6 +307,20 @@
     min-height: 42px;
     max-height: 42px;
     overflow: hidden;
+  }
+
+  .document-tags {
+    margin-top: 8px;
+    min-height: 24px;
+
+    .ant-tag {
+      transition: all 0.25s;
+
+      &:hover {
+        opacity: 0.8;
+        transform: translateY(-1px);
+      }
+    }
   }
 
   .document-meta {

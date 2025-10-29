@@ -17,6 +17,7 @@ import cn.refinex.kb.entity.ContentSpace;
 import cn.refinex.kb.enums.DocumentStatus;
 import cn.refinex.kb.repository.ContentDirectoryRepository;
 import cn.refinex.kb.repository.ContentDocumentRepository;
+import cn.refinex.kb.repository.ContentDocumentTagRepository;
 import cn.refinex.kb.repository.ContentSpaceRepository;
 import cn.refinex.kb.service.ContentDirectoryService;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,7 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
     private final ContentSpaceRepository spaceRepository;
     private final ContentDocumentRepository documentRepository;
     private final PlatformUserServiceClient platformUserServiceClient;
+    private final ContentDocumentTagRepository documentTagRepository;
 
     /**
      * 创建目录
@@ -549,6 +551,25 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
             }
         }
 
+        // 查询文档标签
+        List<ContentTreeNodeResponseDTO.DocumentTagDTO> tags = null;
+        try {
+            List<cn.refinex.kb.entity.ContentTag> tagList = documentTagRepository.selectTagsByDocumentId(document.getId());
+            if (tagList != null && !tagList.isEmpty()) {
+                tags = tagList.stream()
+                        .map(tag -> ContentTreeNodeResponseDTO.DocumentTagDTO.builder()
+                                .id(tag.getId())
+                                .tagName(tag.getTagName())
+                                .tagColor(tag.getTagColor())
+                                .tagType(tag.getTagType())
+                                .usageCount(tag.getUsageCount())
+                                .build())
+                        .toList();
+            }
+        } catch (Exception e) {
+            log.warn("查询文档标签失败，documentId: {}", document.getId(), e);
+        }
+
         return ContentTreeNodeResponseDTO.builder()
                 .nodeType("document")
                 .key("doc_" + document.getDocGuid())
@@ -572,6 +593,8 @@ public class ContentDirectoryServiceImpl implements ContentDirectoryService {
                 .createByName(createByName)
                 .createTime(document.getCreateTime() != null ? document.getCreateTime().toString() : null)
                 .updateTime(document.getUpdateTime() != null ? document.getUpdateTime().toString() : null)
+                // 文档标签
+                .tags(tags)
                 // 树结构字段
                 .parentId(document.getDirectoryId())
                 .depthLevel(null) // 文档不需要深度

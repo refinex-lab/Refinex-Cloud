@@ -29,6 +29,7 @@ import {
   PlusOutlined,
   SearchOutlined,
   StarOutlined,
+  TagsOutlined,
   UnorderedListOutlined,
   UserOutlined,
 } from '@ant-design/icons';
@@ -134,15 +135,53 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
             className="document-card"
             onClick={() => onDocumentOpen(doc.docGuid!, doc)}
             cover={
-              doc.coverImage ? (
-                <div className="document-card-cover-image">
-                  <img alt={doc.docTitle || doc.title} src={doc.coverImage} />
-                </div>
-              ) : (
-                <div className="document-card-cover">
-                  <FileTextOutlined />
-                </div>
-              )
+              <div className="document-card-cover-wrapper">
+                {doc.coverImage ? (
+                  <div className="document-card-cover-image">
+                    <img alt={doc.docTitle || doc.title} src={doc.coverImage} />
+                  </div>
+                ) : (
+                  <div className="document-card-cover">
+                    <FileTextOutlined />
+                  </div>
+                )}
+
+                {/* 标签悬浮层 - 在封面内部 */}
+                {doc.tags && doc.tags.length > 0 && (
+                  <div className="document-card-tags-overlay">
+                    {/* 标签云图标 */}
+                    <div className="tags-cloud-indicator">
+                      <TagsOutlined />
+                      <span className="tags-count">{doc.tags.length}</span>
+                    </div>
+
+                    {/* 悬浮显示的标签列表 */}
+                    <div className="tags-popover-content">
+                      <Space size={6} wrap>
+                        {doc.tags.map((tag) => (
+                          <Tag
+                            key={tag.id}
+                            color={tag.tagColor || 'blue'}
+                            style={{
+                              fontSize: 12,
+                              padding: '2px 8px',
+                              margin: 0,
+                              cursor: 'pointer',
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // TODO: 点击标签筛选同标签文档
+                              console.log('Filter by tag:', tag.tagName);
+                            }}
+                          >
+                            {tag.tagName}
+                          </Tag>
+                        ))}
+                      </Space>
+                    </div>
+                  </div>
+                )}
+              </div>
             }
           >
             <Card.Meta
@@ -251,6 +290,46 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
                 >
                   {doc.docSummary || '暂无简介'}
                 </Paragraph>
+
+                {/* 标签展示 */}
+                {doc.tags && doc.tags.length > 0 && (
+                  <div style={{ marginBottom: 12 }}>
+                    <Space size={6} wrap>
+                      {doc.tags.slice(0, 5).map((tag) => (
+                        <Tag
+                          key={tag.id}
+                          color={tag.tagColor || 'blue'}
+                          style={{
+                            fontSize: 12,
+                            padding: '2px 8px',
+                            margin: 0,
+                            cursor: 'pointer',
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // TODO: 点击标签筛选同标签文档
+                            console.log('Filter by tag:', tag.tagName);
+                          }}
+                        >
+                          {tag.tagName}
+                        </Tag>
+                      ))}
+                      {doc.tags.length > 5 && (
+                        <Tag
+                          style={{
+                            fontSize: 12,
+                            padding: '2px 8px',
+                            margin: 0,
+                            background: '#f0f0f0',
+                            border: '1px solid #d9d9d9',
+                          }}
+                        >
+                          +{doc.tags.length - 5}
+                        </Tag>
+                      )}
+                    </Space>
+                  </div>
+                )}
 
                 <Row gutter={[16, 8]} className="document-list-meta">
                   <Col>
