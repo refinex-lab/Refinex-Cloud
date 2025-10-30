@@ -10,5 +10,7 @@ import { Question, SelectLang } from './RightContent';
 import { AvatarDropdown, AvatarName } from './RightContent/AvatarDropdown';
 import { ThemeSwitch} from "@/components/RightContent";
 import Captcha from './Captcha';
+import MarkdownViewer from './MarkdownViewer';
+import UnifiedDiffViewer from './UnifiedDiffViewer';
 
-export { AvatarDropdown, AvatarName, Footer, Question, SelectLang, ThemeSwitch, Captcha };
+export { AvatarDropdown, AvatarName, Footer, Question, SelectLang, ThemeSwitch, Captcha, MarkdownViewer, UnifiedDiffViewer };

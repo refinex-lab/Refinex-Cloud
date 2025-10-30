@@ -347,6 +347,98 @@ export interface ContentDocumentUpdateRequest {
   version: number;
 }
 
+/** ============ 文档版本管理 ============ */
+
+/** 文档版本列表项 */
+export interface ContentDocumentVersion {
+  id: number;
+  documentId: number;
+  versionNumber: number;
+  contentSummary: string;
+  changeSummary: string;
+  wordCount: number;
+  createdBy: number;
+  createdByName: string;
+  createTime: string;
+  isCurrent: boolean;
+}
+
+/** 文档版本详情 */
+export interface ContentDocumentVersionDetail {
+  id: number;
+  documentId: number;
+  documentTitle: string;
+  versionNumber: number;
+  contentBody: string;
+  fileId?: number;
+  changeSummary: string;
+  wordCount: number;
+  createdBy: number;
+  createdByName: string;
+  createTime: string;
+  isCurrent: boolean;
+}
+
+/** 版本对比差异项 */
+export interface VersionDiffItem {
+  type: 'added' | 'removed' | 'unchanged' | 'modified';
+  content: string;
+  lineNumber?: number;
+}
+
+/** Diff 块类型 */
+export type DiffBlockType = 'INSERT' | 'DELETE' | 'REPLACE';
+
+/** Diff 块信息 */
+export interface DiffBlock {
+  type: DiffBlockType;
+  sourcePosition: number;
+  targetPosition: number;
+  sourceLines: string[];
+  targetLines: string[];
+}
+
+/** 版本对比摘要 */
+export interface DiffSummary {
+  insertions: number;
+  deletions: number;
+  changes: number;
+  totalChanges: number;
+}
+
+/** 版本对比结果 */
+export interface VersionCompareResult {
+  documentId: number;
+  fromVersion: number;
+  toVersion: number;
+  fromVersionTime: string;
+  toVersionTime: string;
+  fromLineCount: number;
+  toLineCount: number;
+  changeCount: number;
+  unifiedDiff: string;
+  diffBlocks: DiffBlock[];
+  summary: DiffSummary;
+  // 保留旧字段用于兼容（已废弃）
+  fromVersionContent?: string;
+  toVersionContent?: string;
+  wordCountDiff?: number;
+  diffContent?: VersionDiffItem[];
+}
+
+/** 版本清理结果 */
+export interface VersionCleanResult {
+  deletedCount: number;
+  keepCount: number;
+  message: string;
+}
+
+/** 版本恢复结果 */
+export interface VersionRestoreResult {
+  newVersionNumber: number;
+  message: string;
+}
+
 // 重新导出通用类型
-export type { ApiResponse, PageResult };
+export type { ApiResponse, PageResult, PageParams };
 

@@ -1,0 +1,318 @@
+/**
+ * 版本时间线样式（精简优化版）
+ * 设计原则：现代、简洁、美观、舒适
+ * 优化要点：去除过度装饰、保持视觉平衡、提升可读性
+ */
+
+.version-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px;
+
+  .version-item {
+    position: relative;
+    display: flex;
+    gap: 0;
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+
+    // 移除左侧粗边框装饰，改用细腻的 hover 效果
+    &:hover {
+      border-color: #1890ff;
+      box-shadow: 0 2px 8px rgba(24, 144, 255, 0.08);
+      // 移除上浮和缩放效果，保持稳定
+    }
+
+    // 当前版本：绿色边框 + 浅绿背景
+    &.current {
+      background: linear-gradient(135deg, #f6ffed 0%, #ffffff 100%);
+      border-color: #b7eb8f;
+      box-shadow: 0 1px 4px rgba(82, 196, 26, 0.08);
+
+      .version-card-body .version-header .version-number {
+        color: #52c41a;
+      }
+    }
+
+    // 选中状态：蓝色边框 + 浅蓝背景
+    &.selected {
+      border-color: #1890ff;
+      box-shadow: 0 2px 8px rgba(24, 144, 255, 0.12);
+      background: linear-gradient(135deg, #e6f7ff 0%, #ffffff 100%);
+    }
+
+    // 对比选中：紫色边框 + 浅紫背景
+    &.compare-selected {
+      border-color: #9254de;
+      box-shadow: 0 2px 8px rgba(114, 46, 209, 0.12);
+      background: linear-gradient(135deg, #f9f0ff 0%, #ffffff 100%);
+    }
+
+    // 复选框区域（对比模式）
+    .version-checkbox {
+      display: flex;
+      align-items: flex-start;
+      padding: 18px 0 0 16px;
+    }
+
+    // ==================== 卡片主体 ====================
+    .version-card-body {
+      flex: 1;
+      min-width: 0;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      // 头部区域：版本号 + 徽章 + 操作菜单
+      .version-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .version-number {
+          font-size: 16px;
+          font-weight: 700;
+          color: #1890ff;
+          font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+          letter-spacing: -0.3px;
+        }
+
+        :global {
+          .ant-badge-status {
+            .ant-badge-status-dot {
+              width: 8px;
+              height: 8px;
+            }
+
+            .ant-badge-status-text {
+              font-size: 12px;
+              font-weight: 600;
+              color: #52c41a;
+              margin-left: 6px;
+            }
+          }
+
+          .ant-btn-text {
+            color: #8c8c8c;
+
+            &:hover {
+              color: #1890ff;
+              background: #f0f0f0;
+            }
+          }
+        }
+      }
+
+      // 元信息区域：时间 + 作者
+      .version-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 13px;
+
+        .meta-item {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+
+          :global {
+            .anticon {
+              font-size: 13px;
+              opacity: 0.65;
+            }
+          }
+
+          &.time {
+            color: #8c8c8c;
+            font-weight: 500;
+          }
+
+          &.author {
+            color: #262626;
+            font-weight: 600;
+
+            :global {
+              .anticon {
+                color: #1890ff;
+                opacity: 0.75;
+              }
+            }
+          }
+        }
+      }
+
+      // ==================== 底部区域：变更说明 + 统计 ====================
+      .version-footer {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        // 变更说明（优化版：简洁卡片，去除不协调装饰）
+        .change-remark {
+          font-size: 14px;
+          line-height: 1.6;
+          color: #595959;
+          padding: 12px 14px;
+          background: #fafafa;
+          border-radius: 6px;
+          border: 1px solid #f0f0f0;
+          word-break: break-word;
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: #f5f5f5;
+            border-color: #e8e8e8;
+          }
+        }
+
+        // 统计信息（去除图标，保持简洁）
+        .version-stats {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 12px;
+
+          .word-count {
+            display: inline-flex;
+            align-items: center;
+            color: #595959;
+            font-weight: 600;
+            padding: 4px 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+            border: 1px solid #e8e8e8;
+          }
+
+          .word-diff {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 11px;
+
+            &.positive {
+              color: #389e0d;
+              background: #f6ffed;
+              border: 1px solid #b7eb8f;
+
+              &::before {
+                content: '↑';
+                font-size: 13px;
+                font-weight: 900;
+              }
+            }
+
+            &.negative {
+              color: #cf1322;
+              background: #fff1f0;
+              border: 1px solid #ffa39e;
+
+              &::before {
+                content: '↓';
+                font-size: 13px;
+                font-weight: 900;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // ==================== 全局样式覆盖 ====================
+  :global {
+    .ant-empty {
+      padding: 40px 0;
+
+      .ant-empty-image {
+        height: 80px;
+        margin-bottom: 12px;
+      }
+
+      .ant-empty-description {
+        color: #8c8c8c;
+        font-size: 14px;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// ==================== 响应式优化 ====================
+@media (max-width: 1024px) {
+  .version-timeline {
+    .version-item {
+      .version-card-body {
+        .version-meta {
+          gap: 14px;
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .version-timeline {
+    gap: 10px;
+    padding: 2px;
+
+    .version-item {
+      .version-checkbox {
+        padding: 14px 0 0 12px;
+      }
+
+      .version-card-body {
+        padding: 14px 16px;
+        gap: 10px;
+
+        .version-header {
+          .version-number {
+            font-size: 15px;
+          }
+        }
+
+        .version-meta {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+
+        .version-footer {
+          gap: 8px;
+
+          .change-remark {
+            padding: 10px 12px;
+            font-size: 13px;
+          }
+
+          .version-stats {
+            flex-wrap: wrap;
+            gap: 8px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// ==================== 打印优化 ====================
+@media print {
+  .version-timeline {
+    .version-item {
+      break-inside: avoid;
+      box-shadow: none !important;
+      border-color: #d9d9d9 !important;
+    }
+  }
+}

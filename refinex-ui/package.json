@@ -54,7 +54,13 @@
     "numeral": "^2.0.6",
     "rc-util": "^5.44.4",
     "react": "^19.1.0",
+    "react-diff-viewer-continued": "^3.4.0",
     "react-dom": "^19.1.0",
+    "react-markdown": "^10.1.0",
+    "rehype-highlight": "^7.0.2",
+    "rehype-raw": "^7.0.0",
+    "rehype-sanitize": "^6.0.0",
+    "remark-gfm": "^4.0.1",
     "sm-crypto": "^0.3.13"
   },
   "devDependencies": {

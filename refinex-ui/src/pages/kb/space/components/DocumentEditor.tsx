@@ -13,6 +13,7 @@ import {
   CheckOutlined,
   StopOutlined,
   TagsOutlined,
+  HistoryOutlined,
 } from '@ant-design/icons';
 import type { MDXEditorMethods } from '@mdxeditor/editor';
 import MDXEditorWrapper from '@/components/MDXEditor';
@@ -27,6 +28,7 @@ import {
   bindDocumentTags,
 } from '@/services/kb/document';
 import TagSelector from './TagSelector';
+import VersionHistory from './VersionHistory';
 import './DocumentEditor.less';
 
 interface DocumentEditorProps {
@@ -56,6 +58,7 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [autoSaveTimer, setAutoSaveTimer] = useState<NodeJS.Timeout | null>(null);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+  const [versionHistoryVisible, setVersionHistoryVisible] = useState(false);
 
   // 加载文档
   const loadDocument = async () => {
@@ -278,7 +281,7 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
                 style={{ fontSize: 18, fontWeight: 600, width: 300 }}
                 disabled={loading}
               />
-              
+
               {/* 标签选择器 */}
               <div className="editor-tags">
                 <TagsOutlined style={{ color: '#8c8c8c', marginRight: 8 }} />
@@ -294,6 +297,18 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
         }
         extra={
           <Space size="middle">
+            {/* 版本号显示 */}
+            {/* {document && (
+              <Tooltip title="点击查看版本历史">
+                <Tag
+                  color="blue"
+                  style={{ cursor: 'pointer', fontSize: 13 }}
+                  onClick={() => setVersionHistoryVisible(true)}
+                >
+                  v{document.versionNumber}
+                </Tag>
+              </Tooltip>
+            )} */}
             {lastSaveTime && (
               <Tooltip title={`上次保存: ${lastSaveTime.toLocaleString('zh-CN')}`}>
                 <span style={{ fontSize: 12, color: '#8c8c8c' }}>
@@ -301,6 +316,14 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
                 </span>
               </Tooltip>
             )}
+            {/* 版本历史按钮 */}
+            <Button
+              icon={<HistoryOutlined />}
+              onClick={() => setVersionHistoryVisible(true)}
+              disabled={!document}
+            >
+              版本历史
+            </Button>
             <Button onClick={onClose} icon={<CloseOutlined />}>
               关闭
             </Button>
@@ -351,6 +374,20 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
           </div>
         </Spin>
       </Card>
+
+      {/* 版本历史抽屉 */}
+      {document && (
+        <VersionHistory
+          visible={versionHistoryVisible}
+          documentId={document.id}
+          currentVersionNumber={document.versionNumber}
+          onClose={() => setVersionHistoryVisible(false)}
+          onVersionRestore={(newVersionNumber) => {
+            message.success(`已恢复到历史版本，当前版本: v${newVersionNumber}`);
+            loadDocument(); // 重新加载文档
+          }}
+        />
+      )}
     </div>
   );
 };

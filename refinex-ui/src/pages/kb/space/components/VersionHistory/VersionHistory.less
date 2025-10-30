@@ -1,0 +1,203 @@
+/**
+ * 版本历史抽屉样式（优化版）
+ * 采用左右分栏布局，独立滚动，提供更好的空间利用和视觉体验
+ */
+
+.version-history-drawer {
+  // 容器主体：使用 Flexbox 实现左右分栏
+  .version-history-container {
+    display: flex;
+    height: 100%;
+    background: #fafafa;
+    overflow: hidden; // 防止容器滚动
+
+    // 左侧：版本列表区域（独立滚动）
+    .version-list-section {
+      flex-shrink: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-right: 1px solid #e8e8e8;
+      transition: width 0.3s ease;
+      overflow: hidden; // 确保独立滚动
+
+      // 当展开详情时，列表区域缩小到 40%
+      &.with-detail {
+        width: 40%;
+        min-width: 360px;
+      }
+
+      // 对比模式提示条
+      .version-compare-hint {
+        flex-shrink: 0;
+        padding: 12px 16px;
+        background: linear-gradient(90deg, #e6f7ff 0%, #f0f9ff 100%);
+        border-bottom: 1px solid #91d5ff;
+        color: #0050b3;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        animation: slideDown 0.3s ease;
+      }
+
+      // 搜索栏（固定高度，不滚动）
+      .version-search {
+        flex-shrink: 0;
+        padding: 16px;
+        background: #fff;
+        border-bottom: 1px solid #f0f0f0;
+        height: 72px; // 固定高度，与右侧头部对齐
+
+        :global {
+          .ant-input-affix-wrapper {
+            border-radius: 8px;
+            border: 1px solid #d9d9d9;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s ease;
+
+            &:hover,
+            &:focus,
+            &:focus-within {
+              border-color: #40a9ff;
+              box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
+            }
+          }
+        }
+      }
+
+      // 版本列表容器（可滚动区域）
+      .version-list-wrapper {
+        flex: 1;
+        overflow-y: auto; // 左侧独立滚动
+        overflow-x: hidden;
+        padding: 12px 16px;
+        min-height: 0; // 关键：允许 flex item 缩小
+
+        // 优化滚动条样式
+        &::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: #d9d9d9;
+          border-radius: 3px;
+          transition: background 0.2s;
+
+          &:hover {
+            background: #bfbfbf;
+          }
+        }
+
+        &::-webkit-scrollbar-track {
+          background: transparent;
+        }
+      }
+
+      // 分页器（固定底部，不滚动）
+      .version-pagination {
+        flex-shrink: 0;
+        padding: 12px 16px;
+        background: #fff;
+        border-top: 1px solid #f0f0f0;
+        text-align: center;
+
+        :global {
+          .ant-pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+        }
+      }
+    }
+
+    // 右侧：版本详情面板（独立滚动）
+    .version-detail-section {
+      flex: 1;
+      min-width: 0;
+      background: #fff;
+      overflow: hidden; // 防止外层滚动，内部组件自行处理滚动
+      animation: slideInRight 0.3s ease;
+    }
+  }
+
+  // 标题栏优化（去除渐变，统一高度）
+  :global {
+    .ant-drawer-header {
+      background: #fafafa;
+      border-bottom: 1px solid #e8e8e8;
+      padding: 16px 24px;
+
+      .ant-drawer-title {
+        display: flex;
+        align-items: flex-start;
+      }
+    }
+
+    .ant-drawer-body {
+      padding: 0 !important;
+      overflow: hidden; // 关键：防止 Drawer body 滚动
+    }
+  }
+}
+
+// 动画效果
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// 响应式布局
+@media (max-width: 1024px) {
+  .version-history-drawer {
+    .version-history-container {
+      .version-list-section {
+        &.with-detail {
+          width: 35%;
+          min-width: 320px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .version-history-drawer {
+    .version-history-container {
+      flex-direction: column;
+
+      .version-list-section {
+        width: 100% !important;
+        border-right: none;
+        border-bottom: 1px solid #e8e8e8;
+        max-height: 40vh;
+
+        &.with-detail {
+          max-height: 30vh;
+        }
+      }
+
+      .version-detail-section {
+        flex: 1;
+      }
+    }
+  }
+}

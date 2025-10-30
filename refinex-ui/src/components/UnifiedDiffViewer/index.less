@@ -1,0 +1,454 @@
+/**
+ * UnifiedDiffViewer - GitHub 风格样式
+ * 参考 GitHub Diff 视图的设计
+ */
+
+.unified-diff-viewer {
+  font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo', monospace;
+  font-size: 12px;
+  line-height: 20px;
+  background-color: #fff;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  overflow: hidden;
+
+  .diff-table-wrapper {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: calc(90vh - 300px);
+
+    // 自定义滚动条
+    &::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #d1d5da;
+      border-radius: 5px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+
+      &:hover {
+        background-color: #959da5;
+      }
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: #f6f8fa;
+    }
+
+    &::-webkit-scrollbar-corner {
+      background-color: #f6f8fa;
+    }
+  }
+
+  .diff-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    table-layout: auto;
+    background-color: #fff;
+
+    tbody {
+      font-family: inherit;
+    }
+
+    .diff-line {
+      vertical-align: top;
+      border: none;
+
+      td {
+        padding: 0;
+        border: none;
+      }
+
+      // 行号列
+      .diff-line-num {
+        width: 1%;
+        min-width: 50px;
+        padding: 0 10px;
+        font-family: inherit;
+        font-size: 12px;
+        line-height: 20px;
+        color: rgba(27, 31, 36, 0.3);
+        text-align: right;
+        white-space: nowrap;
+        vertical-align: top;
+        cursor: pointer;
+        user-select: none;
+        background-color: #fff;
+        border: solid #d0d7de;
+        border-width: 0;
+
+        &.old-line-num {
+          border-right-width: 1px;
+        }
+
+        &.new-line-num {
+          border-right-width: 1px;
+        }
+
+        .line-number {
+          display: inline-block;
+          font-variant-numeric: tabular-nums;
+
+          &:hover {
+            color: rgba(27, 31, 36, 0.6);
+            text-decoration: underline;
+          }
+        }
+      }
+
+      // 内容列
+      .diff-content {
+        padding: 0 10px;
+        font-family: inherit;
+        font-size: 12px;
+        line-height: 20px;
+        white-space: pre;
+        word-wrap: normal;
+        vertical-align: top;
+
+        .diff-marker {
+          display: inline-block;
+          width: 14px;
+          margin-right: 4px;
+          font-weight: 700;
+          text-align: center;
+        }
+
+        .diff-text {
+          white-space: pre-wrap;
+          word-break: break-word;
+        }
+      }
+
+      // 文件头样式
+      &.diff-header {
+        .diff-content {
+          padding: 5px 10px;
+          background-color: #f6f8fa;
+          border-bottom: 1px solid #d0d7de;
+        }
+
+        .diff-header-text {
+          font-weight: 600;
+          color: #1f2328;
+        }
+      }
+
+      // Hunk 头样式
+      &.diff-hunk {
+        .diff-content {
+          padding: 5px 10px;
+          background-color: #ddf4ff;
+          border-top: 1px solid #d0d7de;
+          border-bottom: 1px solid #d0d7de;
+        }
+
+        .diff-hunk-text {
+          color: rgba(27, 31, 36, 0.7);
+          font-weight: 600;
+        }
+      }
+
+      // 新增行样式
+      &.diff-add {
+        background-color: #e6ffec;
+
+        .diff-line-num {
+          background-color: #ccffd8;
+          border-color: #acf2bd;
+          color: rgba(27, 31, 36, 0.3);
+        }
+
+        .diff-content {
+          background-color: #e6ffec;
+
+          .diff-marker {
+            color: #1a7f37;
+          }
+
+          .diff-text {
+            color: #1f2328;
+          }
+        }
+
+        // 强调色（用于重要变更）
+        &.diff-add-emphasis {
+          background-color: #acf2bd;
+
+          .diff-line-num {
+            background-color: #6fdd8b;
+          }
+
+          .diff-content {
+            background-color: #acf2bd;
+          }
+        }
+      }
+
+      // 删除行样式
+      &.diff-delete {
+        background-color: #ffebe9;
+
+        .diff-line-num {
+          background-color: #ffd7d5;
+          border-color: #ffb8b0;
+          color: rgba(27, 31, 36, 0.3);
+        }
+
+        .diff-content {
+          background-color: #ffebe9;
+
+          .diff-marker {
+            color: #d1242f;
+          }
+
+          .diff-text {
+            color: #1f2328;
+          }
+        }
+
+        // 强调色（用于重要变更）
+        &.diff-delete-emphasis {
+          background-color: #ffb8b0;
+
+          .diff-line-num {
+            background-color: #ff8182;
+          }
+
+          .diff-content {
+            background-color: #ffb8b0;
+          }
+        }
+      }
+
+      // 上下文行样式
+      &.diff-context {
+        background-color: #fff;
+
+        .diff-line-num {
+          background-color: #fff;
+          border-color: #d0d7de;
+          color: rgba(27, 31, 36, 0.3);
+        }
+
+        .diff-content {
+          background-color: #fff;
+          color: #1f2328;
+
+          .diff-marker {
+            color: transparent;
+          }
+        }
+
+        &:hover {
+          background-color: #f6f8fa;
+
+          .diff-line-num,
+          .diff-content {
+            background-color: #f6f8fa;
+          }
+        }
+      }
+
+      // No newline 提示样式
+      &.diff-no-newline {
+        .diff-content {
+          padding: 2px 10px;
+          background-color: #fff8c5;
+          border-top: 1px solid #d4a72c;
+        }
+
+        .diff-no-newline-text {
+          color: #6e5700;
+          font-size: 11px;
+          font-style: italic;
+        }
+      }
+    }
+  }
+}
+
+// 空状态样式
+.unified-diff-viewer-empty {
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  background-color: #fff;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .unified-diff-viewer {
+    font-size: 11px;
+
+    .diff-table {
+      .diff-line {
+        .diff-line-num {
+          min-width: 40px;
+          padding: 0 5px;
+          font-size: 10px;
+        }
+
+        .diff-content {
+          padding: 0 8px;
+          font-size: 11px;
+
+          .diff-marker {
+            width: 12px;
+            margin-right: 2px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// 打印样式
+@media print {
+  .unified-diff-viewer {
+    border: 1px solid #000;
+
+    .diff-table {
+      .diff-line {
+        &.diff-add {
+          background-color: #e6ffe6 !important;
+
+          .diff-line-num,
+          .diff-content {
+            background-color: #e6ffe6 !important;
+          }
+        }
+
+        &.diff-delete {
+          background-color: #ffe6e6 !important;
+
+          .diff-line-num,
+          .diff-content {
+            background-color: #ffe6e6 !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+// 暗色主题支持（可选）
+@media (prefers-color-scheme: dark) {
+  .unified-diff-viewer {
+    background-color: #0d1117;
+    border-color: #30363d;
+
+    .diff-table-wrapper {
+      &::-webkit-scrollbar-thumb {
+        background-color: #6e7681;
+
+        &:hover {
+          background-color: #8b949e;
+        }
+      }
+
+      &::-webkit-scrollbar-track {
+        background-color: #161b22;
+      }
+    }
+
+    .diff-table {
+      background-color: #0d1117;
+
+      .diff-line {
+        .diff-line-num {
+          background-color: #0d1117;
+          border-color: #30363d;
+          color: rgba(240, 246, 252, 0.3);
+        }
+
+        .diff-content {
+          color: #e6edf3;
+        }
+
+        &.diff-header .diff-content {
+          background-color: #161b22;
+          border-color: #30363d;
+
+          .diff-header-text {
+            color: #e6edf3;
+          }
+        }
+
+        &.diff-hunk .diff-content {
+          background-color: #1c2d41;
+          border-color: #30363d;
+
+          .diff-hunk-text {
+            color: rgba(240, 246, 252, 0.7);
+          }
+        }
+
+        &.diff-add {
+          background-color: rgba(46, 160, 67, 0.15);
+
+          .diff-line-num {
+            background-color: rgba(46, 160, 67, 0.25);
+            border-color: rgba(46, 160, 67, 0.4);
+          }
+
+          .diff-content {
+            background-color: rgba(46, 160, 67, 0.15);
+
+            .diff-marker {
+              color: #3fb950;
+            }
+          }
+        }
+
+        &.diff-delete {
+          background-color: rgba(248, 81, 73, 0.15);
+
+          .diff-line-num {
+            background-color: rgba(248, 81, 73, 0.25);
+            border-color: rgba(248, 81, 73, 0.4);
+          }
+
+          .diff-content {
+            background-color: rgba(248, 81, 73, 0.15);
+
+            .diff-marker {
+              color: #f85149;
+            }
+          }
+        }
+
+        &.diff-context {
+          background-color: #0d1117;
+
+          .diff-line-num,
+          .diff-content {
+            background-color: #0d1117;
+          }
+
+          &:hover {
+            background-color: #161b22;
+
+            .diff-line-num,
+            .diff-content {
+              background-color: #161b22;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .unified-diff-viewer-empty {
+    background-color: #0d1117;
+    border-color: #30363d;
+  }
+}
+
