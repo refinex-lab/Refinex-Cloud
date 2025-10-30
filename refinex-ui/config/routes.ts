@@ -241,6 +241,65 @@ export default [
     ],
   },
   {
+    name: 'kb',
+    icon: 'read',
+    path: '/kb',
+    routes: [
+      {
+        path: '/kb',
+        redirect: '/kb/space',
+      },
+      {
+        name: 'space',
+        icon: 'appstore',
+        path: '/kb/space',
+        component: './kb/space',
+      },
+      {
+        name: 'space-detail',
+        path: '/kb/space/:spaceCode',
+        component: './kb/space/[spaceCode]',
+        hideInMenu: true,
+      },
+      {
+        name: 'tag',
+        icon: 'tags',
+        path: '/kb/tag',
+        component: './kb/tag',
+      },
+    ],
+  },
+  {
+    name: 'kb-admin',
+    icon: 'book',
+    path: '/kb-admin',
+    routes: [
+      {
+        path: '/kb-admin',
+        redirect: '/kb-admin/space',
+      },
+      {
+        name: 'space',
+        icon: 'appstore',
+        path: '/kb-admin/space',
+        component: './kb-admin/space',
+      },
+      {
+        name: 'space-detail',
+        icon: 'folder',
+        path: '/kb-admin/space/detail/:spaceId',
+        component: './kb/space/detail/[spaceId]',
+        hideInMenu: true,
+      },
+      {
+        name: 'tag',
+        icon: 'tags',
+        path: '/kb-admin/tag',
+        component: './kb-admin/tag',
+      },
+    ],
+  },
+  {
     name: 'system',
     icon: 'setting',
     path: '/system',
@@ -330,65 +389,6 @@ export default [
         icon: 'smile',
         path: '/account/settings',
         component: './account/settings',
-      },
-    ],
-  },
-  {
-    name: 'kb',
-    icon: 'read',
-    path: '/kb',
-    routes: [
-      {
-        path: '/kb',
-        redirect: '/kb/space',
-      },
-      {
-        name: 'space',
-        icon: 'appstore',
-        path: '/kb/space',
-        component: './kb/space',
-      },
-      {
-        name: 'space-detail',
-        path: '/kb/space/:spaceCode',
-        component: './kb/space/[spaceCode]',
-        hideInMenu: true,
-      },
-      {
-        name: 'tag',
-        icon: 'tags',
-        path: '/kb/tag',
-        component: './kb/tag',
-      },
-    ],
-  },
-  {
-    name: 'kb-admin',
-    icon: 'book',
-    path: '/kb-admin',
-    routes: [
-      {
-        path: '/kb-admin',
-        redirect: '/kb-admin/space',
-      },
-      {
-        name: 'space',
-        icon: 'appstore',
-        path: '/kb-admin/space',
-        component: './kb-admin/space',
-      },
-      {
-        name: 'space-detail',
-        icon: 'folder',
-        path: '/kb-admin/space/detail/:spaceId',
-        component: './kb/space/detail/[spaceId]',
-        hideInMenu: true,
-      },
-      {
-        name: 'tag',
-        icon: 'tags',
-        path: '/kb-admin/tag',
-        component: './kb-admin/tag',
       },
     ],
   },
