@@ -340,7 +340,7 @@ const ContentSpaceDetail: React.FC = () => {
               }}
             />
           ) : (
-            <Card className="editor-card" bordered={false} style={{ boxShadow: "none"}}>
+            <Card className="editor-card" variant="borderless" style={{ boxShadow: "none"}}>
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
                 description={

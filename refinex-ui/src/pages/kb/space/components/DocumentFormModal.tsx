@@ -64,7 +64,6 @@ const DocumentFormModal: React.FC<DocumentFormModalProps> = ({
       onOk={handleSubmit}
       onCancel={onCancel}
       confirmLoading={loading}
-      destroyOnClose
     >
       <Form form={form} layout="vertical">
         <Form.Item

@@ -3,8 +3,11 @@ import {
   CaretDownOutlined,
   CaretRightOutlined,
   DeleteOutlined,
+  DownloadOutlined,
   EditOutlined,
   FileAddOutlined,
+  FileMarkdownOutlined,
+  FilePdfOutlined,
   FileTextOutlined,
   FolderAddOutlined,
   FolderFilled,
@@ -13,7 +16,7 @@ import {
   PlusOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-import { Dropdown, Empty, Input, message, Modal, Spin, Tag, Tree } from 'antd';
+import { App, Dropdown, Empty, Input, Modal, Spin, Tag, Tree } from 'antd';
 import type { MenuProps } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -24,7 +27,8 @@ import {
   getDirectoryTreeWithDocs,
   moveDirectory,
 } from '@/services/kb/directory';
-import { deleteDocument } from '@/services/kb/document';
+import { deleteDocument, getDocumentByGuid } from '@/services/kb/document';
+import { exportToMarkdown, exportToPDF } from '@/utils/documentExport';
 import DirectoryFormModal from './DirectoryFormModal';
 import DocumentFormModal from './DocumentFormModal';
 import './DirectoryTree.less';
@@ -53,6 +57,7 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
   onBack,
   spaceName,
 }) => {
+  const { message } = App.useApp();
   const [treeData, setTreeData] = useState<ContentTreeNode[]>([]);
   const [loading, setLoading] = useState(false);
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
@@ -320,6 +325,68 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
     });
   };
 
+  // 导出文档（Markdown 格式）
+  const handleExportMarkdown = async (node: ContentTreeNode) => {
+    if (!node.docGuid) {
+      message.error('文档 GUID 不存在，无法导出');
+      return;
+    }
+
+    const hide = message.loading('正在导出 Markdown...', 0);
+    try {
+      // 获取完整的文档数据
+      const response = await getDocumentByGuid(node.docGuid);
+      if (response.success && response.data) {
+        const success = exportToMarkdown(response.data);
+        if (success) {
+          hide();
+          message.success('Markdown 导出成功');
+        } else {
+          hide();
+          message.error('Markdown 导出失败');
+        }
+      } else {
+        hide();
+        message.error('获取文档内容失败');
+      }
+    } catch (error) {
+      hide();
+      console.error('导出 Markdown 失败:', error);
+      message.error('导出 Markdown 失败');
+    }
+  };
+
+  // 导出文档（PDF 格式）
+  const handleExportPDF = async (node: ContentTreeNode) => {
+    if (!node.docGuid) {
+      message.error('文档 GUID 不存在，无法导出');
+      return;
+    }
+
+    const hide = message.loading('正在生成 PDF，请稍候...', 0);
+    try {
+      // 获取完整的文档数据
+      const response = await getDocumentByGuid(node.docGuid);
+      if (response.success && response.data) {
+        const success = await exportToPDF(response.data);
+        if (success) {
+          hide();
+          message.success('PDF 导出成功');
+        } else {
+          hide();
+          message.error('PDF 导出失败');
+        }
+      } else {
+        hide();
+        message.error('获取文档内容失败');
+      }
+    } catch (error) {
+      hide();
+      console.error('导出 PDF 失败:', error);
+      message.error('导出 PDF 失败');
+    }
+  };
+
   // 拖拽放置（仅支持目录）
   const onDrop = async (info: any) => {
     const dropNode = info.node.data as ContentTreeNode;
@@ -450,6 +517,34 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
               message.error('文档 GUID 不存在，无法打开');
             }
           },
+        },
+        {
+          type: 'divider',
+        },
+        {
+          key: 'export',
+          label: '导出',
+          icon: <DownloadOutlined />,
+          children: [
+            {
+              key: 'export-markdown',
+              label: 'Markdown (.md)',
+              icon: <FileMarkdownOutlined />,
+              onClick: () => {
+                setDropdownOpenKey(null);
+                handleExportMarkdown(node);
+              },
+            },
+            {
+              key: 'export-pdf',
+              label: 'PDF (.pdf)',
+              icon: <FilePdfOutlined />,
+              onClick: () => {
+                setDropdownOpenKey(null);
+                handleExportPDF(node);
+              },
+            },
+          ],
         },
         {
           type: 'divider',
