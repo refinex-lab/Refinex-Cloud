@@ -17,6 +17,7 @@
         <module>refinex-gateway</module>
         <module>refinex-auth</module>
         <module>refinex-kb</module>
+        <module>refinex-ai</module>
     </modules>
 
     <properties>

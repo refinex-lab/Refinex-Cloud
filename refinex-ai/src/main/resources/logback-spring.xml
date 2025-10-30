@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 导入默认配置 -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <!-- 导入控制台日志配置 -->
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <!-- 导入文件日志配置 -->
+    <include resource="org/springframework/boot/logging/logback/file-appender.xml"/>
+
+    <!-- 定义日志文件路径 -->
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="refinex-ai"/>
+    <property name="LOG_PATH" value="${LOG_PATH:-./logs}"/>
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH}/${APP_NAME}.log}"/>
+
+    <!-- 定义根日志级别 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <!-- 定义开发环境日志级别 -->
+    <springProfile name="dev">
+        <logger name="cn.refinex" level="DEBUG"/>
+    </springProfile>
+
+    <!-- 定义生产环境日志级别 -->
+    <springProfile name="prod">
+        <logger name="cn.refinex" level="INFO"/>
+    </springProfile>
+
+    <logger name="org.springframework.web" level="INFO"/>
+
+</configuration>

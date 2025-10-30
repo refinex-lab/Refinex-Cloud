@@ -36,6 +36,14 @@ spring:
               filters:
                 - StripPrefix=1
 
+            # 智能体服务路由
+            - id: refinex-ai
+              uri: lb://refinex-ai
+              predicates:
+                - Path=/refinex-ai/**
+              filters:
+                - StripPrefix=1
+
 # 网关安全配置
 security:
   ignore:
