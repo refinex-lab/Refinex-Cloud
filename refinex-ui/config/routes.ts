@@ -393,6 +393,23 @@ export default [
     ],
   },
   {
+    name: 'ai',
+    icon: 'robot',
+    path: '/ai',
+    routes: [
+      {
+        path: '/ai',
+        redirect: '/ai/chat',
+      },
+      {
+        name: 'chat',
+        icon: 'comment',
+        path: '/ai/chat',
+        component: './ai/chat',
+      },
+    ],
+  },
+  {
     path: '/',
     redirect: '/dashboard/analysis',
   },

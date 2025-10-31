@@ -14,6 +14,8 @@ import {
   SelectLang,
   ThemeSwitch,
 } from '@/components';
+import CopilotButton from '@/components/AICopilot/CopilotButton';
+import LayoutWrapper from '@/components/AICopilot/LayoutWrapper';
 import { getCurrentUser } from '@/services/auth';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
@@ -101,6 +103,7 @@ export const layout: RunTimeLayoutConfig = ({
       <Question key="doc" />,
       <SelectLang key="SelectLang" />,
       <ThemeSwitch key="ThemeSwitch" />,
+      <CopilotButton key="Copilot" onClick={() => window.dispatchEvent(new Event('openCopilot'))} />,
     ],
     avatarProps: {
       src: initialState?.currentUser?.avatar,
@@ -155,7 +158,7 @@ export const layout: RunTimeLayoutConfig = ({
     childrenRender: (children) => {
       // if (initialState?.loading) return <PageLoading />;
       return (
-        <>
+        <LayoutWrapper>
           {children}
           {isDev && (
             <SettingDrawer
@@ -170,7 +173,7 @@ export const layout: RunTimeLayoutConfig = ({
               }}
             />
           )}
-        </>
+        </LayoutWrapper>
       );
     },
     ...initialState?.settings,
