@@ -30,6 +30,11 @@ public enum ModelProviders {
     DEEPSEEK("DEEPSEEK", "DeepSeek"),
 
     /**
+     * Anthropic
+     */
+    ANTHROPIC("ANTHROPIC", "Anthropic"),
+
+    /**
      * 千问（Qwen）
      */
     QWEN("QWEN", "千问（Qwen）");

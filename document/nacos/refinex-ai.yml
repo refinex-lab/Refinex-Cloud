@@ -149,3 +149,19 @@ spring:
         index-type: IVF_FLAT
         # 度量类型：COSINE, L2, IP
         metric-type: COSINE
+
+    # 通义千问
+    dashscope:
+      api-key: sk-71800982914041848008480000000000
+    # 智谱
+    zhipuai:
+      api-key: 32f84543e54eee31f8d56b2bd6020573.3vh9idLJZ2ZhxDEs
+    # Anthropic
+    anthropic:
+      api-key: sk-anthropic-ssssfrgdfgvsdatawefasdg
+    # DeepSeek
+    deepseek:
+      api-key: sk-e94db327cc7d457d99a8de8810fc6b12
+      chat:
+        options:
+          model: deepseek-chat
