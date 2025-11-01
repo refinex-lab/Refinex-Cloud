@@ -7,4 +7,10 @@ export default {
   'component.aiCopilot.welcome.title': '👋 你好，我是您的 AI 助手',
   'component.aiCopilot.welcome.description': '我可以帮助您解答问题、编写代码、分析数据等。请告诉我您需要什么帮助？',
   'component.aiCopilot.prompts.title': '您可以尝试询问：',
+  'component.tabs.refresh': '刷新',
+  'component.tabs.close': '关闭',
+  'component.tabs.closeOthers': '关闭其他',
+  'component.tabs.closeLeft': '关闭左侧',
+  'component.tabs.closeRight': '关闭右侧',
+  'component.tabs.closeAll': '全部关闭',
 };

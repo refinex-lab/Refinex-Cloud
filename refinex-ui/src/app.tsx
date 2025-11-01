@@ -16,6 +16,8 @@ import {
 } from '@/components';
 import LayoutWrapper from '@/components/AICopilot/LayoutWrapper';
 import AIAssistantEntry from '@/components/AIAssistantEntry';
+import TabsLayout from '@/components/TabsLayout';
+import RouteListener from '@/components/TabsLayout/RouteListener';
 import { getCurrentUser } from '@/services/auth';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
@@ -154,11 +156,20 @@ export const layout: RunTimeLayoutConfig = ({
     menuExtraRender: () => <AIAssistantEntry />,
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
+    // 禁用默认面包屑，由 TabsLayout 自定义渲染
+    breadcrumbRender: false,
+    // 在 Header 右侧渲染标签栏
+    headerContentRender: () => {
+      const { location } = history;
+      const isLoginPage = [loginPath, '/user/register', '/user/register-result', '/user/forgot-password'].includes(location.pathname);
+      return !isLoginPage ? <TabsLayout /> : null;
+    },
     // 增加一个 loading 的状态
     childrenRender: (children) => {
       // if (initialState?.loading) return <PageLoading />;
       return (
         <LayoutWrapper>
+          <RouteListener />
           {children}
           {isDev && (
             <SettingDrawer

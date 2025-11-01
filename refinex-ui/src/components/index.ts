@@ -12,5 +12,6 @@ import { ThemeSwitch} from "@/components/RightContent";
 import Captcha from './Captcha';
 import MarkdownViewer from './MarkdownViewer';
 import UnifiedDiffViewer from './UnifiedDiffViewer';
+import TabsLayout from './TabsLayout';
 
-export { AvatarDropdown, AvatarName, Footer, Question, SelectLang, ThemeSwitch, Captcha, MarkdownViewer, UnifiedDiffViewer };
+export { AvatarDropdown, AvatarName, Footer, Question, SelectLang, ThemeSwitch, Captcha, MarkdownViewer, UnifiedDiffViewer, TabsLayout };

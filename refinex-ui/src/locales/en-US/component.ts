@@ -7,4 +7,10 @@ export default {
   'component.aiCopilot.welcome.title': '👋 Hello, I am your AI Copilot',
   'component.aiCopilot.welcome.description': 'I can help you answer questions, write code, analyze data, and more. How can I assist you?',
   'component.aiCopilot.prompts.title': 'You can try asking:',
+  'component.tabs.refresh': 'Refresh',
+  'component.tabs.close': 'Close',
+  'component.tabs.closeOthers': 'Close Others',
+  'component.tabs.closeLeft': 'Close to the Left',
+  'component.tabs.closeRight': 'Close to the Right',
+  'component.tabs.closeAll': 'Close All',
 };
