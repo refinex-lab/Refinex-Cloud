@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -38,7 +37,7 @@ public class AiModelConfig {
     @Schema(description = "模型显示名称", example = "通义千问Max")
     private String modelName;
 
-    @Schema(description = "供应商:OPENAI,ANTHROPIC,ALIBABA,ZHIPU", example = "ALIBABA")
+    @Schema(description = "供应商:OPENAI,ANTHROPIC,QWEN,ZHIPU,DEEPSEEK", example = "QWEN")
     private String provider;
 
     @Schema(description = "模型类型:CHAT,IMAGE,VIDEO,EMBEDDING", example = "CHAT")
@@ -63,7 +62,7 @@ public class AiModelConfig {
     private Integer maxTokens;
 
     @Schema(description = "默认温度参数", example = "0.70")
-    private BigDecimal temperature;
+    private Double temperature;
 
     @Schema(description = "输入定价,每千token价格,单位分", example = "2")
     private Long pricingInput;

@@ -1,4 +1,4 @@
-# Refinex Platform 服务配置
+# Refinex AI 服务配置
 
 # ====================================================================
 # 业务自定义配置
@@ -7,8 +7,66 @@ refinex:
   # API 文档配置（覆盖 refinex-common.yml 的通用配置）
   swagger:
     # 标题
-    title: Refinex Platform 智能体服务 API 文档
+    title: Refinex AI 智能体服务 API 文档
     # 描述
     description: 提供智能体管理核心业务功能的 RESTful API 接口
     # 版本
     version: 1.0.0
+
+  # AI 模块配置
+  ai:
+    # 是否启用 AI 模块
+    enabled: true
+    
+    # 默认配置
+    default-config:
+      # 请求超时时间（秒）
+      timeout: 60s
+      # 熔断器阈值（连续失败次数）
+      circuit-breaker-threshold: 10
+    
+    # 模型实例缓存配置
+    cache:
+      # 是否启用缓存
+      enabled: true
+      # 缓存过期时间（小时）
+      ttl: 24
+      # 最大缓存容量
+      max-size: 100
+    
+    # 降级配置（可选，数据库配置优先）
+    fallback:
+      # 是否启用降级
+      enabled: true
+      # 默认聊天模型
+      default-chat-model: gpt-3.5-turbo
+      # 默认图像模型
+      default-image-model: dall-e-3
+      # 默认嵌入模型
+      default-embedding-model: text-embedding-ada-002
+
+# ====================================================================
+# Spring AI 官方配置
+# ====================================================================
+spring:
+  ai:
+    # 重试配置（Spring AI 官方配置项）
+    # 参考文档：https://docs.spring.io/spring-ai/reference/api/retry.html
+    retry:
+      # 最大重试次数, 默认 10 次
+      max-attempts: 10
+      # 退避策略
+      backoff:
+        # 初始间隔, 默认 2 秒
+        initial-interval: 2s
+        # 退避间隔倍数, 默认 5 倍
+        multiplier: 5
+        # 最大退避持续时间, 默认 3 分钟
+        max-interval: 3m
+      # 是否在客户端错误时重试, 默认 false
+      # 如果为 false，则抛出 NonTransientAiException 异常，并且不尝试重试 4xx 客户端错误代码
+      on-client-errors: false
+      # 不应触发重试的 HTTP 状态代码列表（例如，不应抛出 NonTransientAiException）
+      # exclude-on-http-codes: [400, 404]
+      # 应触发重试的 HTTP 状态代码列表（例如，应抛出 TransientAiException）
+      # on-http-codes: [429, 500, 502, 503, 504]
