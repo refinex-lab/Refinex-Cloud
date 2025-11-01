@@ -41,6 +41,7 @@
     "@ant-design/pro-components": "^2.7.19",
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "@ant-design/x": "^1.6.1",
+    "@antv/gpt-vis": "^0.5.9",
     "@antv/l7": "^2.22.7",
     "@antv/l7-react": "^2.4.3",
     "@codesandbox/sandpack-client": "^2.19.8",
