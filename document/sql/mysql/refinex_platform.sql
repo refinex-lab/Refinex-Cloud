@@ -859,22 +859,150 @@ CREATE TABLE `video_play_record`
 
 CREATE TABLE `ai_model_config`
 (
-    `id`                 BIGINT       NOT NULL COMMENT '主键ID',
-    `model_code`         VARCHAR(50)  NOT NULL COMMENT '模型编码,如GPT4,CLAUDE3,QWEN_MAX',
-    `model_name`         VARCHAR(100) NOT NULL COMMENT '模型显示名称',
-    `provider`           VARCHAR(50)  NOT NULL COMMENT '供应商:OPENAI,ANTHROPIC,ALIBABA,ZHIPU',
-    `model_type`         VARCHAR(20)  NOT NULL COMMENT '模型类型:CHAT,IMAGE,VIDEO,EMBEDDING',
-    `api_endpoint`       VARCHAR(500)          DEFAULT NULL COMMENT 'API接口地址',
-    `api_key`            VARCHAR(200)          DEFAULT NULL COMMENT 'API密钥,加密存储',
-    `api_version`        VARCHAR(20)           DEFAULT NULL COMMENT 'API版本',
-    `model_capabilities` JSON                  DEFAULT NULL COMMENT '模型能力,JSON格式',
-    `context_window`     INT                   DEFAULT NULL COMMENT '上下文窗口大小',
-    `max_tokens`         INT                   DEFAULT NULL COMMENT '最大输出token数',
-    `temperature`        DECIMAL(3, 2)         DEFAULT 0.70 COMMENT '默认温度参数',
-    `pricing_input`      BIGINT                DEFAULT NULL COMMENT '输入定价,每千token价格,单位分',
-    `pricing_output`     BIGINT                DEFAULT NULL COMMENT '输出定价,每千token价格,单位分',
-    `is_enabled`         TINYINT      NOT NULL DEFAULT 1 COMMENT '是否启用:0否,1是',
-    `priority`           INT          NOT NULL DEFAULT 0 COMMENT '优先级',
+    `id`                        BIGINT       AUTO_INCREMENT NOT NULL COMMENT '主键ID',
+    `model_code`                VARCHAR(50)  NOT NULL COMMENT '模型编码,如GPT4,CLAUDE3,QWEN_MAX',
+    `model_version`             VARCHAR(20)           DEFAULT NULL COMMENT '模型版本号,如gpt-4-0125-preview',
+    `model_name`                VARCHAR(100) NOT NULL COMMENT '模型显示名称',
+    `provider`                  VARCHAR(50)  NOT NULL COMMENT '供应商:OPENAI,ANTHROPIC,ALIBABA,ZHIPU',
+    `model_type`                VARCHAR(20)  NOT NULL COMMENT '模型类型:CHAT,IMAGE,VIDEO,EMBEDDING',
+    `api_endpoint`              VARCHAR(500)          DEFAULT NULL COMMENT 'API接口地址',
+    `api_key`                   VARCHAR(200)          DEFAULT NULL COMMENT 'API密钥,加密存储',
+    `api_version`               VARCHAR(20)           DEFAULT NULL COMMENT 'API版本',
+    `model_capabilities`        JSON                  DEFAULT NULL COMMENT '模型能力,JSON格式',
+    `context_window`            INT                   DEFAULT NULL COMMENT '上下文窗口大小',
+    `max_tokens`                INT                   DEFAULT NULL COMMENT '最大输出token数',
+    `temperature`               DECIMAL(3, 2)         DEFAULT 0.70 COMMENT '默认温度参数',
+    `pricing_input`             BIGINT                DEFAULT NULL COMMENT '输入定价,每千token价格,单位分',
+    `pricing_output`            BIGINT                DEFAULT NULL COMMENT '输出定价,每千token价格,单位分',
+    `rpm_limit`                 INT                   DEFAULT NULL COMMENT 'Requests Per Minute限流',
+    `tpm_limit`                 INT                   DEFAULT NULL COMMENT 'Tokens Per Minute限流',
+    `timeout_seconds`           INT                   DEFAULT 60 COMMENT '请求超时时间(秒)',
+    `retry_times`               INT                   DEFAULT 3 COMMENT '失败重试次数',
+    `circuit_breaker_threshold` INT                   DEFAULT 10 COMMENT '熔断器阈值',
+    `fallback_model_code`       VARCHAR(50)           DEFAULT NULL COMMENT '降级备用模型编码',
+    `health_check_url`          VARCHAR(500)          DEFAULT NULL COMMENT '健康检查端点',
+    `last_health_check_time`    DATETIME              DEFAULT NULL COMMENT '上次健康检查时间',
+    `health_status`             TINYINT               DEFAULT 1 COMMENT '健康状态:0异常,1正常',
+    `is_enabled`                TINYINT      NOT NULL DEFAULT 1 COMMENT '是否启用:0否,1是',
+    `priority`                  INT          NOT NULL DEFAULT 0 COMMENT '优先级',
+    `create_by`                 BIGINT                DEFAULT NULL COMMENT '创建人ID',
+    `create_time`               DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_by`                 BIGINT                DEFAULT NULL COMMENT '更新人ID',
+    `update_time`               DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted`                   TINYINT      NOT NULL DEFAULT 0 COMMENT '逻辑删除标记:0未删除,1已删除',
+    `version`                   INT          NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
+    `remark`                    VARCHAR(500)          DEFAULT NULL COMMENT '备注说明',
+    `sort`                      INT          NOT NULL DEFAULT 0 COMMENT '排序字段',
+    `status`                    TINYINT      NOT NULL DEFAULT 0 COMMENT '状态:0正常,1停用',
+    `extra_data`                JSON                  DEFAULT NULL COMMENT '扩展数据',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uni_model_code` (`model_code`) COMMENT '模型编码唯一索引',
+    KEY `idx_provider_type` (`provider`, `model_type`) COMMENT '供应商类型联合索引',
+    KEY `idx_enabled` (`is_enabled`) COMMENT '启用状态索引',
+    KEY `idx_health_status` (`health_status`) COMMENT '健康状态索引'
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci COMMENT ='AI模型配置表-配置可用的AI模型';
+
+CREATE TABLE `ai_conversation`
+(
+    `id`                    BIGINT      AUTO_INCREMENT NOT NULL COMMENT '主键ID',
+    `conversation_guid`     VARCHAR(64) NOT NULL COMMENT '全局唯一标识,UUID格式',
+    `user_id`               BIGINT      NOT NULL COMMENT '用户ID',
+    `conversation_title`    VARCHAR(200)         DEFAULT NULL COMMENT '会话标题',
+    `conversation_type`     VARCHAR(20) NOT NULL COMMENT '会话类型:GENERAL,KB_QA,IMAGE_GEN,VIDEO_GEN',
+    `model_code`            VARCHAR(50) NOT NULL COMMENT '使用的模型编码',
+    `kb_space_id`           BIGINT               DEFAULT NULL COMMENT '关联的知识库空间ID',
+    `system_prompt`         TEXT                 DEFAULT NULL COMMENT '系统提示词',
+    `context_strategy`      VARCHAR(20)          DEFAULT 'SLIDING_WINDOW' COMMENT '上下文策略:SLIDING_WINDOW,SUMMARIZE,TRUNCATE',
+    `max_context_messages`  INT                  DEFAULT 20 COMMENT '最大上下文消息数',
+    `temperature`           DECIMAL(3, 2)        DEFAULT 0.70 COMMENT '温度参数快照',
+    `max_tokens_per_request` INT                 DEFAULT NULL COMMENT '单次请求最大token数',
+    `conversation_status`   TINYINT     NOT NULL DEFAULT 0 COMMENT '会话状态:0进行中,1已结束,2已删除',
+    `is_pinned`             TINYINT              DEFAULT 0 COMMENT '是否置顶:0否,1是',
+    `share_token`           VARCHAR(64)          DEFAULT NULL COMMENT '分享令牌',
+    `share_expire_time`     DATETIME             DEFAULT NULL COMMENT '分享过期时间',
+    `message_count`         INT         NOT NULL DEFAULT 0 COMMENT '消息数量',
+    `total_tokens`          BIGINT      NOT NULL DEFAULT 0 COMMENT '总消耗token数',
+    `total_cost`            BIGINT      NOT NULL DEFAULT 0 COMMENT '总消耗金额,单位分',
+    `last_message_time`     DATETIME             DEFAULT NULL COMMENT '最后消息时间',
+    `expire_time`           DATETIME             DEFAULT NULL COMMENT '会话过期时间',
+    `create_by`             BIGINT               DEFAULT NULL COMMENT '创建人ID',
+    `create_time`           DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_by`             BIGINT               DEFAULT NULL COMMENT '更新人ID',
+    `update_time`           DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted`               TINYINT     NOT NULL DEFAULT 0 COMMENT '逻辑删除标记:0未删除,1已删除',
+    `version`               INT         NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
+    `remark`                VARCHAR(500)         DEFAULT NULL COMMENT '备注说明',
+    `sort`                  INT         NOT NULL DEFAULT 0 COMMENT '排序字段',
+    `status`                TINYINT     NOT NULL DEFAULT 0 COMMENT '状态:0正常,1停用',
+    `extra_data`            JSON                 DEFAULT NULL COMMENT '扩展数据',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uni_guid` (`conversation_guid`) COMMENT '会话唯一标识索引',
+    KEY `idx_user_status` (`user_id`, `conversation_status`) COMMENT '用户状态联合索引',
+    KEY `idx_kb` (`kb_space_id`) COMMENT '知识库空间索引',
+    KEY `idx_expire` (`expire_time`) COMMENT '过期时间索引',
+    KEY `idx_share_token` (`share_token`) COMMENT '分享令牌索引'
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci COMMENT ='AI对话会话表-用户与AI的对话会话';
+
+CREATE TABLE `ai_message`
+(
+    `id`                   BIGINT      AUTO_INCREMENT NOT NULL COMMENT '主键ID',
+    `conversation_id`      BIGINT      NOT NULL COMMENT '对话会话ID',
+    `parent_message_id`    BIGINT               DEFAULT NULL COMMENT '父消息ID(支持编辑重发)',
+    `message_role`         VARCHAR(20) NOT NULL COMMENT '消息角色:USER,ASSISTANT,SYSTEM',
+    `message_content`      TEXT        NOT NULL COMMENT '消息内容',
+    `message_type`         VARCHAR(20) NOT NULL DEFAULT 'TEXT' COMMENT '消息类型:TEXT,IMAGE,VIDEO,FUNCTION',
+    `is_streaming`         TINYINT              DEFAULT 0 COMMENT '是否流式输出:0否,1是',
+    `stream_finish_reason` VARCHAR(50)          DEFAULT NULL COMMENT '流式结束原因:stop,length,content_filter',
+    `media_urls`           JSON                 DEFAULT NULL COMMENT '媒体URL数组',
+    `prompt_tokens`        INT                  DEFAULT NULL COMMENT '输入token数',
+    `completion_tokens`    INT                  DEFAULT NULL COMMENT '输出token数',
+    `total_tokens`         INT                  DEFAULT NULL COMMENT '总token数',
+    `message_cost`         BIGINT               DEFAULT NULL COMMENT '消息成本,单位分',
+    `latency_ms`           INT                  DEFAULT NULL COMMENT '响应延迟(毫秒)',
+    `model_code`           VARCHAR(50)          DEFAULT NULL COMMENT '使用的模型',
+    `model_params`         JSON                 DEFAULT NULL COMMENT '模型参数',
+    `function_call`        JSON                 DEFAULT NULL COMMENT '函数调用信息',
+    `kb_references`        JSON                 DEFAULT NULL COMMENT '知识库引用',
+    `message_status`       TINYINT     NOT NULL DEFAULT 1 COMMENT '消息状态:0发送中,1成功,2失败',
+    `moderation_status`    TINYINT              DEFAULT 0 COMMENT '审核状态:0待审核,1通过,2拒绝',
+    `moderation_result`    JSON                 DEFAULT NULL COMMENT '审核结果详情',
+    `moderation_time`      DATETIME             DEFAULT NULL COMMENT '审核时间',
+    `error_message`        VARCHAR(500)         DEFAULT NULL COMMENT '错误信息',
+    `create_time`          DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`          DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_conv_time` (`conversation_id`, `create_time`) COMMENT '会话时间联合索引',
+    KEY `idx_conv` (`conversation_id`) COMMENT '会话索引',
+    KEY `idx_parent_message` (`parent_message_id`) COMMENT '父消息索引',
+    KEY `idx_moderation_status` (`moderation_status`) COMMENT '审核状态索引'
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci COMMENT ='AI消息表-会话中的每条消息';
+
+CREATE TABLE `ai_prompt_template`
+(
+    `id`                 BIGINT       AUTO_INCREMENT NOT NULL COMMENT '主键ID',
+    `template_code`      VARCHAR(50)  NOT NULL COMMENT '模板编码',
+    `version_number`     INT                   DEFAULT 1 COMMENT '版本号',
+    `parent_template_id` BIGINT                DEFAULT NULL COMMENT '父模板ID(用于版本链)',
+    `template_name`      VARCHAR(100) NOT NULL COMMENT '模板名称',
+    `template_content`   TEXT         NOT NULL COMMENT '模板内容,支持变量占位符',
+    `template_type`      VARCHAR(20)  NOT NULL COMMENT '模板类型:SYSTEM,USER',
+    `template_category`  VARCHAR(50)           DEFAULT NULL COMMENT '模板分类:写作助手,代码助手,翻译助手',
+    `applicable_models`  JSON                  DEFAULT NULL COMMENT '适用模型数组',
+    `is_system`          TINYINT      NOT NULL DEFAULT 0 COMMENT '是否系统模板:0否,1是',
+    `is_public`          TINYINT      NOT NULL DEFAULT 0 COMMENT '是否公开:0否,1是',
+    `creator_id`         BIGINT                DEFAULT NULL COMMENT '创建者ID',
+    `usage_count`        BIGINT       NOT NULL DEFAULT 0 COMMENT '使用次数',
+    `like_count`         BIGINT       NOT NULL DEFAULT 0 COMMENT '点赞数',
+    `avg_token_usage`    INT                   DEFAULT NULL COMMENT '平均token消耗',
+    `avg_cost`           BIGINT                DEFAULT NULL COMMENT '平均成本(分)',
+    `success_rate`       DECIMAL(5, 2)         DEFAULT NULL COMMENT '成功率',
+    `avg_satisfaction`   DECIMAL(3, 2)         DEFAULT NULL COMMENT '平均满意度评分',
     `create_by`          BIGINT                DEFAULT NULL COMMENT '创建人ID',
     `create_time`        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_by`          BIGINT                DEFAULT NULL COMMENT '更新人ID',
@@ -882,86 +1010,162 @@ CREATE TABLE `ai_model_config`
     `deleted`            TINYINT      NOT NULL DEFAULT 0 COMMENT '逻辑删除标记:0未删除,1已删除',
     `version`            INT          NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
     `remark`             VARCHAR(500)          DEFAULT NULL COMMENT '备注说明',
+    `sort`               INT          NOT NULL DEFAULT 0 COMMENT '排序字段',
     `status`             TINYINT      NOT NULL DEFAULT 0 COMMENT '状态:0正常,1停用',
     `extra_data`         JSON                  DEFAULT NULL COMMENT '扩展数据',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uni_model_code` (`model_code`) COMMENT '模型编码唯一索引',
-    KEY `idx_provider_type` (`provider`, `model_type`) COMMENT '供应商类型联合索引',
-    KEY `idx_enabled` (`is_enabled`) COMMENT '启用状态索引'
+    UNIQUE KEY `uni_code` (`template_code`) COMMENT '模板编码唯一索引',
+    KEY `idx_category_public` (`template_category`, `is_public`) COMMENT '分类公开联合索引',
+    KEY `idx_creator` (`creator_id`) COMMENT '创建者索引',
+    KEY `idx_parent_template` (`parent_template_id`) COMMENT '父模板索引'
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='AI模型配置表-配置可用的AI模型';
+  COLLATE = utf8mb4_unicode_ci COMMENT ='提示词模板表-系统和用户自定义模板';
 
-CREATE TABLE `ai_conversation`
+CREATE TABLE `ai_quota`
 (
-    `id`                  BIGINT      NOT NULL COMMENT '主键ID',
-    `conversation_guid`   VARCHAR(64) NOT NULL COMMENT '全局唯一标识,UUID格式',
-    `user_id`             BIGINT      NOT NULL COMMENT '用户ID',
-    `conversation_title`  VARCHAR(200)         DEFAULT NULL COMMENT '会话标题',
-    `conversation_type`   VARCHAR(20) NOT NULL COMMENT '会话类型:GENERAL,KB_QA,IMAGE_GEN,VIDEO_GEN',
-    `model_code`          VARCHAR(50) NOT NULL COMMENT '使用的模型编码',
-    `kb_space_id`         BIGINT               DEFAULT NULL COMMENT '关联的知识库空间ID',
-    `system_prompt`       TEXT                 DEFAULT NULL COMMENT '系统提示词',
-    `conversation_status` TINYINT     NOT NULL DEFAULT 0 COMMENT '会话状态:0进行中,1已结束,2已删除',
-    `message_count`       INT         NOT NULL DEFAULT 0 COMMENT '消息数量',
-    `total_tokens`        BIGINT      NOT NULL DEFAULT 0 COMMENT '总消耗token数',
-    `total_cost`          BIGINT      NOT NULL DEFAULT 0 COMMENT '总消耗金额,单位分',
-    `last_message_time`   DATETIME             DEFAULT NULL COMMENT '最后消息时间',
-    `create_by`           BIGINT               DEFAULT NULL COMMENT '创建人ID',
-    `create_time`         DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_by`           BIGINT               DEFAULT NULL COMMENT '更新人ID',
-    `update_time`         DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `deleted`             TINYINT     NOT NULL DEFAULT 0 COMMENT '逻辑删除标记:0未删除,1已删除',
-    `version`             INT         NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
-    `sort`                INT         NOT NULL DEFAULT 0 COMMENT '排序字段',
+    `id`                BIGINT      AUTO_INCREMENT NOT NULL COMMENT '主键ID',
+    `user_id`           BIGINT      NOT NULL COMMENT '用户ID',
+    `level_id`          BIGINT      NOT NULL COMMENT '会员等级ID',
+    `chat_quota_total`  INT         NOT NULL DEFAULT 0 COMMENT '对话总配额',
+    `chat_quota_used`   INT         NOT NULL DEFAULT 0 COMMENT '对话已使用配额',
+    `image_quota_total` INT         NOT NULL DEFAULT 0 COMMENT '图像生成总配额',
+    `image_quota_used`  INT         NOT NULL DEFAULT 0 COMMENT '图像生成已使用配额',
+    `video_quota_total` INT         NOT NULL DEFAULT 0 COMMENT '视频生成总配额',
+    `video_quota_used`  INT         NOT NULL DEFAULT 0 COMMENT '视频生成已使用配额',
+    `warning_threshold` INT                  DEFAULT 80 COMMENT '预警阈值百分比',
+    `is_warned`         TINYINT              DEFAULT 0 COMMENT '是否已发送预警:0否,1是',
+    `last_warning_time` DATETIME             DEFAULT NULL COMMENT '上次预警时间',
+    `is_frozen`         TINYINT              DEFAULT 0 COMMENT '是否冻结:0否,1是',
+    `freeze_reason`     VARCHAR(200)         DEFAULT NULL COMMENT '冻结原因',
+    `reset_cycle`       VARCHAR(20) NOT NULL COMMENT '重置周期:DAILY,MONTHLY',
+    `last_reset_time`   DATETIME    NOT NULL COMMENT '上次重置时间',
+    `next_reset_time`   DATETIME    NOT NULL COMMENT '下次重置时间',
+    `create_time`       DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`       DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uni_guid` (`conversation_guid`) COMMENT '会话唯一标识索引',
-    KEY `idx_user_status` (`user_id`, `conversation_status`) COMMENT '用户状态联合索引',
-    KEY `idx_kb` (`kb_space_id`) COMMENT '知识库空间索引'
+    UNIQUE KEY `uni_user` (`user_id`) COMMENT '用户唯一索引',
+    KEY `idx_next_reset` (`next_reset_time`) COMMENT '下次重置时间索引',
+    KEY `idx_is_frozen` (`is_frozen`) COMMENT '冻结状态索引'
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='AI对话会话表-用户与AI的对话会话';
+  COLLATE = utf8mb4_unicode_ci COMMENT ='用户AI配额表-记录用户AI使用配额';
 
-CREATE TABLE `ai_message`
+CREATE TABLE `ai_consumption`
 (
-    `id`                BIGINT      NOT NULL COMMENT '主键ID',
-    `conversation_id`   BIGINT      NOT NULL COMMENT '对话会话ID',
-    `message_role`      VARCHAR(20) NOT NULL COMMENT '消息角色:USER,ASSISTANT,SYSTEM',
-    `message_content`   TEXT        NOT NULL COMMENT '消息内容',
-    `message_type`      VARCHAR(20) NOT NULL DEFAULT 'TEXT' COMMENT '消息类型:TEXT,IMAGE,VIDEO,FUNCTION',
-    `media_urls`        JSON                 DEFAULT NULL COMMENT '媒体URL数组',
+    `id`                BIGINT      AUTO_INCREMENT NOT NULL COMMENT '主键ID',
+    `user_id`           BIGINT      NOT NULL COMMENT '用户ID',
+    `conversation_id`   BIGINT               DEFAULT NULL COMMENT '会话ID',
+    `message_id`        BIGINT               DEFAULT NULL COMMENT '消息ID',
+    `request_id`        VARCHAR(64)          DEFAULT NULL COMMENT '请求ID(用于追踪)',
+    `model_code`        VARCHAR(50) NOT NULL COMMENT '模型编码',
+    `consumption_type`  VARCHAR(20) NOT NULL COMMENT '消费类型:CHAT,IMAGE,VIDEO',
     `prompt_tokens`     INT                  DEFAULT NULL COMMENT '输入token数',
     `completion_tokens` INT                  DEFAULT NULL COMMENT '输出token数',
     `total_tokens`      INT                  DEFAULT NULL COMMENT '总token数',
-    `message_cost`      BIGINT               DEFAULT NULL COMMENT '消息成本,单位分',
-    `model_code`        VARCHAR(50)          DEFAULT NULL COMMENT '使用的模型',
-    `model_params`      JSON                 DEFAULT NULL COMMENT '模型参数',
-    `function_call`     JSON                 DEFAULT NULL COMMENT '函数调用信息',
-    `kb_references`     JSON                 DEFAULT NULL COMMENT '知识库引用',
-    `message_status`    TINYINT     NOT NULL DEFAULT 1 COMMENT '消息状态:0发送中,1成功,2失败',
-    `error_message`     VARCHAR(500)         DEFAULT NULL COMMENT '错误信息',
+    `unit_price`        BIGINT               DEFAULT NULL COMMENT '单价,每千token价格,单位分',
+    `total_cost`        BIGINT      NOT NULL COMMENT '总成本,单位分',
+    `is_abnormal`       TINYINT              DEFAULT 0 COMMENT '是否异常消费:0否,1是',
+    `abnormal_reason`   VARCHAR(200)         DEFAULT NULL COMMENT '异常原因',
+    `response_time_ms`  INT                  DEFAULT NULL COMMENT '响应时间(毫秒)',
+    `consumption_time`  DATETIME    NOT NULL COMMENT '消费时间',
     `create_time`       DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     PRIMARY KEY (`id`),
-    KEY `idx_conv_time` (`conversation_id`, `create_time`) COMMENT '会话时间联合索引',
-    KEY `idx_conv` (`conversation_id`) COMMENT '会话索引'
+    KEY `idx_user_time` (`user_id`, `create_time`) COMMENT '用户时间联合索引',
+    KEY `idx_conv` (`conversation_id`) COMMENT '会话索引',
+    KEY `idx_time` (`consumption_time`) COMMENT '消费时间索引',
+    KEY `idx_request_id` (`request_id`) COMMENT '请求ID索引',
+    KEY `idx_abnormal` (`is_abnormal`, `consumption_time`) COMMENT '异常消费联合索引'
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='AI消息表-会话中的每条消息';
+  COLLATE = utf8mb4_unicode_ci COMMENT ='AI消费记录表-详细记录每次AI调用';
 
-CREATE TABLE `ai_prompt_template`
+CREATE TABLE `ai_vector_store`
 (
-    `id`                BIGINT       NOT NULL COMMENT '主键ID',
-    `template_code`     VARCHAR(50)  NOT NULL COMMENT '模板编码',
-    `template_name`     VARCHAR(100) NOT NULL COMMENT '模板名称',
-    `template_content`  TEXT         NOT NULL COMMENT '模板内容,支持变量占位符',
-    `template_type`     VARCHAR(20)  NOT NULL COMMENT '模板类型:SYSTEM,USER',
-    `template_category` VARCHAR(50)           DEFAULT NULL COMMENT '模板分类:写作助手,代码助手,翻译助手',
-    `applicable_models` JSON                  DEFAULT NULL COMMENT '适用模型数组',
-    `is_system`         TINYINT      NOT NULL DEFAULT 0 COMMENT '是否系统模板:0否,1是',
-    `is_public`         TINYINT      NOT NULL DEFAULT 0 COMMENT '是否公开:0否,1是',
-    `creator_id`        BIGINT                DEFAULT NULL COMMENT '创建者ID',
-    `usage_count`       BIGINT       NOT NULL DEFAULT 0 COMMENT '使用次数',
-    `like_count`        BIGINT       NOT NULL DEFAULT 0 COMMENT '点赞数',
+    `id`                 BIGINT   AUTO_INCREMENT NOT NULL COMMENT '主键ID',
+    `document_id`        BIGINT   NOT NULL COMMENT '文档ID',
+    `chunk_index`        INT      NOT NULL COMMENT '分块索引',
+    `chunk_size`         INT               DEFAULT 500 COMMENT '分块大小(字符数)',
+    `chunk_overlap`      INT               DEFAULT 50 COMMENT '分块重叠大小',
+    `chunk_content`      TEXT     NOT NULL COMMENT '分块内容',
+    `chunk_hash`         VARCHAR(64)       DEFAULT NULL COMMENT '分块内容哈希,用于去重',
+    `chunk_tokens`       INT      NOT NULL COMMENT '分块token数',
+    `vector_id`          VARCHAR(100)      DEFAULT NULL COMMENT '向量数据库中的向量ID',
+    `collection_name`    VARCHAR(100)      DEFAULT NULL COMMENT '向量库集合名称',
+    `embedding_model`    VARCHAR(50)       DEFAULT NULL COMMENT '嵌入模型',
+    `vector_dimension`   INT               DEFAULT NULL COMMENT '向量维度,如1536',
+    `vector_data`        JSON              DEFAULT NULL COMMENT '向量数据(小规模场景)或存储路径',
+    `similarity_threshold` DECIMAL(5, 4)   DEFAULT 0.7500 COMMENT '相似度阈值',
+    `sync_status`        TINYINT           DEFAULT 0 COMMENT '同步状态:0待同步,1已同步,2同步失败',
+    `sync_time`          DATETIME          DEFAULT NULL COMMENT '同步到向量库的时间',
+    `sync_error`         VARCHAR(500)      DEFAULT NULL COMMENT '同步错误信息',
+    `metadata`           JSON              DEFAULT NULL COMMENT '元数据',
+    `create_time`        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_doc_chunk` (`document_id`, `chunk_index`) COMMENT '文档分块联合索引',
+    KEY `idx_vector` (`vector_id`) COMMENT '向量ID索引',
+    KEY `idx_chunk_hash` (`chunk_hash`) COMMENT '分块哈希索引',
+    KEY `idx_sync_status` (`sync_status`) COMMENT '同步状态索引',
+    KEY `idx_collection` (`collection_name`) COMMENT '集合名称索引'
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci COMMENT ='向量存储索引表-知识库文档向量化映射';
+
+CREATE TABLE `ai_generation_task`
+(
+    `id`                 BIGINT      AUTO_INCREMENT NOT NULL COMMENT '主键ID',
+    `task_guid`          VARCHAR(64) NOT NULL COMMENT '任务唯一标识,UUID格式',
+    `user_id`            BIGINT      NOT NULL COMMENT '用户ID',
+    `task_type`          VARCHAR(20) NOT NULL COMMENT '任务类型:IMAGE,VIDEO',
+    `queue_name`         VARCHAR(50)          DEFAULT 'default' COMMENT '任务队列名称',
+    `priority`           INT                  DEFAULT 5 COMMENT '优先级0-9,数字越大优先级越高',
+    `model_code`         VARCHAR(50) NOT NULL COMMENT '模型编码',
+    `prompt`             TEXT        NOT NULL COMMENT '提示词',
+    `negative_prompt`    TEXT                 DEFAULT NULL COMMENT '反向提示词',
+    `task_params`        JSON                 DEFAULT NULL COMMENT '任务参数',
+    `task_status`        TINYINT     NOT NULL DEFAULT 0 COMMENT '任务状态:0排队中,1生成中,2已完成,3失败,4已取消',
+    `progress`           INT         NOT NULL DEFAULT 0 COMMENT '进度百分比0-100',
+    `retry_count`        INT                  DEFAULT 0 COMMENT '重试次数',
+    `max_retry`          INT                  DEFAULT 3 COMMENT '最大重试次数',
+    `result_urls`        JSON                 DEFAULT NULL COMMENT '生成结果URL数组',
+    `task_cost`          BIGINT               DEFAULT NULL COMMENT '任务成本,单位分',
+    `callback_url`       VARCHAR(500)         DEFAULT NULL COMMENT '回调地址',
+    `callback_status`    TINYINT              DEFAULT 0 COMMENT '回调状态:0未回调,1成功,2失败',
+    `estimated_duration` INT                  DEFAULT NULL COMMENT '预估耗时(秒)',
+    `actual_duration`    INT                  DEFAULT NULL COMMENT '实际耗时(秒)',
+    `start_time`         DATETIME             DEFAULT NULL COMMENT '开始时间',
+    `complete_time`      DATETIME             DEFAULT NULL COMMENT '完成时间',
+    `fail_reason`        VARCHAR(500)         DEFAULT NULL COMMENT '失败原因',
+    `create_by`          BIGINT               DEFAULT NULL COMMENT '创建人ID',
+    `create_time`        DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_by`          BIGINT               DEFAULT NULL COMMENT '更新人ID',
+    `update_time`        DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted`            TINYINT     NOT NULL DEFAULT 0 COMMENT '逻辑删除标记:0未删除,1已删除',
+    `version`            INT         NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
+    `remark`             VARCHAR(500)         DEFAULT NULL COMMENT '备注说明',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uni_guid` (`task_guid`) COMMENT '任务唯一标识索引',
+    KEY `idx_user_status` (`user_id`, `task_status`) COMMENT '用户状态联合索引',
+    KEY `idx_status` (`task_status`) COMMENT '任务状态索引',
+    KEY `idx_queue_priority_status` (`queue_name`, `priority`, `task_status`) COMMENT '队列优先级状态联合索引'
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci COMMENT ='生成任务表-异步生成任务状态跟踪';
+
+CREATE TABLE `ai_vector_database_config`
+(
+    `id`                BIGINT       AUTO_INCREMENT NOT NULL COMMENT '主键ID',
+    `config_code`       VARCHAR(50)  NOT NULL COMMENT '配置编码',
+    `config_name`       VARCHAR(100) NOT NULL COMMENT '配置名称',
+    `db_type`           VARCHAR(20)  NOT NULL COMMENT '向量库类型:MILVUS,PINECONE,WEAVIATE,CHROMA,ELASTICSEARCH',
+    `connection_url`    VARCHAR(500) NOT NULL COMMENT '连接地址',
+    `api_key`           VARCHAR(200)          DEFAULT NULL COMMENT 'API密钥,加密存储',
+    `collection_prefix` VARCHAR(50)           DEFAULT NULL COMMENT '集合名称前缀',
+    `default_dimension` INT                   DEFAULT 1536 COMMENT '默认向量维度',
+    `batch_size`        INT                   DEFAULT 100 COMMENT '批量写入大小',
+    `is_default`        TINYINT      NOT NULL DEFAULT 0 COMMENT '是否默认配置:0否,1是',
+    `is_enabled`        TINYINT      NOT NULL DEFAULT 1 COMMENT '是否启用:0否,1是',
     `create_by`         BIGINT                DEFAULT NULL COMMENT '创建人ID',
     `create_time`       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_by`         BIGINT                DEFAULT NULL COMMENT '更新人ID',
@@ -971,107 +1175,102 @@ CREATE TABLE `ai_prompt_template`
     `remark`            VARCHAR(500)          DEFAULT NULL COMMENT '备注说明',
     `status`            TINYINT      NOT NULL DEFAULT 0 COMMENT '状态:0正常,1停用',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uni_code` (`template_code`) COMMENT '模板编码唯一索引',
-    KEY `idx_category_public` (`template_category`, `is_public`) COMMENT '分类公开联合索引',
-    KEY `idx_creator` (`creator_id`) COMMENT '创建者索引'
+    UNIQUE KEY `uni_code` (`config_code`) COMMENT '配置编码唯一索引',
+    KEY `idx_db_type` (`db_type`) COMMENT '向量库类型索引',
+    KEY `idx_is_default` (`is_default`) COMMENT '默认配置索引'
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='提示词模板表-系统和用户自定义模板';
+  COLLATE = utf8mb4_unicode_ci COMMENT ='向量数据库配置表-配置向量数据库连接';
 
-CREATE TABLE `ai_quota`
+CREATE TABLE `ai_quota_adjustment`
 (
-    `id`                BIGINT      NOT NULL COMMENT '主键ID',
+    `id`                BIGINT      AUTO_INCREMENT NOT NULL COMMENT '主键ID',
     `user_id`           BIGINT      NOT NULL COMMENT '用户ID',
-    `level_id`          BIGINT      NOT NULL COMMENT '会员等级ID',
-    `chat_quota_total`  INT         NOT NULL DEFAULT 0 COMMENT '对话总配额',
-    `chat_quota_used`   INT         NOT NULL DEFAULT 0 COMMENT '对话已使用配额',
-    `image_quota_total` INT         NOT NULL DEFAULT 0 COMMENT '图像生成总配额',
-    `image_quota_used`  INT         NOT NULL DEFAULT 0 COMMENT '图像生成已使用配额',
-    `video_quota_total` INT         NOT NULL DEFAULT 0 COMMENT '视频生成总配额',
-    `video_quota_used`  INT         NOT NULL DEFAULT 0 COMMENT '视频生成已使用配额',
-    `reset_cycle`       VARCHAR(20) NOT NULL COMMENT '重置周期:DAILY,MONTHLY',
-    `last_reset_time`   DATETIME    NOT NULL COMMENT '上次重置时间',
-    `next_reset_time`   DATETIME    NOT NULL COMMENT '下次重置时间',
-    `update_time`       DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uni_user` (`user_id`) COMMENT '用户唯一索引',
-    KEY `idx_next_reset` (`next_reset_time`) COMMENT '下次重置时间索引'
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='用户AI配额表-记录用户AI使用配额';
-
-CREATE TABLE `ai_consumption`
-(
-    `id`                BIGINT      NOT NULL COMMENT '主键ID',
-    `user_id`           BIGINT      NOT NULL COMMENT '用户ID',
-    `conversation_id`   BIGINT               DEFAULT NULL COMMENT '会话ID',
-    `message_id`        BIGINT               DEFAULT NULL COMMENT '消息ID',
-    `model_code`        VARCHAR(50) NOT NULL COMMENT '模型编码',
-    `consumption_type`  VARCHAR(20) NOT NULL COMMENT '消费类型:CHAT,IMAGE,VIDEO',
-    `prompt_tokens`     INT                  DEFAULT NULL COMMENT '输入token数',
-    `completion_tokens` INT                  DEFAULT NULL COMMENT '输出token数',
-    `total_tokens`      INT                  DEFAULT NULL COMMENT '总token数',
-    `unit_price`        BIGINT               DEFAULT NULL COMMENT '单价,每千token价格,单位分',
-    `total_cost`        BIGINT      NOT NULL COMMENT '总成本,单位分',
-    `consumption_time`  DATETIME    NOT NULL COMMENT '消费时间',
+    `quota_type`        VARCHAR(20) NOT NULL COMMENT '配额类型:CHAT,IMAGE,VIDEO',
+    `adjustment_type`   VARCHAR(20) NOT NULL COMMENT '调整类型:GRANT,DEDUCT,RESET,TRANSFER',
+    `adjustment_amount` INT         NOT NULL COMMENT '调整数量(正数增加,负数减少)',
+    `before_amount`     INT         NOT NULL COMMENT '调整前数量',
+    `after_amount`      INT         NOT NULL COMMENT '调整后数量',
+    `reason`            VARCHAR(500)         DEFAULT NULL COMMENT '调整原因',
+    `operator_id`       BIGINT               DEFAULT NULL COMMENT '操作人ID',
+    `biz_id`            VARCHAR(64)          DEFAULT NULL COMMENT '业务单号',
     `create_time`       DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     PRIMARY KEY (`id`),
-    KEY `idx_user_time` (`user_id`, `create_time`) COMMENT '用户时间联合索引',
-    KEY `idx_conv` (`conversation_id`) COMMENT '会话索引',
-    KEY `idx_time` (`consumption_time`) COMMENT '消费时间索引'
+    KEY `idx_user_type_time` (`user_id`, `quota_type`, `create_time`) COMMENT '用户类型时间联合索引',
+    KEY `idx_operator` (`operator_id`) COMMENT '操作人索引'
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='AI消费记录表-详细记录每次AI调用';
+  COLLATE = utf8mb4_unicode_ci COMMENT ='AI配额调整历史表-记录配额变动历史';
 
-CREATE TABLE `ai_vector_store`
+CREATE TABLE `ai_prompt_feedback`
 (
-    `id`              BIGINT   NOT NULL COMMENT '主键ID',
-    `document_id`     BIGINT   NOT NULL COMMENT '文档ID',
-    `chunk_index`     INT      NOT NULL COMMENT '分块索引',
-    `chunk_content`   TEXT     NOT NULL COMMENT '分块内容',
-    `chunk_tokens`    INT      NOT NULL COMMENT '分块token数',
-    `vector_id`       VARCHAR(100)      DEFAULT NULL COMMENT '向量数据库中的向量ID',
-    `collection_name` VARCHAR(100)      DEFAULT NULL COMMENT '向量库集合名称',
-    `embedding_model` VARCHAR(50)       DEFAULT NULL COMMENT '嵌入模型',
-    `metadata`        JSON              DEFAULT NULL COMMENT '元数据',
-    `create_time`     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `id`               BIGINT   AUTO_INCREMENT NOT NULL COMMENT '主键ID',
+    `template_id`      BIGINT   NOT NULL COMMENT '模板ID',
+    `user_id`          BIGINT   NOT NULL COMMENT '用户ID',
+    `conversation_id`  BIGINT            DEFAULT NULL COMMENT '会话ID',
+    `rating`           TINYINT  NOT NULL COMMENT '评分1-5',
+    `feedback_text`    VARCHAR(500)      DEFAULT NULL COMMENT '反馈文本',
+    `token_usage`      INT               DEFAULT NULL COMMENT 'token消耗',
+    `response_quality` TINYINT           DEFAULT NULL COMMENT '回复质量1-5',
+    `create_time`      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     PRIMARY KEY (`id`),
-    KEY `idx_doc_chunk` (`document_id`, `chunk_index`) COMMENT '文档分块联合索引',
-    KEY `idx_vector` (`vector_id`) COMMENT '向量ID索引'
+    KEY `idx_template_rating` (`template_id`, `rating`) COMMENT '模板评分联合索引',
+    KEY `idx_user` (`user_id`) COMMENT '用户索引',
+    KEY `idx_conversation` (`conversation_id`) COMMENT '会话索引'
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='向量存储索引表-知识库文档向量化映射';
+  COLLATE = utf8mb4_unicode_ci COMMENT ='提示词使用反馈表-收集提示词使用效果反馈';
 
-CREATE TABLE `ai_generation_task`
+CREATE TABLE `ai_model_statistics`
 (
-    `id`              BIGINT      NOT NULL COMMENT '主键ID',
-    `task_guid`       VARCHAR(64) NOT NULL COMMENT '任务唯一标识,UUID格式',
-    `user_id`         BIGINT      NOT NULL COMMENT '用户ID',
-    `task_type`       VARCHAR(20) NOT NULL COMMENT '任务类型:IMAGE,VIDEO',
-    `model_code`      VARCHAR(50) NOT NULL COMMENT '模型编码',
-    `prompt`          TEXT        NOT NULL COMMENT '提示词',
-    `negative_prompt` TEXT                 DEFAULT NULL COMMENT '反向提示词',
-    `task_params`     JSON                 DEFAULT NULL COMMENT '任务参数',
-    `task_status`     TINYINT     NOT NULL DEFAULT 0 COMMENT '任务状态:0排队中,1生成中,2已完成,3失败,4已取消',
-    `progress`        INT         NOT NULL DEFAULT 0 COMMENT '进度百分比0-100',
-    `result_urls`     JSON                 DEFAULT NULL COMMENT '生成结果URL数组',
-    `task_cost`       BIGINT               DEFAULT NULL COMMENT '任务成本,单位分',
-    `start_time`      DATETIME             DEFAULT NULL COMMENT '开始时间',
-    `complete_time`   DATETIME             DEFAULT NULL COMMENT '完成时间',
-    `fail_reason`     VARCHAR(500)         DEFAULT NULL COMMENT '失败原因',
-    `create_by`       BIGINT               DEFAULT NULL COMMENT '创建人ID',
-    `create_time`     DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_by`       BIGINT               DEFAULT NULL COMMENT '更新人ID',
-    `update_time`     DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `deleted`         TINYINT     NOT NULL DEFAULT 0 COMMENT '逻辑删除标记:0未删除,1已删除',
-    `version`         INT         NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
+    `id`                   BIGINT   AUTO_INCREMENT NOT NULL COMMENT '主键ID',
+    `model_code`           VARCHAR(50) NOT NULL COMMENT '模型编码',
+    `stat_date`            DATE     NOT NULL COMMENT '统计日期',
+    `total_requests`       BIGINT            DEFAULT 0 COMMENT '总请求数',
+    `success_requests`     BIGINT            DEFAULT 0 COMMENT '成功请求数',
+    `failed_requests`      BIGINT            DEFAULT 0 COMMENT '失败请求数',
+    `total_tokens`         BIGINT            DEFAULT 0 COMMENT '总token消耗',
+    `total_cost`           BIGINT            DEFAULT 0 COMMENT '总成本(分)',
+    `avg_response_time_ms` INT               DEFAULT NULL COMMENT '平均响应时间(毫秒)',
+    `p95_response_time_ms` INT               DEFAULT NULL COMMENT 'P95响应时间',
+    `p99_response_time_ms` INT               DEFAULT NULL COMMENT 'P99响应时间',
+    `unique_users`         INT               DEFAULT 0 COMMENT '独立用户数',
+    `create_time`          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uni_guid` (`task_guid`) COMMENT '任务唯一标识索引',
-    KEY `idx_user_status` (`user_id`, `task_status`) COMMENT '用户状态联合索引',
-    KEY `idx_status` (`task_status`) COMMENT '任务状态索引'
+    UNIQUE KEY `uni_model_date` (`model_code`, `stat_date`) COMMENT '模型日期唯一索引',
+    KEY `idx_date` (`stat_date`) COMMENT '统计日期索引',
+    KEY `idx_model` (`model_code`) COMMENT '模型编码索引'
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='生成任务表-异步生成任务状态跟踪';
+  COLLATE = utf8mb4_unicode_ci COMMENT ='AI模型使用统计表-按日统计模型使用情况';
+
+CREATE TABLE `ai_rate_limit_rule`
+(
+    `id`           BIGINT       AUTO_INCREMENT NOT NULL COMMENT '主键ID',
+    `rule_name`    VARCHAR(100) NOT NULL COMMENT '规则名称',
+    `rule_type`    VARCHAR(20)  NOT NULL COMMENT '规则类型:USER,MODEL,GLOBAL',
+    `target_id`    BIGINT                DEFAULT NULL COMMENT '目标ID(用户ID或模型ID)',
+    `model_code`   VARCHAR(50)           DEFAULT NULL COMMENT '模型编码',
+    `limit_period` VARCHAR(20)  NOT NULL COMMENT '限流周期:SECOND,MINUTE,HOUR,DAY',
+    `limit_count`  INT          NOT NULL COMMENT '周期内限制次数',
+    `is_enabled`   TINYINT      NOT NULL DEFAULT 1 COMMENT '是否启用:0否,1是',
+    `priority`     INT          NOT NULL DEFAULT 0 COMMENT '优先级',
+    `create_by`    BIGINT                DEFAULT NULL COMMENT '创建人ID',
+    `create_time`  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_by`    BIGINT                DEFAULT NULL COMMENT '更新人ID',
+    `update_time`  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `deleted`      TINYINT      NOT NULL DEFAULT 0 COMMENT '逻辑删除标记:0未删除,1已删除',
+    `version`      INT          NOT NULL DEFAULT 0 COMMENT '乐观锁版本号',
+    `remark`       VARCHAR(500)          DEFAULT NULL COMMENT '备注说明',
+    `status`       TINYINT      NOT NULL DEFAULT 0 COMMENT '状态:0正常,1停用',
+    PRIMARY KEY (`id`),
+    KEY `idx_type_target` (`rule_type`, `target_id`) COMMENT '类型目标联合索引',
+    KEY `idx_model` (`model_code`) COMMENT '模型编码索引',
+    KEY `idx_enabled` (`is_enabled`) COMMENT '启用状态索引'
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci COMMENT ='AI流控规则配置表-配置AI接口限流规则';
 
 CREATE TABLE `file_info`
 (
