@@ -471,6 +471,7 @@ const AdminContentSpace: React.FC = () => {
       <ProTable<ContentSpace, ContentSpaceQueryParams>
         columns={columns}
         actionRef={actionRef}
+        cardBordered
         rowKey="id"
         search={{
           labelWidth: 'auto',

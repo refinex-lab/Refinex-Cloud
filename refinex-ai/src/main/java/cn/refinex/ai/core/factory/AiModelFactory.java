@@ -1,7 +1,7 @@
 package cn.refinex.ai.core.factory;
 
 import cn.hutool.core.convert.Convert;
-import cn.refinex.ai.config.properties.AiProperties;
+import cn.refinex.ai.properties.AiProperties;
 import cn.refinex.ai.core.client.AiModelClient;
 import cn.refinex.ai.core.client.ChatModelClient;
 import cn.refinex.ai.core.client.EmbeddingModelClient;

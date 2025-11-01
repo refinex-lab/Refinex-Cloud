@@ -393,21 +393,34 @@ export default [
     ],
   },
   {
-    name: 'ai',
+    name: 'ai-admin',
     icon: 'robot',
     path: '/ai',
     routes: [
       {
         path: '/ai',
-        redirect: '/ai/chat',
+        redirect: '/ai/model-config',
       },
       {
-        name: 'chat',
-        icon: 'comment',
-        path: '/ai/chat',
-        component: './ai/chat',
+        name: 'model-config',
+        icon: 'api',
+        path: '/ai/model-config',
+        component: './ai/admin/model-config',
+      },
+      {
+        name: 'prompt-template',
+        icon: 'fileText',
+        path: '/ai/prompt-template',
+        component: './ai/admin/prompt-template',
       },
     ],
+  },
+  {
+    path: '/ai/chat',
+    name: 'ai-chat',
+    icon: 'message',
+    component: './ai/chat',
+    hideInMenu: true,
   },
   {
     path: '/',

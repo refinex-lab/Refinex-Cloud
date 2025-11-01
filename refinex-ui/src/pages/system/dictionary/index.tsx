@@ -169,6 +169,7 @@ const DictionaryTypeList: React.FC = () => {
       <ProTable<DictType>
         actionRef={actionRef}
         rowKey="id"
+        cardBordered
         search={{
           labelWidth: 'auto',
           span: 6,

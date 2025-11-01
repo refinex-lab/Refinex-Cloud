@@ -1,4 +1,4 @@
-package cn.refinex.ai.config.properties;
+package cn.refinex.ai.properties;
 
 import cn.refinex.ai.enums.VectorStoreType;
 import lombok.Data;

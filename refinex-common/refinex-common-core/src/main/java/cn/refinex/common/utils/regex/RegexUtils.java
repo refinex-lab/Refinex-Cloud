@@ -968,6 +968,52 @@ public final class RegexUtils {
     }
 
     /**
+     * 自定义脱敏
+     * <p>
+     * 格式：根据正则表达式替换为指定字符
+     * </p>
+     *
+     * @param input       输入字符串
+     * @param regex       正则表达式
+     * @param replacement 替换字符
+     * @return 脱敏后的字符串
+     */
+    public static String desensitizeCustom(String input, String regex, String replacement) {
+        if (StrUtil.isBlank(input)) {
+            return input;
+        }
+        return input.replaceAll(regex, replacement);
+    }
+
+    /**
+     * 自定义脱敏（保留首尾字符）
+     * <p>
+     * 格式：保留前keepFront个字符和后keepEnd个字符，中间用mask替换
+     * </p>
+     *
+     * @param input     输入字符串
+     * @param keepFront 保留前端字符数
+     * @param keepEnd   保留后端字符数
+     * @param mask      替换字符
+     * @return 脱敏后的字符串
+     */
+    public static String desensitizeCustom(String input, int keepFront, int keepEnd, String mask) {
+        if (StrUtil.isBlank(input)) {
+            return input;
+        }
+
+        int length = input.length();
+        if (length <= keepFront + keepEnd) {
+            return input;
+        }
+
+        String front = input.substring(0, keepFront);
+        String end = input.substring(length - keepEnd);
+        String middle = StrUtil.repeat(mask, length - keepFront - keepEnd);
+        return front + middle + end;
+    }
+
+    /**
      * 姓名脱敏
      * <p>
      * 两个字：*明<br>

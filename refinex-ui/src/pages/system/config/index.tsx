@@ -291,6 +291,7 @@ const SystemConfig: React.FC = () => {
       <ProTable<SysConfig>
         actionRef={actionRef}
         rowKey="id"
+        cardBordered
         search={{
           labelWidth: 'auto',
           span: 6,

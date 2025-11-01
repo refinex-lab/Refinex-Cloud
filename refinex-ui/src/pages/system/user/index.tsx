@@ -557,6 +557,7 @@ const UserManagement: React.FC = () => {
       <ProTable<UserListItem>
         headerTitle="用户列表"
         actionRef={actionRef}
+        cardBordered
         rowKey="id"
         search={{
           labelWidth: 'auto',

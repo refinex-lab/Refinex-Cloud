@@ -1,6 +1,6 @@
-package cn.refinex.ai.config;
+package cn.refinex.ai.autoconfigure;
 
-import cn.refinex.ai.config.properties.AiProperties;
+import cn.refinex.ai.properties.AiProperties;
 import cn.refinex.ai.core.factory.AiModelFactory;
 import cn.refinex.ai.core.factory.VectorStoreFactory;
 import cn.refinex.ai.core.manager.VectorStoreManager;

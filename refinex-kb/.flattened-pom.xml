@@ -10,7 +10,6 @@
   <groupId>cn.refinex</groupId>
   <artifactId>refinex-kb</artifactId>
   <version>1.0.0</version>
-  <packaging>pom</packaging>
   <name>${project.artifactId}</name>
   <description>知识库服务</description>
   <dependencies>
@@ -47,12 +46,8 @@
       <artifactId>refinex-common-redis</artifactId>
     </dependency>
     <dependency>
-      <groupId>cn.refinex</groupId>
-      <artifactId>refinex-common-json</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cn.refinex</groupId>
-      <artifactId>refinex-common-satoken</artifactId>
+      <groupId>io.github.java-diff-utils</groupId>
+      <artifactId>java-diff-utils</artifactId>
     </dependency>
   </dependencies>
   <build>

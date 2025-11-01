@@ -16,6 +16,7 @@ import {
 } from '@/components';
 import CopilotButton from '@/components/AICopilot/CopilotButton';
 import LayoutWrapper from '@/components/AICopilot/LayoutWrapper';
+import AIAssistantEntry from '@/components/AIAssistantEntry';
 import { getCurrentUser } from '@/services/auth';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
@@ -152,6 +153,7 @@ export const layout: RunTimeLayoutConfig = ({
         ]
       : [],
     menuHeaderRender: undefined,
+    menuExtraRender: () => <AIAssistantEntry />,
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     // 增加一个 loading 的状态

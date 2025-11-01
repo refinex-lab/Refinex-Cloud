@@ -2,7 +2,7 @@ package cn.refinex.ai.core.factory;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
-import cn.refinex.ai.config.properties.AiProperties;
+import cn.refinex.ai.properties.AiProperties;
 import cn.refinex.ai.enums.VectorStoreType;
 import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.utils.spring.SpringUtils;

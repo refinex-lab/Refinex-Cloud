@@ -67,6 +67,8 @@ export default {
   'menu.kb-admin.space': 'Space Management',
   'menu.kb-admin.space-detail': 'Space Detail',
   'menu.kb-admin.tag': 'Tag Management',
-  'menu.ai': 'AI Assistant',
-  'menu.ai.chat': 'AI Chat',
+  'menu.ai-admin': 'AI Admin',
+  'menu.ai-admin.model-config': 'Model Config',
+  'menu.ai-admin.prompt-template': 'Prompt Template',
+  'menu.ai-chat': 'AI Chat',
 };

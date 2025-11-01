@@ -63,6 +63,15 @@ refinex:
 # Spring AI 官方配置
 # ====================================================================
 spring:
+  # 自动配置排除项
+  autoconfigure:
+    exclude:
+      # 禁用 AI 模块的 Qdrant, 手动创建
+      - org.springframework.ai.vectorstore.qdrant.autoconfigure.QdrantVectorStoreAutoConfiguration
+      # 禁用 AI 模块的 Milvus, 手动创建
+      - org.springframework.ai.vectorstore.milvus.autoconfigure.MilvusVectorStoreAutoConfiguration
+
+  # Spring AI 配置
   ai:
     # 重试配置（Spring AI 官方配置项）
     # 参考文档：https://docs.spring.io/spring-ai/reference/api/retry.html
@@ -90,6 +99,11 @@ spring:
     # 参考文档：https://docs.spring.io/spring-ai/reference/api/vectordbs.html
     # ====================================================================
     vectorstore:
+      # 向量存储类型：milvus、redis、qdrant
+      # 具体参见：org.springframework.ai.vectorstore.SpringAIVectorStoreTypes
+      # 这里用不到，因为我们是手动创建向量存储，而不是自动创建
+      # type: simple
+
       # Redis 向量存储配置
       # 参考文档：https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html
       redis:

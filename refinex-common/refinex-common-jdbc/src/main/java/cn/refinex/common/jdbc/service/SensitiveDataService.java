@@ -179,8 +179,10 @@ public class SensitiveDataService {
      * @param rowGuid    sys_sensitive 表的 row_guid
      * @param plainValue 新的明文值
      */
-    public void updateSensitiveData(String rowGuid, String plainValue) {
+    public void updateSensitiveData(String tableName, String rowGuid, String fieldCode, String plainValue) {
+        Assert.hasText(tableName, "tableName 不能为空");
         Assert.hasText(rowGuid, "rowGuid 不能为空");
+        Assert.hasText(fieldCode, "fieldCode 不能为空");
         Assert.hasText(plainValue, "plainValue 不能为空");
 
         try {
@@ -191,13 +193,17 @@ public class SensitiveDataService {
             String sql = """
                     UPDATE sys_sensitive
                     SET encrypted_value = :encryptedValue,
-                        update_time = NOW()
-                    WHERE row_guid = :rowGuid
+                        update_time     = NOW()
+                    WHERE table_name = :tableName
+                      AND row_guid   = :rowGuid
+                      AND field_code = :fieldCode
                     """;
 
             Map<String, Object> params = Map.of(
+                    "tableName", tableName,
                     "encryptedValue", encryptedValue,
-                    "rowGuid", rowGuid
+                    "rowGuid", rowGuid,
+                    "fieldCode", fieldCode
             );
 
             int updated = jdbcManager.update(sql, params);
