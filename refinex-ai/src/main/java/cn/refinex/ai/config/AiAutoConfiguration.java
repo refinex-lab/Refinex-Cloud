@@ -2,12 +2,17 @@ package cn.refinex.ai.config;
 
 import cn.refinex.ai.config.properties.AiProperties;
 import cn.refinex.ai.core.factory.AiModelFactory;
+import cn.refinex.ai.core.factory.VectorStoreFactory;
+import cn.refinex.ai.core.manager.VectorStoreManager;
 import cn.refinex.ai.core.provider.ModelProvider;
 import cn.refinex.ai.repository.AiModelConfigRepository;
 import cn.refinex.common.jdbc.service.SensitiveDataService;
 import io.micrometer.observation.ObservationRegistry;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -70,7 +75,6 @@ public class AiAutoConfiguration {
             SensitiveDataService sensitiveDataService,
             AiProperties aiProperties,
             List<ModelProvider> providers) {
-        log.info("注册 AI 模型工厂，支持 {} 个供应商", providers.size());
         return new AiModelFactory(configRepository, sensitiveDataService, aiProperties, providers);
     }
 
@@ -106,6 +110,38 @@ public class AiAutoConfiguration {
     }
 
     /**
+     * 注册向量存储工厂
+     *
+     * @param aiProperties                        AI 配置属性
+     * @param observationRegistryProvider         观察注册表提供者
+     * @param customObservationConventionProvider 自定义观察约定提供者
+     * @param batchingStrategyProvider            批处理策略提供者
+     * @return 向量存储工厂
+     */
+    @Bean
+    @ConditionalOnProperty(prefix = "refinex.ai.vector-store", name = "enabled", havingValue = "true")
+    public VectorStoreFactory vectorStoreFactory(
+            AiProperties aiProperties,
+            ObjectProvider<ObservationRegistry> observationRegistryProvider,
+            ObjectProvider<VectorStoreObservationConvention> customObservationConventionProvider,
+            ObjectProvider<BatchingStrategy> batchingStrategyProvider) {
+
+        return new VectorStoreFactory(aiProperties, observationRegistryProvider, customObservationConventionProvider, batchingStrategyProvider);
+    }
+
+    /**
+     * 注册向量存储管理器
+     *
+     * @param vectorStoreFactory 向量存储工厂
+     * @return 向量存储管理器
+     */
+    @Bean
+    @ConditionalOnProperty(prefix = "refinex.ai.vector-store", name = "enabled", havingValue = "true")
+    public VectorStoreManager vectorStoreManager(VectorStoreFactory vectorStoreFactory) {
+        return new VectorStoreManager(vectorStoreFactory);
+    }
+
+    /**
      * 配置完成回调
      *
      * @param aiProperties AI 配置属性
@@ -129,6 +165,10 @@ public class AiAutoConfiguration {
             log.info("缓存容量: {}", aiProperties.getCache().getMaxSize());
             log.info("缓存过期: {}小时", aiProperties.getCache().getTtl());
             log.info("默认聊天模型: {}", aiProperties.getFallback().getDefaultChatModel());
+            log.info("向量存储启用: {}", aiProperties.getVectorStore().isEnabled());
+            if (aiProperties.getVectorStore().isEnabled()) {
+                log.info("向量存储类型: {}", aiProperties.getVectorStore().getType().getDescription());
+            }
             log.info("注意: 重试配置请使用 Spring AI 官方的 spring.ai.retry.* 配置项");
             log.info("=========================");
         }

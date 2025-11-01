@@ -44,6 +44,20 @@ refinex:
       default-image-model: dall-e-3
       # 默认嵌入模型
       default-embedding-model: text-embedding-ada-002
+    
+    # 向量存储配置
+    vector-store:
+      # 是否启用向量存储
+      enabled: false
+      # 向量存储类型：SIMPLE（内存+文件持久化）、REDIS、QDRANT、MILVUS
+      type: SIMPLE
+      
+      # SimpleVectorStore 配置
+      simple:
+        # 存储文件路径
+        store-path: ${user.home}/vector_store
+        # 定时保存间隔（分钟）
+        save-interval-minutes: 1
 
 # ====================================================================
 # Spring AI 官方配置
@@ -70,3 +84,68 @@ spring:
       # exclude-on-http-codes: [400, 404]
       # 应触发重试的 HTTP 状态代码列表（例如，应抛出 TransientAiException）
       # on-http-codes: [429, 500, 502, 503, 504]
+    
+    # ====================================================================
+    # 向量存储配置（Spring AI 官方配置项）
+    # 参考文档：https://docs.spring.io/spring-ai/reference/api/vectordbs.html
+    # ====================================================================
+    vectorstore:
+      # Redis 向量存储配置
+      # 参考文档：https://docs.spring.io/spring-ai/reference/api/vectordbs/redis.html
+      redis:
+        # 是否初始化 Schema（生产环境建议设置为 false，手动创建索引）
+        initialize-schema: false
+        # 索引名称
+        index-name: spring-ai-index
+        # Redis Key 前缀
+        prefix: "embedding:"
+        # Redis URI（格式：redis://[username:password@]host:port[/database]）
+        uri: redis://localhost:6379
+        # 或者使用独立配置
+        # host: localhost
+        # port: 6379
+        # username: default
+        # password:
+        # database: 0
+      
+      # Qdrant 向量存储配置
+      # 参考文档：https://docs.spring.io/spring-ai/reference/api/vectordbs/qdrant.html
+      qdrant:
+        # 是否初始化 Schema（生产环境建议设置为 false，手动创建 Collection）
+        initialize-schema: false
+        # Collection 名称
+        collection-name: vector_store
+        # Qdrant 主机地址
+        host: localhost
+        # Qdrant gRPC 端口
+        port: 6334
+        # API Key（可选）
+        api-key:
+        # 是否使用 TLS
+        use-tls: false
+      
+      # Milvus 向量存储配置
+      # 参考文档：https://docs.spring.io/spring-ai/reference/api/vectordbs/milvus.html
+      milvus:
+        # 是否初始化 Schema（生产环境建议设置为 false，手动创建 Collection）
+        initialize-schema: false
+        # Collection 名称
+        collection-name: vector_store
+        # 数据库名称
+        database-name: default
+        # Milvus 主机地址
+        host: localhost
+        # Milvus 端口
+        port: 19530
+        # 用户名
+        username: root
+        # 密码
+        password: milvus
+        # Token（可选，用于认证）
+        token:
+        # 嵌入维度
+        embedding-dimension: 1536
+        # 索引类型：IVF_FLAT, IVF_SQ8, IVF_PQ, HNSW, ANNOY
+        index-type: IVF_FLAT
+        # 度量类型：COSINE, L2, IP
+        metric-type: COSINE

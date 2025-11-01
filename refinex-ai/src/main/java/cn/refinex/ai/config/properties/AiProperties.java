@@ -1,5 +1,6 @@
 package cn.refinex.ai.config.properties;
 
+import cn.refinex.ai.enums.VectorStoreType;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -34,6 +35,11 @@ public class AiProperties {
      * 降级配置
      */
     private FallbackConfig fallback = new FallbackConfig();
+
+    /**
+     * 向量存储配置
+     */
+    private VectorStoreConfig vectorStore = new VectorStoreConfig();
 
     /**
      * 默认配置
@@ -99,6 +105,43 @@ public class AiProperties {
          * 是否启用降级, 默认 true
          */
         private boolean enabled = true;
+    }
+
+    /**
+     * 向量存储配置
+     */
+    @Data
+    public static class VectorStoreConfig {
+        /**
+         * 是否启用向量存储, 默认 false
+         */
+        private boolean enabled = false;
+
+        /**
+         * 向量存储类型, 默认 SIMPLE
+         */
+        private VectorStoreType type = VectorStoreType.SIMPLE;
+
+        /**
+         * SimpleVectorStore 配置
+         */
+        private SimpleConfig simple = new SimpleConfig();
+
+        /**
+         * SimpleVectorStore 配置
+         */
+        @Data
+        public static class SimpleConfig {
+            /**
+             * 存储文件路径, 默认 ${user.home}/vector_store
+             */
+            private String storePath = System.getProperty("user.home") + "/vector_store";
+
+            /**
+             * 定时保存间隔（分钟）, 默认 1 分钟
+             */
+            private int saveIntervalMinutes = 1;
+        }
     }
 }
 
