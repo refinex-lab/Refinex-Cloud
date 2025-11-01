@@ -86,6 +86,25 @@ const AGENT_PLACEHOLDER = 'Generating content, please wait...';
 
 const useCopilotStyle = createStyles(({ token, css }) => {
   return {
+    copilotMask: css`
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 999;
+      animation: fadeIn 0.3s ease;
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+    `,
     copilotChat: css`
       display: flex;
       flex-direction: column;
@@ -500,16 +519,19 @@ const AICopilot: React.FC<AICopilotProps> = ({ open, onClose }) => {
   }, [messages, curSession]);
 
   return (
-    <div className={styles.copilotChat} style={{ width: open ? 550 : 0 }}>
-      {/** 对话区 - header */}
-      {chatHeader}
+    <>
+      {open && <div className={styles.copilotMask} onClick={onClose} />}
+      <div className={styles.copilotChat} style={{ width: open ? 550 : 0 }}>
+        {/** 对话区 - header */}
+        {chatHeader}
 
-      {/** 对话区 - 消息列表 */}
-      {chatList}
+        {/** 对话区 - 消息列表 */}
+        {chatList}
 
-      {/** 对话区 - 输入框 */}
-      {chatSender}
-    </div>
+        {/** 对话区 - 输入框 */}
+        {chatSender}
+      </div>
+    </>
   );
 };
 

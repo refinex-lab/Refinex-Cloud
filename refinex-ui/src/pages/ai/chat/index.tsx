@@ -152,6 +152,11 @@ const useStyle = createStyles(({ token, css }) => {
       display: flex;
       background: ${token.colorBgContainer};
       font-family: AlibabaPuHuiTi, ${token.fontFamily}, sans-serif;
+
+      /* 覆盖 ant-pro-layout 的默认 padding */
+      margin: -32px -40px;
+      width: calc(100% + 80px);
+      height: calc(100vh + 0px);
     `,
     // sider 样式
     sider: css`
