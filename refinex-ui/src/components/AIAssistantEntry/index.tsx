@@ -1,8 +1,8 @@
-import { RobotOutlined } from '@ant-design/icons';
 import { createStyles } from 'antd-style';
 import { history } from '@umijs/max';
 import React, { useState, useEffect } from 'react';
 import { Tooltip } from 'antd';
+import aiWhiteIcon from '@/assets/images/ai/ai_white_icon.svg';
 
 const useStyles = createStyles(({ token }) => ({
   entry: {
@@ -60,11 +60,12 @@ const useStyles = createStyles(({ token }) => ({
     justifyContent: 'center',
   },
   icon: {
-    fontSize: '18px',
-    color: '#fff',
+    width: '20px',
+    height: '20px',
     position: 'relative',
     zIndex: 1,
     flexShrink: 0,
+    filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1))',
   },
   text: {
     color: '#fff',
@@ -130,7 +131,7 @@ const AIAssistantEntry: React.FC = () => {
       )}
       onClick={handleClick}
     >
-      <RobotOutlined className={styles.icon} />
+      <img src={aiWhiteIcon} alt="AI" className={styles.icon} />
       {!isCollapsed && <span className={styles.text}>AI 助手</span>}
     </div>
   );

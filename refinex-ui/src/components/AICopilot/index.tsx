@@ -500,7 +500,7 @@ const AICopilot: React.FC<AICopilotProps> = ({ open, onClose }) => {
   }, [messages, curSession]);
 
   return (
-    <div className={styles.copilotChat} style={{ width: open ? 400 : 0 }}>
+    <div className={styles.copilotChat} style={{ width: open ? 550 : 0 }}>
       {/** 对话区 - header */}
       {chatHeader}
 

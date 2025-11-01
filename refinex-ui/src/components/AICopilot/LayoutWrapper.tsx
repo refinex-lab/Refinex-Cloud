@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AICopilot from './index';
+import CopilotButton from './CopilotButton';
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -43,6 +44,7 @@ const LayoutWrapper: React.FC<LayoutWrapperProps> = ({ children }) => {
   return (
     <>
       {children}
+      <CopilotButton onClick={() => setCopilotOpen(true)} />
       <AICopilot open={copilotOpen} onClose={() => setCopilotOpen(false)} />
     </>
   );

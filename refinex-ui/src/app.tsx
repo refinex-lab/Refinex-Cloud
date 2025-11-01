@@ -14,7 +14,6 @@ import {
   SelectLang,
   ThemeSwitch,
 } from '@/components';
-import CopilotButton from '@/components/AICopilot/CopilotButton';
 import LayoutWrapper from '@/components/AICopilot/LayoutWrapper';
 import AIAssistantEntry from '@/components/AIAssistantEntry';
 import { getCurrentUser } from '@/services/auth';
@@ -104,7 +103,6 @@ export const layout: RunTimeLayoutConfig = ({
       <Question key="doc" />,
       <SelectLang key="SelectLang" />,
       <ThemeSwitch key="ThemeSwitch" />,
-      <CopilotButton key="Copilot" onClick={() => window.dispatchEvent(new Event('openCopilot'))} />,
     ],
     avatarProps: {
       src: initialState?.currentUser?.avatar,
