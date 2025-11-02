@@ -5,6 +5,7 @@
  * - GitHub Flavored Markdown (GFM)
  * - 代码语法高亮
  * - HTML 安全渲染
+ * - Mermaid 图表渲染
  * - 自定义样式
  *
  * @author Refinex Team
@@ -18,6 +19,7 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import { Empty } from 'antd';
 import classNames from 'classnames';
+import MermaidRenderer from './MermaidRenderer';
 import './index.less';
 import 'highlight.js/styles/github.css'; // GitHub 风格代码高亮
 
@@ -34,6 +36,8 @@ export interface MarkdownViewerProps {
   enableHighlight?: boolean;
   /** 是否允许 HTML */
   allowHtml?: boolean;
+  /** 是否启用 Mermaid 图表 */
+  enableMermaid?: boolean;
   /** 空状态提示 */
   emptyText?: string;
 }
@@ -48,6 +52,7 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = ({
   bordered = false,
   enableHighlight = true,
   allowHtml = false,
+  enableMermaid = true,
   emptyText = '暂无内容',
 }) => {
   // 计算 rehype 插件列表
@@ -114,6 +119,25 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = ({
               {children}
             </a>
           ),
+          // 代码块增强：支持 Mermaid 图表
+          code: (props) => {
+            const { node, inline, className, children, ...rest } = props as any;
+            const match = /language-(\w+)/.exec(className || '');
+            const language = match ? match[1] : '';
+            const codeString = String(children).replace(/\n$/, '');
+
+            // Mermaid 图表渲染
+            if (!inline && enableMermaid && language === 'mermaid') {
+              return <MermaidRenderer chart={codeString} className="markdown-mermaid" />;
+            }
+
+            // 普通代码块
+            return (
+              <code className={className} {...rest}>
+                {children}
+              </code>
+            );
+          },
         }}
       >
         {content}
