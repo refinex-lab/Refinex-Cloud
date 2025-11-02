@@ -93,7 +93,7 @@ public class SysRoleRepository {
         Map<String, Object> params = Map.of("roleId", roleId);
 
         try {
-            Integer isBuiltin = jdbcManager.queryObject(sql, params, Integer.class);
+            Integer isBuiltin = jdbcManager.queryInt(sql, params);
             return isBuiltin != null && isBuiltin == 1;
         } catch (Exception e) {
             log.error("检查是否为内置角色失败，roleId: {}", roleId, e);

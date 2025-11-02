@@ -173,7 +173,7 @@ public class EmailVerifyCodeRepository {
                 "startTime", startTime,
                 "endTime", endTime
         );
-        Integer count = jdbcManager.queryObject(sql, params, Integer.class);
+        Integer count = jdbcManager.queryInt(sql, params);
         return count != null ? count : 0;
     }
 
@@ -197,7 +197,7 @@ public class EmailVerifyCodeRepository {
                 "startTime", startTime,
                 "endTime", endTime
         );
-        Integer count = jdbcManager.queryObject(sql, params, Integer.class);
+        Integer count = jdbcManager.queryInt(sql, params);
         return count != null ? count : 0;
     }
 

@@ -224,7 +224,7 @@ public class EmailSendQueueRepository {
             WHERE send_status = 0
             """;
 
-        Integer count = jdbcManager.queryObject(sql, Map.of(), Integer.class);
+        Integer count = jdbcManager.queryInt(sql, Map.of());
         return count != null ? count : 0;
     }
 
@@ -239,7 +239,7 @@ public class EmailSendQueueRepository {
             WHERE send_status = 3
             """;
 
-        Integer count = jdbcManager.queryObject(sql, Map.of(), Integer.class);
+        Integer count = jdbcManager.queryInt(sql, Map.of());
         return count != null ? count : 0;
     }
 
