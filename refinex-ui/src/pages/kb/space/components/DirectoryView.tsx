@@ -408,31 +408,22 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
           </Space>
         }
         extra={
-          <Space size="middle">
-            <Segmented
-              value={viewMode}
-              onChange={(value) => setViewMode(value as ViewMode)}
-              options={[
-                {
-                  label: '卡片',
-                  value: 'card',
-                  icon: <AppstoreOutlined />,
-                },
-                {
-                  label: '列表',
-                  value: 'list',
-                  icon: <UnorderedListOutlined />,
-                },
-              ]}
-            />
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => onCreateDocument(directory.directoryId!)}
-            >
-              新建文档
-            </Button>
-          </Space>
+          <Segmented
+            value={viewMode}
+            onChange={(value) => setViewMode(value as ViewMode)}
+            options={[
+              {
+                label: '卡片',
+                value: 'card',
+                icon: <AppstoreOutlined />,
+              },
+              {
+                label: '列表',
+                value: 'list',
+                icon: <UnorderedListOutlined />,
+              },
+            ]}
+          />
         }
         bordered={false}
         className="directory-view-card"
