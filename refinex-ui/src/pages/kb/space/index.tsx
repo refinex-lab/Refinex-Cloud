@@ -1,6 +1,8 @@
 import {
   AppstoreOutlined,
   BookOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
   DeleteOutlined,
   EditOutlined,
   EllipsisOutlined,
@@ -12,6 +14,7 @@ import {
   LockOutlined,
   PlusOutlined,
   SafetyOutlined,
+  SearchOutlined,
   SendOutlined,
   SettingOutlined,
   StopOutlined,
@@ -40,6 +43,7 @@ import {
   Modal,
   Popconfirm,
   Row,
+  Segmented,
   Select,
   Space,
   Spin,
@@ -67,6 +71,7 @@ import {
 import { AccessType, PublishStatus, SpaceStatus, SpaceType } from '@/services/kb/typings.d';
 import { listDictDataByTypeCode } from '@/services/system/dictionary';
 import { encryptPassword, getRsaPublicKey } from '@/utils/crypto';
+import './index.less';
 
 const { Search } = Input;
 const { Title, Text, Paragraph } = Typography;
@@ -415,8 +420,8 @@ const MyContentSpace: React.FC = () => {
 
     return (
       <Card
-        hoverable
         style={{ height: '100%' }}
+        className="space-card"
         cover={
           <div
             style={{
@@ -445,25 +450,19 @@ const MyContentSpace: React.FC = () => {
               }}
             >
               <Tag
-                color={space.isPublished === PublishStatus.PUBLISHED ? 'success' : 'default'}
+                className={`space-status-tag ${space.isPublished === PublishStatus.PUBLISHED ? 'published' : 'unpublished'}`}
                 icon={
                   space.isPublished === PublishStatus.PUBLISHED ? (
-                    <EyeOutlined />
+                    <CheckCircleOutlined />
                   ) : (
-                    <EyeInvisibleOutlined />
+                    <CloseCircleOutlined />
                   )
                 }
               >
                 {space.isPublished === PublishStatus.PUBLISHED ? '已发布' : '未发布'}
               </Tag>
               <Tag
-                color={
-                  space.accessType === AccessType.PUBLIC
-                    ? 'success'
-                    : space.accessType === AccessType.PRIVATE
-                      ? 'default'
-                      : 'warning'
-                }
+                className={`space-access-tag ${space.accessType === AccessType.PUBLIC ? 'public' : space.accessType === AccessType.PRIVATE ? 'private' : 'limited'}`}
                 icon={getAccessTypeIcon(space.accessType)}
               >
                 {accessTypeDictMap[space.accessType] || space.accessTypeDesc}
@@ -476,7 +475,7 @@ const MyContentSpace: React.FC = () => {
                 left: 12,
               }}
             >
-              <Tag color={getSpaceTypeColor(space.spaceType)}>
+              <Tag className="space-type-tag" color={getSpaceTypeColor(space.spaceType)}>
                 {spaceTypeDictMap[space.spaceType] || space.spaceTypeDesc}
               </Tag>
             </div>
@@ -533,9 +532,9 @@ const MyContentSpace: React.FC = () => {
   const renderSpaceList = (space: ContentSpace) => {
     return (
       <Card
-        hoverable
         style={{ marginBottom: 16 }}
         bodyStyle={{ padding: 16 }}
+        className="space-list-card"
         onClick={() => handleEnterSpace(space)}
       >
         <Row gutter={16} align="middle">
@@ -556,29 +555,32 @@ const MyContentSpace: React.FC = () => {
                 <Title level={5} style={{ margin: 0 }}>
                   {space.spaceName}
                 </Title>
-                <Tag color={getSpaceTypeColor(space.spaceType)}>
+                <Tag className="space-type-tag" color={getSpaceTypeColor(space.spaceType)}>
                   {spaceTypeDictMap[space.spaceType] || space.spaceTypeDesc}
                 </Tag>
                 <Tag
-                  color={space.isPublished === PublishStatus.PUBLISHED ? 'success' : 'default'}
+                  className={`space-status-tag ${space.isPublished === PublishStatus.PUBLISHED ? 'published' : 'unpublished'}`}
                   icon={
                     space.isPublished === PublishStatus.PUBLISHED ? (
-                      <EyeOutlined />
+                      <CheckCircleOutlined />
                     ) : (
-                      <EyeInvisibleOutlined />
+                      <CloseCircleOutlined />
                     )
                   }
                 >
                   {space.isPublished === PublishStatus.PUBLISHED ? '已发布' : '未发布'}
+                </Tag>
+                <Tag
+                  className={`space-access-tag ${space.accessType === AccessType.PUBLIC ? 'public' : space.accessType === AccessType.PRIVATE ? 'private' : 'limited'}`}
+                  icon={getAccessTypeIcon(space.accessType)}
+                >
+                  {accessTypeDictMap[space.accessType] || space.accessTypeDesc}
                 </Tag>
               </Space>
               <Text type="secondary" ellipsis>
                 {space.spaceDesc || '暂无描述'}
               </Text>
               <Space size="large">
-                <Text type="secondary">
-                  {getAccessTypeIcon(space.accessType)} {accessTypeDictMap[space.accessType] || space.accessTypeDesc}
-                </Text>
                 <Text type="secondary">
                   <EyeOutlined /> {space.viewCount} 次浏览
                 </Text>
@@ -670,19 +672,21 @@ const MyContentSpace: React.FC = () => {
       }}
     >
       {/* 搜索和过滤工具栏 */}
-      <Card style={{ marginBottom: 16 }} bodyStyle={{ padding: '12px 24px' }}>
+      <Card style={{ marginBottom: 16 }} bodyStyle={{ padding: '16px 24px' }}>
         <Row gutter={16} align="middle">
           <Col flex="1">
-            <Search
+            <Input
+              prefix={<SearchOutlined style={{ color: 'rgba(0, 0, 0, 0.45)' }} />}
               placeholder="搜索空间名称、描述或编码"
               allowClear
               size="large"
               onChange={(e) => setSearchKeyword(e.target.value)}
               style={{ maxWidth: 400 }}
+              className="space-search-input"
             />
           </Col>
           <Col>
-            <Space>
+            <Space size="middle">
               <Select
                 value={filterType}
                 onChange={setFilterType}
@@ -696,26 +700,31 @@ const MyContentSpace: React.FC = () => {
                   </Select.Option>
                 ))}
               </Select>
-              <Button.Group size="large">
-                <Button
-                  icon={<AppstoreOutlined />}
-                  type={viewMode === 'grid' ? 'primary' : 'default'}
-                  onClick={() => setViewMode('grid')}
-                />
-                <Button
-                  icon={<UnorderedListOutlined />}
-                  type={viewMode === 'list' ? 'primary' : 'default'}
-                  onClick={() => setViewMode('list')}
-                />
-              </Button.Group>
+              <Segmented
+                value={viewMode}
+                onChange={(value) => setViewMode(value as 'grid' | 'list')}
+                options={[
+                  {
+                    label: '卡片',
+                    value: 'grid',
+                    icon: <AppstoreOutlined />,
+                  },
+                  {
+                    label: '列表',
+                    value: 'list',
+                    icon: <UnorderedListOutlined />,
+                  },
+                ]}
+                size="large"
+              />
               <Button
-                type="primary"
                 size="large"
                 icon={<PlusOutlined />}
                 onClick={() => {
                   setCurrentSpace(undefined);
                   setModalVisible(true);
                 }}
+                className="create-space-btn"
               >
                 创建空间
               </Button>

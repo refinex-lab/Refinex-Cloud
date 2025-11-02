@@ -1,0 +1,327 @@
+// 空间列表页面样式
+
+// ============================================
+// 1. 顶部工具栏样式
+// ============================================
+
+// 搜索框 - 无边框浅灰色质感
+.space-search-input {
+  background: #f5f5f5;
+  border: none !important;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+
+  &:hover,
+  &:focus {
+    background: #ececec;
+    box-shadow: none !important;
+  }
+
+  .ant-input {
+    background: transparent;
+    border: none;
+    box-shadow: none !important;
+
+    &:focus {
+      box-shadow: none !important;
+    }
+  }
+
+  // 清除按钮样式
+  .ant-input-clear-icon {
+    color: rgba(0, 0, 0, 0.45);
+  }
+}
+
+// 创建空间按钮 - 黑细线边框简约样式
+.create-space-btn {
+  border: 1px solid #262626 !important;
+  color: #262626 !important;
+  background: transparent !important;
+  font-weight: normal !important;
+
+  &:hover {
+    background: #fafafa !important;
+    border-color: #262626 !important;
+    color: #000 !important;
+  }
+
+  &:active {
+    background: #f0f0f0 !important;
+  }
+
+  .anticon {
+    font-size: 14px;
+  }
+}
+
+// ============================================
+// 2. 空间卡片样式
+// ============================================
+
+.space-card {
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  overflow: hidden;
+
+  // 去除 Ant Design 默认的 hover 阴影效果
+  &:hover {
+    border-color: #1890ff;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  // 卡片内容
+  .ant-card-body {
+    padding: 16px;
+  }
+
+  // 卡片封面
+  .ant-card-cover {
+    position: relative;
+  }
+
+  // 底部操作按钮 - 保持白色背景
+  .ant-card-actions {
+    border-top: 1px solid #f0f0f0;
+    background: #fff;
+
+    > li {
+      margin: 8px 0;
+    }
+  }
+}
+
+// 列表模式卡片
+.space-list-card {
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+
+  &:hover {
+    border-color: #1890ff;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+}
+
+// ============================================
+// 3. 状态标签样式优化
+// ============================================
+
+// 发布状态标签
+.space-status-tag {
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 2px 10px;
+  font-weight: 500;
+  border: none;
+
+  // 已发布 - 清新的绿色
+  &.published {
+    background: #f6ffed;
+    color: #52c41a;
+    border: 1px solid #b7eb8f;
+
+    .anticon {
+      color: #52c41a;
+    }
+  }
+
+  // 未发布 - 柔和的灰色
+  &.unpublished {
+    background: #fafafa;
+    color: rgba(0, 0, 0, 0.65);
+    border: 1px solid #d9d9d9;
+
+    .anticon {
+      color: rgba(0, 0, 0, 0.45);
+    }
+  }
+}
+
+// 访问权限标签
+.space-access-tag {
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 2px 10px;
+  font-weight: 500;
+  border: none;
+
+  // 公开 - 清爽的蓝色
+  &.public {
+    background: #e6f7ff;
+    color: #1890ff;
+    border: 1px solid #91d5ff;
+
+    .anticon {
+      color: #1890ff;
+    }
+  }
+
+  // 私有 - 深邃的灰色
+  &.private {
+    background: #fafafa;
+    color: rgba(0, 0, 0, 0.85);
+    border: 1px solid #d9d9d9;
+
+    .anticon {
+      color: rgba(0, 0, 0, 0.65);
+    }
+  }
+
+  // 受限 - 温暖的琥珀色
+  &.limited {
+    background: #fffbe6;
+    color: #faad14;
+    border: 1px solid #ffe58f;
+
+    .anticon {
+      color: #faad14;
+    }
+  }
+}
+
+// 空间类型标签 - Ant Design 默认实色标签
+.space-type-tag {
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 2px 10px;
+  font-weight: 500;
+}
+
+// ============================================
+// 4. 响应式优化
+// ============================================
+
+@media (max-width: 768px) {
+  .space-search-input {
+    max-width: 100% !important;
+  }
+
+  .create-space-btn {
+    span:not(.anticon) {
+      display: none;
+    }
+  }
+}
+
+// ============================================
+// 5. 空状态优化
+// ============================================
+
+.ant-empty {
+  .ant-empty-description {
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 14px;
+  }
+}
+
+// ============================================
+// 6. 统计信息样式优化
+// ============================================
+
+.ant-statistic {
+  .ant-statistic-title {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.45);
+  }
+
+  .ant-statistic-content {
+    font-weight: 500;
+  }
+}
+
+// ============================================
+// 7. 细节优化
+// ============================================
+
+// 卡片元信息
+.ant-card-meta-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.ant-card-meta-description {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+  line-height: 1.6;
+}
+
+// Segmented 组件优化
+.ant-segmented {
+  background: #f5f5f5;
+  padding: 2px;
+  border-radius: 6px;
+
+  .ant-segmented-item {
+    transition: all 0.3s ease;
+    border-radius: 4px;
+
+    &:hover {
+      color: #1890ff;
+    }
+  }
+
+  .ant-segmented-item-selected {
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    font-weight: 500;
+  }
+}
+
+// ============================================
+// 8. 操作按钮优化
+// ============================================
+
+.space-card,
+.space-list-card {
+  // 进入按钮样式优化
+  .ant-btn-primary {
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+    }
+  }
+
+  // 编辑按钮样式优化
+  .ant-btn:not(.ant-btn-primary):not(.ant-btn-text) {
+    border-radius: 6px;
+
+    &:hover {
+      border-color: #1890ff;
+      color: #1890ff;
+    }
+  }
+}
+
+// ============================================
+// 9. 封面渐变优化
+// ============================================
+
+.space-card {
+  .ant-card-cover > div {
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent);
+      pointer-events: none;
+    }
+  }
+}
+
