@@ -172,22 +172,7 @@ const DictionaryDataList: React.FC = () => {
     <PageContainer
       header={{
         title: dictName,
-        onBack: () => history.push('/system/dictionary'),
-        breadcrumb: {
-          items: [
-            {
-              path: '/system',
-              title: intl.formatMessage({ id: 'menu.system' }),
-            },
-            {
-              path: '/system/dictionary',
-              title: intl.formatMessage({ id: 'menu.system.dictionary' }),
-            },
-            {
-              title: intl.formatMessage({ id: 'pages.system.dictionary.data.title' }),
-            },
-          ],
-        },
+        onBack: () => history.push('/system/dictionary')
       }}
     >
       <ProTable<DictData>

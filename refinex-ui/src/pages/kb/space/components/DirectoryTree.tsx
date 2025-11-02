@@ -628,7 +628,7 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
           <span className="tree-node-label">{node.title}</span>
 
           {/* 文档状态标签 */}
-          {isDocument && nodeData.docStatus === DocumentStatus.DRAFT && (
+          {/* {isDocument && nodeData.docStatus === DocumentStatus.DRAFT && (
             <Tag color="default" style={{ marginLeft: 4, fontSize: 12 }}>
               草稿
             </Tag>
@@ -637,7 +637,7 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
             <Tag color="error" style={{ marginLeft: 4, fontSize: 12 }}>
               已下架
             </Tag>
-          )}
+          )} */}
         </div>
 
         {/* 操作按钮（始终渲染，通过 opacity 控制显示） */}

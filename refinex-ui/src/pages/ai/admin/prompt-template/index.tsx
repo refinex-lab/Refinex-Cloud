@@ -338,12 +338,7 @@ const PromptTemplateManagement: React.FC = () => {
     <PageContainer
       header={{
         title: false,
-        breadcrumb: {
-          items: [
-            { path: '/ai/model-config', title: 'AI 管理' },
-            { title: '提示词管理' },
-          ],
-        },
+        subTitle: false
       }}
     >
       <ProTable<PromptTemplate>

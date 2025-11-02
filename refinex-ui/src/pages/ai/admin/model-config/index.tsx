@@ -320,12 +320,7 @@ const ModelConfigManagement: React.FC = () => {
     <PageContainer
       header={{
         title: false,
-        breadcrumb: {
-          items: [
-            { path: '/ai/model-config', title: 'AI 管理' },
-            { title: '模型管理' },
-          ],
-        },
+        subTitle: false
       }}
     >
       <ProTable<ModelConfig>

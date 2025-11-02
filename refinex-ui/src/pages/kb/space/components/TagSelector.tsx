@@ -58,11 +58,17 @@ const TagSelector: React.FC<TagSelectorProps> = ({
     }
   };
 
+  // 组件挂载时立即加载标签数据（而不是等待 Popover 打开）
+  useEffect(() => {
+    loadTags();
+  }, [spaceId]);
+
+  // Popover 打开时重新加载标签数据（保持数据最新）
   useEffect(() => {
     if (popoverVisible) {
       loadTags();
     }
-  }, [popoverVisible, spaceId]);
+  }, [popoverVisible]);
 
   // 搜索过滤
   useEffect(() => {

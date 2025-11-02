@@ -331,12 +331,7 @@ const RoleManagement: React.FC = () => {
     <PageContainer
       header={{
         title: false,
-        breadcrumb: {
-          items: [
-            { path: '/system', title: '系统管理' },
-            { title: '角色管理' },
-          ],
-        },
+        subTitle: false
       }}
     >
       <ProTable<RoleResponse>

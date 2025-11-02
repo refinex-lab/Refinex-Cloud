@@ -404,7 +404,7 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
         title={
           <Space>
             <FolderOpenFilled style={{ color: '#1890ff', fontSize: 20 }} />
-            <span style={{ fontSize: 18, fontWeight: 600 }}>{directory.directoryName}</span>
+            <span style={{ fontSize: 16, fontWeight: 600 }}>{directory.directoryName}</span>
           </Space>
         }
         extra={

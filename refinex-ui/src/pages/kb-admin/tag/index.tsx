@@ -351,13 +351,7 @@ const TagAdminManagement: React.FC = () => {
     <PageContainer
       header={{
         title: '标签管理',
-        subTitle: '管理所有用户的标签',
-        breadcrumb: {
-          items: [
-            { title: '知识库管理' },
-            { title: '标签管理' },
-          ],
-        },
+        subTitle: '管理所有用户的标签'
       }}
     >
       {/* 统计卡片 */}

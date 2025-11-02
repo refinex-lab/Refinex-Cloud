@@ -309,13 +309,7 @@ const RoleUserManagement: React.FC = () => {
     <PageContainer
       header={{
         title: roleInfo ? `${roleInfo.roleName} - 用户管理` : '角色用户管理',
-        breadcrumb: {
-          items: [
-            { path: '/system', title: '系统管理' },
-            { path: '/system/role', title: '角色管理' },
-            { title: '用户管理' },
-          ],
-        },
+        subTitle: false,
         extra: [
           <Button
             key="back"

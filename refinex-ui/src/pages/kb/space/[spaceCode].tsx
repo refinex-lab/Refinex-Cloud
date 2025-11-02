@@ -12,6 +12,7 @@ import { Button, Card, Empty, Input, Layout, message, Space, Spin, Typography } 
 import React, { useEffect, useState } from 'react';
 import DirectoryTree from './components/DirectoryTree';
 import DocumentEditor from './components/DocumentEditor';
+import DocumentViewer from './components/DocumentViewer';
 import DirectoryView from './components/DirectoryView';
 import DocumentFormModal from './components/DocumentFormModal';
 import type { ContentSpaceDetail, ContentTreeNode } from '@/services/kb/typings.d';
@@ -42,6 +43,7 @@ const ContentSpaceDetail: React.FC = () => {
   const [selectedNode, setSelectedNode] = useState<ContentTreeNode | null>(null);
   const [currentDocGuid, setCurrentDocGuid] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'directory' | 'document' | 'empty'>('empty');
+  const [editMode, setEditMode] = useState(false); // 是否处于编辑模式
 
   // 文档弹窗状态
   const [docFormVisible, setDocFormVisible] = useState(false);
@@ -118,21 +120,33 @@ const ContentSpaceDetail: React.FC = () => {
   const handleDocumentOpen = (docGuid: string, node: ContentTreeNode) => {
     setCurrentDocGuid(docGuid);
     setViewMode('document');
+    setEditMode(false); // 默认进入阅读模式
     setSelectedNode(node);
 
     // 更新 URL（使用 history.replace 避免历史记录堆积）
     history.replace(`/kb/space/${spaceCode}?doc=${docGuid}`);
   };
 
-  // 关闭文档编辑器
+  // 关闭文档编辑器/查看器
   const handleCloseEditor = () => {
     setCurrentDocGuid(null);
+    setEditMode(false);
     if (selectedNode && selectedNode.nodeType === TreeNodeType.DIRECTORY) {
       setViewMode('directory');
     } else {
       setViewMode('empty');
     }
     history.replace(`/kb/space/${spaceCode}`);
+  };
+
+  // 切换到编辑模式
+  const handleSwitchToEdit = () => {
+    setEditMode(true);
+  };
+
+  // 切换到阅读模式
+  const handleSwitchToView = () => {
+    setEditMode(false);
   };
 
   // 返回空间列表
@@ -321,13 +335,26 @@ const ContentSpaceDetail: React.FC = () => {
         {/* 右侧内容区域 */}
         <Content className="space-detail-content">
           {viewMode === 'document' && currentDocGuid && space ? (
-            <DocumentEditor
-              docGuid={currentDocGuid}
-              spaceId={space.id}
-              onClose={handleCloseEditor}
-              onTitleChange={(newTitle) => {
-              }}
-            />
+            editMode ? (
+              // 编辑模式：使用 DocumentEditor
+              <DocumentEditor
+                docGuid={currentDocGuid}
+                spaceId={space.id}
+                onClose={handleCloseEditor}
+                onTitleChange={(newTitle) => {
+                  // 标题变更后可以刷新目录树
+                }}
+                onBackToView={handleSwitchToView}
+              />
+            ) : (
+              // 阅读模式：使用 DocumentViewer
+              <DocumentViewer
+                docGuid={currentDocGuid}
+                spaceId={space.id}
+                onClose={handleCloseEditor}
+                onEdit={handleSwitchToEdit}
+              />
+            )
           ) : viewMode === 'directory' && selectedNode && space ? (
             <DirectoryView
               directory={selectedNode}

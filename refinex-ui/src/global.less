@@ -111,5 +111,18 @@ ol {
   margin-inline: 0 !important;
 }
 
-// 为固定的标签栏添加上边距，避免内容被遮挡
-/* 标签栏现在在 Header 内，不需要额外的 padding */
+// 减少面包屑高度，因为没有用到
+.ant-page-header-no-children {
+  height: 15px;
+}
+
+// MDXEditor 工具栏样式覆盖（全局级别，确保优先级）
+// 使用最高优先级覆盖 CSS Modules 生成的类名
+.mdxeditor [class*='toolbarRoot'],
+.mdxeditor [class*='_toolbarRoot_'],
+div[class*='_toolbarRoot_'] {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #d9d9d9 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}

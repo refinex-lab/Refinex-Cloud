@@ -6,7 +6,8 @@
 
     .ant-card-head {
       border-bottom: 1px solid #f0f0f0;
-      padding: 16px 24px;
+      padding: 8px 24px;
+      min-height: 53px;
     }
 
     .ant-card-body {
@@ -106,7 +107,7 @@
     border-color: #1890ff;
     box-shadow: 0 2px 8px rgba(24, 144, 255, 0.12);
   }
-  
+
   // 卡片的封面区域需要保持裁剪
   :global {
     .ant-card-cover {
@@ -185,7 +186,7 @@
     top: 8px;
     right: 8px;
     z-index: 100; // 提高层级，确保在卡片之上
-    
+
     // 标签云图标指示器
     .tags-cloud-indicator {
       display: flex;
@@ -200,21 +201,21 @@
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
-      
+
       .tags-count {
         font-size: 12px;
         font-weight: 600;
         min-width: 16px;
         text-align: center;
       }
-      
+
       &:hover {
         background: rgba(24, 144, 255, 1); // Hover 时更深蓝色
         transform: scale(1.08);
         box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
       }
     }
-    
+
     // 悬浮显示的标签列表（默认隐藏）
     .tags-popover-content {
       position: absolute;
@@ -234,7 +235,7 @@
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       pointer-events: none;
       z-index: 1000; // 极高层级，确保不被遮挡
-      
+
       // 小三角箭头
       &::before {
         content: '';
@@ -248,7 +249,7 @@
         border-top-left-radius: 2px;
         box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.05);
       }
-      
+
       // 标签自动换行布局
       :global {
         .ant-space {
@@ -256,7 +257,7 @@
         }
       }
     }
-    
+
     // Hover 状态：显示标签列表
     &:hover .tags-popover-content {
       opacity: 1;

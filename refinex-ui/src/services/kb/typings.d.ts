@@ -35,9 +35,9 @@ export enum PublishStatus {
 /** 空间状态枚举 */
 export enum SpaceStatus {
   /** 正常 */
-  NORMAL = 0,
+  NORMAL = 1,
   /** 停用 */
-  DISABLED = 1,
+  DISABLED = 0,
 }
 
 /** 内容空间响应 */

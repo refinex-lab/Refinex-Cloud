@@ -14,6 +14,7 @@ import {
   StopOutlined,
   TagsOutlined,
   HistoryOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import type { MDXEditorMethods } from '@mdxeditor/editor';
 import MDXEditorWrapper from '@/components/MDXEditor';
@@ -36,6 +37,7 @@ interface DocumentEditorProps {
   spaceId: number;
   onClose?: () => void; // 关闭编辑器回调
   onTitleChange?: (newTitle: string) => void; // 标题变更回调
+  onBackToView?: () => void; // 返回阅读模式回调
 }
 
 /**
@@ -47,8 +49,11 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
   spaceId,
   onClose,
   onTitleChange,
+  onBackToView,
 }) => {
   const editorRef = useRef<MDXEditorMethods>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const editorContentRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [document, setDocument] = useState<ContentDocumentDetail | null>(null);
@@ -263,52 +268,40 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
   }
 
   return (
-    <div className="document-editor-container">
-      <Card
-        className="editor-card"
-        title={
-          <div className="editor-header">
-            <Space size="middle" split={<Divider type="vertical" />}>
-              {/* 文档标题 */}
-              <Input
-                value={documentTitle}
-                onChange={(e) => setDocumentTitle(e.target.value)}
-                onBlur={handleTitleBlur}
-                onPressEnter={handleTitleBlur}
-                placeholder="请输入文档标题"
-                bordered={false}
-                className="document-title-input"
-                style={{ fontSize: 18, fontWeight: 600, width: 300 }}
-                disabled={loading}
-              />
+    <div className="document-editor-container" ref={containerRef}>
+      {/* 独立的 Header 区域 */}
+      <div className="editor-header">
+        <div className="editor-header-left">
+          <FileMarkdownOutlined style={{ fontSize: 24, marginRight: 12, color: '#1890ff' }} />
+          <Space size="middle" split={<Divider type="vertical" />}>
+            {/* 文档标题 */}
+            <Input
+              value={documentTitle}
+              onChange={(e) => setDocumentTitle(e.target.value)}
+              onBlur={handleTitleBlur}
+              onPressEnter={handleTitleBlur}
+              placeholder="请输入文档标题"
+              bordered={false}
+              className="document-title-input"
+              style={{ fontSize: 18, fontWeight: 600, width: 300 }}
+              disabled={loading}
+            />
 
-              {/* 标签选择器 */}
-              <div className="editor-tags">
-                <TagsOutlined style={{ color: '#8c8c8c', marginRight: 8 }} />
-                <TagSelector
-                  value={selectedTagIds}
-                  onChange={handleTagsChange}
-                  spaceId={spaceId}
-                  maxCount={5}
-                />
-              </div>
-            </Space>
-          </div>
-        }
-        extra={
+            {/* 标签选择器 */}
+            <div className="editor-tags">
+              <TagsOutlined style={{ color: '#8c8c8c', marginRight: 8 }} />
+              <TagSelector
+                value={selectedTagIds}
+                onChange={handleTagsChange}
+                spaceId={spaceId}
+                maxCount={5}
+              />
+            </div>
+          </Space>
+        </div>
+
+        <div className="editor-header-right">
           <Space size="middle">
-            {/* 版本号显示 */}
-            {/* {document && (
-              <Tooltip title="点击查看版本历史">
-                <Tag
-                  color="blue"
-                  style={{ cursor: 'pointer', fontSize: 13 }}
-                  onClick={() => setVersionHistoryVisible(true)}
-                >
-                  v{document.versionNumber}
-                </Tag>
-              </Tooltip>
-            )} */}
             {lastSaveTime && (
               <Tooltip title={`上次保存: ${lastSaveTime.toLocaleString('zh-CN')}`}>
                 <span style={{ fontSize: 12, color: '#8c8c8c' }}>
@@ -327,6 +320,12 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
             <Button onClick={onClose} icon={<CloseOutlined />}>
               关闭
             </Button>
+            {/* 返回阅读模式按钮 */}
+            {onBackToView && (
+              <Button icon={<EyeOutlined />} onClick={onBackToView}>
+                返回阅读
+              </Button>
+            )}
             <Button
               type="primary"
               icon={<SaveOutlined />}
@@ -358,9 +357,11 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
               </Button>
             )}
           </Space>
-        }
-        bordered={false}
-      >
+        </div>
+      </div>
+
+      {/* 独立的内容区域 */}
+      <div className="editor-content-wrapper" ref={editorContentRef}>
         <Spin spinning={loading} tip="加载文档中...">
           <div className="editor-content">
             {!loading && document && (
@@ -373,7 +374,7 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
             )}
           </div>
         </Spin>
-      </Card>
+      </div>
 
       {/* 版本历史抽屉 */}
       {document && (
