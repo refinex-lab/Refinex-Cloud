@@ -15,7 +15,6 @@ import {
   ProFormText,
   ProFormTextArea,
   ProTable,
-  ProFormRadio,
 } from '@ant-design/pro-components';
 import { Badge, Button, message, Popconfirm, Space, Switch, Tag, Tooltip, Modal, Card, Typography, Alert } from 'antd';
 import React, { useRef, useState, useEffect } from 'react';
@@ -49,6 +48,7 @@ const PromptTemplateManagement: React.FC = () => {
   const [templateTypeOptions, setTemplateTypeOptions] = useState<Array<{ label: string; value: string }>>([]);
   const [statusOptions, setStatusOptions] = useState<Array<{ label: string; value: string }>>([]);
   const [publicStatusOptions, setPublicStatusOptions] = useState<Array<{ label: string; value: string }>>([]);
+  const [yesNoOptions, setYesNoOptions] = useState<Array<{ label: string; value: string }>>([]);
   const actionRef = useRef<ActionType>(null);
 
   // 加载所有字典数据
@@ -56,11 +56,12 @@ const PromptTemplateManagement: React.FC = () => {
     const loadDictionaries = async () => {
       try {
         // 并行加载所有字典数据
-        const [categoryRes, templateTypeRes, statusRes, publicStatusRes] = await Promise.all([
+        const [categoryRes, templateTypeRes, statusRes, publicStatusRes, yesNoRes] = await Promise.all([
           listDictDataByTypeCode('ai_prompt_category'),
           listDictDataByTypeCode('ai_template_type'),
           listDictDataByTypeCode('common_status'),
           listDictDataByTypeCode('common_public_status'),
+          listDictDataByTypeCode('boolean'),
         ]);
 
         // 处理模板分类
@@ -106,18 +107,23 @@ const PromptTemplateManagement: React.FC = () => {
             }));
           setPublicStatusOptions(options);
         }
+
+        // 处理是否状态
+        if (yesNoRes.code === 200 && yesNoRes.data) {
+          const options = yesNoRes.data
+            .sort((a, b) => (a.dictSort || 0) - (b.dictSort || 0))
+            .map((item: DictData) => ({
+              label: item.dictLabel,
+              value: item.dictValue,
+            }));
+          setYesNoOptions(options);
+        }
       } catch (error) {
         console.error('加载字典数据失败:', error);
       }
     };
     loadDictionaries();
   }, []);
-
-  // 系统模板枚举（保留用于是否系统模板字段渲染）
-  const systemEnum = {
-    0: { text: '否', status: 'Default' },
-    1: { text: '是', status: 'Processing' },
-  };
 
   // 列定义
   const columns: ProColumns<PromptTemplate>[] = [
@@ -170,12 +176,15 @@ const PromptTemplateManagement: React.FC = () => {
       dataIndex: 'isSystem',
       width: 120,
       hideInSearch: true,
-      render: (_, record) => (
-        <Badge
-          status={record.isSystem === 1 ? 'processing' : 'default'}
-          text={systemEnum[record.isSystem as 0 | 1]?.text}
-        />
-      ),
+      render: (_, record) => {
+        const systemOption = yesNoOptions.find((opt) => opt.value === String(record.isSystem));
+        return (
+          <Badge
+            status={record.isSystem === 1 ? 'processing' : 'default'}
+            text={systemOption?.label || (record.isSystem === 1 ? '是' : '否')}
+          />
+        );
+      },
     },
     {
       title: '是否公开',
@@ -473,13 +482,14 @@ const PromptTemplateManagement: React.FC = () => {
             rows: 2,
           }}
         />
-        <ProFormRadio.Group
+        <ProFormSelect
           name="isSystem"
           label="是否系统模板"
-          options={[
-            { label: '否', value: 0 },
-            { label: '是', value: 1 },
-          ]}
+          options={yesNoOptions.map(opt => ({
+            label: opt.label,
+            value: Number(opt.value),
+          }))}
+          showSearch
           rules={[{ required: true, message: '请选择是否系统模板' }]}
           disabled={!!currentRecord}
         />

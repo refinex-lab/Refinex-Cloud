@@ -143,9 +143,9 @@ const UserManagement: React.FC = () => {
         commonStatusRes.data.forEach((item) => {
           // 根据字典值映射 ProTable 的状态
           let status = 'Default';
-          if (item.dictValue === '0' || item.dictValue === 'normal' || item.dictValue === 'enabled') {
+          if (item.dictValue === '1' || item.dictValue === 'normal' || item.dictValue === 'enabled') {
             status = 'Success';
-          } else if (item.dictValue === '1' || item.dictValue === 'disabled' || item.dictValue === 'stopped') {
+          } else if (item.dictValue === '0' || item.dictValue === 'disabled' || item.dictValue === 'stopped') {
             status = 'Error';
           }
 
