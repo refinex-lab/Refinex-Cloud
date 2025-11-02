@@ -84,7 +84,7 @@ public class SysDictServiceImpl implements SysDictService {
                 .deleted(0)
                 .version(0)
                 .remark(remark)
-                .status(status == null ? 0 : status)
+                .status(status == null ? SystemStatusConstants.NORMAL_VALUE : status)
                 .build();
 
         int rows = dictTypeRepository.insert(type);
@@ -485,7 +485,7 @@ public class SysDictServiceImpl implements SysDictService {
                 .deleted(0)
                 .version(0)
                 .remark(request.getRemark())
-                .status(request.getStatus() == null ? 0 : request.getStatus())
+                .status(request.getStatus() == null ? SystemStatusConstants.NORMAL_VALUE : request.getStatus())
                 .build();
 
         int rows = dictDataRepository.insert(data);

@@ -336,7 +336,7 @@ const DictionaryDataList: React.FC = () => {
           }
         }}
         key={currentData?.id || Date.now()}
-        initialValues={currentData ? { ...currentData } : { dictTypeId, status: 0, isDefault: 0, dictSort: initialDictSort }}
+        initialValues={currentData ? { ...currentData } : { dictTypeId, status: 1, isDefault: 0, dictSort: initialDictSort }}
         grid
         rowProps={{ gutter: 16 }}
         onFinish={async (values) => {
@@ -417,8 +417,8 @@ const DictionaryDataList: React.FC = () => {
           name="status"
           label={intl.formatMessage({ id: 'pages.system.dictionary.form.status.label' })}
           options={[
-            { label: intl.formatMessage({ id: 'pages.system.dictionary.form.status.normal' }), value: 0 },
-            { label: intl.formatMessage({ id: 'pages.system.dictionary.form.status.disabled' }), value: 1 },
+            { label: intl.formatMessage({ id: 'pages.system.dictionary.form.status.normal' }), value: 1 },
+            { label: intl.formatMessage({ id: 'pages.system.dictionary.form.status.disabled' }), value: 0 },
           ]}
         />
         <ProFormTextArea

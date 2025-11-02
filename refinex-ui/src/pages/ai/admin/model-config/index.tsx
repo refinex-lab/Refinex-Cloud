@@ -15,8 +15,8 @@ import {
   ProTable,
   ProFormRadio,
 } from '@ant-design/pro-components';
-import { Badge, Button, message, Popconfirm, Space, Switch, Tag, Tooltip } from 'antd';
-import React, { useRef, useState } from 'react';
+import { Badge, Button, message, Popconfirm, Switch, Tag } from 'antd';
+import React, { useRef, useState, useEffect } from 'react';
 import type {
   ModelConfig,
   ModelConfigCreateRequest,
@@ -31,6 +31,8 @@ import {
 } from '@/services/ai/model-config';
 import SensitiveField from '@/components/SensitiveField';
 import ProFormSensitiveField from '@/components/SensitiveField/ProFormSensitiveField';
+import { listDictDataByTypeCode } from '@/services/system/dictionary';
+import type { DictData } from '@/services/system/typings';
 
 /**
  * AI 模型配置管理页面
@@ -38,36 +40,60 @@ import ProFormSensitiveField from '@/components/SensitiveField/ProFormSensitiveF
 const ModelConfigManagement: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<ModelConfig | undefined>();
+  const [providerOptions, setProviderOptions] = useState<Array<{ label: string; value: string }>>([]);
+  const [modelTypeOptions, setModelTypeOptions] = useState<Array<{ label: string; value: string }>>([]);
+  const [statusOptions, setStatusOptions] = useState<Array<{ label: string; value: string }>>([]);
   const actionRef = useRef<ActionType>(null);
 
-  // 供应商枚举
-  const providerEnum = {
-    OPENAI: { text: 'OpenAI', color: 'green' },
-    ANTHROPIC: { text: 'Anthropic', color: 'blue' },
-    QWEN: { text: '通义千问', color: 'orange' },
-    ZHIPU: { text: '智谱AI', color: 'purple' },
-    DEEPSEEK: { text: 'DeepSeek', color: 'cyan' },
-  };
+  // 加载所有字典数据
+  useEffect(() => {
+    const loadDictionaries = async () => {
+      try {
+        // 并行加载所有字典数据
+        const [providerRes, modelTypeRes, statusRes] = await Promise.all([
+          listDictDataByTypeCode('ai_provider'),
+          listDictDataByTypeCode('ai_model_type'),
+          listDictDataByTypeCode('common_status'),
+        ]);
 
-  // 模型类型枚举
-  const modelTypeEnum = {
-    CHAT: { text: '对话模型', color: 'blue' },
-    IMAGE: { text: '图像模型', color: 'green' },
-    VIDEO: { text: '视频模型', color: 'orange' },
-    EMBEDDING: { text: '向量模型', color: 'purple' },
-  };
+        // 处理供应商字典
+        if (providerRes.code === 200 && providerRes.data) {
+          const options = providerRes.data
+            .sort((a, b) => (a.dictSort || 0) - (b.dictSort || 0))
+            .map((item: DictData) => ({
+              label: item.dictLabel,
+              value: item.dictValue,
+            }));
+          setProviderOptions(options);
+        }
 
-  // 状态枚举
-  const statusEnum = {
-    0: { text: '正常', status: 'Success' },
-    1: { text: '停用', status: 'Default' },
-  };
+        // 处理模型类型字典
+        if (modelTypeRes.code === 200 && modelTypeRes.data) {
+          const options = modelTypeRes.data
+            .sort((a, b) => (a.dictSort || 0) - (b.dictSort || 0))
+            .map((item: DictData) => ({
+              label: item.dictLabel,
+              value: item.dictValue,
+            }));
+          setModelTypeOptions(options);
+        }
 
-  // 启用状态枚举
-  const enabledEnum = {
-    0: { text: '未启用', status: 'Default' },
-    1: { text: '已启用', status: 'Success' },
-  };
+        // 处理状态字典
+        if (statusRes.code === 200 && statusRes.data) {
+          const options = statusRes.data
+            .sort((a, b) => (a.dictSort || 0) - (b.dictSort || 0))
+            .map((item: DictData) => ({
+              label: item.dictLabel,
+              value: item.dictValue,
+            }));
+          setStatusOptions(options);
+        }
+      } catch (error) {
+        console.error('加载字典数据失败:', error);
+      }
+    };
+    loadDictionaries();
+  }, []);
 
   // 列定义
   const columns: ProColumns<ModelConfig>[] = [
@@ -107,24 +133,47 @@ const ModelConfigManagement: React.FC = () => {
       dataIndex: 'provider',
       width: 120,
       valueType: 'select',
-      valueEnum: providerEnum,
-      render: (_, record) => (
-        <Tag color={providerEnum[record.provider as keyof typeof providerEnum]?.color}>
-          {providerEnum[record.provider as keyof typeof providerEnum]?.text || record.provider}
-        </Tag>
-      ),
+      fieldProps: {
+        options: providerOptions,
+      },
+      render: (_, record) => {
+        const providerOption = providerOptions.find((opt) => opt.value === record.provider);
+        const colorMap: Record<string, string> = {
+          OPENAI: 'green',
+          ANTHROPIC: 'blue',
+          QWEN: 'orange',
+          ZHIPU: 'purple',
+          DEEPSEEK: 'cyan',
+        };
+        return (
+          <Tag color={colorMap[record.provider] || 'default'}>
+            {providerOption?.label || record.provider}
+          </Tag>
+        );
+      },
     },
     {
       title: '模型类型',
       dataIndex: 'modelType',
       width: 120,
       valueType: 'select',
-      valueEnum: modelTypeEnum,
-      render: (_, record) => (
-        <Tag color={modelTypeEnum[record.modelType as keyof typeof modelTypeEnum]?.color}>
-          {modelTypeEnum[record.modelType as keyof typeof modelTypeEnum]?.text || record.modelType}
-        </Tag>
-      ),
+      fieldProps: {
+        options: modelTypeOptions,
+      },
+      render: (_, record) => {
+        const modelTypeOption = modelTypeOptions.find((opt) => opt.value === record.modelType);
+        const colorMap: Record<string, string> = {
+          CHAT: 'blue',
+          IMAGE: 'green',
+          VIDEO: 'orange',
+          EMBEDDING: 'purple',
+        };
+        return (
+          <Tag color={colorMap[record.modelType] || 'default'}>
+            {modelTypeOption?.label || record.modelType}
+          </Tag>
+        );
+      },
     },
     {
       title: 'API密钥',
@@ -162,34 +211,44 @@ const ModelConfigManagement: React.FC = () => {
       dataIndex: 'isEnabled',
       width: 100,
       hideInSearch: true,
-      render: (_, record) => (
-        <Badge
-          status={record.isEnabled === 1 ? 'success' : 'default'}
-          text={enabledEnum[record.isEnabled as 0 | 1]?.text}
-        />
-      ),
+      render: (_, record) => {
+        const enabledOption = statusOptions.find((opt) => opt.value === String(record.isEnabled));
+        return (
+          <Badge
+            status={record.isEnabled === 1 ? 'success' : 'default'}
+            text={enabledOption?.label || (record.isEnabled === 1 ? '已启用' : '未启用')}
+          />
+        );
+      },
     },
     {
       title: '状态',
       dataIndex: 'status',
       width: 100,
-      valueEnum: statusEnum,
-      render: (_, record) => (
-        <Switch
-          checked={record.status === 0}
-          checkedChildren="正常"
-          unCheckedChildren="停用"
-          onChange={async (checked) => {
-            try {
-              await toggleModelStatus(record.id, checked ? 0 : 1);
-              message.success('状态更新成功');
-              actionRef.current?.reload();
-            } catch (error) {
-              message.error('状态更新失败');
-            }
-          }}
-        />
-      ),
+      valueType: 'select',
+      fieldProps: {
+        options: statusOptions,
+      },
+      render: (_, record) => {
+        const normalStatus = statusOptions.find((opt) => opt.value === '1');
+        const disabledStatus = statusOptions.find((opt) => opt.value === '0');
+        return (
+          <Switch
+            checked={record.status === 1}
+            checkedChildren={normalStatus?.label || '正常'}
+            unCheckedChildren={disabledStatus?.label || '停用'}
+            onChange={async (checked) => {
+              try {
+                await toggleModelStatus(record.id, checked ? 1 : 0);
+                message.success('状态更新成功');
+                actionRef.current?.reload();
+              } catch (_error) {
+                message.error('状态更新失败');
+              }
+            }}
+          />
+        );
+      },
     },
     {
       title: '创建时间',
@@ -222,7 +281,7 @@ const ModelConfigManagement: React.FC = () => {
               await deleteModelConfig(record.id);
               message.success('删除成功');
               actionRef.current?.reload();
-            } catch (error) {
+            } catch (_error) {
               message.error('删除失败');
             }
           }}
@@ -251,7 +310,7 @@ const ModelConfigManagement: React.FC = () => {
       setCurrentRecord(undefined);
       actionRef.current?.reload();
       return true;
-    } catch (error) {
+    } catch (_error) {
       message.error(currentRecord ? '更新失败' : '创建失败');
       return false;
     }
@@ -336,7 +395,7 @@ const ModelConfigManagement: React.FC = () => {
             : {
                 isEnabled: 1,
                 priority: 100,
-                status: 0,
+                status: 1,
                 sort: 0,
                 timeoutSeconds: 60,
                 retryTimes: 3,
@@ -378,20 +437,14 @@ const ModelConfigManagement: React.FC = () => {
         <ProFormSelect
           name="provider"
           label="供应商"
-          options={Object.entries(providerEnum).map(([value, { text }]) => ({
-            label: text,
-            value,
-          }))}
+          options={providerOptions}
           rules={[{ required: true, message: '请选择供应商' }]}
           colProps={{ span: 12 }}
         />
         <ProFormSelect
           name="modelType"
           label="模型类型"
-          options={Object.entries(modelTypeEnum).map(([value, { text }]) => ({
-            label: text,
-            value,
-          }))}
+          options={modelTypeOptions}
           rules={[{ required: true, message: '请选择模型类型' }]}
           colProps={{ span: 12 }}
         />
@@ -458,20 +511,20 @@ const ModelConfigManagement: React.FC = () => {
         <ProFormRadio.Group
           name="isEnabled"
           label="是否启用"
-          options={[
-            { label: '启用', value: 1 },
-            { label: '不启用', value: 0 },
-          ]}
+          options={statusOptions.map((opt) => ({
+            label: opt.label,
+            value: Number(opt.value),
+          }))}
           rules={[{ required: true, message: '请选择是否启用' }]}
           colProps={{ span: 12 }}
         />
         <ProFormRadio.Group
           name="status"
           label="状态"
-          options={[
-            { label: '正常', value: 0 },
-            { label: '停用', value: 1 },
-          ]}
+          options={statusOptions.map((opt) => ({
+            label: opt.label,
+            value: Number(opt.value),
+          }))}
           rules={[{ required: true, message: '请选择状态' }]}
           colProps={{ span: 12 }}
         />

@@ -38,7 +38,7 @@ public class PromptTemplateResponseDTO {
     @Schema(description = "模板类型", example = "USER")
     private String templateType;
 
-    @Schema(description = "模板分类", example = "写作助手")
+    @Schema(description = "模板分类", example = "writin_assistant")
     private String templateCategory;
 
     @Schema(description = "适用模型数组")

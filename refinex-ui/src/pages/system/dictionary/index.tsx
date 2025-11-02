@@ -259,7 +259,7 @@ const DictionaryTypeList: React.FC = () => {
           }
         }}
         key={currentType?.id || Date.now()}
-        initialValues={currentType ? { ...currentType } : { status: 0, dictSort: initialDictSort }}
+        initialValues={currentType ? { ...currentType } : { status: 1, dictSort: initialDictSort }}
         onFinish={async (values) => {
           try {
             if (currentType) {
@@ -322,8 +322,8 @@ const DictionaryTypeList: React.FC = () => {
           name="status"
           label={intl.formatMessage({ id: 'pages.system.dictionary.form.status.label' })}
           options={[
-            { label: intl.formatMessage({ id: 'pages.system.dictionary.form.status.normal' }), value: 0 },
-            { label: intl.formatMessage({ id: 'pages.system.dictionary.form.status.disabled' }), value: 1 },
+            { label: intl.formatMessage({ id: 'pages.system.dictionary.form.status.normal' }), value: 1 },
+            { label: intl.formatMessage({ id: 'pages.system.dictionary.form.status.disabled' }), value: 0 },
           ]}
         />
         <ProFormTextArea

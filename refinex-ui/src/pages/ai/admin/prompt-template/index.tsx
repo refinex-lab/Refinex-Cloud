@@ -227,20 +227,20 @@ const PromptTemplateManagement: React.FC = () => {
         options: statusOptions,
       },
       render: (_, record) => {
-        const normalStatus = statusOptions.find((opt) => opt.value === '0');
-        const disabledStatus = statusOptions.find((opt) => opt.value === '1');
+        const normalStatus = statusOptions.find((opt) => opt.value === '1');
+        const disabledStatus = statusOptions.find((opt) => opt.value === '0');
         return (
           <Switch
-            checked={record.status === 0}
+            checked={record.status === 1}
             checkedChildren={normalStatus?.label || '正常'}
             unCheckedChildren={disabledStatus?.label || '停用'}
             disabled={record.isSystem === 1}
             onChange={async (checked) => {
               try {
-                await toggleTemplateStatus(record.id, checked ? 0 : 1);
+                await toggleTemplateStatus(record.id, checked ? 1 : 0);
                 message.success('状态更新成功');
                 actionRef.current?.reload();
-              } catch (error) {
+              } catch (_error) {
                 message.error('状态更新失败');
               }
             }}
@@ -293,7 +293,7 @@ const PromptTemplateManagement: React.FC = () => {
               await deletePromptTemplate(record.id);
               message.success('删除成功');
               actionRef.current?.reload();
-            } catch (error) {
+            } catch (_error) {
               message.error('删除失败');
             }
           }}
@@ -328,7 +328,7 @@ const PromptTemplateManagement: React.FC = () => {
       setCurrentRecord(undefined);
       actionRef.current?.reload();
       return true;
-    } catch (error) {
+    } catch (_error) {
       message.error(currentRecord ? '更新失败' : '创建失败');
       return false;
     }
@@ -528,6 +528,18 @@ const PromptTemplateManagement: React.FC = () => {
         open={previewVisible}
         onCancel={() => setPreviewVisible(false)}
         footer={[
+          <Button
+            key="copy"
+            onClick={() => {
+              navigator.clipboard.writeText(previewContent).then(() => {
+                message.success('复制成功');
+              }).catch(() => {
+                message.error('复制失败');
+              });
+            }}
+          >
+            复制
+          </Button>,
           <Button key="close" onClick={() => setPreviewVisible(false)}>
             关闭
           </Button>,
