@@ -442,7 +442,6 @@ const useStyle = createStyles(({ token, css }) => {
 
       pre {
         background: ${token.colorFillTertiary};
-        padding: 12px;
         border-radius: 6px;
         overflow-x: auto;
         margin: 8px 0;
@@ -718,7 +717,7 @@ const AIChatPage: React.FC = () => {
   const [agent] = useXAgent<BubbleDataType>({
     baseURL: 'https://api.deepseek.com/chat/completions',
     model: 'deepseek-reasoner',
-    dangerouslyApiKey: 'Bearer sk-5555ec2',
+    dangerouslyApiKey: 'Bearer sk-5555ec224cd34d1583dedc1000fb9dba',
   });
   const loading = agent.isRequesting();
 

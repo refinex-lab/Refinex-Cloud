@@ -19,7 +19,7 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import { Empty } from 'antd';
 import classNames from 'classnames';
-import MermaidRenderer from './MermaidRenderer';
+import CodeBlock from './CodeBlock';
 import './index.less';
 import 'highlight.js/styles/github.css'; // GitHub 风格代码高亮
 
@@ -119,23 +119,29 @@ const MarkdownViewer: React.FC<MarkdownViewerProps> = ({
               {children}
             </a>
           ),
-          // 代码块增强：支持 Mermaid 图表
+          // 代码块增强：使用 CodeBlock 组件
           code: (props) => {
             const { node, inline, className, children, ...rest } = props as any;
-            const match = /language-(\w+)/.exec(className || '');
-            const language = match ? match[1] : '';
-            const codeString = String(children).replace(/\n$/, '');
 
-            // Mermaid 图表渲染
-            if (!inline && enableMermaid && language === 'mermaid') {
-              return <MermaidRenderer chart={codeString} className="markdown-mermaid" />;
+            // 行内代码：直接返回原生 code 标签
+            if (inline || !className) {
+              return <code className={className}>{children}</code>;
             }
 
-            // 普通代码块
+            // 代码块：使用增强的 CodeBlock 组件
+            const match = /language-(\w+)/.exec(className || '');
+            const language = match ? match[1] : 'text';
+
+            // 直接传递 children，让 CodeBlock 处理
+            // rehype-highlight 已经将代码转换为带高亮的 React 元素
             return (
-              <code className={className} {...rest}>
-                {children}
-              </code>
+              <CodeBlock
+                code={children}
+                language={language}
+                inline={false}
+                className={className}
+                enableMermaid={enableMermaid}
+              />
             );
           },
         }}

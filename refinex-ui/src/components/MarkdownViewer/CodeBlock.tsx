@@ -1,0 +1,268 @@
+/**
+ * CodeBlock - 增强的代码块组件
+ *
+ * 功能：
+ * - 左上角显示语言标签
+ * - 右上角显示操作按钮（复制、下载）
+ * - Mermaid 图表额外显示"查看源码"按钮
+ * - 代码高亮支持
+ *
+ * @author Refinex Team
+ */
+
+import React, { useState } from 'react';
+import { Button, message, Tooltip } from 'antd';
+import { CopyOutlined, DownloadOutlined, CodeOutlined, CheckOutlined } from '@ant-design/icons';
+import MermaidRenderer from './MermaidRenderer';
+
+export interface CodeBlockProps {
+  /** 代码内容（字符串或已高亮的 React 元素） */
+  code: string | React.ReactNode;
+  /** 编程语言 */
+  language?: string;
+  /** 是否为行内代码 */
+  inline?: boolean;
+  /** 自定义类名 */
+  className?: string;
+  /** 是否启用 Mermaid */
+  enableMermaid?: boolean;
+}
+
+/**
+ * 增强的代码块组件
+ */
+const CodeBlock: React.FC<CodeBlockProps> = ({
+  code,
+  language = 'text',
+  inline = false,
+  className = '',
+  enableMermaid = true,
+}) => {
+  const [copied, setCopied] = useState(false);
+  const [showSource, setShowSource] = useState(false);
+
+  // 行内代码直接返回
+  if (inline) {
+    return <code className={className}>{code}</code>;
+  }
+
+  // 判断是否为 Mermaid 图表
+  const isMermaid = enableMermaid && language === 'mermaid';
+
+  // 提取纯文本代码（用于复制和下载）
+  const getPlainTextCode = (): string => {
+    if (typeof code === 'string') {
+      return code;
+    }
+    // 如果是 React 元素，尝试提取文本内容
+    if (React.isValidElement(code)) {
+      return extractTextFromReactElement(code);
+    }
+    return String(code);
+  };
+
+  /**
+   * 从 React 元素中提取纯文本
+   */
+  const extractTextFromReactElement = (element: any): string => {
+    if (typeof element === 'string') {
+      return element;
+    }
+    if (Array.isArray(element)) {
+      return element.map(extractTextFromReactElement).join('');
+    }
+    if (React.isValidElement(element)) {
+      const props = element.props as any;
+      if (props && props.children) {
+        return extractTextFromReactElement(props.children);
+      }
+    }
+    return '';
+  };
+
+  /**
+   * 复制代码到剪贴板
+   */
+  const handleCopy = async () => {
+    try {
+      const plainText = getPlainTextCode();
+      await navigator.clipboard.writeText(plainText);
+      setCopied(true);
+      message.success('复制成功');
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      message.error('复制失败');
+      console.error('复制失败:', err);
+    }
+  };
+
+  /**
+   * 下载代码为文件
+   */
+  const handleDownload = () => {
+    try {
+      const plainText = getPlainTextCode();
+
+      // 根据语言确定文件扩展名
+      const extensionMap: Record<string, string> = {
+        javascript: 'js',
+        typescript: 'ts',
+        python: 'py',
+        java: 'java',
+        cpp: 'cpp',
+        csharp: 'cs',
+        go: 'go',
+        rust: 'rs',
+        php: 'php',
+        ruby: 'rb',
+        swift: 'swift',
+        kotlin: 'kt',
+        scala: 'scala',
+        html: 'html',
+        css: 'css',
+        scss: 'scss',
+        less: 'less',
+        json: 'json',
+        xml: 'xml',
+        yaml: 'yaml',
+        markdown: 'md',
+        sql: 'sql',
+        shell: 'sh',
+        bash: 'sh',
+        powershell: 'ps1',
+        mermaid: 'mmd',
+      };
+
+      const ext = extensionMap[language.toLowerCase()] || 'txt';
+      const filename = `code.${ext}`;
+
+      // 创建 Blob 并下载
+      const blob = new Blob([plainText], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      message.success('下载成功');
+    } catch (err) {
+      message.error('下载失败');
+      console.error('下载失败:', err);
+    }
+  };
+
+  /**
+   * 切换源码显示
+   */
+  const handleToggleSource = () => {
+    setShowSource(!showSource);
+  };
+
+  /**
+   * 获取语言显示名称
+   */
+  const getLanguageDisplayName = (lang: string): string => {
+    const nameMap: Record<string, string> = {
+      javascript: 'JavaScript',
+      typescript: 'TypeScript',
+      python: 'Python',
+      java: 'Java',
+      cpp: 'C++',
+      csharp: 'C#',
+      go: 'Go',
+      rust: 'Rust',
+      php: 'PHP',
+      ruby: 'Ruby',
+      swift: 'Swift',
+      kotlin: 'Kotlin',
+      scala: 'Scala',
+      html: 'HTML',
+      css: 'CSS',
+      scss: 'SCSS',
+      less: 'Less',
+      json: 'JSON',
+      xml: 'XML',
+      yaml: 'YAML',
+      markdown: 'Markdown',
+      sql: 'SQL',
+      shell: 'Shell',
+      bash: 'Bash',
+      powershell: 'PowerShell',
+      mermaid: 'Mermaid',
+      text: 'Text',
+    };
+
+    return nameMap[lang.toLowerCase()] || lang.toUpperCase();
+  };
+
+  return (
+    <div className="code-block-enhanced">
+      {/* 顶部工具栏 */}
+      <div className="code-block-toolbar">
+        {/* 左侧：语言标签 */}
+        <div className="code-block-language">
+          {getLanguageDisplayName(language)}
+        </div>
+
+        {/* 右侧：操作按钮 */}
+        <div className="code-block-actions">
+          {/* Mermaid 图表：查看源码按钮 */}
+          {isMermaid && (
+            <Tooltip title={showSource ? '查看图表' : '查看源码'}>
+              <Button
+                type="text"
+                size="small"
+                icon={<CodeOutlined />}
+                onClick={handleToggleSource}
+                className="code-block-action-btn"
+              />
+            </Tooltip>
+          )}
+
+          {/* 复制按钮 */}
+          <Tooltip title={copied ? '已复制' : '复制代码'}>
+            <Button
+              type="text"
+              size="small"
+              icon={copied ? <CheckOutlined /> : <CopyOutlined />}
+              onClick={handleCopy}
+              className="code-block-action-btn"
+            />
+          </Tooltip>
+
+          {/* 下载按钮 */}
+          <Tooltip title="下载代码">
+            <Button
+              type="text"
+              size="small"
+              icon={<DownloadOutlined />}
+              onClick={handleDownload}
+              className="code-block-action-btn"
+            />
+          </Tooltip>
+        </div>
+      </div>
+
+      {/* 代码内容区域 */}
+      <div className="code-block-content">
+        {isMermaid && !showSource ? (
+          // Mermaid 图表渲染
+          <MermaidRenderer chart={getPlainTextCode()} className="code-block-mermaid" />
+        ) : (
+          // 普通代码块 - 直接使用 rehype-highlight 处理后的 React 元素
+          <pre className="code-block-pre">
+            <code className={`hljs language-${language}`}>
+              {code}
+            </code>
+          </pre>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default CodeBlock;
+
