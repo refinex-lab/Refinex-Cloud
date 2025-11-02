@@ -10,12 +10,12 @@ import {
   FilePdfOutlined,
   FileTextOutlined,
   FolderAddOutlined,
-  FolderFilled,
-  FolderOpenFilled,
   MoreOutlined,
   PlusOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
+import { BsFolder2, BsFolder2Open } from 'react-icons/bs';
+import { IoDocumentTextOutline } from 'react-icons/io5';
 import { App, Dropdown, Empty, Input, Modal, Spin, Tag, Tree } from 'antd';
 import type { MenuProps } from 'antd';
 import type { DataNode } from 'antd/es/tree';
@@ -130,6 +130,17 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
       });
     };
     traverse(nodes);
+    return keys;
+  };
+
+  // 递归获取节点及其所有子孙节点的 key
+  const getAllDescendantKeys = (node: ContentTreeNode): React.Key[] => {
+    const keys: React.Key[] = [node.key];
+    if (node.children && node.children.length > 0) {
+      node.children.forEach((child) => {
+        keys.push(...getAllDescendantKeys(child));
+      });
+    }
     return keys;
   };
 
@@ -575,22 +586,22 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
     const isDocument = nodeData.nodeType === TreeNodeType.DOCUMENT;
 
     // 选择图标
-    let IconComponent: React.ComponentType<any> = FolderFilled;
+    let IconComponent: React.ComponentType<any> = BsFolder2;
     let iconColor = '#1890ff';
 
     if (isDirectory) {
-      IconComponent = isExpanded ? FolderOpenFilled : FolderFilled;
+      IconComponent = isExpanded ? BsFolder2Open : BsFolder2;
       iconColor = isSearching && node.title !== nodeData.directoryName ? '#faad14' : '#1890ff';
     } else if (isDocument) {
-      IconComponent = FileTextOutlined;
+      IconComponent = IoDocumentTextOutline;
       // 根据文档状态显示不同颜色
-      if (nodeData.docStatus === DocumentStatus.DRAFT) {
-        iconColor = '#8c8c8c'; // 草稿：灰色
-      } else if (nodeData.docStatus === DocumentStatus.OFFLINE) {
-        iconColor = '#ff4d4f'; // 下架：红色
-      } else {
-        iconColor = '#52c41a'; // 已发布：绿色
-      }
+      // if (nodeData.docStatus === DocumentStatus.DRAFT) {
+      //   iconColor = '#8c8c8c'; // 草稿：灰色
+      // } else if (nodeData.docStatus === DocumentStatus.OFFLINE) {
+      //   iconColor = '#ff4d4f'; // 下架：红色
+      // } else {
+      //   iconColor = '#52c41a'; // 已发布：绿色
+      // }
     }
 
     // 点击节点内容区域
@@ -598,7 +609,9 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
       // 对于目录，切换展开状态
       if (isDirectory && node.children && node.children.length > 0) {
         if (isExpanded) {
-          setExpandedKeys(expandedKeys.filter((k) => k !== node.key));
+          // 折叠时，需要移除当前节点及其所有子孙节点的 key
+          const keysToRemove = getAllDescendantKeys(nodeData);
+          setExpandedKeys(expandedKeys.filter((k) => !keysToRemove.includes(k)));
         } else {
           setExpandedKeys([...expandedKeys, node.key]);
         }
