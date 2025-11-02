@@ -66,7 +66,7 @@ public class LogOperationCreateRequestDTO {
     @Schema(description = "操作系统", example = "Windows NT 10.0")
     private String os;
 
-    @Schema(description = "操作状态(0成功,1失败)", example = "200")
+    @Schema(description = "操作状态(1成功,0失败)", example = "1")
     private Integer operationStatus;
 
     @Schema(description = "错误信息", example = "cause by ...")

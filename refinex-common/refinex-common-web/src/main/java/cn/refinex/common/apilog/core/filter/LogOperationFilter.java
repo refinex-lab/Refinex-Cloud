@@ -10,6 +10,7 @@ import cn.refinex.common.apilog.core.annotation.LogOperation;
 import cn.refinex.common.apilog.core.client.PlatformLoggerServiceClient;
 import cn.refinex.common.apilog.core.dto.request.LogOperationCreateRequestDTO;
 import cn.refinex.common.apilog.core.enums.OperateTypeEnum;
+import cn.refinex.common.constants.SystemStatusConstants;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.enums.HttpStatusCode;
 import cn.refinex.common.json.utils.JsonUtils;
@@ -225,8 +226,8 @@ public class LogOperationFilter extends ApiRequestFilter {
         String osName = DeviceUtils.getOperatingSystemName(userAgent);
         logOperationRequest.setOs(osName);
 
-        // 设置操作状态(0成功,1失败)
-        logOperationRequest.setOperationStatus(Objects.nonNull(ex) ? 1 : 0);
+        // 设置操作状态(1成功,0失败)
+        logOperationRequest.setOperationStatus(Objects.nonNull(ex) ? SystemStatusConstants.DISABLE_VALUE : SystemStatusConstants.NORMAL_VALUE);
 
         // 设置执行时间(毫秒)
         long executeTime = Duration.between(beginTime, LocalDateTime.now()).toMillis();
@@ -242,7 +243,7 @@ public class LogOperationFilter extends ApiRequestFilter {
             Operation operationAnnotation = handlerMethod.getMethodAnnotation(Operation.class);
 
             String operateModule = null;
-            if (logOperationAnnotation != null && StrUtil.isNotBlank(logOperationAnnotation.operateModule())) {
+            if (StrUtil.isNotBlank(logOperationAnnotation.operateModule())) {
                 operateModule = logOperationAnnotation.operateModule();
             } else {
                 operateModule = tagAnnotation != null ? StrUtil.nullToDefault(tagAnnotation.name(), tagAnnotation.description()) : null;
@@ -250,7 +251,7 @@ public class LogOperationFilter extends ApiRequestFilter {
             logOperationRequest.setOperationModule(operateModule);
 
             String operateDesc = null;
-            if (logOperationAnnotation != null && StrUtil.isNotBlank(logOperationAnnotation.operateDesc())) {
+            if (StrUtil.isNotBlank(logOperationAnnotation.operateDesc())) {
                 operateDesc = logOperationAnnotation.operateDesc();
             } else {
                 operateDesc = operationAnnotation != null ? operationAnnotation.summary() : null;
@@ -258,7 +259,7 @@ public class LogOperationFilter extends ApiRequestFilter {
             logOperationRequest.setOperationDesc(operateDesc);
 
             String operateType = null;
-            if (logOperationAnnotation != null && logOperationAnnotation.operationType().length > 0) {
+            if (logOperationAnnotation.operationType().length > 0) {
                 operateType = logOperationAnnotation.operationType()[0].name();
             } else {
                 operateType = parseOperateLogType(request).getValue();
