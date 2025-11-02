@@ -25,7 +25,7 @@ public class SysMenuQueryRequestDTO {
     @Schema(description = "是否可见：0隐藏,1显示")
     private Integer isVisible;
 
-    @Schema(description = "状态：0正常,1停用")
+    @Schema(description = "状态：1正常,0停用")
     private Integer status;
 }
 

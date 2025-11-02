@@ -156,7 +156,7 @@ public class ContentDocumentDetailResponseDTO {
     @Schema(description = "排序字段", example = "0")
     private Integer sort;
 
-    @Schema(description = "状态：0正常,1停用", example = "0")
+    @Schema(description = "状态：1正常,0停用", example = "1")
     private Integer status;
 
     // ============== 扩展字段（用户相关） ==============

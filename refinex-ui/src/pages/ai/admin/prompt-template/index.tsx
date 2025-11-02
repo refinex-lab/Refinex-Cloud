@@ -4,6 +4,7 @@ import {
   PlusOutlined,
   ExclamationCircleOutlined,
   EyeOutlined,
+  QuestionCircleOutlined,
 } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import {
@@ -16,8 +17,8 @@ import {
   ProTable,
   ProFormRadio,
 } from '@ant-design/pro-components';
-import { Badge, Button, message, Popconfirm, Space, Switch, Tag, Tooltip, Modal } from 'antd';
-import React, { useRef, useState } from 'react';
+import { Badge, Button, message, Popconfirm, Space, Switch, Tag, Tooltip, Modal, Card, Typography, Alert } from 'antd';
+import React, { useRef, useState, useEffect } from 'react';
 import type {
   PromptTemplate,
   PromptTemplateCreateRequest,
@@ -30,36 +31,89 @@ import {
   toggleTemplateStatus,
   updatePromptTemplate,
 } from '@/services/ai/prompt-template';
+import { listDictDataByTypeCode } from '@/services/system/dictionary';
+import type { DictData } from '@/services/system/typings';
 
 /**
  * AI 提示词模板管理页面
  */
+const { Text, Paragraph } = Typography;
+
 const PromptTemplateManagement: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<PromptTemplate | undefined>();
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewContent, setPreviewContent] = useState('');
+  const [placeholderRuleVisible, setPlaceholderRuleVisible] = useState(false);
+  const [categoryOptions, setCategoryOptions] = useState<Array<{ label: string; value: string }>>([]);
+  const [templateTypeOptions, setTemplateTypeOptions] = useState<Array<{ label: string; value: string }>>([]);
+  const [statusOptions, setStatusOptions] = useState<Array<{ label: string; value: string }>>([]);
+  const [publicStatusOptions, setPublicStatusOptions] = useState<Array<{ label: string; value: string }>>([]);
   const actionRef = useRef<ActionType>(null);
 
-  // 模板类型枚举
-  const templateTypeEnum = {
-    SYSTEM: { text: '系统模板', color: 'blue' },
-    USER: { text: '用户模板', color: 'green' },
-  };
+  // 加载所有字典数据
+  useEffect(() => {
+    const loadDictionaries = async () => {
+      try {
+        // 并行加载所有字典数据
+        const [categoryRes, templateTypeRes, statusRes, publicStatusRes] = await Promise.all([
+          listDictDataByTypeCode('ai_prompt_category'),
+          listDictDataByTypeCode('ai_template_type'),
+          listDictDataByTypeCode('common_status'),
+          listDictDataByTypeCode('common_public_status'),
+        ]);
 
-  // 状态枚举
-  const statusEnum = {
-    0: { text: '正常', status: 'Success' },
-    1: { text: '停用', status: 'Default' },
-  };
+        // 处理模板分类
+        if (categoryRes.code === 200 && categoryRes.data) {
+          const options = categoryRes.data
+            .sort((a, b) => (a.dictSort || 0) - (b.dictSort || 0))
+            .map((item: DictData) => ({
+              label: item.dictLabel,
+              value: item.dictValue,
+            }));
+          setCategoryOptions(options);
+        }
 
-  // 公开状态枚举
-  const publicEnum = {
-    0: { text: '私有', status: 'Default' },
-    1: { text: '公开', status: 'Success' },
-  };
+        // 处理模板类型
+        if (templateTypeRes.code === 200 && templateTypeRes.data) {
+          const options = templateTypeRes.data
+            .sort((a, b) => (a.dictSort || 0) - (b.dictSort || 0))
+            .map((item: DictData) => ({
+              label: item.dictLabel,
+              value: item.dictValue,
+            }));
+          setTemplateTypeOptions(options);
+        }
 
-  // 系统模板枚举
+        // 处理状态
+        if (statusRes.code === 200 && statusRes.data) {
+          const options = statusRes.data
+            .sort((a, b) => (a.dictSort || 0) - (b.dictSort || 0))
+            .map((item: DictData) => ({
+              label: item.dictLabel,
+              value: item.dictValue,
+            }));
+          setStatusOptions(options);
+        }
+
+        // 处理公开状态
+        if (publicStatusRes.code === 200 && publicStatusRes.data) {
+          const options = publicStatusRes.data
+            .sort((a, b) => (a.dictSort || 0) - (b.dictSort || 0))
+            .map((item: DictData) => ({
+              label: item.dictLabel,
+              value: item.dictValue,
+            }));
+          setPublicStatusOptions(options);
+        }
+      } catch (error) {
+        console.error('加载字典数据失败:', error);
+      }
+    };
+    loadDictionaries();
+  }, []);
+
+  // 系统模板枚举（保留用于是否系统模板字段渲染）
   const systemEnum = {
     0: { text: '否', status: 'Default' },
     1: { text: '是', status: 'Processing' },
@@ -85,19 +139,31 @@ const PromptTemplateManagement: React.FC = () => {
       dataIndex: 'templateType',
       width: 120,
       valueType: 'select',
-      valueEnum: templateTypeEnum,
-      render: (_, record) => (
-        <Tag color={templateTypeEnum[record.templateType as keyof typeof templateTypeEnum]?.color}>
-          {templateTypeEnum[record.templateType as keyof typeof templateTypeEnum]?.text ||
-            record.templateType}
-        </Tag>
-      ),
+      fieldProps: {
+        options: templateTypeOptions,
+      },
+      render: (_, record) => {
+        const typeOption = templateTypeOptions.find((opt) => opt.value === record.templateType);
+        const colorMap: Record<string, string> = {
+          SYSTEM: 'blue',
+          USER: 'green',
+        };
+        return (
+          <Tag color={colorMap[record.templateType] || 'default'}>
+            {typeOption?.label || record.templateType}
+          </Tag>
+        );
+      },
     },
     {
       title: '分类',
       dataIndex: 'templateCategory',
       width: 120,
       ellipsis: true,
+      valueType: 'select',
+      fieldProps: {
+        options: categoryOptions,
+      },
     },
     {
       title: '是否系统模板',
@@ -116,13 +182,18 @@ const PromptTemplateManagement: React.FC = () => {
       dataIndex: 'isPublic',
       width: 100,
       valueType: 'select',
-      valueEnum: publicEnum,
-      render: (_, record) => (
-        <Badge
-          status={record.isPublic === 1 ? 'success' : 'default'}
-          text={publicEnum[record.isPublic as 0 | 1]?.text}
-        />
-      ),
+      fieldProps: {
+        options: publicStatusOptions,
+      },
+      render: (_, record) => {
+        const publicOption = publicStatusOptions.find((opt) => opt.value === String(record.isPublic));
+        return (
+          <Badge
+            status={record.isPublic === 1 ? 'success' : 'default'}
+            text={publicOption?.label || (record.isPublic === 1 ? '公开' : '私有')}
+          />
+        );
+      },
     },
     {
       title: '使用次数',
@@ -142,24 +213,31 @@ const PromptTemplateManagement: React.FC = () => {
       title: '状态',
       dataIndex: 'status',
       width: 100,
-      valueEnum: statusEnum,
-      render: (_, record) => (
-        <Switch
-          checked={record.status === 0}
-          checkedChildren="正常"
-          unCheckedChildren="停用"
-          disabled={record.isSystem === 1}
-          onChange={async (checked) => {
-            try {
-              await toggleTemplateStatus(record.id, checked ? 0 : 1);
-              message.success('状态更新成功');
-              actionRef.current?.reload();
-            } catch (error) {
-              message.error('状态更新失败');
-            }
-          }}
-        />
-      ),
+      valueType: 'select',
+      fieldProps: {
+        options: statusOptions,
+      },
+      render: (_, record) => {
+        const normalStatus = statusOptions.find((opt) => opt.value === '0');
+        const disabledStatus = statusOptions.find((opt) => opt.value === '1');
+        return (
+          <Switch
+            checked={record.status === 0}
+            checkedChildren={normalStatus?.label || '正常'}
+            unCheckedChildren={disabledStatus?.label || '停用'}
+            disabled={record.isSystem === 1}
+            onChange={async (checked) => {
+              try {
+                await toggleTemplateStatus(record.id, checked ? 0 : 1);
+                message.success('状态更新成功');
+                actionRef.current?.reload();
+              } catch (error) {
+                message.error('状态更新失败');
+              }
+            }}
+          />
+        );
+      },
     },
     {
       title: '创建时间',
@@ -229,8 +307,12 @@ const PromptTemplateManagement: React.FC = () => {
         await updatePromptTemplate(currentRecord.id, values as PromptTemplateUpdateRequest);
         message.success('更新成功');
       } else {
-        // 创建
-        await createPromptTemplate(values as PromptTemplateCreateRequest);
+        // 创建 - 移除空的 templateCode，让后端自动生成
+        const createData: any = { ...values };
+        if (!createData.templateCode || createData.templateCode.trim() === '') {
+          delete createData.templateCode;
+        }
+        await createPromptTemplate(createData as PromptTemplateCreateRequest);
         message.success('创建成功');
       }
       setModalVisible(false);
@@ -305,6 +387,10 @@ const PromptTemplateManagement: React.FC = () => {
         width={800}
         open={modalVisible}
         onOpenChange={setModalVisible}
+        modalProps={{
+          centered: true,
+          destroyOnClose: true,
+        }}
         initialValues={
           currentRecord
             ? currentRecord
@@ -323,10 +409,19 @@ const PromptTemplateManagement: React.FC = () => {
       >
         <ProFormText
           name="templateCode"
-          label="模板编码"
-          placeholder="请输入模板编码，如：WRITING_ASSISTANT"
-          rules={[{ required: true, message: '请输入模板编码' }]}
-          disabled={!!currentRecord}
+          label={
+            <Space>
+              <span>模板编码</span>
+              <Tooltip title="新建时，模板编码将根据模板名称自动生成（如：'写作助手' → 'XZZS'）；编辑时不可修改">
+                <QuestionCircleOutlined style={{ color: '#1890ff' }} />
+              </Tooltip>
+            </Space>
+          }
+          disabled={!currentRecord}
+          placeholder={currentRecord ? undefined : '将根据模板名称自动生成'}
+          fieldProps={{
+            style: currentRecord ? undefined : { color: '#999' },
+          }}
         />
         <ProFormText
           name="templateName"
@@ -336,8 +431,18 @@ const PromptTemplateManagement: React.FC = () => {
         />
         <ProFormTextArea
           name="templateContent"
-          label="模板内容"
-          placeholder="请输入模板内容，支持变量占位符"
+          label={
+            <Space>
+              <span>模板内容</span>
+              <Tooltip title="点击查看变量占位符规则">
+                <QuestionCircleOutlined
+                  style={{ color: '#1890ff', cursor: 'pointer' }}
+                  onClick={() => setPlaceholderRuleVisible(true)}
+                />
+              </Tooltip>
+            </Space>
+          }
+          placeholder="请输入模板内容，支持变量占位符，如：{{变量名}}"
           rules={[{ required: true, message: '请输入模板内容' }]}
           fieldProps={{
             rows: 6,
@@ -348,16 +453,17 @@ const PromptTemplateManagement: React.FC = () => {
         <ProFormSelect
           name="templateType"
           label="模板类型"
-          options={Object.entries(templateTypeEnum).map(([value, { text }]) => ({
-            label: text,
-            value,
-          }))}
+          options={templateTypeOptions}
+          showSearch
           rules={[{ required: true, message: '请选择模板类型' }]}
         />
-        <ProFormText
+        <ProFormSelect
           name="templateCategory"
           label="模板分类"
-          placeholder="请输入模板分类，如：写作助手"
+          placeholder="请选择模板分类"
+          options={categoryOptions}
+          showSearch
+          allowClear
         />
         <ProFormTextArea
           name="applicableModels"
@@ -377,22 +483,24 @@ const PromptTemplateManagement: React.FC = () => {
           rules={[{ required: true, message: '请选择是否系统模板' }]}
           disabled={!!currentRecord}
         />
-        <ProFormRadio.Group
+        <ProFormSelect
           name="isPublic"
           label="是否公开"
-          options={[
-            { label: '私有', value: 0 },
-            { label: '公开', value: 1 },
-          ]}
+          options={publicStatusOptions.map(opt => ({
+            label: opt.label,
+            value: Number(opt.value),
+          }))}
+          showSearch
           rules={[{ required: true, message: '请选择是否公开' }]}
         />
-        <ProFormRadio.Group
+        <ProFormSelect
           name="status"
           label="状态"
-          options={[
-            { label: '正常', value: 0 },
-            { label: '停用', value: 1 },
-          ]}
+          options={statusOptions.map(opt => ({
+            label: opt.label,
+            value: Number(opt.value),
+          }))}
+          showSearch
           rules={[{ required: true, message: '请选择状态' }]}
         />
         <ProFormDigit
@@ -419,6 +527,85 @@ const PromptTemplateManagement: React.FC = () => {
         <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', maxHeight: 500, overflow: 'auto' }}>
           {previewContent}
         </pre>
+      </Modal>
+
+      <Modal
+        title="变量占位符使用规则"
+        open={placeholderRuleVisible}
+        onCancel={() => setPlaceholderRuleVisible(false)}
+        footer={[
+          <Button key="close" type="primary" onClick={() => setPlaceholderRuleVisible(false)}>
+            我知道了
+          </Button>,
+        ]}
+        width={700}
+        centered
+      >
+        <Card bordered={false}>
+          <Paragraph>
+            <Text strong>变量占位符格式：</Text>
+            <Text code>{'{{变量名}}'}</Text>
+          </Paragraph>
+
+          <Paragraph>
+            <Text strong>使用规则：</Text>
+          </Paragraph>
+          <ul style={{ paddingLeft: 20 }}>
+            <li>
+              <Text>使用双花括号包裹变量名，例如：</Text>
+              <Text code>{'{{用户名}}'}</Text>
+              <Text>、</Text>
+              <Text code>{'{{主题}}'}</Text>
+            </li>
+            <li>
+              <Text>变量名支持中文、英文、数字和下划线</Text>
+            </li>
+            <li>
+              <Text>变量名区分大小写</Text>
+            </li>
+            <li>
+              <Text>同一个变量可以在模板中多次使用</Text>
+            </li>
+          </ul>
+
+          <Paragraph>
+            <Text strong>示例模板：</Text>
+          </Paragraph>
+          <Card type="inner" size="small" style={{ backgroundColor: '#f5f5f5' }}>
+            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
+              {`你好，{{用户名}}！
+
+请帮我写一篇关于{{主题}}的文章，要求如下：
+1. 字数：{{字数}}字左右
+2. 风格：{{风格}}
+3. 目标读者：{{目标读者}}
+
+请确保内容专业、准确，并且易于理解。`}
+            </pre>
+          </Card>
+
+          <Paragraph style={{ marginTop: 16 }}>
+            <Text strong>常用变量示例：</Text>
+          </Paragraph>
+          <Space wrap>
+            <Tag color="blue">{'{{用户名}}'}</Tag>
+            <Tag color="blue">{'{{主题}}'}</Tag>
+            <Tag color="blue">{'{{内容}}'}</Tag>
+            <Tag color="blue">{'{{语言}}'}</Tag>
+            <Tag color="blue">{'{{风格}}'}</Tag>
+            <Tag color="blue">{'{{字数}}'}</Tag>
+            <Tag color="blue">{'{{要求}}'}</Tag>
+            <Tag color="blue">{'{{上下文}}'}</Tag>
+          </Space>
+
+          <Alert
+            message="提示"
+            description="在实际使用时，系统会自动将占位符替换为用户输入的实际值"
+            type="info"
+            showIcon
+            style={{ marginTop: 16 }}
+          />
+        </Card>
       </Modal>
     </PageContainer>
   );

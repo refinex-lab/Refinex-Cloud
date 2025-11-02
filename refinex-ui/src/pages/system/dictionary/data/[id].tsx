@@ -193,6 +193,7 @@ const DictionaryDataList: React.FC = () => {
       <ProTable<DictData>
         actionRef={actionRef}
         rowKey="id"
+        cardBordered
         search={{
           labelWidth: 'auto',
           span: 6,

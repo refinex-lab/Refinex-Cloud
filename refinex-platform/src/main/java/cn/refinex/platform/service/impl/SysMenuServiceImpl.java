@@ -1,6 +1,7 @@
 package cn.refinex.platform.service.impl;
 
 import cn.hutool.core.convert.Convert;
+import cn.refinex.common.constants.SystemStatusConstants;
 import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
 import cn.refinex.common.jdbc.page.PageRequest;
@@ -63,7 +64,7 @@ public class SysMenuServiceImpl implements SysMenuService {
         m.setIsCached(Convert.toInt(request.getIsCached(), 0));
         m.setIsVisible(Convert.toInt(request.getIsVisible(), 1));
         m.setSort(Convert.toInt(request.getSort(), 0));
-        m.setStatus(Convert.toInt(request.getStatus(), 0));
+        m.setStatus(Convert.toInt(request.getStatus(), SystemStatusConstants.NORMAL_VALUE));
         m.setCreateBy(operatorId);
         m.setCreateTime(LocalDateTime.now());
         m.setUpdateBy(operatorId);
@@ -111,7 +112,7 @@ public class SysMenuServiceImpl implements SysMenuService {
         exist.setIsCached(Convert.toInt(request.getIsCached(), 0));
         exist.setIsVisible(Convert.toInt(request.getIsVisible(), 1));
         exist.setSort(Convert.toInt(request.getSort(), 0));
-        exist.setStatus(Convert.toInt(request.getStatus(), 0));
+        exist.setStatus(Convert.toInt(request.getStatus(), SystemStatusConstants.NORMAL_VALUE));
         exist.setRemark(request.getRemark());
         exist.setExtraData(request.getExtraData());
         exist.setUpdateBy(operatorId);

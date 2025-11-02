@@ -67,6 +67,7 @@
         <httpclient5.version>5.5.1</httpclient5.version>
         <java-diff-utils.version>4.16</java-diff-utils.version>
         <netty.version>4.1.116.Final</netty.version>
+        <tiny-pinyin.version>2.0.3.RELEASE</tiny-pinyin.version>
 
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
@@ -283,6 +284,13 @@
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-core</artifactId>
                 <version>${tika-core.version}</version>
+            </dependency>
+
+            <!-- 中文转拼音库 https://github.com/biezhi/TinyPinyin -->
+            <dependency>
+                <groupId>io.github.biezhi</groupId>
+                <artifactId>TinyPinyin</artifactId>
+                <version>${tiny-pinyin.version}</version>
             </dependency>
 
             <!-- 验证码生成库 https://github.com/ele-admin/EasyCaptcha -->

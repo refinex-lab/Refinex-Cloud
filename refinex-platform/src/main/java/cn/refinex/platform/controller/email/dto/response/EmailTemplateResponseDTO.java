@@ -46,7 +46,7 @@ public class EmailTemplateResponseDTO {
     @Schema(description = "是否系统模板：0否,1是")
     private Integer isSystem;
 
-    @Schema(description = "状态：0正常,1停用")
+    @Schema(description = "状态：1正常,0停用")
     private Integer status;
 
     @Schema(description = "备注说明")

@@ -19,7 +19,7 @@ public class ModelConfigQueryRequestDTO {
     @Schema(description = "模型类型", example = "CHAT")
     private String modelType;
 
-    @Schema(description = "状态:0正常,1停用", example = "0")
+    @Schema(description = "状态:1正常,0停用", example = "1")
     private Integer status;
 
     @Schema(description = "关键词（搜索模型名称和编码）", example = "通义千问")

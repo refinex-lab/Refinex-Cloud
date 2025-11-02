@@ -14,9 +14,8 @@ import lombok.Data;
 @Schema(description = "提示词模板创建请求")
 public class PromptTemplateCreateRequestDTO {
 
-    @NotBlank(message = "模板编码不能为空")
     @Size(max = 50, message = "模板编码长度不能超过50")
-    @Schema(description = "模板编码", example = "WRITING_ASSISTANT", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "模板编码（可选，不填则根据模板名称自动生成）", example = "WRITING_ASSISTANT")
     private String templateCode;
 
     @NotBlank(message = "模板名称不能为空")
@@ -63,7 +62,7 @@ public class PromptTemplateCreateRequestDTO {
     @NotNull(message = "状态不能为空")
     @Min(value = 0, message = "状态只能为0或1")
     @Max(value = 1, message = "状态只能为0或1")
-    @Schema(description = "状态:0正常,1停用", example = "0", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "状态:1正常,0停用", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer status;
 
     @Schema(description = "扩展数据（JSON格式）")

@@ -1,5 +1,6 @@
 package cn.refinex.platform.service.impl;
 
+import cn.refinex.common.constants.SystemStatusConstants;
 import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
 import cn.refinex.common.jdbc.page.PageRequest;
@@ -54,7 +55,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         }
 
         SysPermission p = BeanConverter.toBean(request, SysPermission.class);
-        p.setStatus(request.getStatus() == null ? 0 : request.getStatus());
+        p.setStatus(request.getStatus() == null ? SystemStatusConstants.NORMAL_VALUE : request.getStatus());
         p.setCreateBy(operatorId);
         p.setCreateTime(LocalDateTime.now());
         p.setUpdateBy(operatorId);
@@ -96,7 +97,7 @@ public class SysPermissionServiceImpl implements SysPermissionService {
         exist.setResourcePath(request.getResourcePath());
         exist.setHttpMethod(request.getHttpMethod());
         exist.setSort(request.getSort());
-        exist.setStatus(request.getStatus() == null ? 0 : request.getStatus());
+        exist.setStatus(request.getStatus() == null ? SystemStatusConstants.NORMAL_VALUE : request.getStatus());
         exist.setRemark(request.getRemark());
         exist.setExtraData(request.getExtraData());
         exist.setUpdateBy(operatorId);

@@ -689,7 +689,7 @@ const AIChatPage: React.FC = () => {
   const [agent] = useXAgent<BubbleDataType>({
     baseURL: 'https://api.deepseek.com/chat/completions',
     model: 'deepseek-reasoner',
-    dangerouslyApiKey: 'Bearer sk-5555ec224',
+    dangerouslyApiKey: 'Bearer sk-5555ec224cd34d1583dedc1000fb9dba',
   });
   const loading = agent.isRequesting();
 

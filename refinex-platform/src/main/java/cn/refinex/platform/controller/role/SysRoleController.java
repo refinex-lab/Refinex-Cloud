@@ -62,7 +62,7 @@ public class SysRoleController {
     @LogOperation(operateDesc = "更新角色状态", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "更新角色状态", description = "更新指定角色的状态（启用/停用）")
     @Parameter(name = "id", description = "角色 ID", required = true)
-    @Parameter(name = "status", description = "状态：0正常,1停用", required = true)
+    @Parameter(name = "status", description = "状态：1正常,0停用", required = true)
     public ApiResult<Boolean> updateRoleStatus(
             @PathVariable("id") Long id,
             @RequestParam("status") Integer status
@@ -103,7 +103,7 @@ public class SysRoleController {
     @Parameter(name = "roleCode", description = "角色编码，支持模糊查询")
     @Parameter(name = "roleName", description = "角色名称，支持模糊查询")
     @Parameter(name = "roleType", description = "角色类型：0前台角色,1后台角色")
-    @Parameter(name = "status", description = "状态：0正常,1停用")
+    @Parameter(name = "status", description = "状态：1正常,0停用")
     @Parameter(name = "orderBy", description = "排序字段，如：sort, create_time")
     @Parameter(name = "orderDirection", description = "排序方向：ASC 或 DESC")
     @Parameter(name = "pageNum", description = "页码，从1开始")

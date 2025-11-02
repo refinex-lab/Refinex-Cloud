@@ -80,7 +80,7 @@ public class AiModelConfigController {
     @Operation(summary = "分页查询模型配置", description = "根据条件分页查询模型配置")
     @Parameter(name = "provider", description = "供应商")
     @Parameter(name = "modelType", description = "模型类型")
-    @Parameter(name = "status", description = "状态：0正常,1停用")
+    @Parameter(name = "status", description = "状态：1正常,0停用")
     @Parameter(name = "keyword", description = "关键词（搜索模型名称和编码）")
     @Parameter(name = "orderBy", description = "排序字段")
     @Parameter(name = "orderDirection", description = "排序方向：ASC 或 DESC")
@@ -119,7 +119,7 @@ public class AiModelConfigController {
     @LogOperation(operateDesc = "切换模型状态", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "切换模型状态", description = "启用或停用指定的模型配置")
     @Parameter(name = "id", description = "模型配置 ID", required = true)
-    @Parameter(name = "status", description = "状态：0正常,1停用", required = true)
+    @Parameter(name = "status", description = "状态：1正常,0停用", required = true)
     public ApiResult<Boolean> toggleModelStatus(
             @PathVariable("id") Long id,
             @RequestParam("status") Integer status) {
