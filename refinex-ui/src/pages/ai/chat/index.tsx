@@ -16,7 +16,6 @@ import {
   LinkOutlined,
   PaperClipOutlined,
   ProductOutlined,
-  QuestionCircleOutlined,
   RedoOutlined,
   ReloadOutlined,
   RobotOutlined,
@@ -24,6 +23,8 @@ import {
   SearchOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons';
+// @ts-ignore
+import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarRightCollapse } from 'react-icons/tb';
 import {
   Actions,
   type ActionsProps,
@@ -208,41 +209,16 @@ const useStyle = createStyles(({ token, css }) => {
       padding: 0 8px;
     `,
     collapseBtn: css`
-      width: 32px;
-      height: 32px;
+      font-size: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
       color: ${token.colorTextSecondary};
+      transition: color 0.2s ease;
 
       &:hover {
-        background: ${token.colorPrimaryBg};
         color: ${token.colorPrimary};
       }
-    `,
-    collapseBtnWrapper: css`
-      position: absolute;
-      top: 50%;
-      right: -12px; /* 向右偏移，让按钮完全露出 */
-      transform: translateY(-50%);
-      z-index: 1000;
-    `,
-    collapseBtnFloating: css`
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: ${token.colorBgContainer};
-      border: 1px solid ${token.colorBorder};
-      border-radius: 50%;
-      cursor: pointer;
-      color: ${token.colorTextSecondary};
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-      font-size: 10px;
     `,
     featureMenu: css`
       display: flex;
@@ -496,7 +472,7 @@ const useStyle = createStyles(({ token, css }) => {
       height: 40px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      margin-top: auto;
     `,
     // chat list 样式
     chat: css`
@@ -1069,17 +1045,6 @@ const AIChatPage: React.FC = () => {
   // ==================== Nodes ====================
   const chatSider = (
     <div className={`${styles.sider} ${siderCollapsed ? 'collapsed' : ''}`}>
-      {/* 🌟 折叠按钮（垂直居中悬浮） */}
-      <div className={styles.collapseBtnWrapper}>
-        <div
-          className={styles.collapseBtnFloating}
-          onClick={() => setSiderCollapsed(!siderCollapsed)}
-          title={siderCollapsed ? '展开' : '收起'}
-        >
-          {siderCollapsed ? '›' : '‹'}
-        </div>
-      </div>
-
       {/* 🌟 功能菜单 */}
       {!siderCollapsed && (
         <>
@@ -1169,9 +1134,24 @@ const AIChatPage: React.FC = () => {
       )}
 
       {!siderCollapsed && (
-        <div className={styles.siderFooter}>
-          <Avatar size={24} />
-          <Button type="text" icon={<QuestionCircleOutlined />} />
+        <div className={styles.siderFooter} style={{ justifyContent: 'flex-end' }}>
+          <Button
+            type="text"
+            icon={<TbLayoutSidebarLeftCollapse className={styles.collapseBtn} />}
+            onClick={() => setSiderCollapsed(true)}
+            title="收起侧边栏"
+          />
+        </div>
+      )}
+
+      {siderCollapsed && (
+        <div className={styles.siderFooter} style={{ justifyContent: 'center' }}>
+          <Button
+            type="text"
+            icon={<TbLayoutSidebarRightCollapse className={styles.collapseBtn} />}
+            onClick={() => setSiderCollapsed(false)}
+            title="展开侧边栏"
+          />
         </div>
       )}
     </div>
@@ -1235,6 +1215,39 @@ const AIChatPage: React.FC = () => {
               placement: 'end',
               // 用户消息也支持 Markdown
               messageRender: renderMarkdown,
+              // 🌟 用户消息操作按钮
+              footer: (messageContent: string, info: { key?: string | number }) => (
+                <Actions
+                  items={[
+                    {
+                      key: 'retry',
+                      icon: <RedoOutlined />,
+                      label: '重试',
+                    },
+                    {
+                      key: 'copy',
+                      icon: <CopyOutlined />,
+                      label: '复制',
+                    },
+                  ]}
+                  onClick={(actionInfo) => {
+                    const action = actionInfo.keyPath[0];
+
+                    if (action === 'retry') {
+                      // 重试：重新发送该用户消息
+                      onSubmit(messageContent);
+                      message.success('正在重新发送...');
+                    } else if (action === 'copy') {
+                      // 复制用户消息内容
+                      navigator.clipboard.writeText(messageContent).then(() => {
+                        message.success('已复制到剪贴板');
+                      }).catch(() => {
+                        message.error('复制失败');
+                      });
+                    }
+                  }}
+                />
+              ),
               // 🎨 DeepSeek 风格：用户消息保持浅灰色背景
               styles: {
                 content: {
