@@ -211,7 +211,7 @@ const VersionCompareModal: React.FC<VersionCompareModalProps> = ({
         </div>
       }
       className="version-compare-modal"
-      destroyOnClose
+      destroyOnHidden
     >
       <div className="compare-content" style={{ height: '100%', overflow: 'auto' }}>
         {compareResult ? (

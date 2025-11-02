@@ -1492,7 +1492,7 @@ const AIChatPage: React.FC = () => {
         width={600}
         className={styles.searchModal}
         closeIcon={null}
-        destroyOnClose
+        destroyOnHidden
       >
         {/* 搜索输入框 */}
         <div className={styles.searchModalHeader}>

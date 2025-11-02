@@ -10,7 +10,7 @@
  * @author Refinex Team
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button, message, Tooltip } from 'antd';
 import {
   CopyOutlined,
@@ -18,9 +18,13 @@ import {
   CodeOutlined,
   CheckOutlined,
   ExpandOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons';
 import MermaidRenderer from './MermaidRenderer';
 import MermaidPreviewModal from './MermaidPreviewModal';
+import { CodePreviewPanel } from '../CodePreview';
+import { detectExecutableCode } from '../CodePreview/utils/codeDetector';
+import type { CodeType } from '../CodePreview/types';
 
 export interface CodeBlockProps {
   /** 代码内容（字符串或已高亮的 React 元素） */
@@ -48,6 +52,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
   const [copied, setCopied] = useState(false);
   const [showSource, setShowSource] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
+  const [codePreviewVisible, setCodePreviewVisible] = useState(false);
 
   // 行内代码直接返回
   if (inline) {
@@ -62,6 +67,10 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
     if (typeof code === 'string') {
       return code;
     }
+    // 如果是数组，递归提取每个元素的文本
+    if (Array.isArray(code)) {
+      return extractTextFromReactElement(code);
+    }
     // 如果是 React 元素，尝试提取文本内容
     if (React.isValidElement(code)) {
       return extractTextFromReactElement(code);
@@ -73,20 +82,47 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
    * 从 React 元素中提取纯文本
    */
   const extractTextFromReactElement = (element: any): string => {
+    // 处理字符串
     if (typeof element === 'string') {
       return element;
     }
+    // 处理数字
+    if (typeof element === 'number') {
+      return String(element);
+    }
+    // 处理数组
     if (Array.isArray(element)) {
       return element.map(extractTextFromReactElement).join('');
     }
+    // 处理 React 元素
     if (React.isValidElement(element)) {
       const props = element.props as any;
       if (props && props.children) {
         return extractTextFromReactElement(props.children);
       }
+      // React 元素没有 children，返回空字符串
+      return '';
     }
-    return '';
+    // 处理其他类型（null, undefined, boolean 等）
+    if (element == null || typeof element === 'boolean') {
+      return '';
+    }
+    // 处理对象类型：返回空字符串，避免 "[object Object]"
+    if (typeof element === 'object') {
+      return '';
+    }
+    // 最后尝试转换为字符串
+    return String(element);
   };
+
+  // 检测代码是否可执行
+  const codeDetection = useMemo(() => {
+    const plainText = getPlainTextCode();
+    return detectExecutableCode(plainText, language);
+  }, [code, language]);
+
+  const isExecutable = codeDetection.executable;
+  const executableType: CodeType = codeDetection.type;
 
   /**
    * 复制代码到剪贴板
@@ -184,6 +220,20 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
   };
 
   /**
+   * 打开代码预览
+   */
+  const handleExecuteCode = () => {
+    setCodePreviewVisible(true);
+  };
+
+  /**
+   * 关闭代码预览
+   */
+  const handleCloseCodePreview = () => {
+    setCodePreviewVisible(false);
+  };
+
+  /**
    * 获取语言显示名称
    */
   const getLanguageDisplayName = (lang: string): string => {
@@ -232,6 +282,19 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
 
           {/* 右侧：操作按钮 */}
           <div className="code-block-actions">
+            {/* 可执行代码：执行按钮 */}
+            {isExecutable && !isMermaid && (
+              <Tooltip title="运行代码">
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<ThunderboltOutlined />}
+                  onClick={handleExecuteCode}
+                  className="code-block-action-btn"
+                />
+              </Tooltip>
+            )}
+
             {/* Mermaid 图表：大屏预览按钮 */}
             {isMermaid && (
               <Tooltip title="大屏预览">
@@ -305,6 +368,18 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
           onClose={handleClosePreview}
           chart={getPlainTextCode()}
           language={language}
+        />
+      )}
+
+      {/* 代码预览面板 */}
+      {isExecutable && executableType && (
+        <CodePreviewPanel
+          visible={codePreviewVisible}
+          code={getPlainTextCode()}
+          language={language}
+          codeType={executableType}
+          onClose={handleCloseCodePreview}
+          title={`${getLanguageDisplayName(language)} 代码预览`}
         />
       )}
     </>

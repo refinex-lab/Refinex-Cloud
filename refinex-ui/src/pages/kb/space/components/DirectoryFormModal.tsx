@@ -106,7 +106,7 @@ const DirectoryFormModal: React.FC<DirectoryFormModalProps> = ({
       onOk={handleOk}
       onCancel={handleCancel}
       confirmLoading={loading}
-      destroyOnClose
+      destroyOnHidden
       width={520}
       okText="确定"
       cancelText="取消"

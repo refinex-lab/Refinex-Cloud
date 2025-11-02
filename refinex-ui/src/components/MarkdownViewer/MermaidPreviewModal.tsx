@@ -466,7 +466,7 @@ const MermaidPreviewModal: React.FC<MermaidPreviewModalProps> = ({
         body: { height: 'calc(100vh - 110px)', padding: 0 },
       }}
       className="mermaid-preview-modal"
-      destroyOnClose
+      destroyOnHidden
       closeIcon={false}
     >
       {/* 工具栏 */}
