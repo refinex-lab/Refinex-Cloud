@@ -12,8 +12,15 @@
 
 import React, { useState } from 'react';
 import { Button, message, Tooltip } from 'antd';
-import { CopyOutlined, DownloadOutlined, CodeOutlined, CheckOutlined } from '@ant-design/icons';
+import {
+  CopyOutlined,
+  DownloadOutlined,
+  CodeOutlined,
+  CheckOutlined,
+  ExpandOutlined,
+} from '@ant-design/icons';
 import MermaidRenderer from './MermaidRenderer';
+import MermaidPreviewModal from './MermaidPreviewModal';
 
 export interface CodeBlockProps {
   /** 代码内容（字符串或已高亮的 React 元素） */
@@ -40,6 +47,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
   const [showSource, setShowSource] = useState(false);
+  const [previewVisible, setPreviewVisible] = useState(false);
 
   // 行内代码直接返回
   if (inline) {
@@ -162,6 +170,20 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
   };
 
   /**
+   * 打开大屏预览
+   */
+  const handleOpenPreview = () => {
+    setPreviewVisible(true);
+  };
+
+  /**
+   * 关闭大屏预览
+   */
+  const handleClosePreview = () => {
+    setPreviewVisible(false);
+  };
+
+  /**
    * 获取语言显示名称
    */
   const getLanguageDisplayName = (lang: string): string => {
@@ -199,68 +221,93 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
   };
 
   return (
-    <div className="code-block-enhanced">
-      {/* 顶部工具栏 */}
-      <div className="code-block-toolbar">
-        {/* 左侧：语言标签 */}
-        <div className="code-block-language">
-          {getLanguageDisplayName(language)}
-        </div>
+    <>
+      <div className="code-block-enhanced">
+        {/* 顶部工具栏 */}
+        <div className="code-block-toolbar">
+          {/* 左侧：语言标签 */}
+          <div className="code-block-language">
+            {getLanguageDisplayName(language)}
+          </div>
 
-        {/* 右侧：操作按钮 */}
-        <div className="code-block-actions">
-          {/* Mermaid 图表：查看源码按钮 */}
-          {isMermaid && (
-            <Tooltip title={showSource ? '查看图表' : '查看源码'}>
+          {/* 右侧：操作按钮 */}
+          <div className="code-block-actions">
+            {/* Mermaid 图表：大屏预览按钮 */}
+            {isMermaid && (
+              <Tooltip title="大屏预览">
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<ExpandOutlined />}
+                  onClick={handleOpenPreview}
+                  className="code-block-action-btn"
+                />
+              </Tooltip>
+            )}
+
+            {/* Mermaid 图表：查看源码按钮 */}
+            {isMermaid && (
+              <Tooltip title={showSource ? '查看图表' : '查看源码'}>
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<CodeOutlined />}
+                  onClick={handleToggleSource}
+                  className="code-block-action-btn"
+                />
+              </Tooltip>
+            )}
+
+            {/* 复制按钮 */}
+            <Tooltip title={copied ? '已复制' : '复制代码'}>
               <Button
                 type="text"
                 size="small"
-                icon={<CodeOutlined />}
-                onClick={handleToggleSource}
+                icon={copied ? <CheckOutlined /> : <CopyOutlined />}
+                onClick={handleCopy}
                 className="code-block-action-btn"
               />
             </Tooltip>
+
+            {/* 下载按钮 */}
+            <Tooltip title="下载代码">
+              <Button
+                type="text"
+                size="small"
+                icon={<DownloadOutlined />}
+                onClick={handleDownload}
+                className="code-block-action-btn"
+              />
+            </Tooltip>
+          </div>
+        </div>
+
+        {/* 代码内容区域 */}
+        <div className="code-block-content">
+          {isMermaid && !showSource ? (
+            // Mermaid 图表渲染
+            <MermaidRenderer chart={getPlainTextCode()} className="code-block-mermaid" />
+          ) : (
+            // 普通代码块 - 直接使用 rehype-highlight 处理后的 React 元素
+            <pre className="code-block-pre">
+              <code className={`hljs language-${language}`}>
+                {code}
+              </code>
+            </pre>
           )}
-
-          {/* 复制按钮 */}
-          <Tooltip title={copied ? '已复制' : '复制代码'}>
-            <Button
-              type="text"
-              size="small"
-              icon={copied ? <CheckOutlined /> : <CopyOutlined />}
-              onClick={handleCopy}
-              className="code-block-action-btn"
-            />
-          </Tooltip>
-
-          {/* 下载按钮 */}
-          <Tooltip title="下载代码">
-            <Button
-              type="text"
-              size="small"
-              icon={<DownloadOutlined />}
-              onClick={handleDownload}
-              className="code-block-action-btn"
-            />
-          </Tooltip>
         </div>
       </div>
 
-      {/* 代码内容区域 */}
-      <div className="code-block-content">
-        {isMermaid && !showSource ? (
-          // Mermaid 图表渲染
-          <MermaidRenderer chart={getPlainTextCode()} className="code-block-mermaid" />
-        ) : (
-          // 普通代码块 - 直接使用 rehype-highlight 处理后的 React 元素
-          <pre className="code-block-pre">
-            <code className={`hljs language-${language}`}>
-              {code}
-            </code>
-          </pre>
-        )}
-      </div>
-    </div>
+      {/* Mermaid 大屏预览 Modal */}
+      {isMermaid && (
+        <MermaidPreviewModal
+          visible={previewVisible}
+          onClose={handleClosePreview}
+          chart={getPlainTextCode()}
+          language={language}
+        />
+      )}
+    </>
   );
 };
 
