@@ -382,6 +382,77 @@ const useStyle = createStyles(({ token, css }) => {
         color: ${token.colorTextQuaternary};
       }
     `,
+    // 🧠 思考过程样式（DeepSeek 风格）
+    thinkingBlock: css`
+      margin-bottom: 12px;
+      border: 1px solid ${token.colorBorder};
+      border-radius: 8px;
+      overflow: hidden;
+      background: transparent;
+    `,
+    thinkingHeader: css`
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: transparent;
+      cursor: pointer;
+      user-select: none;
+    `,
+    thinkingIcon: css`
+      font-size: 16px;
+      line-height: 1;
+    `,
+    thinkingTitle: css`
+      font-size: 13px;
+      font-weight: 500;
+      color: ${token.colorTextSecondary};
+    `,
+    thinkingContent: css`
+      padding: 16px;
+      background: transparent;
+      border-top: 1px solid ${token.colorBorderSecondary};
+      font-size: 13px;
+      line-height: 1.8;
+      color: ${token.colorTextSecondary};
+
+      /* 思考内容的 Markdown 样式调整 */
+      p {
+        margin-bottom: 8px;
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      ul, ol {
+        margin: 8px 0;
+        padding-left: 24px;
+      }
+
+      li {
+        margin-bottom: 4px;
+      }
+
+      code {
+        background: ${token.colorFillTertiary};
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+
+      pre {
+        background: ${token.colorFillTertiary};
+        padding: 12px;
+        border-radius: 6px;
+        overflow-x: auto;
+        margin: 8px 0;
+
+        code {
+          background: transparent;
+          padding: 0;
+        }
+      }
+    `,
     addBtn: css`
       display: flex;
       align-items: center;
@@ -647,7 +718,7 @@ const AIChatPage: React.FC = () => {
   const [agent] = useXAgent<BubbleDataType>({
     baseURL: 'https://api.deepseek.com/chat/completions',
     model: 'deepseek-reasoner',
-    dangerouslyApiKey: 'Bearer sk-5555xxxxxxxxx',
+    dangerouslyApiKey: 'Bearer sk-5555ec2',
   });
   const loading = agent.isRequesting();
 
@@ -886,31 +957,114 @@ const AIChatPage: React.FC = () => {
     }
   };
 
-  // 🌟 自定义 Markdown 渲染函数（支持图表可视化）
+  // 🧠 解析消息内容，分离思考过程和正文
+  const parseMessageContent = (content: string) => {
+    if (typeof content !== 'string') {
+      return { thinkingContent: null, mainContent: content, isThinkingComplete: false };
+    }
+
+    // 🧠 检测是否有 <think> 开始标签
+    const hasThinkStart = content.includes('<think>');
+    if (!hasThinkStart) {
+      return { thinkingContent: null, mainContent: content, isThinkingComplete: false };
+    }
+
+    // 🧠 检测是否有完整的 <think></think> 标签对
+    const completeThinkMatch = content.match(/<think>([\s\S]*?)<\/think>/);
+
+    if (completeThinkMatch) {
+      // ✅ 思考完成：提取完整的思考内容
+      const thinkingContent = completeThinkMatch[1].trim();
+      const mainContent = content.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+      return { thinkingContent, mainContent, isThinkingComplete: true };
+    } else {
+      // ⏳ 思考中：提取 <think> 之后的所有内容作为思考内容
+      const thinkStartIndex = content.indexOf('<think>');
+      const thinkingContent = content.substring(thinkStartIndex + 7).trim(); // 7 = '<think>'.length
+      return { thinkingContent, mainContent: '', isThinkingComplete: false };
+    }
+  };
+
+  // 🧠 思考过程展示组件（DeepSeek 风格）
+  const ThinkingBlock: React.FC<{ content: string; isStreaming?: boolean }> = ({ content, isStreaming = false }) => {
+    const [collapsed, setCollapsed] = useState(false);
+
+    return (
+      <div className={styles.thinkingBlock}>
+        {/* 思考过程头部 */}
+        <div
+          className={styles.thinkingHeader}
+          onClick={() => setCollapsed(!collapsed)}
+        >
+          <Space size={8}>
+            <span className={styles.thinkingIcon}>🧠</span>
+            <span className={styles.thinkingTitle}>
+              {isStreaming ? '正在思考' : '思考过程'}
+            </span>
+            {isStreaming && <Spin size="small" />}
+          </Space>
+          <DownOutlined
+            style={{
+              fontSize: 12,
+              transform: collapsed ? 'rotate(-90deg)' : 'rotate(0deg)',
+              transition: 'transform 0.2s ease',
+            }}
+          />
+        </div>
+
+        {/* 思考内容 */}
+        {!collapsed && (
+          <div className={styles.thinkingContent}>
+            <MarkdownViewer
+              content={content}
+              enableHighlight={true}
+              allowHtml={false}
+            />
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // 🌟 自定义 Markdown 渲染函数（支持图表可视化 + 思考过程展示）
   const renderMarkdown: BubbleProps['messageRender'] = (content) => {
     if (typeof content !== 'string') {
       return content;
     }
 
-    // 移除 DeepSeek <think> 标签内容
-    const contentWithoutThink = content.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+    // 🧠 解析思考过程和正文
+    const { thinkingContent, mainContent, isThinkingComplete } = parseMessageContent(content);
 
     // 🌟 检测是否包含图表代码块（vis-chart）
-    const hasVisChart = /```vis-chart[\s\S]*?```/.test(contentWithoutThink);
+    const hasVisChart = /```vis-chart[\s\S]*?```/.test(mainContent);
 
-    // 如果包含图表，使用 GPTVis 渲染（支持 Markdown + 图表混合）
+    // 渲染正文内容
+    let mainContentRender: React.ReactNode;
     if (hasVisChart) {
-      return <GPTVis>{contentWithoutThink}</GPTVis>;
+      // 如果包含图表，使用 GPTVis 渲染
+      mainContentRender = <GPTVis>{mainContent}</GPTVis>;
+    } else {
+      // 否则使用 MarkdownViewer 渲染
+      mainContentRender = (
+        <MarkdownViewer
+          content={mainContent}
+          enableHighlight={true}
+          allowHtml={false}
+        />
+      );
     }
 
-    // 否则使用 MarkdownViewer 渲染（更强大的 Markdown 支持）
-    return (
-      <MarkdownViewer
-        content={contentWithoutThink}
-        enableHighlight={true}
-        allowHtml={false}
-      />
-    );
+    // 🧠 如果有思考过程，先展示思考过程，再展示正文
+    if (thinkingContent) {
+      return (
+        <>
+          <ThinkingBlock content={thinkingContent} isStreaming={!isThinkingComplete} />
+          {mainContent && <div style={{ marginTop: 16 }}>{mainContentRender}</div>}
+        </>
+      );
+    }
+
+    return mainContentRender;
   };
 
   // ==================== Nodes ====================
