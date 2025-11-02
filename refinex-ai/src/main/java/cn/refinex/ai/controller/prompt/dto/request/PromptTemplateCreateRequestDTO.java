@@ -56,7 +56,8 @@ public class PromptTemplateCreateRequestDTO {
     @Schema(description = "备注说明")
     private String remark;
 
-    @Schema(description = "排序字段", example = "0")
+    @NotNull(message = "排序字段不能为空")
+    @Schema(description = "排序字段", example = "0", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer sort;
 
     @NotNull(message = "状态不能为空")

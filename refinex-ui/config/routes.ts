@@ -300,6 +300,29 @@ export default [
     ],
   },
   {
+    name: 'ai-admin',
+    icon: 'robot',
+    path: '/ai',
+    routes: [
+      {
+        path: '/ai',
+        redirect: '/ai/model-config',
+      },
+      {
+        name: 'model-config',
+        icon: 'api',
+        path: '/ai/model-config',
+        component: './ai/admin/model-config',
+      },
+      {
+        name: 'prompt-template',
+        icon: 'fileText',
+        path: '/ai/prompt-template',
+        component: './ai/admin/prompt-template',
+      },
+    ],
+  },
+  {
     name: 'system',
     icon: 'setting',
     path: '/system',
@@ -389,29 +412,6 @@ export default [
         icon: 'smile',
         path: '/account/settings',
         component: './account/settings',
-      },
-    ],
-  },
-  {
-    name: 'ai-admin',
-    icon: 'robot',
-    path: '/ai',
-    routes: [
-      {
-        path: '/ai',
-        redirect: '/ai/model-config',
-      },
-      {
-        name: 'model-config',
-        icon: 'api',
-        path: '/ai/model-config',
-        component: './ai/admin/model-config',
-      },
-      {
-        name: 'prompt-template',
-        icon: 'fileText',
-        path: '/ai/prompt-template',
-        component: './ai/admin/prompt-template',
       },
     ],
   },

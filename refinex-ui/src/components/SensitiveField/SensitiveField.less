@@ -1,0 +1,33 @@
+.sensitive-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  &-value {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.85);
+
+    &.copyable {
+      cursor: pointer;
+      transition: color 0.2s;
+
+      &:hover {
+        color: #1890ff;
+      }
+    }
+  }
+
+  &-icon {
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.45);
+    transition: color 0.2s;
+    display: inline-flex;
+    align-items: center;
+
+    &:hover {
+      color: #1890ff;
+    }
+  }
+}
+

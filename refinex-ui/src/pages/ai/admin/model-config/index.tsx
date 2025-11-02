@@ -29,6 +29,8 @@ import {
   toggleModelStatus,
   updateModelConfig,
 } from '@/services/ai/model-config';
+import SensitiveField from '@/components/SensitiveField';
+import ProFormSensitiveField from '@/components/SensitiveField/ProFormSensitiveField';
 
 /**
  * AI 模型配置管理页面
@@ -70,17 +72,35 @@ const ModelConfigManagement: React.FC = () => {
   // 列定义
   const columns: ProColumns<ModelConfig>[] = [
     {
+      title: '关键词',
+      dataIndex: 'keyword',
+      hideInTable: true,
+      fieldProps: {
+        placeholder: '搜索模型编码或模型名称',
+      },
+    },
+    {
       title: '模型编码',
       dataIndex: 'modelCode',
       width: 150,
       ellipsis: true,
       fixed: 'left',
+      hideInSearch: true,
+    },
+    {
+      title: '模型版本',
+      dataIndex: 'modelVersion',
+      width: 180,
+      ellipsis: true,
+      hideInSearch: true,
+      render: (_, record) => record.modelVersion || <span style={{ color: '#999' }}>-</span>,
     },
     {
       title: '模型名称',
       dataIndex: 'modelName',
       width: 180,
       ellipsis: true,
+      hideInSearch: true,
     },
     {
       title: '供应商',
@@ -105,6 +125,30 @@ const ModelConfigManagement: React.FC = () => {
           {modelTypeEnum[record.modelType as keyof typeof modelTypeEnum]?.text || record.modelType}
         </Tag>
       ),
+    },
+    {
+      title: 'API密钥',
+      dataIndex: 'apiKey',
+      width: 330,
+      hideInSearch: true,
+      ellipsis: true,
+      render: (_, record) => {
+        if (!record.apiKey) {
+          return <span style={{ color: '#999' }}>未配置</span>;
+        }
+        return (
+          <div style={{ display: 'inline-block' }}>
+            <SensitiveField
+              maskedValue={record.apiKey}
+              servicePath="/refinex-platform"
+              tableName="ai_model_config"
+              rowGuid={String(record.id)}
+              fieldCode="api_key"
+              copyable={true}
+            />
+          </div>
+        );
+      },
     },
     {
       title: '优先级',
@@ -271,14 +315,23 @@ const ModelConfigManagement: React.FC = () => {
 
       <ModalForm<ModelConfigCreateRequest | ModelConfigUpdateRequest>
         title={currentRecord ? '编辑模型配置' : '新建模型配置'}
-        width={800}
+        width={1200}
         open={modalVisible}
-        onOpenChange={setModalVisible}
+        onOpenChange={(visible) => {
+          setModalVisible(visible);
+          if (!visible) {
+            setCurrentRecord(undefined);
+          }
+        }}
+        key={currentRecord ? `edit-${currentRecord.id}` : 'create'}
+        modalProps={{
+          centered: true,
+        }}
         initialValues={
           currentRecord
             ? {
                 ...currentRecord,
-                apiKey: undefined, // 编辑时不显示密钥
+                // apiKey 保留脱敏值，由 SensitiveFormField 组件处理
               }
             : {
                 isEnabled: 1,
@@ -293,8 +346,12 @@ const ModelConfigManagement: React.FC = () => {
         }
         onFinish={handleSubmit}
         layout="horizontal"
-        labelCol={{ span: 6 }}
-        wrapperCol={{ span: 16 }}
+        labelAlign="right"
+        labelCol={{ style: { width: '120px' } }}
+        grid
+        rowProps={{
+          gutter: [16, 0],
+        }}
       >
         <ProFormText
           name="modelCode"
@@ -302,12 +359,21 @@ const ModelConfigManagement: React.FC = () => {
           placeholder="请输入模型编码，如：QWEN_MAX"
           rules={[{ required: true, message: '请输入模型编码' }]}
           disabled={!!currentRecord}
+          colProps={{ span: 12 }}
+        />
+        <ProFormText
+          name="modelVersion"
+          label="模型版本"
+          placeholder="请输入模型版本号，如：deepseek-chat"
+          tooltip="可选字段，用于标识具体的模型版本"
+          colProps={{ span: 12 }}
         />
         <ProFormText
           name="modelName"
           label="模型名称"
           placeholder="请输入模型名称"
           rules={[{ required: true, message: '请输入模型名称' }]}
+          colProps={{ span: 12 }}
         />
         <ProFormSelect
           name="provider"
@@ -317,6 +383,7 @@ const ModelConfigManagement: React.FC = () => {
             value,
           }))}
           rules={[{ required: true, message: '请选择供应商' }]}
+          colProps={{ span: 12 }}
         />
         <ProFormSelect
           name="modelType"
@@ -326,18 +393,34 @@ const ModelConfigManagement: React.FC = () => {
             value,
           }))}
           rules={[{ required: true, message: '请选择模型类型' }]}
+          colProps={{ span: 12 }}
+        />
+        <ProFormDigit
+          name="priority"
+          label="优先级"
+          placeholder="请输入优先级"
+          rules={[{ required: true, message: '请输入优先级' }]}
+          fieldProps={{ precision: 0 }}
+          colProps={{ span: 12 }}
         />
         <ProFormText
           name="apiEndpoint"
           label="API接口地址"
           placeholder="请输入API接口地址"
           rules={[{ required: true, message: '请输入API接口地址' }]}
+          colProps={{ span: 24 }}
         />
-        <ProFormText.Password
+        <ProFormSensitiveField
           name="apiKey"
           label="API密钥"
           placeholder={currentRecord ? '留空则不修改' : '请输入API密钥'}
           rules={currentRecord ? [] : [{ required: true, message: '请输入API密钥' }]}
+          isEdit={!!currentRecord}
+          servicePath="/refinex-platform"
+          tableName="ai_model_config"
+          rowGuid={currentRecord ? String(currentRecord.id) : undefined}
+          fieldCode="api_key"
+          colProps={{ span: 12 }}
         />
         <ProFormDigit
           name="contextWindow"
@@ -345,6 +428,7 @@ const ModelConfigManagement: React.FC = () => {
           placeholder="请输入上下文窗口大小"
           min={1}
           fieldProps={{ precision: 0 }}
+          colProps={{ span: 12 }}
         />
         <ProFormDigit
           name="maxTokens"
@@ -352,6 +436,7 @@ const ModelConfigManagement: React.FC = () => {
           placeholder="请输入最大输出token数"
           min={1}
           fieldProps={{ precision: 0 }}
+          colProps={{ span: 12 }}
         />
         <ProFormDigit
           name="temperature"
@@ -360,13 +445,15 @@ const ModelConfigManagement: React.FC = () => {
           min={0}
           max={2}
           fieldProps={{ precision: 2, step: 0.1 }}
+          colProps={{ span: 12 }}
         />
         <ProFormDigit
-          name="priority"
-          label="优先级"
-          placeholder="请输入优先级"
-          rules={[{ required: true, message: '请输入优先级' }]}
+          name="sort"
+          label="排序"
+          placeholder="请输入排序值"
           fieldProps={{ precision: 0 }}
+          rules={[{ required: true, message: '请输入排序值' }]}
+          colProps={{ span: 12 }}
         />
         <ProFormRadio.Group
           name="isEnabled"
@@ -376,6 +463,7 @@ const ModelConfigManagement: React.FC = () => {
             { label: '不启用', value: 0 },
           ]}
           rules={[{ required: true, message: '请选择是否启用' }]}
+          colProps={{ span: 12 }}
         />
         <ProFormRadio.Group
           name="status"
@@ -385,8 +473,14 @@ const ModelConfigManagement: React.FC = () => {
             { label: '停用', value: 1 },
           ]}
           rules={[{ required: true, message: '请选择状态' }]}
+          colProps={{ span: 12 }}
         />
-        <ProFormTextArea name="remark" label="备注说明" placeholder="请输入备注说明" />
+        <ProFormTextArea
+          name="remark"
+          label="备注说明"
+          placeholder="请输入备注说明"
+          colProps={{ span: 24 }}
+        />
       </ModalForm>
     </PageContainer>
   );

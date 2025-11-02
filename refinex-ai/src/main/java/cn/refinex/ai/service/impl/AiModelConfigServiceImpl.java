@@ -55,8 +55,8 @@ public class AiModelConfigServiceImpl implements AiModelConfigService {
         }
 
         // 2. 构建实体对象
-        AiModelConfig config = BeanConverter.toBean(request, AiModelConfig.class);;
-        config.setHealthStatus(HealthStatus.HEALTHY.getCode());
+        AiModelConfig config = BeanConverter.toBean(request, AiModelConfig.class);
+        config.setHealthStatus(HealthStatus.HEALTHY.getValue());
         config.setCreateBy(createBy);
         config.setCreateTime(LocalDateTime.now());
         config.setUpdateBy(createBy);

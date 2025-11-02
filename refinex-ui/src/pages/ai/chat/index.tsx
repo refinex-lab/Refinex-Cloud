@@ -46,6 +46,8 @@ import AiBlueIcon from '@/assets/images/ai/ai_blue_icon.svg';
 import MarkdownViewer from '@/components/MarkdownViewer';
 import type { BubbleProps } from '@ant-design/x';
 import { GPTVis } from '@antv/gpt-vis';
+import type { ModelConfig } from '@/services/ai/typings.d';
+import { listAllModelConfigs } from '@/services/ai/model-config';
 
 type BubbleDataType = {
   role: string;
@@ -74,15 +76,7 @@ const DEFAULT_CONVERSATIONS_ITEMS = [
 ];
 
 
-// 模拟的模型数据
-const MOCK_MODELS = [
-  { key: 'gpt-4', label: 'GPT-4', description: 'OpenAI GPT-4' },
-  { key: 'gpt-3.5', label: 'GPT-3.5 Turbo', description: 'OpenAI GPT-3.5' },
-  { key: 'claude-3', label: 'Claude 3', description: 'Anthropic Claude 3' },
-  { key: 'deepseek', label: 'DeepSeek', description: 'DeepSeek AI' },
-];
-
-// 模拟的知识库数据
+// 模拟的知识库数据（暂时保留，后续接入知识库 API）
 const MOCK_KNOWLEDGE_BASES = [
   { key: 'kb-1', label: '产品文档', description: '产品使用文档知识库' },
   { key: 'kb-2', label: '技术规范', description: '技术开发规范知识库' },
@@ -663,8 +657,10 @@ const AIChatPage: React.FC = () => {
   const [siderCollapsed, setSiderCollapsed] = useState(false);
 
   // 模型和知识库选择状态
-  const [selectedModel, setSelectedModel] = useState(MOCK_MODELS[0]);
+  const [availableModels, setAvailableModels] = useState<ModelConfig[]>([]);
+  const [selectedModel, setSelectedModel] = useState<ModelConfig | null>(null);
   const [selectedKnowledgeBase, setSelectedKnowledgeBase] = useState<typeof MOCK_KNOWLEDGE_BASES[0] | null>(null);
+  const [modelsLoading, setModelsLoading] = useState(false);
 
   // 深度思考和联网搜索状态
   const [deepThinkEnabled, setDeepThinkEnabled] = useState(false);
@@ -693,7 +689,7 @@ const AIChatPage: React.FC = () => {
   const [agent] = useXAgent<BubbleDataType>({
     baseURL: 'https://api.deepseek.com/chat/completions',
     model: 'deepseek-reasoner',
-    dangerouslyApiKey: 'Bearer sk-5555ec224cd34d1583dedc1000fb9dba',
+    dangerouslyApiKey: 'Bearer sk-5555ec224',
   });
   const loading = agent.isRequesting();
 
@@ -1370,25 +1366,42 @@ const AIChatPage: React.FC = () => {
       <Flex gap={8} style={{ marginBottom: 8 }}>
         <Dropdown
           menu={{
-            items: MOCK_MODELS.map(model => ({
-              key: model.key,
-              label: model.label,
+            items: availableModels.length > 0 ? availableModels.map(model => ({
+              key: model.modelCode,
+              label: (
+                <Space>
+                  <span>{model.modelName}</span>
+                  {model.modelVersion && (
+                    <span style={{ fontSize: '12px', color: '#999' }}>
+                      ({model.modelVersion})
+                    </span>
+                  )}
+                </Space>
+              ),
               onClick: () => setSelectedModel(model),
-            })),
+            })) : [
+              {
+                key: 'empty',
+                label: '暂无可用模型',
+                disabled: true,
+              }
+            ],
           }}
           trigger={['click']}
+          disabled={modelsLoading || availableModels.length === 0}
         >
           <Button
             type="text"
-            icon={<RobotOutlined />}
+            icon={modelsLoading ? <Spin size="small" /> : <RobotOutlined />}
             style={{
               padding: '4px 12px',
               height: 'auto',
               fontSize: '13px',
               color: '#666',
             }}
+            loading={modelsLoading}
           >
-            {selectedModel.label}
+            {selectedModel ? selectedModel.modelName : '选择模型'}
             <DownOutlined style={{ fontSize: '10px', marginLeft: '4px' }} />
           </Button>
         </Dropdown>
@@ -1472,6 +1485,37 @@ const AIChatPage: React.FC = () => {
       </Suggestion>
     </div>
   );
+
+  // 🌟 加载可用模型列表
+  useEffect(() => {
+    const fetchModels = async () => {
+      setModelsLoading(true);
+      try {
+        const response = await listAllModelConfigs();
+        if (response.code === 200 && response.data) {
+          // 只显示已启用且状态正常的模型
+          const enabledModels = response.data.filter(
+            (model) => model.isEnabled === 1 && model.status === 0
+          );
+          // 按优先级排序
+          enabledModels.sort((a, b) => b.priority - a.priority);
+          setAvailableModels(enabledModels);
+
+          // 设置默认选中第一个模型
+          if (enabledModels.length > 0 && !selectedModel) {
+            setSelectedModel(enabledModels[0]);
+          }
+        }
+      } catch (error) {
+        console.error('加载模型列表失败:', error);
+        message.error('加载模型列表失败');
+      } finally {
+        setModelsLoading(false);
+      }
+    };
+
+    fetchModels();
+  }, []);
 
   useEffect(() => {
     // history mock

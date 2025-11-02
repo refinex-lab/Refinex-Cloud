@@ -400,6 +400,7 @@ const PromptTemplateManagement: React.FC = () => {
           label="排序"
           placeholder="请输入排序值"
           fieldProps={{ precision: 0 }}
+          rules={[{ required: true, message: '请输入排序值' }]}
         />
         <ProFormTextArea name="remark" label="备注说明" placeholder="请输入备注说明" />
       </ModalForm>

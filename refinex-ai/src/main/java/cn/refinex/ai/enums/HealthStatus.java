@@ -15,29 +15,19 @@ import lombok.Getter;
 public enum HealthStatus {
 
     /**
-     * 健康（模型正常运行）
-     */
-    HEALTHY("HEALTHY", "健康"),
-
-    /**
-     * 亚健康（模型可用但性能下降）
-     */
-    DEGRADED("DEGRADED", "亚健康"),
-
-    /**
      * 不健康（模型不可用）
      */
-    UNHEALTHY("UNHEALTHY", "不健康"),
+    UNHEALTHY(0, "不健康"),
 
     /**
-     * 未知（未进行健康检查或检查失败）
+     * 健康（模型正常运行）
      */
-    UNKNOWN("UNKNOWN", "未知");
+    HEALTHY(1, "健康");
 
     /**
-     * 状态代码
+     * 状态值
      */
-    private final String code;
+    private final Integer value;
 
     /**
      * 状态描述
@@ -45,21 +35,21 @@ public enum HealthStatus {
     private final String description;
 
     /**
-     * 根据代码获取枚举
+     * 根据状态值获取枚举
      *
-     * @param code 状态代码
+     * @param value 状态值
      * @return 枚举
      */
-    public static HealthStatus fromCode(String code) {
-        if (code == null) {
-            return UNKNOWN;
+    public static HealthStatus fromValue(Integer value) {
+        if (value == null) {
+            return HEALTHY; // 默认为健康
         }
         for (HealthStatus status : values()) {
-            if (status.getCode().equals(code)) {
+            if (status.getValue().equals(value)) {
                 return status;
             }
         }
-        return UNKNOWN;
+        return HEALTHY;
     }
 
     /**
@@ -77,7 +67,7 @@ public enum HealthStatus {
      * @return 是否可用
      */
     public boolean isAvailable() {
-        return this == HEALTHY || this == DEGRADED;
+        return this == HEALTHY;
     }
 
     /**
@@ -86,7 +76,7 @@ public enum HealthStatus {
      * @return 是否需要告警
      */
     public boolean needsAlert() {
-        return this == UNHEALTHY || this == DEGRADED;
+        return this == UNHEALTHY;
     }
 }
 

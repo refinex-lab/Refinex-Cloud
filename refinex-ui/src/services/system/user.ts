@@ -1,5 +1,6 @@
 import { request } from '@umijs/max';
 import type { ApiResponse, PageResult, PageParams } from '@/services/typings';
+import { decryptSensitiveData as commonDecryptSensitiveData } from '@/services/common';
 
 /** 用户列表项 */
 export interface UserListItem {
@@ -169,13 +170,10 @@ export async function deleteUser(userId: number) {
 }
 
 /**
- * 解密敏感数据
+ * 解密敏感数据（用户服务专用）
  */
 export async function decryptSensitiveData(params: SensitiveDecryptRequest) {
-  return request<ApiResponse<SensitiveDecryptResponse>>(`${API_PREFIX}/common/sensitive/decrypt`, {
-    method: 'POST',
-    data: params,
-  });
+  return commonDecryptSensitiveData('/refinex-platform', params);
 }
 
 /**

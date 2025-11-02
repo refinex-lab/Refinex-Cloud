@@ -95,8 +95,8 @@ public class AiModelConfig {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastHealthCheckTime;
 
-    @Schema(description = "健康状态", example = "HEALTHY", allowableValues = {"HEALTHY", "DEGRADED", "UNHEALTHY", "UNKNOWN"})
-    private String healthStatus;
+    @Schema(description = "健康状态:0异常,1正常", example = "1")
+    private Integer healthStatus;
 
     @Schema(description = "是否启用:0否,1是", example = "1")
     private Integer isEnabled;

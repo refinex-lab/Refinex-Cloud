@@ -5,6 +5,7 @@ import type {
   RoleUserResponse,
   RoleUserQueryParams,
 } from './typings';
+import { decryptSensitiveData as commonDecryptSensitiveData } from '@/services/common';
 
 const API_PREFIX = '/refinex-platform/roles';
 
@@ -38,16 +39,13 @@ export async function queryRoleUsers(roleId: number, params: RoleUserQueryParams
 }
 
 /**
- * 解密敏感数据
+ * 解密敏感数据（角色用户专用）
  */
 export async function decryptRoleUserSensitiveData(params: {
   tableName: string;
   rowGuid: string;
   fieldCode: string;
 }) {
-  return request<ApiResponse<{ plainValue: string }>>('/refinex-platform/common/sensitive/decrypt', {
-    method: 'POST',
-    data: params,
-  });
+  return commonDecryptSensitiveData('/refinex-platform', params);
 }
 

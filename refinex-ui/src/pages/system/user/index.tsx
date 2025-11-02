@@ -1,7 +1,7 @@
-import { EyeOutlined, EditOutlined, DeleteOutlined, LockOutlined, PlusOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, LockOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { Button, message, Popconfirm, Tag, Space, Tooltip, Modal, Form, Input, Select, Avatar } from 'antd';
+import { Button, message, Popconfirm, Tag, Modal, Form, Input, Select, Avatar } from 'antd';
 import React, { useRef, useState } from 'react';
 import {
   getUserList,
@@ -9,12 +9,12 @@ import {
   updateUserStatus,
   adminResetPassword,
   deleteUser,
-  decryptSensitiveData,
   registerUser,
   type UserListItem,
 } from '@/services/system/user';
 import { listDictDataByTypeCode } from '@/services/system';
 import { useEffect } from 'react';
+import SensitiveField from '@/components/SensitiveField';
 
 const { Option } = Select;
 
@@ -27,9 +27,6 @@ const UserManagement: React.FC = () => {
   const [createForm] = Form.useForm();
   const [form] = Form.useForm();
   const [passwordForm] = Form.useForm();
-
-  // 存储已解密的敏感数据: { userId_fieldCode: plainValue }
-  const [decryptedData, setDecryptedData] = useState<Record<string, string>>({});
 
   // 动态字典数据
   const [userStatusEnum, setUserStatusEnum] = useState<Record<string, { text: string; color: string }>>({});
@@ -169,37 +166,6 @@ const UserManagement: React.FC = () => {
   useEffect(() => {
     loadDictionaries();
   }, []);
-
-  // 查看敏感数据明文 - 局部更新显示
-  const handleViewSensitive = async (userId: number, fieldCode: string) => {
-    const cacheKey = `${userId}_${fieldCode}`;
-
-    // 如果已经解密过，则不再请求
-    if (decryptedData[cacheKey]) {
-      return;
-    }
-
-    try {
-      const response = await decryptSensitiveData({
-        tableName: 'sys_user',
-        rowGuid: String(userId),
-        fieldCode,
-      });
-
-      if (response?.data?.plainValue) {
-        // 更新已解密数据状态，触发表格重新渲染
-        setDecryptedData(prev => ({
-          ...prev,
-          [cacheKey]: response.data.plainValue,
-        }));
-        message.success('明文已显示');
-      }
-      // 错误提示由全局错误处理器统一处理
-    } catch (error) {
-      // 静默处理，错误提示由全局错误处理器统一处理
-      console.error('获取明文失败:', error);
-    }
-  };
 
   // 新增用户
   const handleCreate = () => {
@@ -369,24 +335,18 @@ const UserManagement: React.FC = () => {
       dataIndex: 'mobile',
       width: 180,
       render: (_, record) => {
-        const cacheKey = `${record.id}_mobile`;
-        const plainValue = decryptedData[cacheKey];
-        const displayValue = plainValue || record.mobile || '-';
-
+        if (!record.mobile) {
+          return <span style={{ color: '#999' }}>-</span>;
+        }
         return (
-          <Space>
-            <span style={{ color: plainValue ? '#52c41a' : undefined }}>
-              {displayValue}
-            </span>
-            {record.mobile && !plainValue && (
-              <Tooltip title="查看明文">
-                <EyeOutlined
-                  style={{ cursor: 'pointer', color: '#1890ff' }}
-                  onClick={() => handleViewSensitive(record.id, 'mobile')}
-                />
-              </Tooltip>
-            )}
-          </Space>
+          <SensitiveField
+            maskedValue={record.mobile}
+            servicePath="/refinex-platform"
+            tableName="sys_user"
+            rowGuid={String(record.id)}
+            fieldCode="mobile"
+            copyable={true}
+          />
         );
       },
     },
@@ -395,24 +355,18 @@ const UserManagement: React.FC = () => {
       dataIndex: 'email',
       width: 200,
       render: (_, record) => {
-        const cacheKey = `${record.id}_email`;
-        const plainValue = decryptedData[cacheKey];
-        const displayValue = plainValue || record.email || '-';
-
+        if (!record.email) {
+          return <span style={{ color: '#999' }}>-</span>;
+        }
         return (
-          <Space>
-            <span style={{ color: plainValue ? '#52c41a' : undefined }}>
-              {displayValue}
-            </span>
-            {record.email && !plainValue && (
-              <Tooltip title="查看明文">
-                <EyeOutlined
-                  style={{ cursor: 'pointer', color: '#1890ff' }}
-                  onClick={() => handleViewSensitive(record.id, 'email')}
-                />
-              </Tooltip>
-            )}
-          </Space>
+          <SensitiveField
+            maskedValue={record.email}
+            servicePath="/refinex-platform"
+            tableName="sys_user"
+            rowGuid={String(record.id)}
+            fieldCode="email"
+            copyable={true}
+          />
         );
       },
     },
@@ -573,9 +527,6 @@ const UserManagement: React.FC = () => {
           </Button>,
         ]}
         request={async (params) => {
-          // 每次刷新或查询时，清空已解密的敏感数据缓存
-          setDecryptedData({});
-
           const response = await getUserList({
             username: params.username,
             nickname: params.nickname,

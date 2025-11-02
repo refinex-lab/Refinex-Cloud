@@ -71,7 +71,7 @@ export interface ModelConfigCreateRequest {
   isEnabled: number;
   priority: number;
   remark?: string;
-  sort?: number;
+  sort: number;
   status: number;
   extraData?: string;
 }
@@ -100,7 +100,7 @@ export interface ModelConfigUpdateRequest {
   healthCheckUrl?: string;
   priority: number;
   remark?: string;
-  sort?: number;
+  sort: number;
   status: number;
   extraData?: string;
 }
@@ -159,7 +159,7 @@ export interface PromptTemplateCreateRequest {
   isSystem: number;
   isPublic: number;
   remark?: string;
-  sort?: number;
+  sort: number;
   status: number;
   extraData?: string;
 }
@@ -173,7 +173,7 @@ export interface PromptTemplateUpdateRequest {
   applicableModels?: string;
   isPublic: number;
   remark?: string;
-  sort?: number;
+  sort: number;
   status: number;
   extraData?: string;
 }

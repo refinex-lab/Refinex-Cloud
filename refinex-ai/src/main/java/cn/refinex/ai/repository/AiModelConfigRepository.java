@@ -341,7 +341,7 @@ public class AiModelConfigRepository {
             params.put("excludeId", excludeId);
         }
 
-        Long count = jdbcManager.queryObject(sql.toString(), params, Long.class);
+        Long count = jdbcManager.queryLong(sql.toString(), params);
         return count != null && count > 0;
     }
 

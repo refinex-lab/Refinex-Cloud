@@ -14,8 +14,9 @@ import lombok.Data;
 @Schema(description = "模型配置更新请求")
 public class ModelConfigUpdateRequestDTO {
 
+    @NotBlank(message = "模型版本号不能为空")
     @Size(max = 100, message = "模型版本号长度不能超过100")
-    @Schema(description = "模型版本号", example = "qwen-max-2024-01-01")
+    @Schema(description = "模型版本号", example = "deepseek-chat", requiredMode = Schema.RequiredMode.REQUIRED)
     private String modelVersion;
 
     @NotBlank(message = "模型名称不能为空")
@@ -106,7 +107,8 @@ public class ModelConfigUpdateRequestDTO {
     @Schema(description = "备注说明")
     private String remark;
 
-    @Schema(description = "排序字段", example = "0")
+    @NotNull(message = "排序字段不能为空")
+    @Schema(description = "排序字段", example = "0", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer sort;
 
     @NotNull(message = "状态不能为空")
