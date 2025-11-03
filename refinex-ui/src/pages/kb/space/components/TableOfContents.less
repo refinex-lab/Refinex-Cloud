@@ -5,19 +5,16 @@
   align-self: flex-start; // 从顶部开始
   flex-shrink: 0;
   width: 300px; // 从 280px 增加到 300px，给子目录更多空间
-  height: calc(100vh - 112px); // 匹配 editor-body 的高度（减去 header）
-  max-height: calc(100vh - 112px);
-  background: #fff;
+  height: calc(100vh - 50px); // 匹配 editor-body 的高度（减去 header）
+  max-height: calc(100vh - 50px);
   border-left: 1px solid #e8e8e8;
   display: flex;
   flex-direction: column;
   transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-  // box-shadow: -2px 0 8px rgba(0, 0, 0, 0.04);
 
   // 收起状态
   &.collapsed {
     width: 48px;
-    // box-shadow: -2px 0 8px rgba(0, 0, 0, 0.08);
 
     .toc-header {
       justify-content: center;
@@ -33,7 +30,6 @@
     justify-content: space-between;
     padding: 12px 16px;
     border-bottom: 1px solid #f0f0f0;
-    // background: #fafafa;
 
     .toc-title {
       display: flex;
@@ -41,7 +37,6 @@
       gap: 8px;
       font-size: 14px;
       font-weight: 600;
-      color: rgba(0, 0, 0, 0.88);
 
       :global(.anticon) {
         font-size: 16px;
@@ -215,103 +210,94 @@
   }
 }
 
-// 暗色主题支持
-@media (prefers-color-scheme: dark) {
-  .table-of-contents {
-    background: #1f1f1f;
-    border-left-color: #303030;
-    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.25);
+// 暗色模式适配 - 使用 .realDark 选择器
+.realDark .table-of-contents {
+  background: #1f1f1f;
+  border-left-color: #303030;
 
-    &.collapsed {
-      box-shadow: -2px 0 8px rgba(0, 0, 0, 0.35);
+  .toc-header {
+    background: #141414;
+    border-bottom-color: #303030;
+
+    .toc-title {
+      :global(.anticon) {
+        color: #177ddc;
+      }
     }
 
-    .toc-header {
-      background: #141414;
-      border-bottom-color: #303030;
+    :global(.ant-btn-text) {
+      color: rgba(255, 255, 255, 0.45);
 
-      .toc-title {
+      &:hover {
+        color: #177ddc;
+        background: rgba(255, 255, 255, 0.08);
+      }
+    }
+  }
+
+  .toc-content {
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.25);
+      }
+    }
+
+    // 只在 hover 时显示滚动条（暗色主题）
+    &:not(:hover)::-webkit-scrollbar-thumb {
+      background: transparent;
+    }
+  }
+
+  :global(.toc-tree) {
+    :global(.ant-tree-treenode) {
+      &:hover {
+        background: rgba(255, 255, 255, 0.04);
+      }
+    }
+
+    :global(.ant-tree-node-content-wrapper) {
+      &:hover {
+        background: rgba(24, 144, 255, 0.15);
+      }
+
+      &:global(.ant-tree-node-selected) {
+        background: rgba(24, 144, 255, 0.25);
+
+        .toc-item-title {
+          color: #177ddc;
+        }
+      }
+    }
+
+    .toc-item-title {
+      color: rgba(255, 255, 255, 0.88);
+
+      &[data-level='1'] {
         color: rgba(255, 255, 255, 0.88);
-
-        :global(.anticon) {
-          color: #177ddc;
-        }
       }
 
-      :global(.ant-btn-text) {
-        color: rgba(255, 255, 255, 0.45);
-
-        &:hover {
-          color: #177ddc;
-          background: rgba(255, 255, 255, 0.08);
-        }
-      }
-    }
-
-    .toc-content {
-      &::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.15);
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.25);
-        }
+      &[data-level='2'] {
+        color: rgba(255, 255, 255, 0.75);
       }
 
-      // 只在 hover 时显示滚动条（暗色主题）
-      &:not(:hover)::-webkit-scrollbar-thumb {
-        background: transparent;
+      &[data-level='3'] {
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      &[data-level='4'],
+      &[data-level='5'],
+      &[data-level='6'] {
+        color: rgba(255, 255, 255, 0.55);
       }
     }
 
-    :global(.toc-tree) {
-      :global(.ant-tree-treenode) {
-        &:hover {
-          background: rgba(255, 255, 255, 0.04);
-        }
-      }
+    :global(.ant-tree-switcher) {
+      color: rgba(255, 255, 255, 0.45);
 
-      :global(.ant-tree-node-content-wrapper) {
-        &:hover {
-          background: rgba(24, 144, 255, 0.15);
-        }
-
-        &:global(.ant-tree-node-selected) {
-          background: rgba(24, 144, 255, 0.25);
-
-          .toc-item-title {
-            color: #177ddc;
-          }
-        }
-      }
-
-      .toc-item-title {
-        color: rgba(255, 255, 255, 0.88);
-
-        &[data-level='1'] {
-          color: rgba(255, 255, 255, 0.88);
-        }
-
-        &[data-level='2'] {
-          color: rgba(255, 255, 255, 0.75);
-        }
-
-        &[data-level='3'] {
-          color: rgba(255, 255, 255, 0.65);
-        }
-
-        &[data-level='4'],
-        &[data-level='5'],
-        &[data-level='6'] {
-          color: rgba(255, 255, 255, 0.55);
-        }
-      }
-
-      :global(.ant-tree-switcher) {
-        color: rgba(255, 255, 255, 0.45);
-
-        &:hover {
-          color: #177ddc;
-        }
+      &:hover {
+        color: #177ddc;
       }
     }
   }

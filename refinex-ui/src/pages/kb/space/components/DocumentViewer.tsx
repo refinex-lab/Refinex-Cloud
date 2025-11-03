@@ -10,7 +10,6 @@ import {
   CloseOutlined,
   FileMarkdownOutlined,
   CheckOutlined,
-  StopOutlined,
   TagsOutlined,
   HistoryOutlined,
 } from '@ant-design/icons';
@@ -136,11 +135,6 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
 
         <div className="editor-header-right">
           <Space size="middle">
-            {/* 阅读模式标识 */}
-            {/* <Tag color="blue">
-              阅读模式
-            </Tag> */}
-
             {/* 版本历史按钮 */}
             <Button
               icon={<HistoryOutlined />}

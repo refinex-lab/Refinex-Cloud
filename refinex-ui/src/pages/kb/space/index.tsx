@@ -6,17 +6,14 @@ import {
   DeleteOutlined,
   EditOutlined,
   EllipsisOutlined,
-  EyeInvisibleOutlined,
   EyeOutlined,
   FileTextOutlined,
-  FolderOutlined,
   GlobalOutlined,
   LockOutlined,
   PlusOutlined,
   SafetyOutlined,
   SearchOutlined,
   SendOutlined,
-  SettingOutlined,
   StopOutlined,
   UnorderedListOutlined,
   VideoCameraOutlined,
@@ -41,7 +38,6 @@ import {
   Input,
   message,
   Modal,
-  Popconfirm,
   Row,
   Segmented,
   Select,
@@ -533,7 +529,7 @@ const MyContentSpace: React.FC = () => {
     return (
       <Card
         style={{ marginBottom: 16 }}
-        bodyStyle={{ padding: 16 }}
+        styles={{ body: { padding: 16 } }}
         className="space-list-card"
         onClick={() => handleEnterSpace(space)}
       >

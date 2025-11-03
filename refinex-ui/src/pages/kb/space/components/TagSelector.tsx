@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { Tag, Input, Popover, Space, Button, message, Empty, Spin } from 'antd';
-import { PlusOutlined, SearchOutlined, CloseOutlined, CheckOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined, CheckOutlined } from '@ant-design/icons';
 import { pageMyTags } from '@/services/kb/tag';
 import type { ContentTag } from '@/services/kb/tag.d';
 import './TagSelector.less';
@@ -210,7 +210,9 @@ const TagSelector: React.FC<TagSelectorProps> = ({
             title={null}
             trigger="click"
             placement="bottomLeft"
-            overlayClassName="tag-selector-all-overlay"
+            classNames={{
+              root: 'tag-selector-all-overlay',
+            }}
           >
             <Tag
               style={{
@@ -234,7 +236,9 @@ const TagSelector: React.FC<TagSelectorProps> = ({
             open={popoverVisible}
             onOpenChange={setPopoverVisible}
             placement="bottomLeft"
-            overlayClassName="tag-selector-overlay"
+            classNames={{
+              root: 'tag-selector-overlay',
+            }}
           >
             <Tag
               icon={<PlusOutlined />}

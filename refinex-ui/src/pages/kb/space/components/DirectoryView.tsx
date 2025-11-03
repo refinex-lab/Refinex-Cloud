@@ -425,7 +425,7 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
             ]}
           />
         }
-        bordered={false}
+        variant="borderless"
         className="directory-view-card"
       >
         {/* 搜索框 */}

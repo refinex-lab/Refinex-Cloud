@@ -4,10 +4,9 @@
  */
 
 import React, { useState } from 'react';
-import { App, Avatar, Badge, Button, Checkbox, Dropdown, Space, Tag, Tooltip } from 'antd';
+import { App, Badge, Button, Checkbox, Dropdown, Space, Tooltip } from 'antd';
 import type { MenuProps } from 'antd';
 import {
-  CheckCircleFilled,
   ClockCircleOutlined,
   DeleteOutlined,
   EyeOutlined,

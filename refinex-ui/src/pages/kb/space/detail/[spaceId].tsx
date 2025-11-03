@@ -1,17 +1,15 @@
 import {
-  ArrowLeftOutlined,
-  FileTextOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { history, useParams, useLocation } from '@umijs/max';
-import { Button, Card, Empty, Layout, Spin, Typography } from 'antd';
+import { Button, Empty, Layout, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import DirectoryTree from '../components/DirectoryTree';
 import DocumentEditor from '../components/DocumentEditor';
 import DirectoryView from '../components/DirectoryView';
-import type { ContentDirectory, ContentSpaceDetail, ContentTreeNode } from '@/services/kb/typings.d';
+import type { ContentSpaceDetail, ContentTreeNode } from '@/services/kb/typings.d';
 import { getContentSpaceDetail } from '@/services/kb/space';
 import './detail.less';
 
@@ -106,7 +104,7 @@ const SpaceDetail: React.FC = () => {
           theme="light"
           style={{
             overflow: 'hidden',
-            height: 'calc(100vh - 112px)',
+            height: 'calc(100vh - 50px)',
             position: 'sticky',
             top: 0,
             left: 0,
@@ -155,7 +153,7 @@ const SpaceDetail: React.FC = () => {
             <div className="welcome-content">
               <Empty
                 image="/images/welcome-kb.svg"
-                imageStyle={{ height: 200 }}
+                styles={{ image: { height: '200px' } }}
                 description={
                   <div>
                     <Title level={4} style={{ marginBottom: 8 }}>

@@ -3,7 +3,6 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #fff;
   border-radius: 12px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03),
               0 2px 6px rgba(0, 0, 0, 0.02),
@@ -12,8 +11,7 @@
 
   // 顶部工具栏
   .tree-toolbar {
-    padding: 10px;
-    background: #fff;
+    padding: 8px;
     border-bottom: 1px solid #f0f0f0;
     flex-shrink: 0;
 
@@ -27,16 +25,10 @@
       flex: 1;
       border-radius: 8px;
       border: none;
-      background: #f5f5f5;
       transition: all 0.3s ease;
-
-      &:hover {
-        background: #eeeeee;
-      }
 
       &:focus,
       &:focus-within {
-        background: #ffffff;
         box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
         border: 1px solid #1890ff;
       }
@@ -62,8 +54,8 @@
       width: 32px;
       height: 32px;
       min-width: 32px;
+      background: white;
       border: 1px solid #d9d9d9;
-      background: #ffffff;
       border-radius: 8px;
       cursor: pointer;
       color: rgba(0, 0, 0, 0.65);
@@ -91,7 +83,6 @@
   // 底部空间切换器
   .tree-footer {
     padding: 12px;
-    background: #fff;
     border-top: 1px solid #f0f0f0;
     flex-shrink: 0;
 
@@ -103,22 +94,15 @@
       gap: 10px;
       padding: 0 12px;
       border: none;
-      background: linear-gradient(135deg, #f0f8ff 0%, #f5f9ff 100%);
+      background: linear-gradient(135deg, #e1f1ff 0%, #f5f9ff 100%);
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.3s ease;
       box-shadow: 0 1px 2px rgba(24, 144, 255, 0.05);
 
+      // 鼠标经过 立体感增强
       &:hover {
-        background: linear-gradient(135deg, #e6f4ff 0%, #f0f8ff 100%);
         box-shadow: 0 2px 6px rgba(24, 144, 255, 0.12);
-        transform: translateY(-1px);
-      }
-
-      &:active {
-        background: linear-gradient(135deg, #d6ebff 0%, #e6f4ff 100%);
-        box-shadow: 0 1px 3px rgba(24, 144, 255, 0.15);
-        transform: translateY(0);
       }
 
       &:disabled {
@@ -163,7 +147,6 @@
     overflow-y: auto;
     overflow-x: hidden; // 严格禁止水平滚动
     padding: 12px 8px;
-    background: #fff;
 
     // 自定义滚动条
     &::-webkit-scrollbar {
@@ -189,7 +172,6 @@
     height: 32px;
     padding: 0 16px;
     border: 1px solid #d9d9d9;
-    background: #fff;
     border-radius: 6px;
     cursor: pointer;
     color: rgba(0, 0, 0, 0.65);
@@ -472,7 +454,6 @@
     .space-menu-label {
       font-size: 14px;
       font-weight: 500;
-      color: rgba(0, 0, 0, 0.85);
       flex: 1;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -557,7 +538,7 @@
 @media (max-width: 768px) {
   .directory-tree-container {
     .tree-toolbar {
-      padding: 10px;
+      padding: 8px;
 
       .tree-search-input {
         margin-bottom: 8px;
@@ -584,84 +565,82 @@
   }
 }
 
-// 暗色主题支持
-@media (prefers-color-scheme: dark) {
-  .directory-tree-container {
+// 暗色模式适配 - 使用 .realDark 选择器
+.realDark .directory-tree-container {
+  background: #1f1f1f;
+  border-right-color: #303030;
+
+  .tree-toolbar {
+    background: #141414;
+    border-bottom-color: #303030;
+
+    .tree-create-btn {
+      background: #1f1f1f;
+      color: rgba(255, 255, 255, 0.65);
+      border-color: #434343;
+
+      &:hover {
+        background: #111b26;
+        border-color: #177ddc;
+        color: #177ddc;
+      }
+    }
+  }
+
+  .tree-content {
     background: #1f1f1f;
-    border-right-color: #303030;
 
-    .tree-toolbar {
-      background: #141414;
-      border-bottom-color: #303030;
+    &::-webkit-scrollbar-thumb {
+      background: #434343;
 
-      .tree-create-btn {
-        background: #1f1f1f;
-        color: rgba(255, 255, 255, 0.65);
-        border-color: #434343;
+      &:hover {
+        background: #595959;
+      }
+    }
+  }
+}
 
-        &:hover {
-          background: #111b26;
-          border-color: #177ddc;
+.realDark .custom-directory-tree {
+  :global {
+    .ant-tree-treenode {
+      &.ant-tree-treenode-selected {
+        background: #111b26 !important;
+
+        .tree-node-label {
           color: #177ddc;
         }
       }
     }
 
-    .tree-content {
-      background: #1f1f1f;
+    .ant-tree-node-content-wrapper:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
 
-      &::-webkit-scrollbar-thumb {
-        background: #434343;
-
-        &:hover {
-          background: #595959;
-        }
-      }
+    // 暗黑模式下也要隐藏展开/收起图标
+    .ant-tree-switcher {
+      width: 0 !important;
+      min-width: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      display: none !important;
+      pointer-events: none !important;
     }
   }
+}
 
-  .custom-directory-tree {
-    :global {
-      .ant-tree-treenode {
-        &.ant-tree-treenode-selected {
-          background: #111b26 !important;
-
-          .tree-node-label {
-            color: #177ddc;
-          }
-        }
-      }
-
-      .ant-tree-node-content-wrapper:hover {
-        background: rgba(255, 255, 255, 0.08);
-      }
-
-      // 暗黑模式下也要隐藏展开/收起图标
-      .ant-tree-switcher {
-        width: 0 !important;
-        min-width: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        display: none !important;
-        pointer-events: none !important;
-      }
-    }
+.realDark .tree-node-content {
+  .tree-node-icon {
+    color: rgba(255, 255, 255, 0.65);
   }
 
-  .tree-node-content {
-    .tree-node-icon {
-      color: rgba(255, 255, 255, 0.65);
-    }
+  .tree-node-actions .tree-node-more-btn {
+    color: rgba(255, 255, 255, 0.45);
 
-    .tree-node-actions .tree-node-more-btn {
-      color: rgba(255, 255, 255, 0.45);
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.08);
-        color: rgba(255, 255, 255, 0.85);
-      }
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.85);
     }
   }
 }

@@ -4,7 +4,7 @@
  * 深度集成后端 API，支持真实的文档加载、编辑、保存
  */
 import React, { useRef, useState, useEffect } from 'react';
-import { Card, Button, Space, message, Input, Spin, Empty, Tooltip, Tag, Divider } from 'antd';
+import { Card, Button, Space, message, Input, Spin, Empty, Tooltip, Divider } from 'antd';
 import {
   SaveOutlined,
   CloseOutlined,
@@ -283,7 +283,7 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
               onBlur={handleTitleBlur}
               onPressEnter={handleTitleBlur}
               placeholder="请输入文档标题"
-              bordered={false}
+              variant='borderless'
               className="document-title-input"
               style={{ fontSize: 18, fontWeight: 600, width: 300 }}
               disabled={loading}

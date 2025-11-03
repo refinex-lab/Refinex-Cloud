@@ -1,6 +1,5 @@
 import {
   ArrowLeftOutlined,
-  FileTextOutlined,
   LockOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -8,7 +7,7 @@ import {
 } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { history, useParams, useLocation } from '@umijs/max';
-import { Button, Card, Empty, Input, Layout, message, Space, Spin, Typography } from 'antd';
+import { Button, Card, Empty, Input, Layout, message, Space, Typography } from 'antd';
 import React, { useEffect, useState } from 'react';
 import DirectoryTree from './components/DirectoryTree';
 import DocumentEditor from './components/DocumentEditor';
@@ -303,7 +302,7 @@ const ContentSpaceDetail: React.FC = () => {
           theme="light"
           style={{
             overflow: 'hidden',
-            height: 'calc(100vh - 112px)',
+            height: 'calc(100vh - 50px)',
             position: 'sticky',
             top: 0,
             left: 0,

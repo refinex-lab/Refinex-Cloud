@@ -3,19 +3,14 @@
  * 全屏模式，提供专业的版本差异对比体验
  * 使用 GitHub 风格的 unified diff 展示
  */
-
 import React, { useEffect, useState } from 'react';
-import { App, Button, Modal, Space, Statistic, Row, Col, Divider, Tag } from 'antd';
+import { App, Button, Modal, Space, Tag } from 'antd';
 import {
   CloseOutlined,
   SwapOutlined,
-  PlusOutlined,
-  MinusOutlined,
-  EditOutlined,
   FileTextOutlined,
   SyncOutlined,
   CodeOutlined,
-  HistoryOutlined,
   FullscreenOutlined,
   FullscreenExitOutlined,
 } from '@ant-design/icons';

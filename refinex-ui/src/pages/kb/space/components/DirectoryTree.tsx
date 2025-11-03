@@ -18,13 +18,13 @@ import { BsFolder2, BsFolder2Open } from 'react-icons/bs';
 import { IoDocumentTextOutline } from 'react-icons/io5';
 import { FiBox } from 'react-icons/fi';
 import { GrHomeRounded } from 'react-icons/gr';
-import { App, Dropdown, Empty, Input, Modal, Spin, Tag, Tree } from 'antd';
+import { App, Dropdown, Empty, Input, Modal, Spin, Tree } from 'antd';
 import type { MenuProps } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import React, { useEffect, useMemo, useState } from 'react';
 import { history, useLocation } from '@umijs/max';
 import type { ContentSpace, ContentTreeNode } from '@/services/kb/typings.d';
-import { DocumentStatus, TreeNodeType } from '@/services/kb/typings.d';
+import { TreeNodeType } from '@/services/kb/typings.d';
 import {
   deleteDirectory,
   getDirectoryTreeWithDocs,
@@ -619,14 +619,6 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
       iconColor = isSearching && node.title !== nodeData.directoryName ? '#faad14' : '#1890ff';
     } else if (isDocument) {
       IconComponent = IoDocumentTextOutline;
-      // 根据文档状态显示不同颜色
-      // if (nodeData.docStatus === DocumentStatus.DRAFT) {
-      //   iconColor = '#8c8c8c'; // 草稿：灰色
-      // } else if (nodeData.docStatus === DocumentStatus.OFFLINE) {
-      //   iconColor = '#ff4d4f'; // 下架：红色
-      // } else {
-      //   iconColor = '#52c41a'; // 已发布：绿色
-      // }
     }
 
     // 点击节点内容区域
@@ -664,18 +656,6 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
 
           {/* 文字标签 */}
           <span className="tree-node-label">{node.title}</span>
-
-          {/* 文档状态标签 */}
-          {/* {isDocument && nodeData.docStatus === DocumentStatus.DRAFT && (
-            <Tag color="default" style={{ marginLeft: 4, fontSize: 12 }}>
-              草稿
-            </Tag>
-          )}
-          {isDocument && nodeData.docStatus === DocumentStatus.OFFLINE && (
-            <Tag color="error" style={{ marginLeft: 4, fontSize: 12 }}>
-              已下架
-            </Tag>
-          )} */}
         </div>
 
         {/* 操作按钮（始终渲染，通过 opacity 控制显示） */}

@@ -7,13 +7,9 @@
  * - 全部展开/折叠功能
  * - 高亮当前阅读位置
  */
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button, Space, Tooltip, Tree, Empty } from 'antd';
-import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  AlignLeftOutlined,
-} from '@ant-design/icons';
+import { AlignLeftOutlined } from '@ant-design/icons';
 import { LuListCollapse } from 'react-icons/lu';
 import type { DataNode } from 'antd/es/tree';
 import './TableOfContents.less';
