@@ -6,8 +6,8 @@ import {
   DislikeOutlined,
   DownOutlined,
   EditOutlined,
-  FileSearchOutlined,
   FileImageOutlined,
+  FileSearchOutlined,
   FolderOutlined,
   LikeOutlined,
   PaperClipOutlined,
@@ -18,7 +18,8 @@ import {
 } from '@ant-design/icons';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarRightCollapse } from 'react-icons/tb';
+import {TbLayoutSidebarLeftCollapse, TbLayoutSidebarRightCollapse} from 'react-icons/tb';
+import type {BubbleProps} from '@ant-design/x';
 import {
   Actions,
   type ActionsProps,
@@ -27,23 +28,22 @@ import {
   Conversations,
   Sender,
   Suggestion,
-  Welcome,
   useXAgent,
   useXChat,
+  Welcome,
 } from '@ant-design/x';
-import { Button, Divider, Dropdown, Flex, type GetProp, Input, Modal, Space, Spin, Switch, message, theme } from 'antd';
-import { createStyles } from 'antd-style';
+import {Button, Divider, Dropdown, Flex, type GetProp, Input, message, Modal, Space, Spin, Switch, theme} from 'antd';
+import {createStyles} from 'antd-style';
 import dayjs from 'dayjs';
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import AiBlueIcon from '@/assets/images/ai/ai_blue_icon.svg';
 import MarkdownViewer from '@/components/MarkdownViewer';
-import type { BubbleProps } from '@ant-design/x';
-import { GPTVis } from '@antv/gpt-vis';
-import type { ModelConfig, PromptTemplate } from '@/services/ai/typings.d';
-import { listAllModelConfigs } from '@/services/ai/model-config';
-import { listAllPromptTemplates } from '@/services/ai/prompt-template';
-import { listDictDataByTypeCode } from '@/services/system/dictionary';
-import type { DictData } from '@/services/system/typings';
+import {GPTVis} from '@antv/gpt-vis';
+import type {ModelConfig, PromptTemplate} from '@/services/ai/typings.d';
+import {listAllModelConfigs} from '@/services/ai/model-config';
+import {listAllPromptTemplates} from '@/services/ai/prompt-template';
+import {listDictDataByTypeCode} from '@/services/system/dictionary';
+import type {DictData} from '@/services/system/typings';
 
 type BubbleDataType = {
   role: string;
@@ -1519,7 +1519,7 @@ const AIChatPage: React.FC = () => {
         if (response.code === 200 && response.data) {
           // 只显示已启用且状态正常的模型
           const enabledModels = response.data.filter(
-            (model) => model.isEnabled === 1 && model.status === 0
+            (model) => model.isEnabled === 1 && model.status === 1
           );
           // 按优先级排序
           enabledModels.sort((a, b) => b.priority - a.priority);
