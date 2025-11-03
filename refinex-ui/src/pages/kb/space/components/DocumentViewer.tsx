@@ -19,6 +19,7 @@ import { DocumentStatus } from '@/services/kb/typings.d';
 import { getDocumentByGuid } from '@/services/kb/document';
 import MarkdownViewer from '@/components/MarkdownViewer';
 import VersionHistory from './VersionHistory';
+import TableOfContents from './TableOfContents';
 import './DocumentEditor.less';
 
 interface DocumentViewerProps {
@@ -40,6 +41,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerContentRef = useRef<HTMLDivElement>(null);
+  const editorBodyRef = useRef<HTMLDivElement>(null); // 真正的滚动容器
 
   const [loading, setLoading] = useState(false);
   const [document, setDocument] = useState<ContentDocumentDetail | null>(null);
@@ -165,20 +167,31 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
         </div>
       </div>
 
-      {/* 独立的内容区域 */}
-      <div className="editor-content-wrapper" ref={viewerContentRef}>
-        <Spin spinning={loading} tip="加载文档中...">
-          <div className="editor-content">
-            {!loading && document && (
-              <MarkdownViewer
-                content={document.contentBody || ''}
-                enableMermaid={true}
-                enableHighlight={true}
-                emptyText="该文档暂无内容"
-              />
-            )}
-          </div>
-        </Spin>
+      {/* 内容区域和大纲的容器 */}
+      <div className="editor-body" ref={editorBodyRef}>
+        {/* 独立的内容区域 */}
+        <div className="editor-content-wrapper" ref={viewerContentRef}>
+          <Spin spinning={loading} tip="加载文档中...">
+            <div className="editor-content">
+              {!loading && document && (
+                <MarkdownViewer
+                  content={document.contentBody || ''}
+                  enableMermaid={true}
+                  enableHighlight={true}
+                  emptyText="该文档暂无内容"
+                />
+              )}
+            </div>
+          </Spin>
+        </div>
+
+        {/* 右侧大纲（目录） */}
+        {!loading && document && document.contentBody && (
+          <TableOfContents
+            content={document.contentBody}
+            containerRef={editorBodyRef as React.RefObject<HTMLElement>}
+          />
+        )}
       </div>
 
       {/* 版本历史抽屉 */}

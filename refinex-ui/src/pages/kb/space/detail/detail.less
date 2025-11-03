@@ -280,20 +280,27 @@
 .space-detail-content {
   scroll-behavior: smooth;
 
+  // 简约滚动条样式
   &::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #d9d9d9;
-    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+    transition: background 0.2s ease;
 
     &:hover {
-      background: #bfbfbf;
+      background: rgba(0, 0, 0, 0.25);
     }
   }
 
   &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  // 只在 hover 时显示滚动条（更简约）
+  &:not(:hover)::-webkit-scrollbar-thumb {
     background: transparent;
   }
 }

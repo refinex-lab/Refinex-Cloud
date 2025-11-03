@@ -30,6 +30,7 @@ import {
 } from '@/services/kb/document';
 import TagSelector from './TagSelector';
 import VersionHistory from './VersionHistory';
+import TableOfContents from './TableOfContents';
 import './DocumentEditor.less';
 
 interface DocumentEditorProps {
@@ -54,6 +55,7 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
   const editorRef = useRef<MDXEditorMethods>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const editorContentRef = useRef<HTMLDivElement>(null);
+  const editorBodyRef = useRef<HTMLDivElement>(null); // 真正的滚动容器
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [document, setDocument] = useState<ContentDocumentDetail | null>(null);
@@ -360,20 +362,31 @@ const DocumentEditor: React.FC<DocumentEditorProps> = ({
         </div>
       </div>
 
-      {/* 独立的内容区域 */}
-      <div className="editor-content-wrapper" ref={editorContentRef}>
-        <Spin spinning={loading} tip="加载文档中...">
-          <div className="editor-content">
-            {!loading && document && (
-              <MDXEditorWrapper
-                ref={editorRef}
-                markdown={markdown}
-                onChange={handleEditorChange}
-                className="mdx-editor"
-              />
-            )}
-          </div>
-        </Spin>
+      {/* 内容区域和大纲的容器 */}
+      <div className="editor-body" ref={editorBodyRef}>
+        {/* 独立的内容区域 */}
+        <div className="editor-content-wrapper" ref={editorContentRef}>
+          <Spin spinning={loading} tip="加载文档中...">
+            <div className="editor-content">
+              {!loading && document && (
+                <MDXEditorWrapper
+                  ref={editorRef}
+                  markdown={markdown}
+                  onChange={handleEditorChange}
+                  className="mdx-editor"
+                />
+              )}
+            </div>
+          </Spin>
+        </div>
+
+        {/* 右侧大纲（目录） */}
+        {!loading && document && markdown && (
+          <TableOfContents
+            content={markdown}
+            containerRef={editorBodyRef as React.RefObject<HTMLElement>}
+          />
+        )}
       </div>
 
       {/* 版本历史抽屉 */}
