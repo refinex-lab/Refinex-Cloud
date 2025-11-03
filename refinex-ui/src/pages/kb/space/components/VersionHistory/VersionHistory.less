@@ -201,3 +201,118 @@
     }
   }
 }
+
+// ==================== 暗色模式适配 ====================
+.realDark {
+  .version-history-drawer {
+    .version-history-container {
+      background: #141414;
+
+      // 左侧版本列表区域
+      .version-list-section {
+        background: #1f1f1f;
+        border-right-color: #303030;
+
+        // 对比模式提示条
+        .version-compare-hint {
+          background: linear-gradient(90deg, #111b26 0%, #0d1117 100%);
+          border-bottom-color: #15395b;
+          color: #91d5ff;
+        }
+
+        // 搜索栏
+        .version-search {
+          background: #1f1f1f;
+          border-bottom-color: #303030;
+
+          :global {
+            .ant-input-affix-wrapper {
+              background: #262626;
+              border-color: #434343;
+              color: rgba(255, 255, 255, 0.85);
+
+              &:hover,
+              &:focus,
+              &:focus-within {
+                border-color: #177ddc;
+                box-shadow: 0 2px 8px rgba(23, 125, 220, 0.25);
+              }
+
+              .ant-input {
+                background: transparent;
+                color: rgba(255, 255, 255, 0.85);
+
+                &::placeholder {
+                  color: rgba(255, 255, 255, 0.45);
+                }
+              }
+
+              .anticon {
+                color: rgba(255, 255, 255, 0.45);
+              }
+            }
+          }
+        }
+
+        // 版本列表容器
+        .version-list-wrapper {
+          background: #1f1f1f;
+
+          &::-webkit-scrollbar-thumb {
+            background: #434343;
+
+            &:hover {
+              background: #595959;
+            }
+          }
+        }
+
+        // 分页器
+        .version-pagination {
+          background: #1f1f1f;
+          border-top-color: #303030;
+        }
+      }
+
+      // 右侧版本详情面板
+      .version-detail-section {
+        background: #141414;
+      }
+    }
+
+    // 标题栏暗色适配
+    :global {
+      .ant-drawer-header {
+        background: #1f1f1f;
+        border-bottom-color: #303030;
+
+        .ant-drawer-title {
+          color: rgba(255, 255, 255, 0.88);
+        }
+
+        .ant-drawer-close {
+          color: rgba(255, 255, 255, 0.45);
+
+          &:hover {
+            color: rgba(255, 255, 255, 0.85);
+          }
+        }
+      }
+
+      .ant-drawer-body {
+        background: #141414;
+      }
+    }
+  }
+
+  // 响应式暗色适配
+  @media (max-width: 768px) {
+    .version-history-drawer {
+      .version-history-container {
+        .version-list-section {
+          border-bottom-color: #303030;
+        }
+      }
+    }
+  }
+}

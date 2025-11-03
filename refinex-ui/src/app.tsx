@@ -18,6 +18,7 @@ import LayoutWrapper from '@/components/AICopilot/LayoutWrapper';
 import AIAssistantEntry from '@/components/AIAssistantEntry';
 import TabsLayout from '@/components/TabsLayout';
 import RouteListener from '@/components/TabsLayout/RouteListener';
+import ThemeProvider from '@/components/ThemeProvider';
 import { getCurrentUser } from '@/services/auth';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
@@ -168,23 +169,25 @@ export const layout: RunTimeLayoutConfig = ({
     childrenRender: (children) => {
       // if (initialState?.loading) return <PageLoading />;
       return (
-        <LayoutWrapper>
-          <RouteListener />
-          {children}
-          {isDev && (
-            <SettingDrawer
-              disableUrlParams
-              enableDarkTheme
-              settings={initialState?.settings}
-              onSettingChange={(settings) => {
-                setInitialState((preInitialState) => ({
-                  ...preInitialState,
-                  settings,
-                }));
-              }}
-            />
-          )}
-        </LayoutWrapper>
+        <ThemeProvider>
+          <LayoutWrapper>
+            <RouteListener />
+            {children}
+            {isDev && (
+              <SettingDrawer
+                disableUrlParams
+                enableDarkTheme
+                settings={initialState?.settings}
+                onSettingChange={(settings) => {
+                  setInitialState((preInitialState) => ({
+                    ...preInitialState,
+                    settings,
+                  }));
+                }}
+              />
+            )}
+          </LayoutWrapper>
+        </ThemeProvider>
       );
     },
     ...initialState?.settings,

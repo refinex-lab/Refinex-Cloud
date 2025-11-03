@@ -126,3 +126,98 @@ div[class*='_toolbarRoot_'] {
   box-shadow: none !important;
   border-radius: 0 !important;
 }
+
+// ==================== 全局滚动条样式 ====================
+// 亮色模式滚动条（默认）
+::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #bfbfbf;
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+
+  &:hover {
+    background: #8c8c8c;
+    background-clip: content-box;
+  }
+}
+
+::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 5px;
+}
+
+// Firefox 滚动条
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #bfbfbf #f0f0f0;
+}
+
+// 暗色模式滚动条 - 支持多种暗色模式选择器
+html.realDark,
+body.realDark,
+html[data-theme='dark'],
+html[data-prefers-color='dark'] {
+  ::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #434343;
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+
+    &:hover {
+      background: #595959;
+      background-clip: content-box;
+    }
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #1a1a1a;
+    border-radius: 5px;
+  }
+
+  // Firefox 滚动条
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #434343 #1a1a1a;
+  }
+}
+
+// 暗色模式下，对所有滚动条元素应用暗色样式（更高优先级）
+.realDark {
+  ::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #434343;
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+
+    &:hover {
+      background: #595959;
+      background-clip: content-box;
+    }
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #1a1a1a;
+    border-radius: 5px;
+  }
+
+  // Firefox 滚动条
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #434343 #1a1a1a;
+  }
+}

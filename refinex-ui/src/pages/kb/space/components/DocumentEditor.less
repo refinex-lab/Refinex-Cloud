@@ -48,6 +48,7 @@
     .editor-tags {
       display: flex;
       align-items: center;
+      background: transparent;
     }
   }
 
@@ -262,6 +263,148 @@
 
       .document-title-input {
         width: 100% !important;
+      }
+    }
+  }
+}
+
+// ==================== 暗色模式适配 ====================
+.realDark {
+  .document-editor-container {
+    background: #141414;
+
+    .editor-header {
+      border-bottom-color: #303030;
+
+      .document-title-input {
+        color: rgba(255, 255, 255, 0.88);
+
+        &:hover,
+        &:focus {
+          background: #262626;
+        }
+      }
+    }
+
+    .editor-body {
+      background: #141414;
+    }
+
+    .editor-content-wrapper {
+      background: #141414;
+
+      .editor-content {
+        .mdx-editor {
+          :global {
+            .mdxeditor {
+              background: #141414;
+
+              // 工具栏暗色适配
+              .mdxeditor-toolbar,
+              [class*='toolbarRoot'],
+              [class*='_toolbarRoot_'],
+              div[class*='toolbar'] {
+                background-color: #1f1f1f !important;
+                border-bottom-color: #303030 !important;
+
+                --baseBg: #1f1f1f;
+              }
+
+              // 内容区域暗色适配
+              .mdxeditor-root-contenteditable {
+                background: #141414;
+                color: rgba(255, 255, 255, 0.88);
+
+                // 标题样式暗色适配
+                h1, h2, h3, h4, h5, h6 {
+                  color: rgba(255, 255, 255, 0.95);
+                }
+
+                h1 {
+                  border-bottom-color: #303030;
+                }
+
+                h2 {
+                  border-bottom-color: #303030;
+                }
+
+                // 段落暗色适配
+                p {
+                  color: rgba(255, 255, 255, 0.85);
+                }
+
+                // 代码块暗色适配
+                pre {
+                  background: #1f1f1f;
+                  border-color: #303030;
+                }
+
+                code {
+                  background: #262626;
+                  color: #ff7875;
+                }
+
+                pre code {
+                  background: transparent;
+                  color: #abb2bf;
+                }
+
+                // 引用块暗色适配
+                blockquote {
+                  border-left-color: #177ddc;
+                  background: rgba(23, 125, 220, 0.08);
+                  color: rgba(255, 255, 255, 0.85);
+                }
+
+                // 表格暗色适配
+                table {
+                  border-color: #303030;
+                }
+
+                th, td {
+                  border-color: #303030;
+                  color: rgba(255, 255, 255, 0.85);
+                }
+
+                th {
+                  background: #262626;
+                  color: rgba(255, 255, 255, 0.95);
+                }
+
+                tr:nth-child(even) {
+                  background: #1f1f1f;
+                }
+
+                tr:hover {
+                  background: #262626;
+                }
+
+                // 链接暗色适配
+                a {
+                  color: #91d5ff;
+
+                  &:hover {
+                    color: #bae7ff;
+                  }
+
+                  &:active {
+                    color: #69c0ff;
+                  }
+                }
+
+                // 分割线暗色适配
+                hr {
+                  background: linear-gradient(90deg, transparent 0%, #303030 50%, transparent 100%);
+                }
+
+                // 删除线暗色适配
+                del {
+                  color: rgba(255, 255, 255, 0.45);
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

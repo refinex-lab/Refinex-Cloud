@@ -316,3 +316,133 @@
     }
   }
 }
+
+// ==================== 暗色模式适配 ====================
+.realDark {
+  .version-timeline {
+    .version-item {
+      background: #1f1f1f;
+      border-color: #303030;
+
+      &:hover {
+        border-color: #177ddc;
+        box-shadow: 0 2px 8px rgba(23, 125, 220, 0.15);
+        background: #262626;
+      }
+
+      // 当前版本暗色适配
+      &.current {
+        background: linear-gradient(135deg, #162312 0%, #1f1f1f 100%);
+        border-color: #274916;
+        box-shadow: 0 1px 4px rgba(73, 170, 25, 0.15);
+
+        .version-card-body .version-header .version-number {
+          color: #95de64;
+        }
+      }
+
+      // 选中状态暗色适配
+      &.selected {
+        border-color: #177ddc;
+        box-shadow: 0 2px 8px rgba(23, 125, 220, 0.25);
+        background: linear-gradient(135deg, #111b26 0%, #1f1f1f 100%);
+      }
+
+      // 对比选中暗色适配
+      &.compare-selected {
+        border-color: #642ab5;
+        box-shadow: 0 2px 8px rgba(100, 42, 181, 0.25);
+        background: linear-gradient(135deg, #1d1028 0%, #1f1f1f 100%);
+      }
+
+      .version-card-body {
+        .version-header {
+          .version-number {
+            color: #91d5ff;
+          }
+
+          :global {
+            .ant-badge-status {
+              .ant-badge-status-text {
+                color: #95de64;
+              }
+            }
+
+            .ant-btn-text {
+              color: rgba(255, 255, 255, 0.65);
+
+              &:hover {
+                color: #177ddc;
+                background: #262626;
+              }
+            }
+          }
+        }
+
+        .version-meta {
+          .meta-item {
+            &.time {
+              color: rgba(255, 255, 255, 0.65);
+            }
+
+            &.author {
+              color: rgba(255, 255, 255, 0.88);
+
+              :global {
+                .anticon {
+                  color: #177ddc;
+                }
+              }
+            }
+          }
+        }
+
+        .version-footer {
+          // 变更说明暗色适配
+          .change-remark {
+            background: #262626;
+            border-color: #303030;
+            color: rgba(255, 255, 255, 0.75);
+
+            &:hover {
+              background: #2a2a2a;
+              border-color: #434343;
+            }
+          }
+
+          // 统计信息暗色适配
+          .version-stats {
+            .word-count {
+              background: #262626;
+              border-color: #303030;
+              color: rgba(255, 255, 255, 0.75);
+            }
+
+            .word-diff {
+              &.positive {
+                color: #95de64;
+                background: #162312;
+                border-color: #274916;
+              }
+
+              &.negative {
+                color: #ff7875;
+                background: #2a1215;
+                border-color: #531d1f;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // 空状态暗色适配
+    :global {
+      .ant-empty {
+        .ant-empty-description {
+          color: rgba(255, 255, 255, 0.65);
+        }
+      }
+    }
+  }
+}

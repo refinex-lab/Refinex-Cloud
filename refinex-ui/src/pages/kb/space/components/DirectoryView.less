@@ -649,3 +649,218 @@
     background: #bfbfbf;
   }
 }
+
+// ==================== 暗色模式适配 ====================
+.realDark {
+  .directory-view-container {
+    .directory-view-card {
+      background: #1f1f1f;
+
+      .ant-card-head {
+        background: #141414;
+        border-bottom-color: #303030;
+      }
+
+      .ant-card-body {
+        background: #1f1f1f;
+
+        &::-webkit-scrollbar-track {
+          background: #262626;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: #434343;
+
+          &:hover {
+            background: #595959;
+          }
+        }
+      }
+    }
+
+    // 搜索框暗色适配
+    .directory-view-search {
+      :global {
+        .ant-input-search {
+          .ant-input {
+            background: #262626;
+            border-color: #434343;
+            color: rgba(255, 255, 255, 0.85);
+
+            &::placeholder {
+              color: rgba(255, 255, 255, 0.45);
+            }
+
+            &:hover {
+              border-color: #595959;
+            }
+
+            &:focus {
+              border-color: #177ddc;
+              box-shadow: 0 0 0 3px rgba(23, 125, 220, 0.15);
+            }
+          }
+
+          .ant-input-search-button {
+            background: #262626;
+            border-color: #434343;
+            color: rgba(255, 255, 255, 0.65);
+
+            &:hover {
+              background: #177ddc;
+              border-color: #177ddc;
+              color: #fff;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 卡片视图暗色适配
+  .document-card {
+    background: #1f1f1f;
+    border-color: #303030;
+
+    &:hover {
+      border-color: #177ddc;
+      box-shadow: 0 2px 8px rgba(23, 125, 220, 0.25);
+      background: #262626;
+    }
+
+    .document-card-cover {
+      background: linear-gradient(135deg, #111b26 0%, #0d1117 50%, #1f1f1f 100%);
+      color: #177ddc;
+    }
+
+    .document-card-cover-image {
+      background: #262626;
+    }
+
+    // 标签悬浮层暗色适配
+    .document-card-tags-overlay {
+      .tags-cloud-indicator {
+        background: rgba(23, 125, 220, 0.85);
+        box-shadow: 0 2px 8px rgba(23, 125, 220, 0.4);
+
+        &:hover {
+          background: rgba(23, 125, 220, 1);
+          box-shadow: 0 4px 12px rgba(23, 125, 220, 0.5);
+        }
+      }
+
+      .tags-popover-content {
+        background: rgba(31, 31, 31, 0.98);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+
+        &::before {
+          background: rgba(31, 31, 31, 0.98);
+          box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.15);
+        }
+      }
+    }
+
+    .document-card-title {
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    .document-summary {
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    .document-meta {
+      border-top-color: #303030;
+      border-bottom-color: #303030;
+    }
+
+    .document-author {
+      .ant-avatar {
+        background: linear-gradient(135deg, #177ddc 0%, #1890ff 100%);
+      }
+
+      .ant-typography {
+        color: rgba(255, 255, 255, 0.85);
+      }
+    }
+
+    .document-stats {
+      color: rgba(255, 255, 255, 0.65);
+
+      span:hover {
+        color: #177ddc;
+      }
+    }
+  }
+
+  // 列表视图暗色适配
+  .document-list-view {
+    .document-list-item {
+      background: #1f1f1f;
+      border-color: #303030 !important;
+
+      &:hover {
+        border-color: #177ddc !important;
+        background: #111b26;
+        box-shadow: 0 2px 8px rgba(23, 125, 220, 0.15);
+      }
+
+      .ant-list-item-meta,
+      .ant-list-item-extra {
+        background: #1f1f1f;
+      }
+
+      &:hover .ant-list-item-meta,
+      &:hover .ant-list-item-extra {
+        background: #111b26;
+      }
+    }
+
+    .document-list-icon {
+      background: linear-gradient(135deg, #111b26 0%, #0d1117 100%);
+      color: #177ddc;
+    }
+
+    .document-list-title {
+      color: rgba(255, 255, 255, 0.88);
+
+      .document-list-item:hover & {
+        color: #177ddc;
+      }
+    }
+
+    .document-list-description {
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    .document-list-meta {
+      .ant-avatar {
+        background: linear-gradient(135deg, #177ddc 0%, #1890ff 100%);
+      }
+
+      .ant-typography {
+        color: rgba(255, 255, 255, 0.85);
+      }
+    }
+
+    .document-list-stats {
+      color: rgba(255, 255, 255, 0.65);
+
+      span:hover {
+        color: #177ddc;
+      }
+    }
+
+    .document-list-cover {
+      background: #262626;
+      border-color: #303030;
+    }
+  }
+
+  // 空状态暗色适配
+  .document-empty-state {
+    .ant-empty-description {
+      color: rgba(255, 255, 255, 0.45);
+    }
+  }
+}

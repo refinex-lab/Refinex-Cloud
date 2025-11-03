@@ -322,3 +322,149 @@
   }
 }
 
+// ============================================
+// 10. 暗色模式适配
+// ============================================
+
+.realDark {
+  // 搜索框暗色适配
+  .space-search-input {
+    background: #262626;
+
+    &:hover,
+    &:focus {
+      background: #303030;
+    }
+
+    .ant-input {
+      color: rgba(255, 255, 255, 0.85);
+
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.45);
+      }
+    }
+
+    .ant-input-clear-icon {
+      color: rgba(255, 255, 255, 0.45);
+    }
+  }
+
+  // 创建按钮暗色适配
+  .create-space-btn {
+    border-color: #434343 !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+
+    &:hover {
+      background: #262626 !important;
+      border-color: #595959 !important;
+      color: #fff !important;
+    }
+
+    &:active {
+      background: #303030 !important;
+    }
+  }
+
+  // 空间卡片暗色适配
+  .space-card,
+  .space-list-card {
+    background: #1f1f1f;
+    border-color: #303030;
+
+    &:hover {
+      border-color: #177ddc;
+      background: #262626;
+    }
+
+    .ant-card-body {
+      background: #1f1f1f;
+    }
+
+    .ant-card-actions {
+      background: #1f1f1f;
+      border-top-color: #303030;
+    }
+  }
+
+  // 状态标签暗色适配
+  .space-status-tag {
+    &.published {
+      background: #162312;
+      color: #73d13d;
+      border-color: #274916;
+    }
+
+    &.unpublished {
+      background: #262626;
+      color: rgba(255, 255, 255, 0.65);
+      border-color: #434343;
+    }
+  }
+
+  // 访问权限标签暗色适配
+  .space-access-tag {
+    &.public {
+      background: #111b26;
+      color: #91d5ff;
+      border-color: #15395b;
+    }
+
+    &.private {
+      background: #262626;
+      color: rgba(255, 255, 255, 0.85);
+      border-color: #434343;
+    }
+
+    &.limited {
+      background: #2b2111;
+      color: #ffc53d;
+      border-color: #594214;
+    }
+  }
+
+  // 卡片元信息暗色适配
+  .ant-card-meta-title {
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  .ant-card-meta-description {
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  // 统计信息暗色适配
+  .ant-statistic {
+    .ant-statistic-title {
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .ant-statistic-content {
+      color: rgba(255, 255, 255, 0.85);
+    }
+  }
+
+  // 空状态暗色适配
+  .ant-empty {
+    .ant-empty-description {
+      color: rgba(255, 255, 255, 0.45);
+    }
+  }
+
+  // Segmented 组件暗色适配
+  .ant-segmented {
+    background: #262626;
+
+    .ant-segmented-item {
+      color: rgba(255, 255, 255, 0.65);
+
+      &:hover {
+        color: #177ddc;
+      }
+    }
+
+    .ant-segmented-item-selected {
+      background: #177ddc;
+      color: #fff;
+    }
+  }
+}
+
