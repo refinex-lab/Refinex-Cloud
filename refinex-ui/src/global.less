@@ -50,6 +50,227 @@ body,
     sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
+// ==================== 主题切换过渡动画 ====================
+// 参考业界优秀实践：GitHub、VS Code、Ant Design、macOS
+// 支持：View Transitions API（现代浏览器）+ CSS 过渡（兼容方案）
+
+// CSS 变量：允许动态配置动画参数
+:root {
+  --theme-transition-duration: 400ms;
+  --theme-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// ========== 1. View Transitions API（Chrome 111+, Edge 111+）==========
+@supports (view-transition-name: root) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: var(--theme-transition-duration);
+    animation-timing-function: var(--theme-transition-easing);
+    mix-blend-mode: normal;
+  }
+
+  // === fade 效果：仅淡入淡出，无缩放 ===
+  html[data-transition-effect='fade'] {
+    ::view-transition-old(root) {
+      animation-name: theme-fade-out-only;
+    }
+
+    ::view-transition-new(root) {
+      animation-name: theme-fade-in-only;
+    }
+  }
+
+  // === scale 效果：淡入淡出 + 缩放（默认）===
+  html[data-transition-effect='scale'] {
+    ::view-transition-old(root) {
+      animation-name: theme-fade-out-scale;
+    }
+
+    ::view-transition-new(root) {
+      animation-name: theme-fade-in-scale;
+    }
+  }
+
+  // === slide 效果：淡入淡出 + 滑动 ===
+  html[data-transition-effect='slide'] {
+    ::view-transition-old(root) {
+      animation-name: theme-fade-out-slide;
+    }
+
+    ::view-transition-new(root) {
+      animation-name: theme-fade-in-slide;
+    }
+  }
+
+  // === none 效果：无动画 ===
+  html[data-transition-effect='none'] {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+    }
+  }
+
+  // ===== 动画关键帧定义 =====
+
+  // fade only: 仅透明度变化
+  @keyframes theme-fade-out-only {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes theme-fade-in-only {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  // scale: 透明度 + 缩放（类似 GitHub）
+  @keyframes theme-fade-out-scale {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+  }
+
+  @keyframes theme-fade-in-scale {
+    from {
+      opacity: 0;
+      transform: scale(1.02);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  // slide: 透明度 + 滑动
+  @keyframes theme-fade-out-slide {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes theme-fade-in-slide {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+// ========== 2. 传统 CSS 过渡（兼容方案：Safari、Firefox、旧版浏览器）==========
+html {
+  &.theme-transitioning {
+    // 为所有元素添加平滑的颜色过渡
+    *,
+    *::before,
+    *::after {
+      transition:
+        background-color var(--theme-transition-duration) var(--theme-transition-easing),
+        color var(--theme-transition-duration) var(--theme-transition-easing),
+        border-color var(--theme-transition-duration) var(--theme-transition-easing),
+        box-shadow var(--theme-transition-duration) var(--theme-transition-easing),
+        fill var(--theme-transition-duration) var(--theme-transition-easing),
+        stroke var(--theme-transition-duration) var(--theme-transition-easing) !important;
+
+      // 保留原有的 transform、opacity 等属性的过渡，避免覆盖
+      transition-property: background-color, color, border-color, box-shadow, fill, stroke;
+    }
+
+    // 淡入淡出效果
+    &[data-transition-effect='fade'] {
+      animation: theme-body-fade var(--theme-transition-duration) var(--theme-transition-easing);
+    }
+
+    // 缩放效果
+    &[data-transition-effect='scale'] body {
+      animation: theme-body-scale var(--theme-transition-duration) var(--theme-transition-easing);
+    }
+
+    // 滑动效果
+    &[data-transition-effect='slide'] body {
+      animation: theme-body-slide var(--theme-transition-duration) var(--theme-transition-easing);
+    }
+  }
+}
+
+// 传统方式的动画关键帧
+@keyframes theme-body-fade {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes theme-body-scale {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes theme-body-slide {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-10px);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// ========== 3. 尊重用户系统设置（无障碍）==========
+@media (prefers-reduced-motion: reduce) {
+  // 如果用户偏好减少动画，禁用所有过渡效果
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}
+
 .colorWeak {
   filter: invert(80%);
 }
