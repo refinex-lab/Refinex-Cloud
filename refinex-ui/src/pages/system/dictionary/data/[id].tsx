@@ -171,8 +171,7 @@ const DictionaryDataList: React.FC = () => {
   return (
     <PageContainer
       header={{
-        title: dictName,
-        onBack: () => history.push('/system/dictionary')
+        title: false
       }}
     >
       <ProTable<DictData>
