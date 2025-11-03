@@ -34,8 +34,14 @@ build/
 !.vscode/settings.json
 !.vscode/launch.json
 
+### Cursor ###
+.cursor/
+
 ### Mac OS ###
 .DS_Store
+
+### Project Documentation ###
+CLAUDE.md
 
 # Logs
 logs
