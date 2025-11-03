@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #fff;
+  // background: #fff;
   overflow: hidden;
 
   // ==================== 顶部工具栏（去除渐变，对齐高度） ====================
@@ -81,7 +81,7 @@
 
     .markdown-body {
       padding: 32px 40px;
-      background: #ffffff;
+      // background: #ffffff;
       border: 1px solid #e8e8e8;
       border-radius: 10px;
       min-height: 400px;
@@ -523,6 +523,210 @@
             font-size: 0.8em;
             color: #8c8c8c;
           }
+        }
+      }
+    }
+  }
+}
+
+// ==================== 暗色模式适配 ====================
+.realDark {
+  .version-detail-panel {
+    background: #141414;
+
+    // 顶部工具栏暗色适配
+    .detail-panel-header {
+      background: #1f1f1f;
+      border-bottom-color: #303030;
+
+      .header-info {
+        :global {
+          .ant-typography {
+            color: rgba(255, 255, 255, 0.88);
+          }
+        }
+      }
+    }
+
+    // 主内容区域暗色适配
+    .detail-panel-body {
+      background: #141414;
+
+      &::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #434343 0%, #303030 100%);
+
+        &:hover {
+          background: linear-gradient(180deg, #595959 0%, #434343 100%);
+        }
+      }
+    }
+
+    // 内容预览区域暗色适配
+    .detail-content-preview {
+      .markdown-body {
+        background: #1f1f1f;
+        border-color: #303030;
+        color: rgba(255, 255, 255, 0.88);
+
+        // 标题暗色适配
+        h1, h2, h3, h4, h5, h6 {
+          color: rgba(255, 255, 255, 0.95);
+        }
+
+        h1 {
+          border-bottom-color: #303030;
+        }
+
+        h2 {
+          border-bottom-color: #303030;
+        }
+
+        h6 {
+          color: rgba(255, 255, 255, 0.75);
+        }
+
+        // 段落暗色适配
+        p {
+          color: rgba(255, 255, 255, 0.85);
+        }
+
+        // 强调样式暗色适配
+        strong {
+          color: rgba(255, 255, 255, 0.95);
+        }
+
+        em {
+          color: rgba(255, 255, 255, 0.75);
+        }
+
+        // 行内代码暗色适配
+        code {
+          background: linear-gradient(135deg, #262626 0%, #2a2a2a 100%);
+          border-color: #303030;
+          color: #ff7875;
+        }
+
+        // 代码块暗色适配
+        pre {
+          background: linear-gradient(135deg, #1f1f1f 0%, #1a1a1a 100%);
+          border-color: #0d0d0d;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+
+          code {
+            background: transparent;
+            border: none;
+            color: #abb2bf;
+          }
+
+          &::-webkit-scrollbar {
+            height: 8px;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            background: #434343;
+
+            &:hover {
+              background: #595959;
+            }
+          }
+        }
+
+        // 引用块暗色适配
+        blockquote {
+          background: linear-gradient(135deg, #111b26 0%, #0d1117 100%);
+          border-left-color: #177ddc;
+          color: rgba(255, 255, 255, 0.88);
+          box-shadow: 0 2px 4px rgba(23, 125, 220, 0.15);
+
+          p {
+            color: rgba(255, 255, 255, 0.88);
+          }
+
+          code {
+            background: rgba(38, 38, 38, 0.7);
+            border-color: #15395b;
+          }
+        }
+
+        // 列表暗色适配
+        ul, ol {
+          li {
+            color: rgba(255, 255, 255, 0.85);
+
+            &::marker {
+              color: #177ddc;
+            }
+          }
+        }
+
+        // 表格暗色适配
+        table {
+          border-color: #303030;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+          th, td {
+            border-color: #303030;
+            color: rgba(255, 255, 255, 0.85);
+          }
+
+          th {
+            background: linear-gradient(135deg, #262626 0%, #1f1f1f 100%);
+            color: rgba(255, 255, 255, 0.95);
+            border-bottom-color: #434343;
+          }
+
+          tr {
+            &:nth-child(even) {
+              background: #1a1a1a;
+            }
+
+            &:hover {
+              background: #111b26;
+            }
+          }
+
+          code {
+            background: #1a1a1a;
+          }
+        }
+
+        // 图片暗色适配
+        img {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+
+          &:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+          }
+        }
+
+        // 链接暗色适配
+        a {
+          color: #91d5ff;
+          border-bottom-color: transparent;
+
+          &:hover {
+            color: #bae7ff;
+            border-bottom-color: #bae7ff;
+          }
+
+          &:active {
+            color: #69c0ff;
+          }
+        }
+
+        // 分割线暗色适配
+        hr {
+          background: linear-gradient(90deg, transparent 0%, #303030 50%, transparent 100%);
+        }
+
+        // 删除线暗色适配
+        del {
+          color: rgba(255, 255, 255, 0.45);
+        }
+
+        // 任务列表暗色适配
+        input[type='checkbox'] {
+          filter: invert(1) hue-rotate(180deg);
         }
       }
     }

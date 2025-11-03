@@ -89,7 +89,7 @@ public class AiPromptTemplateController {
     @Parameter(name = "category", description = "模板分类")
     @Parameter(name = "type", description = "模板类型：SYSTEM,USER")
     @Parameter(name = "isPublic", description = "是否公开：0否,1是")
-    @Parameter(name = "status", description = "状态：0正常,1停用")
+    @Parameter(name = "status", description = "状态：1正常,0停用")
     @Parameter(name = "keyword", description = "关键词（搜索模板名称和编码）")
     @Parameter(name = "orderBy", description = "排序字段")
     @Parameter(name = "orderDirection", description = "排序方向：ASC 或 DESC")
@@ -130,7 +130,7 @@ public class AiPromptTemplateController {
     @LogOperation(operateDesc = "切换模板状态", operationType = OperateTypeEnum.UPDATE)
     @Operation(summary = "切换模板状态", description = "启用或停用指定的提示词模板")
     @Parameter(name = "id", description = "模板 ID", required = true)
-    @Parameter(name = "status", description = "状态：0正常,1停用", required = true)
+    @Parameter(name = "status", description = "状态：1正常,0停用", required = true)
     public ApiResult<Boolean> toggleTemplateStatus(
             @PathVariable("id") Long id,
             @RequestParam("status") Integer status) {

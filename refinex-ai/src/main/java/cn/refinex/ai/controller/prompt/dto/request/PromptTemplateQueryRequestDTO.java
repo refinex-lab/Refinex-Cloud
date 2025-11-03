@@ -22,7 +22,7 @@ public class PromptTemplateQueryRequestDTO {
     @Schema(description = "是否公开:0否,1是", example = "1")
     private Integer isPublic;
 
-    @Schema(description = "状态:0正常,1停用", example = "0")
+    @Schema(description = "状态:1正常,0停用", example = "1")
     private Integer status;
 
     @Schema(description = "关键词（搜索模板名称和编码）", example = "写作")

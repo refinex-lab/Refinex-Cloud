@@ -81,9 +81,9 @@ const RoleManagement: React.FC = () => {
           stOptions.push({ label: item.dictLabel, value: numValue });
 
           let status = 'Default';
-          if (item.dictValue === '0') {
+          if (item.dictValue === '1') {
             status = 'Success';
-          } else if (item.dictValue === '1') {
+          } else if (item.dictValue === '0') {
             status = 'Error';
           }
 
@@ -150,7 +150,7 @@ const RoleManagement: React.FC = () => {
 
   // 变更角色状态
   const handleStatusChange = async (record: RoleResponse, checked: boolean) => {
-    const newStatus = checked ? 0 : 1;
+    const newStatus = checked ? 1 : 0;
     try {
       await updateRoleStatus(record.id, newStatus);
       message.success(checked ? '角色已启用' : '角色已停用');
@@ -196,10 +196,10 @@ const RoleManagement: React.FC = () => {
         <Space>
           {renderStatusTag(record.status)}
           <Switch
-            checked={record.status === 0}
+            checked={record.status === 1}
             disabled={record.isBuiltin === 1}
             onChange={(checked) => handleStatusChange(record, checked)}
-            checkedChildren="启用"
+            checkedChildren="正常"
             unCheckedChildren="停用"
             size="small"
           />
@@ -331,12 +331,7 @@ const RoleManagement: React.FC = () => {
     <PageContainer
       header={{
         title: false,
-        breadcrumb: {
-          items: [
-            { path: '/system', title: '系统管理' },
-            { title: '角色管理' },
-          ],
-        },
+        subTitle: false
       }}
     >
       <ProTable<RoleResponse>

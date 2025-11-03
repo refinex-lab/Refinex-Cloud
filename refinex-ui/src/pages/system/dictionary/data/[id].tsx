@@ -49,8 +49,8 @@ const DictionaryDataList: React.FC = () => {
 
   // 状态枚举
   const statusEnum = {
-    0: { text: intl.formatMessage({ id: 'pages.system.dictionary.status.normal' }), status: 'Success' },
-    1: { text: intl.formatMessage({ id: 'pages.system.dictionary.status.disabled' }), status: 'Default' },
+    1: { text: intl.formatMessage({ id: 'pages.system.dictionary.status.normal' }), status: 'Success' },
+    0: { text: intl.formatMessage({ id: 'pages.system.dictionary.status.disabled' }), status: 'Default' },
   };
 
   // 字典数据列表列定义
@@ -99,8 +99,8 @@ const DictionaryDataList: React.FC = () => {
       valueEnum: statusEnum,
       render: (_, record) => (
         <Badge
-          status={record.status === 0 ? 'success' : 'default'}
-          text={statusEnum[record.status as 0 | 1]?.text}
+          status={record.status === 1 ? 'success' : 'default'}
+          text={statusEnum[record.status as 1 | 0]?.text}
         />
       ),
     },
@@ -171,28 +171,13 @@ const DictionaryDataList: React.FC = () => {
   return (
     <PageContainer
       header={{
-        title: dictName,
-        onBack: () => history.push('/system/dictionary'),
-        breadcrumb: {
-          items: [
-            {
-              path: '/system',
-              title: intl.formatMessage({ id: 'menu.system' }),
-            },
-            {
-              path: '/system/dictionary',
-              title: intl.formatMessage({ id: 'menu.system.dictionary' }),
-            },
-            {
-              title: intl.formatMessage({ id: 'pages.system.dictionary.data.title' }),
-            },
-          ],
-        },
+        title: false
       }}
     >
       <ProTable<DictData>
         actionRef={actionRef}
         rowKey="id"
+        cardBordered
         search={{
           labelWidth: 'auto',
           span: 6,
@@ -335,7 +320,7 @@ const DictionaryDataList: React.FC = () => {
           }
         }}
         key={currentData?.id || Date.now()}
-        initialValues={currentData ? { ...currentData } : { dictTypeId, status: 0, isDefault: 0, dictSort: initialDictSort }}
+        initialValues={currentData ? { ...currentData } : { dictTypeId, status: 1, isDefault: 0, dictSort: initialDictSort }}
         grid
         rowProps={{ gutter: 16 }}
         onFinish={async (values) => {
@@ -416,8 +401,8 @@ const DictionaryDataList: React.FC = () => {
           name="status"
           label={intl.formatMessage({ id: 'pages.system.dictionary.form.status.label' })}
           options={[
-            { label: intl.formatMessage({ id: 'pages.system.dictionary.form.status.normal' }), value: 0 },
-            { label: intl.formatMessage({ id: 'pages.system.dictionary.form.status.disabled' }), value: 1 },
+            { label: intl.formatMessage({ id: 'pages.system.dictionary.form.status.normal' }), value: 1 },
+            { label: intl.formatMessage({ id: 'pages.system.dictionary.form.status.disabled' }), value: 0 },
           ]}
         />
         <ProFormTextArea

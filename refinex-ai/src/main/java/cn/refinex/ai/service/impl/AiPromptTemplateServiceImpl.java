@@ -12,6 +12,8 @@ import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
 import cn.refinex.common.utils.object.BeanConverter;
+import cn.refinex.common.utils.pinyin.PinyinUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,13 +46,21 @@ public class AiPromptTemplateServiceImpl implements AiPromptTemplateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Long createTemplate(PromptTemplateCreateRequestDTO request, Long createBy) {
-        // 1. 检查模板编码是否已存在
-        if (templateRepository.checkTemplateCodeExists(request.getTemplateCode(), null)) {
-            throw new BusinessException("模板编码已存在：" + request.getTemplateCode());
+        // 1. 自动生成模板编码（如果未提供）
+        String templateCode = request.getTemplateCode();
+        if (StrUtil.isBlank(templateCode)) {
+            templateCode = generateTemplateCode(request.getTemplateName());
+            log.info("自动生成模板编码：{} -> {}", request.getTemplateName(), templateCode);
         }
 
-        // 2. 构建实体对象
+        // 2. 检查模板编码是否已存在
+        if (templateRepository.checkTemplateCodeExists(templateCode, null)) {
+            throw new BusinessException("模板编码已存在：" + templateCode);
+        }
+
+        // 3. 构建实体对象
         AiPromptTemplate template = BeanConverter.toBean(request, AiPromptTemplate.class);
+        template.setTemplateCode(templateCode);
         // 初始版本号为 1
         template.setVersionNumber(1);
         template.setCreatorId(createBy);
@@ -68,13 +78,58 @@ public class AiPromptTemplateServiceImpl implements AiPromptTemplateService {
             template.setSort(0);
         }
 
-        // 3. 插入数据库
+        // 4. 插入数据库
         long id = templateRepository.insert(template);
         if (id <= 0) {
             throw new BusinessException("创建提示词模板失败");
         }
 
         return id;
+    }
+
+    /**
+     * 根据模板名称生成唯一的模板编码
+     * <p>
+     * 规则：
+     * 1. 提取中文首字母（大写）
+     * 2. 如果编码已存在，则追加数字后缀（_1, _2, ...）
+     * 3. 最大长度限制为 50 字符
+     *
+     * @param templateName 模板名称
+     * @return 唯一的模板编码
+     */
+    private String generateTemplateCode(String templateName) {
+        if (StrUtil.isBlank(templateName)) {
+            throw new BusinessException("模板名称不能为空");
+        }
+
+        // 提取首字母并转大写
+        String baseCode = PinyinUtil.toFirstLettersUpperCase(templateName);
+        
+        // 如果全是非中文字符，直接转大写
+        if (StrUtil.isBlank(baseCode) || baseCode.equals(templateName)) {
+            baseCode = templateName.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
+        }
+        
+        // 限制基础编码长度（留出空间给后缀）
+        if (baseCode.length() > 45) {
+            baseCode = baseCode.substring(0, 45);
+        }
+
+        // 检查编码是否已存在，如果存在则追加数字后缀
+        String finalCode = baseCode;
+        int suffix = 1;
+        while (templateRepository.checkTemplateCodeExists(finalCode, null)) {
+            finalCode = baseCode + "_" + suffix;
+            suffix++;
+            
+            // 防止无限循环
+            if (suffix > 1000) {
+                throw new BusinessException("无法生成唯一的模板编码，请手动指定");
+            }
+        }
+
+        return finalCode;
     }
 
     /**

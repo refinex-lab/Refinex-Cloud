@@ -2,9 +2,7 @@ package cn.refinex.ai.converter;
 
 import cn.refinex.ai.controller.prompt.dto.response.PromptTemplateResponseDTO;
 import cn.refinex.ai.entity.AiPromptTemplate;
-import org.mapstruct.Mapper;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 
 /**
  * 提示词模板转换接口

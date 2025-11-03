@@ -28,7 +28,7 @@ public class SysPermissionQueryRequestDTO {
     @Schema(description = "父权限ID")
     private Long parentId;
 
-    @Schema(description = "状态：0正常,1停用")
+    @Schema(description = "状态：1正常,0停用")
     private Integer status;
 }
 

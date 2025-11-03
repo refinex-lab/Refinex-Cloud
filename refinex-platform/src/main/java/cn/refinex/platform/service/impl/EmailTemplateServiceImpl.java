@@ -1,5 +1,6 @@
 package cn.refinex.platform.service.impl;
 
+import cn.refinex.common.constants.SystemStatusConstants;
 import cn.refinex.common.exception.SystemException;
 import cn.refinex.common.json.utils.JsonUtils;
 import cn.refinex.common.utils.algorithm.SnowflakeIdGenerator;
@@ -189,7 +190,7 @@ public class EmailTemplateServiceImpl implements EmailTemplateService {
         EmailTemplate template = getTemplateByCode(templateCode);
 
         // 2. 检查模板状态
-        if (Objects.nonNull(template.getStatus()) && template.getStatus() == 1) {
+        if (Objects.nonNull(template.getStatus()) && template.getStatus().equals(SystemStatusConstants.DISABLE_VALUE)) {
             log.error("模板已停用: code={}", templateCode);
             throw new SystemException("邮件模板已停用");
         }

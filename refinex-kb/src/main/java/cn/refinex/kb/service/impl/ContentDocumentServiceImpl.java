@@ -1,6 +1,7 @@
 package cn.refinex.kb.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+import cn.refinex.common.constants.SystemStatusConstants;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.jdbc.page.PageRequest;
@@ -95,7 +96,7 @@ public class ContentDocumentServiceImpl implements ContentDocumentService {
         document.setVersion(0);
 
         if (document.getStatus() == null) {
-            document.setStatus(0);
+            document.setStatus(SystemStatusConstants.NORMAL_VALUE);
         }
         if (document.getSort() == null) {
             document.setSort(0);

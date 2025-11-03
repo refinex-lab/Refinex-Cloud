@@ -179,7 +179,7 @@ public class EmailTemplateRepository {
             """;
 
         Map<String, Object> params = Map.of("templateCode", templateCode);
-        Integer count = jdbcManager.queryObject(sql, params, Integer.class);
+        Integer count = jdbcManager.queryInt(sql, params);
         return count != null && count > 0;
     }
 }

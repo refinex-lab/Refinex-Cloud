@@ -3,6 +3,7 @@ package cn.refinex.kb.service.impl;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.crypto.digest.BCrypt;
+import cn.refinex.common.constants.SystemStatusConstants;
 import cn.refinex.common.domain.ApiResult;
 import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.exception.SystemException;
@@ -81,7 +82,7 @@ public class ContentSpaceServiceImpl implements ContentSpaceService {
         space.setUpdateTime(LocalDateTime.now());
         space.setDeleted(0);
         space.setVersion(0);
-        space.setStatus(0);
+        space.setStatus(SystemStatusConstants.NORMAL_VALUE);
 
         // 处理访问密码加密
         if (Objects.equals(request.getAccessType(), AccessType.PASSWORD_PROTECTED.getCode())) {

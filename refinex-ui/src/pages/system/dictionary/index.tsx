@@ -40,8 +40,8 @@ const DictionaryTypeList: React.FC = () => {
 
   // 状态枚举
   const statusEnum = {
-    0: { text: intl.formatMessage({ id: 'pages.system.dictionary.status.normal' }), status: 'Success' },
-    1: { text: intl.formatMessage({ id: 'pages.system.dictionary.status.disabled' }), status: 'Default' },
+    1: { text: intl.formatMessage({ id: 'pages.system.dictionary.status.normal' }), status: 'Success' },
+    0: { text: intl.formatMessage({ id: 'pages.system.dictionary.status.disabled' }), status: 'Default' },
   };
 
   // 字典类型列表列定义
@@ -82,8 +82,8 @@ const DictionaryTypeList: React.FC = () => {
       valueEnum: statusEnum,
       render: (_, record) => (
         <Badge
-          status={record.status === 0 ? 'success' : 'default'}
-          text={statusEnum[record.status as 0 | 1]?.text}
+          status={record.status === 1 ? 'success' : 'default'}
+          text={statusEnum[record.status as 1 | 0]?.text}
         />
       ),
     },
@@ -259,7 +259,7 @@ const DictionaryTypeList: React.FC = () => {
           }
         }}
         key={currentType?.id || Date.now()}
-        initialValues={currentType ? { ...currentType } : { status: 0, dictSort: initialDictSort }}
+        initialValues={currentType ? { ...currentType } : { status: 1, dictSort: initialDictSort }}
         onFinish={async (values) => {
           try {
             if (currentType) {
@@ -322,8 +322,8 @@ const DictionaryTypeList: React.FC = () => {
           name="status"
           label={intl.formatMessage({ id: 'pages.system.dictionary.form.status.label' })}
           options={[
-            { label: intl.formatMessage({ id: 'pages.system.dictionary.form.status.normal' }), value: 0 },
-            { label: intl.formatMessage({ id: 'pages.system.dictionary.form.status.disabled' }), value: 1 },
+            { label: intl.formatMessage({ id: 'pages.system.dictionary.form.status.normal' }), value: 1 },
+            { label: intl.formatMessage({ id: 'pages.system.dictionary.form.status.disabled' }), value: 0 },
           ]}
         />
         <ProFormTextArea

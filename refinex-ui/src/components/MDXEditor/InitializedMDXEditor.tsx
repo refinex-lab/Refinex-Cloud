@@ -248,68 +248,86 @@ const count = ref(0)
                 <UndoRedo />
                 <Separator />
 
-                {/* 文本格式 */}
-                <BoldItalicUnderlineToggles />
-                <CodeToggle />
-                <Separator />
-
-                {/* 块类型选择 */}
-                <BlockTypeSelect />
-                <Separator />
-
-                {/* 列表 */}
-                <ListsToggle />
-                <Separator />
-
-                {/* 链接和图片 */}
-                <CreateLink />
-                <InsertImage />
-                <Separator />
-
-                {/* 表格、分隔线、代码块 */}
-                <InsertTable />
-                <InsertThematicBreak />
-                <InsertCodeBlock />
-                <Separator />
-
-                {/* Admonitions 提示框 */}
-                <InsertAdmonition />
-                <Separator />
-
-                {/* Sandpack 实时代码编辑器 */}
-                <InsertSandpack />
-                <Separator />
-
-                {/* Front-matter */}
-                <InsertFrontmatter />
-                <Separator />
-
-                {/* 搜索 */}
-                <SearchButton />
-                <Separator />
-
-                {/* 条件工具栏：根据编辑器焦点动态显示 */}
+                {/* 条件工具栏：根据编辑器模式动态显示不同的工具组合 */}
                 <ConditionalContents
                   options={[
                     {
-                      // 代码块聚焦时显示语言切换
+                      // 源码模式 / Diff 模式：只显示切换按钮
+                      when: (editor) =>
+                        editor?.editorType === 'source' || editor?.editorType === 'diff',
+                      contents: () => (
+                        <DiffSourceToggleWrapper>
+                          <></>
+                        </DiffSourceToggleWrapper>
+                      ),
+                    },
+                    {
+                      // 代码块聚焦时：只显示语言切换
                       when: (editor) => editor?.editorType === 'codeblock',
                       contents: () => <ChangeCodeMirrorLanguage />,
                     },
                     {
-                      // Admonition 聚焦时显示类型切换
+                      // Sandpack 聚焦时：只显示 Sandpack 信息
+                      when: (editor) => editor?.editorType === 'sandpack',
+                      contents: () => <ShowSandpackInfo />,
+                    },
+                    {
+                      // Admonition 聚焦时：显示类型切换
                       when: (editor) => editor?.editorType === 'directive',
                       contents: () => <ChangeAdmonitionType />,
                     },
                     {
-                      // Sandpack 聚焦时显示信息
-                      when: (editor) => editor?.editorType === 'sandpack',
-                      contents: () => <ShowSandpackInfo />,
+                      // 默认模式：显示所有常规编辑工具（when 始终返回 true 作为 fallback）
+                      when: () => true,
+                      contents: () => (
+                        <>
+                          {/* 文本格式 */}
+                          <BoldItalicUnderlineToggles />
+                          <CodeToggle />
+                          <Separator />
+
+                          {/* 块类型选择 */}
+                          <BlockTypeSelect />
+                          <Separator />
+
+                          {/* 列表 */}
+                          <ListsToggle />
+                          <Separator />
+
+                          {/* 链接和图片 */}
+                          <CreateLink />
+                          <InsertImage />
+                          <Separator />
+
+                          {/* 表格、分隔线、代码块 */}
+                          <InsertTable />
+                          <InsertThematicBreak />
+                          <InsertCodeBlock />
+                          <Separator />
+
+                          {/* Admonitions 提示框 */}
+                          <InsertAdmonition />
+                          <Separator />
+
+                          {/* Sandpack 实时代码编辑器 */}
+                          <InsertSandpack />
+                          <Separator />
+
+                          {/* Front-matter */}
+                          <InsertFrontmatter />
+                          <Separator />
+
+                          {/* 搜索 */}
+                          <SearchButton />
+                        </>
+                      ),
                     },
                   ]}
                 />
 
-                {/* 源码模式切换 */}
+                <Separator />
+
+                {/* 源码模式切换按钮（始终显示在最右侧） */}
                 <DiffSourceToggleWrapper>
                   <></>
                 </DiffSourceToggleWrapper>

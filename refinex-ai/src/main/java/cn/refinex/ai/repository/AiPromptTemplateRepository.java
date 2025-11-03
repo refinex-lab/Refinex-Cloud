@@ -228,7 +228,7 @@ public class AiPromptTemplateRepository {
             params.put("excludeId", excludeId);
         }
 
-        Long count = jdbcManager.queryObject(sql.toString(), params, Long.class);
+        Integer count = jdbcManager.queryInt(sql.toString(), params);
         return count != null && count > 0;
     }
 

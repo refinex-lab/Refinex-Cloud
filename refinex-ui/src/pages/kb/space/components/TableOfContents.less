@@ -1,0 +1,310 @@
+// 文档大纲（目录）组件样式
+.table-of-contents {
+  position: sticky;
+  top: 0;
+  align-self: flex-start; // 从顶部开始
+  flex-shrink: 0;
+  width: 300px; // 从 280px 增加到 300px，给子目录更多空间
+  height: calc(100vh - 50px); // 匹配 editor-body 的高度（减去 header）
+  max-height: calc(100vh - 50px);
+  border-left: 1px solid #e8e8e8;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+  // 收起状态
+  &.collapsed {
+    width: 48px;
+
+    .toc-header {
+      justify-content: center;
+      padding: 12px 8px;
+    }
+  }
+
+  // 头部
+  .toc-header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+
+    .toc-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+
+      :global(.anticon) {
+        font-size: 16px;
+        color: #1890ff;
+      }
+    }
+
+    :global(.ant-btn-text) {
+      color: rgba(0, 0, 0, 0.45);
+
+      &:hover {
+        color: #1890ff;
+        background: rgba(0, 0, 0, 0.04);
+      }
+    }
+  }
+
+  // 内容区域
+  .toc-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 8px 0;
+
+    // 简约滚动条样式
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 3px;
+      transition: background 0.2s ease;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.25);
+      }
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    // 只在 hover 时显示滚动条（更简约）
+    &:not(:hover)::-webkit-scrollbar-thumb {
+      background: transparent;
+    }
+  }
+
+  // 目录树样式
+  :global(.toc-tree) {
+    background: transparent;
+    font-size: 13px;
+
+    // Tree 节点样式
+    :global(.ant-tree-treenode) {
+      padding: 0;
+      align-items: flex-start;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.02);
+      }
+    }
+
+    // 树节点内容
+    :global(.ant-tree-node-content-wrapper) {
+      flex: 1;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      line-height: 1.6;
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+
+      &:hover {
+        background: rgba(24, 144, 255, 0.08);
+      }
+
+      // 选中状态
+      &:global(.ant-tree-node-selected) {
+        background: rgba(24, 144, 255, 0.12);
+
+        .toc-item-title {
+          color: #1890ff;
+          font-weight: 500;
+        }
+      }
+    }
+
+    // 标题样式
+    .toc-item-title {
+      color: rgba(0, 0, 0, 0.88);
+      word-break: break-word;
+      line-height: 1.6;
+      transition: color 0.2s ease;
+      overflow: hidden; // 隐藏溢出文本
+      text-overflow: ellipsis; // 使用省略号
+      display: -webkit-box; // 使用弹性盒子布局
+      -webkit-line-clamp: 2; // 最多显示 2 行
+      line-clamp: 2; // 标准属性
+      -webkit-box-orient: vertical; // 垂直方向
+      word-wrap: break-word; // 允许在单词内换行
+
+      // 根据层级设置字体大小和颜色
+      &[data-level='1'] {
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(0, 0, 0, 0.88);
+      }
+
+      &[data-level='2'] {
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.75);
+      }
+
+      &[data-level='3'] {
+        font-size: 13px;
+        color: rgba(0, 0, 0, 0.65);
+      }
+
+      &[data-level='4'],
+      &[data-level='5'],
+      &[data-level='6'] {
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.55);
+      }
+    }
+
+    // 缩进样式 - 减小缩进
+    :global(.ant-tree-indent) {
+      :global(.ant-tree-indent-unit) {
+        width: 10px; // 从 12px 进一步减小到 10px，减少缩进占用空间
+      }
+    }
+
+    // 展开/折叠图标 - 减小宽度和右边距
+    :global(.ant-tree-switcher) {
+      width: 14px; // 从 16px 减小到 14px
+      margin-right: 2px; // 从 4px 减小到 2px
+      line-height: 28px;
+      color: rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        color: #1890ff;
+      }
+
+      :global(.ant-tree-switcher-icon) {
+        font-size: 10px;
+      }
+    }
+
+    // 调整节点内容位置，减少与图标的间距
+    :global(.ant-tree-treenode) {
+      :global(.ant-tree-node-content-wrapper) {
+        margin-left: -4px; // 向左移动以减少间距
+        padding-right: 12px; // 增加右侧内边距，防止文本太靠边
+      }
+    }
+  }
+}
+
+// 响应式：小屏幕时隐藏大纲
+@media (max-width: 1200px) {
+  .table-of-contents {
+    display: none;
+  }
+}
+
+// 暗色模式适配 - 使用 .realDark 选择器
+.realDark .table-of-contents {
+  border-left-color: #303030;
+
+  .toc-header {
+    background: #141414;
+    border-bottom-color: #303030;
+
+    .toc-title {
+      :global(.anticon) {
+        color: #177ddc;
+      }
+    }
+
+    :global(.ant-btn-text) {
+      color: rgba(255, 255, 255, 0.45);
+
+      &:hover {
+        color: #177ddc;
+        background: rgba(255, 255, 255, 0.08);
+      }
+    }
+  }
+
+  .toc-content {
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.25);
+      }
+    }
+
+    // 只在 hover 时显示滚动条（暗色主题）
+    &:not(:hover)::-webkit-scrollbar-thumb {
+      background: transparent;
+    }
+  }
+
+  :global(.toc-tree) {
+    :global(.ant-tree-treenode) {
+      &:hover {
+        background: rgba(255, 255, 255, 0.04);
+      }
+    }
+
+    :global(.ant-tree-node-content-wrapper) {
+      &:hover {
+        background: rgba(24, 144, 255, 0.15);
+      }
+
+      &:global(.ant-tree-node-selected) {
+        background: rgba(24, 144, 255, 0.25);
+
+        .toc-item-title {
+          color: #177ddc;
+        }
+      }
+    }
+
+    .toc-item-title {
+      color: rgba(255, 255, 255, 0.88);
+
+      &[data-level='1'] {
+        color: rgba(255, 255, 255, 0.88);
+      }
+
+      &[data-level='2'] {
+        color: rgba(255, 255, 255, 0.75);
+      }
+
+      &[data-level='3'] {
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      &[data-level='4'],
+      &[data-level='5'],
+      &[data-level='6'] {
+        color: rgba(255, 255, 255, 0.55);
+      }
+    }
+
+    :global(.ant-tree-switcher) {
+      color: rgba(255, 255, 255, 0.45);
+
+      &:hover {
+        color: #177ddc;
+      }
+    }
+  }
+}
+
+// 打印时隐藏大纲
+@media print {
+  .table-of-contents {
+    display: none !important;
+  }
+}

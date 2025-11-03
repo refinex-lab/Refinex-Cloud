@@ -331,3 +331,260 @@
   }
 }
 
+// ==================== 暗色模式适配 ====================
+.realDark {
+  // 全部标签 Popover 暗色适配
+  .tag-selector-all-overlay {
+    .ant-popover-inner {
+      background: #1f1f1f;
+      border-color: #303030;
+    }
+
+    .ant-popover-inner-content {
+      background: #1f1f1f;
+    }
+
+    .tag-selector-all-tags {
+      .all-tags-title {
+        color: rgba(255, 255, 255, 0.88);
+        border-bottom-color: #303030;
+      }
+    }
+  }
+
+  // Popover 样式暗色适配
+  .tag-selector-overlay {
+    .ant-popover-inner {
+      background: #1f1f1f;
+      border-color: #303030;
+    }
+
+    .ant-popover-title {
+      background: #1f1f1f;
+      border-bottom-color: #303030;
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    .ant-popover-inner-content {
+      background: #1f1f1f;
+    }
+  }
+
+  // Popover 内容区域暗色适配
+  .tag-selector-popover {
+    .tag-list-container {
+      &::-webkit-scrollbar-track {
+        background: #262626;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: #434343;
+
+        &:hover {
+          background: #595959;
+        }
+      }
+    }
+
+    .tag-item {
+      // Tag 本身的暗色样式
+      .ant-tag {
+        // 默认状态 - 暗色背景
+        &[color="blue"] {
+          background: #111b26;
+          color: #91d5ff;
+        }
+
+        &[color="green"] {
+          background: #162312;
+          color: #95de64;
+        }
+
+        &[color="orange"] {
+          background: #2b2111;
+          color: #ffc069;
+        }
+
+        &[color="red"] {
+          background: #2a1215;
+          color: #ff7875;
+        }
+
+        &[color="purple"] {
+          background: #1d1028;
+          color: #b37feb;
+        }
+
+        &[color="cyan"] {
+          background: #112123;
+          color: #87e8de;
+        }
+
+        &[color="geekblue"] {
+          background: #10152b;
+          color: #85a5ff;
+        }
+
+        &[color="magenta"] {
+          background: #291321;
+          color: #ff85c0;
+        }
+
+        &[color="volcano"] {
+          background: #2b1611;
+          color: #ff9c6e;
+        }
+
+        &[color="gold"] {
+          background: #2b2111;
+          color: #ffc53d;
+        }
+
+        &[color="lime"] {
+          background: #1f2611;
+          color: #d3f261;
+        }
+      }
+
+      // Hover 效果暗色
+      &:hover {
+        .ant-tag {
+          &[color="blue"] {
+            background: #153450;
+            border-color: #15395b;
+          }
+
+          &[color="green"] {
+            background: #1d3712;
+            border-color: #274916;
+          }
+
+          &[color="orange"] {
+            background: #3f2a11;
+            border-color: #594214;
+          }
+
+          &[color="red"] {
+            background: #3c171a;
+            border-color: #531d1f;
+          }
+
+          &[color="purple"] {
+            background: #2b1640;
+            border-color: #391e55;
+          }
+
+          &[color="cyan"] {
+            background: #163234;
+            border-color: #1e4749;
+          }
+
+          &[color="geekblue"] {
+            background: #16203f;
+            border-color: #1d2e5a;
+          }
+
+          &[color="magenta"] {
+            background: #3c1d2f;
+            border-color: #521d43;
+          }
+
+          &[color="volcano"] {
+            background: #3f2016;
+            border-color: #5a2b1e;
+          }
+
+          &[color="gold"] {
+            background: #3f2a11;
+            border-color: #594214;
+          }
+
+          &[color="lime"] {
+            background: #2e3716;
+            border-color: #3e491e;
+          }
+        }
+      }
+
+      // 选中状态暗色（保持亮色，对比更明显）
+      &.selected {
+        .ant-tag {
+          &[color="blue"] {
+            background: #177ddc;
+            color: #fff;
+            border-color: #177ddc;
+          }
+
+          &[color="green"] {
+            background: #49aa19;
+            color: #fff;
+            border-color: #49aa19;
+          }
+
+          &[color="orange"] {
+            background: #d87a16;
+            color: #fff;
+            border-color: #d87a16;
+          }
+
+          &[color="red"] {
+            background: #d32029;
+            color: #fff;
+            border-color: #d32029;
+          }
+
+          &[color="purple"] {
+            background: #642ab5;
+            color: #fff;
+            border-color: #642ab5;
+          }
+
+          &[color="cyan"] {
+            background: #13a8a8;
+            color: #fff;
+            border-color: #13a8a8;
+          }
+
+          &[color="geekblue"] {
+            background: #2b4acb;
+            color: #fff;
+            border-color: #2b4acb;
+          }
+
+          &[color="magenta"] {
+            background: #cb2b7d;
+            color: #fff;
+            border-color: #cb2b7d;
+          }
+
+          &[color="volcano"] {
+            background: #d84a1b;
+            color: #fff;
+            border-color: #d84a1b;
+          }
+
+          &[color="gold"] {
+            background: #d89614;
+            color: #fff;
+            border-color: #d89614;
+          }
+
+          &[color="lime"] {
+            background: #8bbb11;
+            color: #fff;
+            border-color: #8bbb11;
+          }
+        }
+      }
+    }
+
+    .tag-selector-footer {
+      border-top-color: #303030;
+
+      .tag-count {
+        color: rgba(255, 255, 255, 0.65);
+      }
+    }
+  }
+}
+

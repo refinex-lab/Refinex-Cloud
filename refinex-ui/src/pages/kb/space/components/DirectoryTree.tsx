@@ -1,5 +1,4 @@
 import {
-  ArrowLeftOutlined,
   CaretDownOutlined,
   CaretRightOutlined,
   DeleteOutlined,
@@ -10,24 +9,29 @@ import {
   FilePdfOutlined,
   FileTextOutlined,
   FolderAddOutlined,
-  FolderFilled,
-  FolderOpenFilled,
   MoreOutlined,
   PlusOutlined,
   SearchOutlined,
+  SwapOutlined,
 } from '@ant-design/icons';
-import { App, Dropdown, Empty, Input, Modal, Spin, Tag, Tree } from 'antd';
+import { BsFolder2, BsFolder2Open } from 'react-icons/bs';
+import { IoDocumentTextOutline } from 'react-icons/io5';
+import { FiBox } from 'react-icons/fi';
+import { GrHomeRounded } from 'react-icons/gr';
+import { App, Dropdown, Empty, Input, Modal, Spin, Tree } from 'antd';
 import type { MenuProps } from 'antd';
 import type { DataNode } from 'antd/es/tree';
 import React, { useEffect, useMemo, useState } from 'react';
-import type { ContentTreeNode } from '@/services/kb/typings.d';
-import { DocumentStatus, TreeNodeType } from '@/services/kb/typings.d';
+import { history, useLocation } from '@umijs/max';
+import type { ContentSpace, ContentTreeNode } from '@/services/kb/typings.d';
+import { TreeNodeType } from '@/services/kb/typings.d';
 import {
   deleteDirectory,
   getDirectoryTreeWithDocs,
   moveDirectory,
 } from '@/services/kb/directory';
 import { deleteDocument, getDocumentByGuid } from '@/services/kb/document';
+import { getMyContentSpaces } from '@/services/kb/space';
 import { exportToMarkdown, exportToPDF } from '@/utils/documentExport';
 import DirectoryFormModal from './DirectoryFormModal';
 import DocumentFormModal from './DocumentFormModal';
@@ -58,6 +62,7 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
   spaceName,
 }) => {
   const { message } = App.useApp();
+  const location = useLocation();
   const [treeData, setTreeData] = useState<ContentTreeNode[]>([]);
   const [loading, setLoading] = useState(false);
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
@@ -66,6 +71,10 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
   const [autoExpandParent, setAutoExpandParent] = useState(true);
   const [hoverKey, setHoverKey] = useState<React.Key | null>(null);
   const [dropdownOpenKey, setDropdownOpenKey] = useState<React.Key | null>(null);
+
+  // 空间列表
+  const [spaceList, setSpaceList] = useState<ContentSpace[]>([]);
+  const [loadingSpaces, setLoadingSpaces] = useState(false);
 
   // 目录弹窗状态
   const [formModalVisible, setFormModalVisible] = useState(false);
@@ -96,8 +105,24 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
     }
   };
 
+  // 加载空间列表
+  const loadSpaceList = async () => {
+    setLoadingSpaces(true);
+    try {
+      const response = await getMyContentSpaces();
+      if (response.success && response.data) {
+        setSpaceList(response.data);
+      }
+    } catch (error) {
+      console.error('加载空间列表失败:', error);
+    } finally {
+      setLoadingSpaces(false);
+    }
+  };
+
   useEffect(() => {
     loadTree();
+    loadSpaceList();
   }, [spaceId]);
 
   // 同步外部选中状态
@@ -130,6 +155,17 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
       });
     };
     traverse(nodes);
+    return keys;
+  };
+
+  // 递归获取节点及其所有子孙节点的 key
+  const getAllDescendantKeys = (node: ContentTreeNode): React.Key[] => {
+    const keys: React.Key[] = [node.key];
+    if (node.children && node.children.length > 0) {
+      node.children.forEach((child) => {
+        keys.push(...getAllDescendantKeys(child));
+      });
+    }
     return keys;
   };
 
@@ -575,22 +611,14 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
     const isDocument = nodeData.nodeType === TreeNodeType.DOCUMENT;
 
     // 选择图标
-    let IconComponent: React.ComponentType<any> = FolderFilled;
+    let IconComponent: React.ComponentType<any> = BsFolder2;
     let iconColor = '#1890ff';
 
     if (isDirectory) {
-      IconComponent = isExpanded ? FolderOpenFilled : FolderFilled;
+      IconComponent = isExpanded ? BsFolder2Open : BsFolder2;
       iconColor = isSearching && node.title !== nodeData.directoryName ? '#faad14' : '#1890ff';
     } else if (isDocument) {
-      IconComponent = FileTextOutlined;
-      // 根据文档状态显示不同颜色
-      if (nodeData.docStatus === DocumentStatus.DRAFT) {
-        iconColor = '#8c8c8c'; // 草稿：灰色
-      } else if (nodeData.docStatus === DocumentStatus.OFFLINE) {
-        iconColor = '#ff4d4f'; // 下架：红色
-      } else {
-        iconColor = '#52c41a'; // 已发布：绿色
-      }
+      IconComponent = IoDocumentTextOutline;
     }
 
     // 点击节点内容区域
@@ -598,7 +626,9 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
       // 对于目录，切换展开状态
       if (isDirectory && node.children && node.children.length > 0) {
         if (isExpanded) {
-          setExpandedKeys(expandedKeys.filter((k) => k !== node.key));
+          // 折叠时，需要移除当前节点及其所有子孙节点的 key
+          const keysToRemove = getAllDescendantKeys(nodeData);
+          setExpandedKeys(expandedKeys.filter((k) => !keysToRemove.includes(k)));
         } else {
           setExpandedKeys([...expandedKeys, node.key]);
         }
@@ -626,18 +656,6 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
 
           {/* 文字标签 */}
           <span className="tree-node-label">{node.title}</span>
-
-          {/* 文档状态标签 */}
-          {isDocument && nodeData.docStatus === DocumentStatus.DRAFT && (
-            <Tag color="default" style={{ marginLeft: 4, fontSize: 12 }}>
-              草稿
-            </Tag>
-          )}
-          {isDocument && nodeData.docStatus === DocumentStatus.OFFLINE && (
-            <Tag color="error" style={{ marginLeft: 4, fontSize: 12 }}>
-              已下架
-            </Tag>
-          )}
         </div>
 
         {/* 操作按钮（始终渲染，通过 opacity 控制显示） */}
@@ -667,25 +685,71 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
     );
   };
 
+  // 空间切换菜单
+  const getSpaceMenuItems = (): MenuProps['items'] => {
+    const items: MenuProps['items'] = [
+      {
+        key: 'home',
+        label: (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <GrHomeRounded style={{ fontSize: 16 }} />
+            <span>空间首页</span>
+          </div>
+        ),
+        onClick: () => {
+          history.push('/kb/space');
+        },
+      },
+    ];
+
+    // 如果有空间列表，添加分隔线
+    if (spaceList.length > 0) {
+      items.push({
+        key: 'divider',
+        type: 'divider',
+      });
+    }
+
+    // 添加空间列表（显示最多 10 个空间）
+    // 判断是前台还是后台路由
+    const isAdminRoute = location.pathname.startsWith('/kb-admin');
+
+    const spaceItems = spaceList
+      .slice(0, 10) // 最多显示 10 个
+      .map((space) => {
+        const isCurrent = space.id === spaceId;
+        return {
+          key: `space-${space.id}`,
+          label: (
+            <div className="space-menu-item">
+              <FiBox style={{ fontSize: 14, color: '#1890ff' }} />
+              <span className="space-menu-label">{space.spaceName}</span>
+              {isCurrent && <div className="current-indicator" />}
+            </div>
+          ),
+          disabled: isCurrent, // 当前空间禁用点击
+          onClick: () => {
+            if (!isCurrent) {
+              // 根据当前路由判断跳转路径
+              if (isAdminRoute) {
+                // 后台管理：使用 spaceId
+                history.push(`/kb-admin/space/detail/${space.id}`);
+              } else {
+                // 前台用户：使用 spaceCode
+                history.push(`/kb/space/${space.spaceCode}`);
+              }
+            }
+          },
+        };
+      });
+
+    return [...items, ...spaceItems];
+  };
+
   return (
     <div className="directory-tree-container">
       {/* 顶部工具栏 */}
       <div className="tree-toolbar">
-        {/* 返回按钮和空间名称 */}
-        {showBackButton && (
-          <div className="toolbar-header">
-            <button
-              type="button"
-              className="tree-back-btn"
-              onClick={onBack}
-              title="返回空间列表"
-            >
-              <ArrowLeftOutlined />
-            </button>
-            {spaceName && <div className="space-name">{spaceName}</div>}
-          </div>
-        )}
-
         <div className="toolbar-row">
           <Input
             placeholder="搜索目录或文档..."
@@ -787,6 +851,29 @@ const DirectoryTree: React.FC<DirectoryTreeProps> = ({
         onSuccess={handleDocumentSuccess}
         onCancel={() => setDocFormVisible(false)}
       />
+
+      {/* 底部空间切换器 */}
+      {showBackButton && (
+        <div className="tree-footer">
+          <Dropdown
+            menu={{ items: getSpaceMenuItems() }}
+            trigger={['click']}
+            placement="topLeft"
+            overlayClassName="space-switcher-dropdown"
+            disabled={loadingSpaces}
+          >
+            <button
+              type="button"
+              className="space-switcher-btn"
+              title="切换空间"
+            >
+              <FiBox className="space-icon" />
+              <span className="space-name">{spaceName || '当前空间'}</span>
+              <SwapOutlined className="switch-icon" />
+            </button>
+          </Dropdown>
+        </div>
+      )}
     </div>
   );
 };

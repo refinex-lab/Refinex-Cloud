@@ -1,11 +1,10 @@
-import { MoonOutlined, SunOutlined } from '@ant-design/icons';
-import { useModel } from '@umijs/max';
-import { createStyles } from 'antd-style';
-import React, { useEffect, useState } from 'react';
-import { flushSync } from 'react-dom';
-import type { MenuProps } from 'antd';
-import { Dropdown } from 'antd';
+import {MoonOutlined, SunOutlined} from '@ant-design/icons';
+import {useModel} from '@umijs/max';
+import {createStyles} from 'antd-style';
+import React, {useEffect, useState} from 'react';
+import type {MenuProps} from 'antd';
 import HeaderDropdown from '../HeaderDropdown';
+import {executeThemeTransition, getRecommendedConfig} from '@/utils/themeTransition';
 
 type ThemeMode = 'light' | 'dark';
 
@@ -22,6 +21,18 @@ const useStyles = createStyles(({ token }) => {
       transition: 'all 0.3s',
       '&:hover': {
         backgroundColor: token.colorBgTextHover,
+      },
+    },
+    iconWrapper: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '18px',
+      height: '18px',
+      position: 'relative',
+      transition: 'transform 0.3s ease-in-out',
+      '&:hover': {
+        transform: 'rotate(20deg) scale(1.1)',
       },
     },
   };
@@ -51,13 +62,15 @@ export const ThemeSwitch: React.FC = () => {
 
   const currentTheme = initialState?.settings?.navTheme || getCurrentTheme();
 
-  // 应用主题
+  // 应用主题（带过渡动画）
   const applyTheme = (themeMode: ThemeMode): void => {
     const newTheme = themeMode === 'dark' ? 'realDark' : 'light';
 
-    setCurrentThemeMode(themeMode);
+    // 使用 View Transitions API 或传统过渡效果
+    // 使用 elegant 模式：600ms 优雅过渡动画
+    executeThemeTransition(() => {
+      setCurrentThemeMode(themeMode);
 
-    flushSync(() => {
       setInitialState((preInitialState) => ({
         ...preInitialState,
         settings: {
@@ -65,10 +78,10 @@ export const ThemeSwitch: React.FC = () => {
           navTheme: newTheme,
         },
       }));
-    });
 
-    // 保存主题模式到 localStorage
-    localStorage.setItem('themeMode', themeMode);
+      // 保存主题模式到 localStorage
+      localStorage.setItem('themeMode', themeMode);
+    }, getRecommendedConfig('elegant'));
   };
 
   const menuItems: MenuProps['items'] = [
@@ -86,9 +99,10 @@ export const ThemeSwitch: React.FC = () => {
     },
   ];
 
-  // 根据当前主题模式显示对应图标
+  // 根据当前主题模式显示对应图标（带动画包裹）
   const getCurrentIcon = () => {
-    return currentTheme === 'light' ? <SunOutlined /> : <MoonOutlined />;
+    const icon = currentTheme === 'light' ? <SunOutlined /> : <MoonOutlined />;
+    return <span className={styles.iconWrapper}>{icon}</span>;
   };
 
   return (

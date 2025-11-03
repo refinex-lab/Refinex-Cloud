@@ -404,37 +404,28 @@ const DirectoryView: React.FC<DirectoryViewProps> = ({
         title={
           <Space>
             <FolderOpenFilled style={{ color: '#1890ff', fontSize: 20 }} />
-            <span style={{ fontSize: 18, fontWeight: 600 }}>{directory.directoryName}</span>
+            <span style={{ fontSize: 16, fontWeight: 600 }}>{directory.directoryName}</span>
           </Space>
         }
         extra={
-          <Space size="middle">
-            <Segmented
-              value={viewMode}
-              onChange={(value) => setViewMode(value as ViewMode)}
-              options={[
-                {
-                  label: '卡片',
-                  value: 'card',
-                  icon: <AppstoreOutlined />,
-                },
-                {
-                  label: '列表',
-                  value: 'list',
-                  icon: <UnorderedListOutlined />,
-                },
-              ]}
-            />
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => onCreateDocument(directory.directoryId!)}
-            >
-              新建文档
-            </Button>
-          </Space>
+          <Segmented
+            value={viewMode}
+            onChange={(value) => setViewMode(value as ViewMode)}
+            options={[
+              {
+                label: '卡片',
+                value: 'card',
+                icon: <AppstoreOutlined />,
+              },
+              {
+                label: '列表',
+                value: 'list',
+                icon: <UnorderedListOutlined />,
+              },
+            ]}
+          />
         }
-        bordered={false}
+        variant="borderless"
         className="directory-view-card"
       >
         {/* 搜索框 */}

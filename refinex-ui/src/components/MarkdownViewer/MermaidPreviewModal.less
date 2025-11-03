@@ -87,22 +87,24 @@
   }
 }
 
-// 深色主题适配
-[data-theme='dark'] {
+// ==================== 暗色模式适配 ====================
+.realDark {
   .mermaid-preview-modal {
+    // 工具栏暗色适配
     .mermaid-preview-toolbar {
       background: #1f1f1f;
       border-bottom-color: #303030;
 
       .mermaid-preview-scale-info {
-        color: #e8e8e8;
+        color: rgba(255, 255, 255, 0.88);
       }
 
       .mermaid-preview-shortcuts {
-        color: #8c8c8c;
+        color: rgba(255, 255, 255, 0.65);
       }
     }
 
+    // 预览容器暗色适配
     .mermaid-preview-container {
       background: #141414;
       background-image:
@@ -114,7 +116,7 @@
       .mermaid-preview-content {
         .mermaid-preview-diagram {
           background: #1f1f1f;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
         }
       }
     }

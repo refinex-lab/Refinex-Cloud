@@ -38,7 +38,7 @@ public class PromptTemplateResponseDTO {
     @Schema(description = "模板类型", example = "USER")
     private String templateType;
 
-    @Schema(description = "模板分类", example = "写作助手")
+    @Schema(description = "模板分类", example = "writin_assistant")
     private String templateCategory;
 
     @Schema(description = "适用模型数组")
@@ -91,7 +91,7 @@ public class PromptTemplateResponseDTO {
     @Schema(description = "排序字段", example = "0")
     private Integer sort;
 
-    @Schema(description = "状态:0正常,1停用", example = "0")
+    @Schema(description = "状态:1正常,0停用", example = "1")
     private Integer status;
 
     @Schema(description = "扩展数据")

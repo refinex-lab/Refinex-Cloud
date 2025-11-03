@@ -14,13 +14,11 @@ import {
   Pagination,
   Space,
   Spin,
-  Tabs,
   Badge,
   Tooltip,
 } from 'antd';
 import {
   ClearOutlined,
-  CloseOutlined,
   SwapOutlined,
   ReloadOutlined,
   SearchOutlined,

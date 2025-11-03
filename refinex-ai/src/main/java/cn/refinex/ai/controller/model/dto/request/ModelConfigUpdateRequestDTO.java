@@ -114,7 +114,7 @@ public class ModelConfigUpdateRequestDTO {
     @NotNull(message = "状态不能为空")
     @Min(value = 0, message = "状态只能为0或1")
     @Max(value = 1, message = "状态只能为0或1")
-    @Schema(description = "状态:0正常,1停用", example = "0", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "状态:1正常,0停用", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     private Integer status;
 
     @Schema(description = "扩展数据（JSON格式）")

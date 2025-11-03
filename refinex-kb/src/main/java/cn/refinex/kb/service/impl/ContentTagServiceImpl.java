@@ -1,5 +1,6 @@
 package cn.refinex.kb.service.impl;
 
+import cn.refinex.common.constants.SystemStatusConstants;
 import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.jdbc.core.JdbcTemplateManager;
 import cn.refinex.common.jdbc.page.PageRequest;
@@ -67,7 +68,7 @@ public class ContentTagServiceImpl implements ContentTagService {
         }
 
         if (entity.getStatus() == null) {
-            entity.setStatus(0);
+            entity.setStatus(SystemStatusConstants.NORMAL_VALUE);
         }
 
         return jdbcManager.executeInTransaction(tx -> contentTagRepository.insert(tx, entity));

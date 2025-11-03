@@ -1,6 +1,7 @@
 package cn.refinex.platform.service.impl;
 
 import cn.refinex.common.constants.SystemRedisKeyConstants;
+import cn.refinex.common.constants.SystemStatusConstants;
 import cn.refinex.common.exception.BusinessException;
 import cn.refinex.common.jdbc.page.PageRequest;
 import cn.refinex.common.jdbc.page.PageResult;
@@ -83,7 +84,7 @@ public class SysDictServiceImpl implements SysDictService {
                 .deleted(0)
                 .version(0)
                 .remark(remark)
-                .status(status == null ? 0 : status)
+                .status(status == null ? SystemStatusConstants.NORMAL_VALUE : status)
                 .build();
 
         int rows = dictTypeRepository.insert(type);
@@ -456,7 +457,7 @@ public class SysDictServiceImpl implements SysDictService {
             throw new BusinessException("字典类型不存在");
         }
         // 校验字典类型是否停用
-        if (type.getStatus() != null && type.getStatus() == 1) {
+        if (type.getStatus() != null && Objects.equals(type.getStatus(), SystemStatusConstants.DISABLE_VALUE)) {
             throw new BusinessException("字典类型已停用");
         }
         // 校验字典标签、值的唯一性
@@ -484,7 +485,7 @@ public class SysDictServiceImpl implements SysDictService {
                 .deleted(0)
                 .version(0)
                 .remark(request.getRemark())
-                .status(request.getStatus() == null ? 0 : request.getStatus())
+                .status(request.getStatus() == null ? SystemStatusConstants.NORMAL_VALUE : request.getStatus())
                 .build();
 
         int rows = dictDataRepository.insert(data);
@@ -518,7 +519,7 @@ public class SysDictServiceImpl implements SysDictService {
             throw new BusinessException("字典类型不存在");
         }
         // 校验字典类型是否停用
-        if (type.getStatus() != null && type.getStatus() == 1) {
+        if (type.getStatus() != null && Objects.equals(type.getStatus(), SystemStatusConstants.DISABLE_VALUE)) {
             throw new BusinessException("字典类型已停用");
         }
         // 校验字典标签、值的唯一性（排除当前字典数据）
@@ -678,7 +679,7 @@ public class SysDictServiceImpl implements SysDictService {
             throw new BusinessException("字典类型不存在");
         }
         // 校验字典类型是否停用
-        if (type.getStatus() != null && type.getStatus() == 1) {
+        if (type.getStatus() != null && Objects.equals(type.getStatus(), SystemStatusConstants.DISABLE_VALUE)) {
             throw new BusinessException("字典类型已停用");
         }
 

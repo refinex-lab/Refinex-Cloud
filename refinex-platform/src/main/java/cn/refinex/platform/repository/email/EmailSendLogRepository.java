@@ -152,7 +152,7 @@ public class EmailSendLogRepository {
             """;
 
         Map<String, Object> params = Map.of("startTime", startTime, "endTime", endTime);
-        Integer count = jdbcManager.queryObject(sql, params, Integer.class);
+        Integer count = jdbcManager.queryInt(sql, params);
         return count != null ? count : 0;
     }
 
@@ -171,7 +171,7 @@ public class EmailSendLogRepository {
             """;
 
         Map<String, Object> params = Map.of("startTime", startTime, "endTime", endTime);
-        Integer count = jdbcManager.queryObject(sql, params, Integer.class);
+        Integer count = jdbcManager.queryInt(sql, params);
         return count != null ? count : 0;
     }
 
@@ -195,7 +195,7 @@ public class EmailSendLogRepository {
                 "startTime", startTime,
                 "endTime", endTime
         );
-        Integer count = jdbcManager.queryObject(sql, params, Integer.class);
+        Integer count = jdbcManager.queryInt(sql, params);
         return count != null ? count : 0;
     }
 

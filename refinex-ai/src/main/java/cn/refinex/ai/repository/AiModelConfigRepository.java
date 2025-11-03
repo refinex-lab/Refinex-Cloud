@@ -71,7 +71,7 @@ public class AiModelConfigRepository {
     public List<AiModelConfig> findByProviderAndType(String provider, String modelType) {
         String sql = """
                 SELECT * FROM ai_model_config
-                WHERE provider = :provider AND model_type = :modelType 
+                WHERE provider = :provider AND model_type = :modelType
                     AND is_enabled = 1 AND deleted = 0
                 ORDER BY priority DESC, id ASC
                 """;

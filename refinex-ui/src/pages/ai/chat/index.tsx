@@ -1,53 +1,49 @@
 import {
   ApiOutlined,
-  AppstoreAddOutlined,
   CloudUploadOutlined,
   CopyOutlined,
   DeleteOutlined,
   DislikeOutlined,
   DownOutlined,
   EditOutlined,
-  ExperimentOutlined,
-  FileSearchOutlined,
   FileImageOutlined,
+  FileSearchOutlined,
   FolderOutlined,
-  GlobalOutlined,
   LikeOutlined,
-  LinkOutlined,
   PaperClipOutlined,
-  ProductOutlined,
   RedoOutlined,
-  ReloadOutlined,
   RobotOutlined,
-  ScheduleOutlined,
   SearchOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { TbLayoutSidebarLeftCollapse, TbLayoutSidebarRightCollapse } from 'react-icons/tb';
+import {TbLayoutSidebarLeftCollapse, TbLayoutSidebarRightCollapse} from 'react-icons/tb';
+import type {BubbleProps} from '@ant-design/x';
 import {
   Actions,
   type ActionsProps,
   Attachments,
   Bubble,
   Conversations,
-  Prompts,
   Sender,
   Suggestion,
-  Welcome,
   useXAgent,
   useXChat,
+  Welcome,
 } from '@ant-design/x';
-import { Avatar, Button, Divider, Dropdown, Flex, type GetProp, Input, Modal, Space, Spin, Switch, message, theme } from 'antd';
-import { createStyles } from 'antd-style';
+import {Button, Divider, Dropdown, Flex, type GetProp, Input, message, Modal, Space, Spin, Switch, theme} from 'antd';
+import {createStyles} from 'antd-style';
 import dayjs from 'dayjs';
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import AiBlueIcon from '@/assets/images/ai/ai_blue_icon.svg';
 import MarkdownViewer from '@/components/MarkdownViewer';
-import type { BubbleProps } from '@ant-design/x';
-import { GPTVis } from '@antv/gpt-vis';
-import type { ModelConfig } from '@/services/ai/typings.d';
-import { listAllModelConfigs } from '@/services/ai/model-config';
+import {GPTVis} from '@antv/gpt-vis';
+import type {ModelConfig, PromptTemplate} from '@/services/ai/typings.d';
+import {listAllModelConfigs} from '@/services/ai/model-config';
+import {listAllPromptTemplates} from '@/services/ai/prompt-template';
+import {listDictDataByTypeCode} from '@/services/system/dictionary';
+import type {DictData} from '@/services/system/typings';
 
 type BubbleDataType = {
   role: string;
@@ -91,73 +87,6 @@ const FEATURE_MENU_ITEMS = [
   { key: 'image-gen', label: '图片生成', icon: <FileImageOutlined /> },
   { key: 'video-gen', label: '视频生成', icon: <VideoCameraOutlined /> },
   { key: 'project', label: '项目', icon: <FolderOutlined /> },
-];
-
-// 快捷指令数据
-const SUGGESTION_ITEMS: SuggestionItems = [
-  {
-    label: '📝 撰写内容',
-    value: 'writing',
-    icon: <EditOutlined />,
-    children: [
-      { label: '写一份报告', value: 'write-report' },
-      { label: '写一篇文章', value: 'write-article' },
-      { label: '写邮件', value: 'write-email' },
-      { label: '写周报', value: 'write-weekly' },
-    ],
-  },
-  {
-    label: '💡 创意生成',
-    value: 'creative',
-    icon: <ExperimentOutlined />,
-    children: [
-      { label: '头脑风暴', value: 'brainstorm' },
-      { label: '取名字', value: 'naming' },
-      { label: '生成方案', value: 'generate-plan' },
-    ],
-  },
-  {
-    label: '📚 知识问答',
-    value: 'knowledge',
-    icon: <FileSearchOutlined />,
-    children: [
-      { label: '关于 React', value: 'about-react' },
-      { label: '关于 Spring Boot', value: 'about-spring' },
-      { label: '关于 AI', value: 'about-ai' },
-      { label: '关于数据库', value: 'about-database' },
-    ],
-  },
-  {
-    label: '🔧 代码助手',
-    value: 'code',
-    icon: <RobotOutlined />,
-    children: [
-      { label: '代码审查', value: 'code-review' },
-      { label: '优化代码', value: 'optimize-code' },
-      { label: '生成测试', value: 'generate-test' },
-      { label: '解释代码', value: 'explain-code' },
-    ],
-  },
-  {
-    label: '🔍 数据分析',
-    value: 'analysis',
-    icon: <ScheduleOutlined />,
-    children: [
-      { label: '分析数据', value: 'analyze-data' },
-      { label: '生成图表', value: 'generate-chart' },
-      { label: '制作仪表板', value: 'create-dashboard' },
-    ],
-  },
-  {
-    label: '🎨 设计辅助',
-    value: 'design',
-    icon: <AppstoreAddOutlined />,
-    children: [
-      { label: '设计界面', value: 'design-ui' },
-      { label: '生成配色', value: 'generate-colors' },
-      { label: '制作原型', value: 'create-prototype' },
-    ],
-  },
 ];
 
 const useStyle = createStyles(({ token, css }) => {
@@ -662,6 +591,12 @@ const AIChatPage: React.FC = () => {
   const [selectedKnowledgeBase, setSelectedKnowledgeBase] = useState<typeof MOCK_KNOWLEDGE_BASES[0] | null>(null);
   const [modelsLoading, setModelsLoading] = useState(false);
 
+  // 快捷指令状态
+  const [suggestionItems, setSuggestionItems] = useState<SuggestionItems>([]);
+  const [_suggestionsLoading, setSuggestionsLoading] = useState(false);
+  // 模板代码到模板内容的映射
+  const [templateContentMap, setTemplateContentMap] = useState<Map<string, string>>(new Map());
+
   // 深度思考和联网搜索状态
   const [deepThinkEnabled, setDeepThinkEnabled] = useState(false);
   const [webSearchEnabled, setWebSearchEnabled] = useState(false);
@@ -689,7 +624,7 @@ const AIChatPage: React.FC = () => {
   const [agent] = useXAgent<BubbleDataType>({
     baseURL: 'https://api.deepseek.com/chat/completions',
     model: 'deepseek-reasoner',
-    dangerouslyApiKey: 'Bearer sk-5555ec224',
+    dangerouslyApiKey: 'Bearer sk-5555ec224cd34d1583dedc1000fb9dba',
   });
   const loading = agent.isRequesting();
 
@@ -1189,7 +1124,7 @@ const AIChatPage: React.FC = () => {
               // 🌟 Markdown 渲染：AI 回复使用 Markdown 渲染
               messageRender: renderMarkdown,
               // 🌟 Actions 操作按钮
-              footer: (messageContent: string, info: { key?: string | number }) => (
+              footer: (messageContent: string, _info: { key?: string | number }) => (
                 <Actions
                   items={actionItems}
                   onClick={(actionInfo) => handleActionsClick(actionInfo, messageContent)}
@@ -1212,7 +1147,7 @@ const AIChatPage: React.FC = () => {
               // 用户消息也支持 Markdown
               messageRender: renderMarkdown,
               // 🌟 用户消息操作按钮
-              footer: (messageContent: string, info: { key?: string | number }) => (
+              footer: (messageContent: string, _info: { key?: string | number }) => (
                 <Actions
                   items={[
                     {
@@ -1442,14 +1377,21 @@ const AIChatPage: React.FC = () => {
 
       {/* 🌟 快捷指令 + 输入框 */}
       <Suggestion
-        items={SUGGESTION_ITEMS}
+        items={suggestionItems}
         onSelect={(itemVal) => {
-          // 选中快捷指令后，设置对应的值
-          const selectedLabel = SUGGESTION_ITEMS.flatMap(item =>
-            item.children ? item.children : [item]
-          ).find(item => item.value === itemVal)?.label || itemVal;
+          // 选中快捷指令后，从 Map 中获取模板内容并填充到输入框
+          const templateContent = templateContentMap.get(itemVal);
 
-          setInputValue(`[${selectedLabel}]: `);
+          if (templateContent) {
+            // 如果有模板内容，直接填充完整内容
+            setInputValue(templateContent);
+          } else {
+            // 否则使用标签作为提示
+            const selectedTemplate = suggestionItems.flatMap(item =>
+              item.children ? item.children : [item]
+            ).find(item => item.value === itemVal);
+            setInputValue(`[${selectedTemplate?.label || itemVal}]: `);
+          }
         }}
       >
         {({ onTrigger, onKeyDown }) => (
@@ -1471,6 +1413,10 @@ const AIChatPage: React.FC = () => {
             footer={renderSenderFooter}
             actions={false}
             onSubmit={() => {
+              // 防止在只输入 "/" 时误发送消息
+              if (inputValue.trim() === '/') {
+                return;
+              }
               onSubmit(inputValue);
               setInputValue('');
             }}
@@ -1486,6 +1432,84 @@ const AIChatPage: React.FC = () => {
     </div>
   );
 
+  // 🌟 加载快捷指令模板
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      setSuggestionsLoading(true);
+      try {
+        // 并行加载模板数据和字典数据
+        const [templatesResponse, dictResponse] = await Promise.all([
+          listAllPromptTemplates(),
+          listDictDataByTypeCode('ai_prompt_category'),
+        ]);
+
+        if (templatesResponse.code === 200 && templatesResponse.data) {
+          // 只显示已启用且状态正常的模板
+          const enabledTemplates = templatesResponse.data.filter(
+            (template) => template.status === 1
+          );
+
+          // 创建模板代码到模板内容的映射
+          const contentMap = new Map<string, string>();
+          enabledTemplates.forEach((template) => {
+            contentMap.set(template.templateCode, template.templateContent);
+          });
+          setTemplateContentMap(contentMap);
+
+          // 创建分类编码到分类名称的映射（从字典数据）
+          const categoryLabelMap = new Map<string, string>();
+          if (dictResponse.code === 200 && dictResponse.data) {
+            dictResponse.data.forEach((dictItem: DictData) => {
+              categoryLabelMap.set(dictItem.dictValue, dictItem.dictLabel);
+            });
+          }
+
+          // 按 templateCategory 分组
+          const categoryMap = new Map<string, PromptTemplate[]>();
+          enabledTemplates.forEach((template) => {
+            const categoryCode = template.templateCategory || 'other';
+            if (!categoryMap.has(categoryCode)) {
+              categoryMap.set(categoryCode, []);
+            }
+            categoryMap.get(categoryCode)?.push(template);
+          });
+
+          // 转换为 Suggestion 组件需要的格式
+          const suggestions: SuggestionItems = Array.from(categoryMap.entries()).map(
+            ([categoryCode, templates]) => ({
+              label: categoryLabelMap.get(categoryCode) || categoryCode,
+              value: categoryCode,
+              children: templates.map((template) => ({
+                label: template.templateName,
+                value: template.templateCode,
+              })),
+            })
+          );
+
+          // 按 sort 排序每个分组中的模板
+          suggestions.forEach((group) => {
+            if (group.children) {
+              group.children.sort((a, b) => {
+                const templateA = enabledTemplates.find((t) => t.templateCode === a.value);
+                const templateB = enabledTemplates.find((t) => t.templateCode === b.value);
+                return (templateA?.sort || 0) - (templateB?.sort || 0);
+              });
+            }
+          });
+
+          setSuggestionItems(suggestions);
+        }
+      } catch (error) {
+        console.error('加载快捷指令失败:', error);
+        message.error('加载快捷指令失败');
+      } finally {
+        setSuggestionsLoading(false);
+      }
+    };
+
+    fetchSuggestions();
+  }, []);
+
   // 🌟 加载可用模型列表
   useEffect(() => {
     const fetchModels = async () => {
@@ -1495,7 +1519,7 @@ const AIChatPage: React.FC = () => {
         if (response.code === 200 && response.data) {
           // 只显示已启用且状态正常的模型
           const enabledModels = response.data.filter(
-            (model) => model.isEnabled === 1 && model.status === 0
+            (model) => model.isEnabled === 1 && model.status === 1
           );
           // 按优先级排序
           enabledModels.sort((a, b) => b.priority - a.priority);

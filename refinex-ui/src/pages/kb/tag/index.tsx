@@ -293,14 +293,8 @@ const TagManagement: React.FC = () => {
   return (
     <PageContainer
       header={{
-        title: '标签管理',
-        subTitle: '管理您的标签，让知识更有条理',
-        breadcrumb: {
-          items: [
-            { title: '知识库' },
-            { title: '标签管理' },
-          ],
-        },
+        title: false,
+        subTitle: false
       }}
     >
       {/* 统计卡片 */}
